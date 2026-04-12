@@ -1601,7 +1601,7 @@ std::string Transaction::toJSON(int parts) {
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
             std::string header_name =
-                utils::string::toHexIfNeeded(h->getKey().c_str());
+                utils::string::toHexIfNeeded(h->getKey());
             std::string header_value =
                 utils::string::toHexIfNeeded(h->getValue());
             addString(header_name, header_value);

@@ -14,6 +14,7 @@ Exit codes:
  13  backend result difference
  64  invalid usage
 EOF
+    return
 }
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -76,6 +77,7 @@ extract_summary() {
             print backend "\t" m[2] "\t" m[3] "\t" m[1];
         }
     ' "${input_log}" > "${output_tsv}"
+    return
 }
 
 run_backend() {

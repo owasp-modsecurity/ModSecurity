@@ -192,9 +192,21 @@ endfunction()
 
 # unit tests
 file(GLOB unitTestSources ${BASE_DIR}/test/unit/*.cc)
+
+list(REMOVE_ITEM unitTestSources
+  ${BASE_DIR}/test/unit/json_backend_depth_tests.cc
+)
+
 add_executable(unit_tests ${unitTestSources} ${BASE_DIR}/test/common/custom_debug_log.cc)
 setTestTargetProperties(unit_tests)
 target_compile_options(unit_tests PRIVATE /wd4805)
+
+add_executable(json_backend_depth_tests
+  ${BASE_DIR}/test/unit/json_backend_depth_tests.cc
+  ${BASE_DIR}/test/common/custom_debug_log.cc
+)
+setTestTargetProperties(json_backend_depth_tests)
+target_compile_options(json_backend_depth_tests PRIVATE /wd4805)
 
 # regression tests
 file(GLOB regressionTestsSources ${BASE_DIR}/test/regression/*.cc)
@@ -213,6 +225,12 @@ add_regression_test_capability(WITH_LMDB HAVE_LMDB)
 add_regression_test_capability(WITH_MAXMIND HAVE_MAXMIND)
 
 enable_testing()
+
+add_test(
+  NAME json_backend_depth_tests
+  COMMAND json_backend_depth_tests
+  WORKING_DIRECTORY ${BASE_DIR}/test
+)
 
 file(READ ${BASE_DIR}/test/test-suite.in TEST_FILES_RAW)
 string(REPLACE "\n" ";" TEST_FILES ${TEST_FILES_RAW})
@@ -233,15 +251,25 @@ foreach(TEST_FILE ${TEST_FILES})
     # test name
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
 
+    # json_backend_depth_tests is built as a standalone executable,
+    # so skip automatic registration through unit_tests
+    if(TEST_NAME STREQUAL "json_backend_depth_tests")
+      continue()
+    endif()
+
     # determine test runner based on test path prefix
     string(FIND ${TEST_FILE} "test-cases/regression/" is_regression_test)
     if(is_regression_test EQUAL 0)
-        set(TEST_RUNNER "regression_tests")
+      set(TEST_RUNNER "regression_tests")
     else()
-        set(TEST_RUNNER "unit_tests")
+      set(TEST_RUNNER "unit_tests")
     endif()
 
-    add_test(NAME ${TEST_NAME} COMMAND ${TEST_RUNNER} ${TEST_FILE} WORKING_DIRECTORY ${BASE_DIR}/test)
+    add_test(
+      NAME ${TEST_NAME}
+      COMMAND ${TEST_RUNNER} ${TEST_FILE}
+      WORKING_DIRECTORY ${BASE_DIR}/test
+    )
   endif()
 endforeach()
 
@@ -252,7 +280,6 @@ setTestTargetProperties(benchmark)
 # rules_optimization
 add_executable(rules_optimization ${BASE_DIR}/test/optimization/optimization.cc)
 setTestTargetProperties(rules_optimization)
-
 
 # examples
 #

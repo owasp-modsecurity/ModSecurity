@@ -165,7 +165,7 @@ std::unique_ptr<UnitTest> UnitTest::from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }

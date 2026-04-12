@@ -16,7 +16,9 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 #define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
+#include <cstdint>
 #include <deque>
+#include <memory>
 #include <string>
 
 #include "modsecurity/transaction.h"
@@ -53,6 +55,10 @@ class JSON : public JsonEventSink {
  public:
     explicit JSON(Transaction *transaction);
     ~JSON() override;
+    JSON(const JSON &) = delete;
+    JSON &operator=(const JSON &) = delete;
+    JSON(JSON &&) = delete;
+    JSON &operator=(JSON &&) = delete;
 
     bool init();
     bool processChunk(const char *buf, unsigned int size,
@@ -72,13 +78,12 @@ class JSON : public JsonEventSink {
     JsonSinkStatus on_null() override;
 
     bool isPreviousArray() const {
-        const JSONContainerArray *prev = NULL;
-        if (m_containers.size() < 1) {
+        if (m_containers.empty()) {
             return false;
         }
-        prev = dynamic_cast<JSONContainerArray *>(
-            m_containers[m_containers.size() - 1]);
-        return prev != NULL;
+        const JSONContainerArray *prev = dynamic_cast<JSONContainerArray *>(
+            m_containers.back().get());
+        return prev != nullptr;
     }
 
     std::string getCurrentKey(bool emptyIsNull = false) {
@@ -86,8 +91,8 @@ class JSON : public JsonEventSink {
         if (m_containers.size() == 0) {
             return "json";
         }
-        if (m_current_key.empty() == true) {
-            if (isPreviousArray() || emptyIsNull == true) {
+        if (m_current_key.empty()) {
+            if (isPreviousArray() || emptyIsNull) {
                 return "";
             }
             return "empty-key";
@@ -103,7 +108,7 @@ class JSON : public JsonEventSink {
  private:
     void clearContainers();
 
-    std::deque<JSONContainer *> m_containers;
+    std::deque<std::unique_ptr<JSONContainer>> m_containers;
     Transaction *m_transaction;
     std::string m_current_key;
     std::string m_data;

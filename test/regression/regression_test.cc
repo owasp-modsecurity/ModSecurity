@@ -76,7 +76,7 @@ std::vector<std::pair<std::string, std::string>> json_object_to_map(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -90,6 +90,32 @@ std::vector<std::pair<std::string, std::string>> json_object_to_map(
     }
 
     return values;
+}
+
+template <typename Callback>
+void for_each_json_field(modsecurity_test::json::JsonValue value,
+    Callback callback) {
+    modsecurity_test::json::JsonObject object;
+
+    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
+        return;
+    }
+
+    for (auto field_result : object) {
+        modsecurity_test::json::JsonField field;
+        std::string_view key;
+        modsecurity_test::json::JsonValue child;
+
+        if (modsecurity_test::json::get(field_result, &field) == false) {
+            continue;
+        }
+        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
+            continue;
+        }
+
+        child = field.value();
+        callback(key, child);
+    }
 }
 
 void set_int_from_json(int &dest, std::string_view want_key,
@@ -204,27 +230,10 @@ std::unique_ptr<RegressionTest> RegressionTest::from_json_document(
 
 std::unique_ptr<RegressionTest> RegressionTest::from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
     auto test = make_empty_regression_test();
 
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return test;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [&test](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         set_int_from_json(test->enabled, "enabled", key, child);
         set_int_from_json(test->version_min, "version_min", key, child);
         set_opt_int_from_json(test->version_max, "version_max", key, child);
@@ -246,7 +255,7 @@ std::unique_ptr<RegressionTest> RegressionTest::from_json_value(
         } else if (key == "rules") {
             test->update_rules_from_json_value(child);
         }
-    }
+    });
 
     test->name = test->title;
     return test;
@@ -254,81 +263,27 @@ std::unique_ptr<RegressionTest> RegressionTest::from_json_value(
 
 void RegressionTest::update_client_from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
-
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         set_string_from_json(clientIp, "ip", key, child);
         set_int_from_json(clientPort, "port", key, child);
-    }
+    });
 }
 
 void RegressionTest::update_server_from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
-
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         set_string_from_json(serverIp, "ip", key, child);
         set_int_from_json(serverPort, "port", key, child);
         set_string_from_json(hostname, "hostname", key, child);
-    }
+    });
 }
 
 void RegressionTest::update_request_from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
-
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         set_string_from_json(uri, "uri", key, child);
         set_string_from_json(method, "method", key, child);
         if (key == "http_version") {
@@ -339,31 +294,13 @@ void RegressionTest::update_request_from_json_value(
             request_body_lines = json_array_to_vec_string(child);
             request_body = join_strings(request_body_lines);
         }
-    }
+    });
 }
 
 void RegressionTest::update_response_from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
-
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         if (key == "headers") {
             response_headers = json_object_to_map(child);
         } else if (key == "body") {
@@ -371,38 +308,20 @@ void RegressionTest::update_response_from_json_value(
             response_body = join_strings(response_body_lines);
         }
         set_string_from_json(response_protocol, "protocol", key, child);
-    }
+    });
 }
 
 void RegressionTest::update_expected_from_json_value(
     modsecurity_test::json::JsonValue value) {
-    modsecurity_test::json::JsonObject object;
-
-    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
-        return;
-    }
-
-    for (auto field_result : object) {
-        modsecurity_test::json::JsonField field;
-        std::string_view key;
-        modsecurity_test::json::JsonValue child;
-
-        if (modsecurity_test::json::get(std::move(field_result), &field)
-                == false) {
-            continue;
-        }
-        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
-            continue;
-        }
-        child = field.value();
-
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
         set_string_from_json(audit_log, "audit_log", key, child);
         set_string_from_json(debug_log, "debug_log", key, child);
         set_string_from_json(error_log, "error_log", key, child);
         set_int_from_json(http_code, "http_code", key, child);
         set_string_from_json(redirect_url, "redirect_url", key, child);
         set_string_from_json(parser_error, "parser_error", key, child);
-    }
+    });
 }
 
 void RegressionTest::update_rules_from_json_value(
@@ -417,7 +336,6 @@ void RegressionTest::update_rules_from_json_value(
     rules = stream.str();
 }
 
-
 constexpr char ascii_tolower(char c) {
     return 'A' <= c && c <= 'Z' ? (c + ('a' - 'A')) : c;
 }
@@ -430,15 +348,18 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
             });
 }
 
-static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
+static bool has_chunked_header(
+    const std::vector<std::pair<std::string, std::string>> &headers) {
     return std::any_of(std::begin(headers), std::end(headers),
         [](const auto &header) {
             const auto &[name, value]{header};
-            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
+            return iequals_ascii(name, "Transfer-Encoding")
+                && iequals_ascii(value, "chunked");
         });
 }
 
-static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
+static void update_content_length(
+    std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
     if (has_chunked_header(headers)) {
         return;
     }
@@ -451,7 +372,8 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
         }
     }
     if (!has_content_length) {
-        headers.emplace_back(std::pair{"Content-Length", std::to_string(length)});
+        headers.emplace_back(
+            std::pair{"Content-Length", std::to_string(length)});
     }
 }
 
@@ -494,20 +416,20 @@ std::unique_ptr<RegressionTests> RegressionTests::from_json_value(
                 continue;
             }
             tests->tests.emplace_back(
-                std::move(RegressionTest::from_json_value(test_value)));
+                RegressionTest::from_json_value(test_value));
         }
         return tests;
     }
 
     if (type == modsecurity_test::json::JsonType::Object) {
-        tests->tests.emplace_back(std::move(RegressionTest::from_json_value(value)));
+        tests->tests.emplace_back(RegressionTest::from_json_value(value));
     }
 
     return tests;
 }
 
 void RegressionTests::update_content_lengths() {
-    for (auto & test : tests) {
+    for (auto &test : tests) {
         test->update_content_lengths();
     }
 }
@@ -520,7 +442,7 @@ std::string RegressionTests::toJSON() const {
         writer.key(key);
         writer.string(value);
     };
-    const auto addStringIfNonEmpty = [&writer, &addString](
+    const auto addStringIfNonEmpty = [&addString](
         std::string_view key, const std::string &value) {
         if (value.empty() == false) {
             addString(key, value);

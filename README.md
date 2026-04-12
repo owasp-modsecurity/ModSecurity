@@ -253,6 +253,10 @@ It is recommended to use assertions where applicable, and to enable them with
 
 The source tree includes a Benchmark tool that can help measure library performance. The tool is located in the `test/benchmark/` directory. The build process also creates the binary here, so you will have the tool after the compilation is finished.
 
+Detailed benchmark test documentation is available in:
+* `docs/benchmark-tests.en.md`
+* `docs/benchmark-tests.de.md`
+
 To compare the JSON regression suite across both supported JSON backends with separate build directories, run:
 
 ```shell
@@ -325,7 +329,7 @@ The tool is a straightforward wrapper application that utilizes the library. It 
 
 Each transaction is an HTTP/1.1 GET request with some GET parameters. Common headers are added, followed by the response headers and an XML body. Between phases, the tool checks whether an intervention has occurred. All transactions are created with the same data.
 
-Note that the tool does not call the last phase (logging).
+Note that the tool calls the logging phase (`processLogging()`) for each transaction.
 
 Please remember to reset `basic_rules.conf` if you want to try with a different ruleset.
 

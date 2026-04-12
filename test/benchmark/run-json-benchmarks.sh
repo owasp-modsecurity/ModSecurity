@@ -6,6 +6,7 @@ usage() {
     cat <<'EOF'
 Usage: test/benchmark/run-json-benchmarks.sh --simdjson-build DIR --jsoncons-build DIR [--include-invalid]
 EOF
+    return
 }
 
 simdjson_build=""
@@ -74,6 +75,8 @@ run_scenarios() {
             "${binary}" --scenario "${scenario}" --include-invalid --output json >> "${output_file}"
         done
     fi
+
+    return 0
 }
 
 : > "${output_file}"

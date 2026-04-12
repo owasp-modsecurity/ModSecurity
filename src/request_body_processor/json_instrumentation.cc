@@ -9,7 +9,10 @@
 namespace modsecurity::RequestBodyProcessor {
 namespace {
 
-thread_local JsonInstrumentationMetrics g_metrics;
+JsonInstrumentationMetrics &instrumentationMetrics() {
+    thread_local JsonInstrumentationMetrics metrics;
+    return metrics;
+}
 
 std::uint64_t elapsedNanos(
     std::chrono::steady_clock::time_point start_time) noexcept {
@@ -21,20 +24,20 @@ std::uint64_t elapsedNanos(
 }  // namespace
 
 void jsonInstrumentationReset() noexcept {
-    g_metrics = JsonInstrumentationMetrics{};
+    instrumentationMetrics() = JsonInstrumentationMetrics{};
 }
 
 JsonInstrumentationMetrics jsonInstrumentationSnapshot() noexcept {
-    return g_metrics;
+    return instrumentationMetrics();
 }
 
 std::string captureRequestBodySnapshot(const std::ostringstream &request_body) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
     const auto start_time = std::chrono::steady_clock::now();
     std::string snapshot = request_body.str();
-    g_metrics.request_body_snapshot_count++;
-    g_metrics.request_body_snapshot_bytes += snapshot.size();
-    g_metrics.request_body_snapshot_ns += elapsedNanos(start_time);
+    instrumentationMetrics().request_body_snapshot_count++;
+    instrumentationMetrics().request_body_snapshot_bytes += snapshot.size();
+    instrumentationMetrics().request_body_snapshot_ns += elapsedNanos(start_time);
     return snapshot;
 #else
     return request_body.str();
@@ -44,9 +47,9 @@ std::string captureRequestBodySnapshot(const std::ostringstream &request_body) {
 void recordJsonProcessChunkAppend(std::size_t bytes,
     std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.json_process_chunk_calls++;
-    g_metrics.json_process_chunk_appended_bytes += bytes;
-    g_metrics.json_process_chunk_ns += elapsed_ns;
+    instrumentationMetrics().json_process_chunk_calls++;
+    instrumentationMetrics().json_process_chunk_appended_bytes += bytes;
+    instrumentationMetrics().json_process_chunk_ns += elapsed_ns;
 #else
     (void) bytes;
     (void) elapsed_ns;
@@ -55,8 +58,8 @@ void recordJsonProcessChunkAppend(std::size_t bytes,
 
 void recordSimdjsonParserConstruction(std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.simdjson_parser_constructions++;
-    g_metrics.simdjson_parser_construction_ns += elapsed_ns;
+    instrumentationMetrics().simdjson_parser_constructions++;
+    instrumentationMetrics().simdjson_parser_construction_ns += elapsed_ns;
 #else
     (void) elapsed_ns;
 #endif
@@ -65,8 +68,8 @@ void recordSimdjsonParserConstruction(std::uint64_t elapsed_ns) noexcept {
 void recordSimdjsonPaddedCopy(std::size_t bytes,
     std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.simdjson_padded_copy_bytes += bytes;
-    g_metrics.simdjson_padded_copy_ns += elapsed_ns;
+    instrumentationMetrics().simdjson_padded_copy_bytes += bytes;
+    instrumentationMetrics().simdjson_padded_copy_ns += elapsed_ns;
 #else
     (void) bytes;
     (void) elapsed_ns;
@@ -75,7 +78,7 @@ void recordSimdjsonPaddedCopy(std::size_t bytes,
 
 void recordSimdjsonIterate(std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.simdjson_iterate_ns += elapsed_ns;
+    instrumentationMetrics().simdjson_iterate_ns += elapsed_ns;
 #else
     (void) elapsed_ns;
 #endif
@@ -83,8 +86,8 @@ void recordSimdjsonIterate(std::uint64_t elapsed_ns) noexcept {
 
 void recordJsonconsCursorInit(std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.jsoncons_cursor_constructions++;
-    g_metrics.jsoncons_cursor_init_ns += elapsed_ns;
+    instrumentationMetrics().jsoncons_cursor_constructions++;
+    instrumentationMetrics().jsoncons_cursor_init_ns += elapsed_ns;
 #else
     (void) elapsed_ns;
 #endif
@@ -92,8 +95,8 @@ void recordJsonconsCursorInit(std::uint64_t elapsed_ns) noexcept {
 
 void recordJsonconsTokenCursorInit(std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.jsoncons_token_cursor_constructions++;
-    g_metrics.jsoncons_token_cursor_init_ns += elapsed_ns;
+    instrumentationMetrics().jsoncons_token_cursor_constructions++;
+    instrumentationMetrics().jsoncons_token_cursor_init_ns += elapsed_ns;
 #else
     (void) elapsed_ns;
 #endif
@@ -101,7 +104,7 @@ void recordJsonconsTokenCursorInit(std::uint64_t elapsed_ns) noexcept {
 
 void recordJsonconsEventLoop(std::uint64_t elapsed_ns) noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.jsoncons_event_loop_ns += elapsed_ns;
+    instrumentationMetrics().jsoncons_event_loop_ns += elapsed_ns;
 #else
     (void) elapsed_ns;
 #endif
@@ -109,13 +112,13 @@ void recordJsonconsEventLoop(std::uint64_t elapsed_ns) noexcept {
 
 void recordJsonconsTokenSyncStep() noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.jsoncons_token_sync_steps++;
+    instrumentationMetrics().jsoncons_token_sync_steps++;
 #endif
 }
 
 void recordJsonconsTokenExactAdvanceStep() noexcept {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    g_metrics.jsoncons_token_exact_advance_steps++;
+    instrumentationMetrics().jsoncons_token_exact_advance_steps++;
 #endif
 }
 

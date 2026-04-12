@@ -53,10 +53,9 @@ JsonParseResult normalizeResult(JsonParseResult result) {
     return result;
 }
 
-}  // namespace
-
-JsonParseResult JSONAdapter::parse(std::string &input,
-    JsonEventSink *sink, const JsonBackendParseOptions &options) const {
+template <typename InputType>
+JsonParseResult parseImplCommon(InputType &input, JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) {
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
@@ -77,26 +76,30 @@ JsonParseResult JSONAdapter::parse(std::string &input,
 #endif
 }
 
+}  // namespace
+
+JsonParseResult JSONAdapter::parseImpl(std::string &input,
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
+    return parseImplCommon(input, sink, options);
+}
+
+JsonParseResult JSONAdapter::parseImpl(const std::string &input,
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
+    return parseImplCommon(input, sink, options);
+}
+
+JsonParseResult JSONAdapter::parse(std::string &input,
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options) const {
+    return parseImpl(input, sink, options);
+}
+
 JsonParseResult JSONAdapter::parse(const std::string &input,
-    JsonEventSink *sink, const JsonBackendParseOptions &options) const {
-    if (sink == nullptr) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::InternalError, "JSON event sink is null.");
-    }
-
-    if (input.empty()) {
-        return makeResult(JsonParseStatus::Ok);
-    }
-
-#if defined(MSC_JSON_BACKEND_SIMDJSON)
-    return normalizeResult(parseDocumentWithSimdjson(input, sink, options));
-#elif defined(MSC_JSON_BACKEND_JSONCONS)
-    return normalizeResult(parseDocumentWithJsoncons(input, sink, options));
-#else
-    return makeResult(JsonParseStatus::InternalError,
-        JsonSinkStatus::InternalError,
-        "ModSecurity was built without a selected JSON backend.");
-#endif
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options) const {
+    return parseImpl(input, sink, options);
 }
 
 }  // namespace modsecurity::RequestBodyProcessor

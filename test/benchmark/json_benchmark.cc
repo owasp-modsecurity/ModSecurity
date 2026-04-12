@@ -48,6 +48,8 @@ constexpr std::size_t kDefaultTargetBytes = 1048576;
 constexpr std::size_t kDefaultDepth = 512;
 constexpr unsigned long long kDefaultIterations = 100;
 constexpr const char *kRulesFileName = "json_benchmark_rules.conf";
+constexpr const char *kClientIp = "198.51.100.10";  // RFC 5737 documentation range
+constexpr const char *kServerIp = "198.51.100.20";  // RFC 5737 documentation range
 
 struct Options {
     std::string scenario;
@@ -66,7 +68,13 @@ struct Metrics {
     unsigned long long parse_error_count{0};
 };
 
-const char *usage_message =
+class JsonBenchmarkError : public std::runtime_error {
+ public:
+    explicit JsonBenchmarkError(const std::string &message)
+        : std::runtime_error(message) { }
+};
+
+const char *const usage_message =
     "Usage: json_benchmark --scenario NAME [--iterations N] "
     "[--target-bytes N] [--depth N] [--include-invalid] [--output json]";
 
@@ -90,85 +98,89 @@ std::uint64_t elapsedNanos(Clock::time_point start_time) {
             Clock::now() - start_time).count());
 }
 
-std::size_t parseSize(const char *value, const char *flag_name) {
+unsigned long long parseUnsignedLongLong(const char *value,
+    const char *flag_name, bool allow_zero) {
     errno = 0;
     char *end = nullptr;
     const unsigned long long parsed = std::strtoull(value, &end, 10);
-    if (errno != 0 || end == value || *end != '\0') {
-        throw std::runtime_error(std::string("invalid numeric value for ")
+    if (errno != 0 || end == value || *end != '\0'
+            || (!allow_zero && parsed == 0)) {
+        throw JsonBenchmarkError(std::string("invalid numeric value for ")
             + flag_name + ": " + value);
     }
+    return parsed;
+}
+
+std::size_t parseSize(const char *value, const char *flag_name) {
+    const unsigned long long parsed =
+        parseUnsignedLongLong(value, flag_name, true);
     if (parsed > std::numeric_limits<std::size_t>::max()) {
-        throw std::runtime_error(std::string("value too large for ")
+        throw JsonBenchmarkError(std::string("value too large for ")
             + flag_name + ": " + value);
     }
     return static_cast<std::size_t>(parsed);
 }
 
 unsigned long long parseIterations(const char *value) {
-    errno = 0;
-    char *end = nullptr;
-    const unsigned long long parsed = std::strtoull(value, &end, 10);
-    if (errno != 0 || end == value || *end != '\0' || parsed == 0) {
-        throw std::runtime_error(std::string("invalid numeric value for --iterations: ")
-            + value);
+    return parseUnsignedLongLong(value, "--iterations", false);
+}
+
+const char *requireOptionValue(int argc, const char *argv[], int *index,
+    const char *option_name) {
+    if (*index + 1 >= argc) {
+        throw JsonBenchmarkError(std::string("missing value for ")
+            + option_name);
     }
-    return parsed;
+    *index += 1;
+    return argv[*index];
 }
 
 Options parseOptions(int argc, const char *argv[]) {
     Options options;
 
-    for (int i = 1; i < argc; i++) {
+    int i = 1;
+    while (i < argc) {
         const std::string current(argv[i]);
         if (current == "-h" || current == "-?" || current == "--help") {
             std::cout << usage_message << std::endl;
             std::exit(0);
         } else if (current == "--scenario") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --scenario");
-            }
-            options.scenario.assign(argv[++i]);
+            options.scenario.assign(
+                requireOptionValue(argc, argv, &i, "--scenario"));
         } else if (current == "--iterations") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --iterations");
-            }
-            options.iterations = parseIterations(argv[++i]);
+            options.iterations = parseIterations(
+                requireOptionValue(argc, argv, &i, "--iterations"));
         } else if (current == "--target-bytes") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --target-bytes");
-            }
-            options.target_bytes = parseSize(argv[++i], "--target-bytes");
+            options.target_bytes = parseSize(
+                requireOptionValue(argc, argv, &i, "--target-bytes"),
+                "--target-bytes");
         } else if (current == "--depth") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --depth");
-            }
-            options.depth = parseSize(argv[++i], "--depth");
+            options.depth = parseSize(
+                requireOptionValue(argc, argv, &i, "--depth"), "--depth");
         } else if (current == "--include-invalid") {
             options.include_invalid = true;
         } else if (current == "--output") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --output");
-            }
-            if (const std::string output_format(argv[++i]);
+            if (const std::string output_format(
+                    requireOptionValue(argc, argv, &i, "--output"));
                 output_format != "json") {
-                throw std::runtime_error("unsupported output format: "
+                throw JsonBenchmarkError("unsupported output format: "
                     + output_format);
             }
             options.output_json = true;
         } else {
-            throw std::runtime_error("unknown option: " + current);
+            throw JsonBenchmarkError("unknown option: " + current);
         }
+        i++;
     }
 
     if (options.scenario.empty()) {
-        throw std::runtime_error("missing required --scenario");
+        throw JsonBenchmarkError("missing required --scenario");
     }
 
     if (const bool is_invalid_scenario = options.scenario == "truncated"
             || options.scenario == "malformed";
         is_invalid_scenario && !options.include_invalid) {
-        throw std::runtime_error(
+        throw JsonBenchmarkError(
             "invalid JSON scenarios require --include-invalid");
     }
 
@@ -298,7 +310,7 @@ std::string buildScenarioBody(const Options &options) {
         return body;
     }
 
-    throw std::runtime_error("unsupported scenario: " + options.scenario);
+    throw JsonBenchmarkError("unsupported scenario: " + options.scenario);
 }
 
 bool isResolvedZero(const std::unique_ptr<std::string> &value) {
@@ -314,15 +326,14 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
         iteration++) {
         const auto total_start = Clock::now();
         modsecurity::Transaction transaction(modsec, rules, nullptr);
-        transaction.processConnection("200.249.12.31", 12345,
-            "127.0.0.1", 80);
+        transaction.processConnection(kClientIp, 12345, kServerIp, 80);
         transaction.processURI("/json-benchmark", "POST", "1.1");
         transaction.addRequestHeader("Host", "localhost");
         transaction.addRequestHeader("User-Agent",
             "ModSecurity-json-benchmark/1.0");
         transaction.addRequestHeader("Content-Type", "application/json");
         const std::string content_length = std::to_string(body.size());
-        transaction.addRequestHeader("Content-Length", content_length.c_str());
+        transaction.addRequestHeader("Content-Length", content_length);
         transaction.processRequestHeaders();
 
         const auto append_start = Clock::now();
@@ -330,13 +341,13 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
             reinterpret_cast<const unsigned char *>(body.data()), body.size());
         metrics.append_request_body_ns += elapsedNanos(append_start);
         if (append_ok == 0) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "appendRequestBody reported partial body processing");
         }
 
         const auto process_start = Clock::now();
         if (!transaction.processRequestBody()) {
-            throw std::runtime_error("processRequestBody returned false");
+            throw JsonBenchmarkError("processRequestBody returned false");
         }
         metrics.process_request_body_ns += elapsedNanos(process_start);
         metrics.total_transaction_ns += elapsedNanos(total_start);
@@ -347,7 +358,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
             transaction.m_variableReqbodyProcessorError.resolveFirst();
 
         if (!reqbody_error || !processor_error) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "unable to resolve JSON parse outcome variables");
         }
 
@@ -356,7 +367,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
         if (const bool parse_error = !isResolvedZero(reqbody_error)
                 || !isResolvedZero(processor_error);
             parse_success == parse_error) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "ambiguous JSON parse outcome observed in benchmark");
         }
 
@@ -378,85 +389,117 @@ long currentMaxRssKb() {
     return usage.ru_maxrss;
 }
 
+void printJsonStringField(const char *name, const std::string &value,
+    bool &first) {
+    if (!first) {
+        std::cout << ",";
+    }
+    std::cout << "\"" << name << "\":\"" << value << "\"";
+    first = false;
+}
+
+template <typename T>
+void printJsonNumericField(const char *name, T value, bool &first) {
+    if (!first) {
+        std::cout << ",";
+    }
+    std::cout << "\"" << name << "\":" << value;
+    first = false;
+}
+
+void printHumanField(const char *name, const std::string &value) {
+    std::cout << name << ": " << value << "\n";
+}
+
+template <typename T>
+void printHumanField(const char *name, T value) {
+    std::cout << name << ": " << value << "\n";
+}
+
 void printJson(const Options &options, const std::string &body,
     const Metrics &metrics) {
+    bool first = true;
+
     std::cout << "{";
-    std::cout << R"("backend":")" << benchmarkBackend() << "\",";
-    std::cout << R"("scenario":")" << options.scenario << "\",";
-    std::cout << "\"iterations\":" << options.iterations << ",";
-    std::cout << "\"body_bytes\":" << body.size() << ",";
-    std::cout << "\"append_request_body_ns\":"
-        << metrics.append_request_body_ns << ",";
-    std::cout << "\"process_request_body_ns\":"
-        << metrics.process_request_body_ns << ",";
-    std::cout << "\"total_transaction_ns\":"
-        << metrics.total_transaction_ns << ",";
-    std::cout << "\"parse_success_count\":"
-        << metrics.parse_success_count << ",";
-    std::cout << "\"parse_error_count\":"
-        << metrics.parse_error_count << ",";
-    std::cout << "\"ru_maxrss_kb\":" << currentMaxRssKb();
+    printJsonStringField("backend", benchmarkBackend(), first);
+    printJsonStringField("scenario", options.scenario, first);
+    printJsonNumericField("iterations", options.iterations, first);
+    printJsonNumericField("body_bytes", body.size(), first);
+    printJsonNumericField("append_request_body_ns",
+        metrics.append_request_body_ns, first);
+    printJsonNumericField("process_request_body_ns",
+        metrics.process_request_body_ns, first);
+    printJsonNumericField("total_transaction_ns",
+        metrics.total_transaction_ns, first);
+    printJsonNumericField("parse_success_count",
+        metrics.parse_success_count, first);
+    printJsonNumericField("parse_error_count",
+        metrics.parse_error_count, first);
+    printJsonNumericField("ru_maxrss_kb", currentMaxRssKb(), first);
+
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
     const modsecurity::RequestBodyProcessor::JsonInstrumentationMetrics
         instrumentation =
             modsecurity::RequestBodyProcessor::jsonInstrumentationSnapshot();
-    std::cout << ",\"request_body_snapshot_count\":"
-        << instrumentation.request_body_snapshot_count;
-    std::cout << ",\"request_body_snapshot_bytes\":"
-        << instrumentation.request_body_snapshot_bytes;
-    std::cout << ",\"request_body_snapshot_ns\":"
-        << instrumentation.request_body_snapshot_ns;
-    std::cout << ",\"json_process_chunk_calls\":"
-        << instrumentation.json_process_chunk_calls;
-    std::cout << ",\"json_process_chunk_appended_bytes\":"
-        << instrumentation.json_process_chunk_appended_bytes;
-    std::cout << ",\"json_process_chunk_ns\":"
-        << instrumentation.json_process_chunk_ns;
-    std::cout << ",\"simdjson_parser_constructions\":"
-        << instrumentation.simdjson_parser_constructions;
-    std::cout << ",\"simdjson_parser_construction_ns\":"
-        << instrumentation.simdjson_parser_construction_ns;
-    std::cout << ",\"simdjson_padded_copy_bytes\":"
-        << instrumentation.simdjson_padded_copy_bytes;
-    std::cout << ",\"simdjson_padded_copy_ns\":"
-        << instrumentation.simdjson_padded_copy_ns;
-    std::cout << ",\"simdjson_iterate_ns\":"
-        << instrumentation.simdjson_iterate_ns;
-    std::cout << ",\"jsoncons_cursor_constructions\":"
-        << instrumentation.jsoncons_cursor_constructions;
-    std::cout << ",\"jsoncons_cursor_init_ns\":"
-        << instrumentation.jsoncons_cursor_init_ns;
-    std::cout << ",\"jsoncons_token_cursor_constructions\":"
-        << instrumentation.jsoncons_token_cursor_constructions;
-    std::cout << ",\"jsoncons_token_cursor_init_ns\":"
-        << instrumentation.jsoncons_token_cursor_init_ns;
-    std::cout << ",\"jsoncons_event_loop_ns\":"
-        << instrumentation.jsoncons_event_loop_ns;
-    std::cout << ",\"jsoncons_token_sync_steps\":"
-        << instrumentation.jsoncons_token_sync_steps;
-    std::cout << ",\"jsoncons_token_exact_advance_steps\":"
-        << instrumentation.jsoncons_token_exact_advance_steps;
+
+    printJsonNumericField("request_body_snapshot_count",
+        instrumentation.request_body_snapshot_count, first);
+    printJsonNumericField("request_body_snapshot_bytes",
+        instrumentation.request_body_snapshot_bytes, first);
+    printJsonNumericField("request_body_snapshot_ns",
+        instrumentation.request_body_snapshot_ns, first);
+    printJsonNumericField("json_process_chunk_calls",
+        instrumentation.json_process_chunk_calls, first);
+    printJsonNumericField("json_process_chunk_appended_bytes",
+        instrumentation.json_process_chunk_appended_bytes, first);
+    printJsonNumericField("json_process_chunk_ns",
+        instrumentation.json_process_chunk_ns, first);
+    printJsonNumericField("simdjson_parser_constructions",
+        instrumentation.simdjson_parser_constructions, first);
+    printJsonNumericField("simdjson_parser_construction_ns",
+        instrumentation.simdjson_parser_construction_ns, first);
+    printJsonNumericField("simdjson_padded_copy_bytes",
+        instrumentation.simdjson_padded_copy_bytes, first);
+    printJsonNumericField("simdjson_padded_copy_ns",
+        instrumentation.simdjson_padded_copy_ns, first);
+    printJsonNumericField("simdjson_iterate_ns",
+        instrumentation.simdjson_iterate_ns, first);
+    printJsonNumericField("jsoncons_cursor_constructions",
+        instrumentation.jsoncons_cursor_constructions, first);
+    printJsonNumericField("jsoncons_cursor_init_ns",
+        instrumentation.jsoncons_cursor_init_ns, first);
+    printJsonNumericField("jsoncons_token_cursor_constructions",
+        instrumentation.jsoncons_token_cursor_constructions, first);
+    printJsonNumericField("jsoncons_token_cursor_init_ns",
+        instrumentation.jsoncons_token_cursor_init_ns, first);
+    printJsonNumericField("jsoncons_event_loop_ns",
+        instrumentation.jsoncons_event_loop_ns, first);
+    printJsonNumericField("jsoncons_token_sync_steps",
+        instrumentation.jsoncons_token_sync_steps, first);
+    printJsonNumericField("jsoncons_token_exact_advance_steps",
+        instrumentation.jsoncons_token_exact_advance_steps, first);
 #endif
+
     std::cout << "}" << std::endl;
 }
 
 void printHumanReadable(const Options &options, const std::string &body,
     const Metrics &metrics) {
-    std::cout << "backend: " << benchmarkBackend() << "\n";
-    std::cout << "scenario: " << options.scenario << "\n";
-    std::cout << "iterations: " << options.iterations << "\n";
-    std::cout << "body_bytes: " << body.size() << "\n";
-    std::cout << "append_request_body_ns: "
-        << metrics.append_request_body_ns << "\n";
-    std::cout << "process_request_body_ns: "
-        << metrics.process_request_body_ns << "\n";
-    std::cout << "total_transaction_ns: "
-        << metrics.total_transaction_ns << "\n";
-    std::cout << "parse_success_count: "
-        << metrics.parse_success_count << "\n";
-    std::cout << "parse_error_count: "
-        << metrics.parse_error_count << "\n";
-    std::cout << "ru_maxrss_kb: " << currentMaxRssKb() << "\n";
+    printHumanField("backend", benchmarkBackend());
+    printHumanField("scenario", options.scenario);
+    printHumanField("iterations", options.iterations);
+    printHumanField("body_bytes", body.size());
+    printHumanField("append_request_body_ns",
+        metrics.append_request_body_ns);
+    printHumanField("process_request_body_ns",
+        metrics.process_request_body_ns);
+    printHumanField("total_transaction_ns",
+        metrics.total_transaction_ns);
+    printHumanField("parse_success_count",
+        metrics.parse_success_count);
+    printHumanField("parse_error_count",
+        metrics.parse_error_count);
+    printHumanField("ru_maxrss_kb", currentMaxRssKb());
 }
 
 }  // namespace

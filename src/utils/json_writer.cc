@@ -21,9 +21,7 @@
 namespace modsecurity::utils {
 
 JsonWriter::JsonWriter(bool pretty, std::string indent)
-    : m_output(),
-      m_stack(),
-      m_pretty(pretty),
+    : m_pretty(pretty),
       m_indent(std::move(indent)) { }
 
 void JsonWriter::start_object() {

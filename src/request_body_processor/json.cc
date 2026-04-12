@@ -21,6 +21,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "src/request_body_processor/json_adapter.h"
@@ -34,10 +35,44 @@ static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceed
 
 namespace {
 
-JsonSinkStatus startContainer(std::deque<JSONContainer *> *containers,
-    JSONContainer *container, int64_t *current_depth, double max_depth,
-    bool *depth_limit_exceeded) {
-    containers->push_back(container);
+void assignJsonErrorMessage(std::string *err, JsonParseStatus parse_status,
+    const std::string &detail) {
+    if (err == nullptr) {
+        return;
+    }
+
+    if (!detail.empty()) {
+        err->assign(detail);
+        return;
+    }
+
+    switch (parse_status) {
+        case JsonParseStatus::ParseError:
+            err->assign("Invalid JSON body.");
+            break;
+        case JsonParseStatus::TruncatedInput:
+            err->assign("Incomplete JSON body.");
+            break;
+        case JsonParseStatus::Utf8Error:
+            err->assign("Invalid UTF-8 in JSON body.");
+            break;
+        case JsonParseStatus::EngineAbort:
+            err->assign("JSON traversal aborted by ModSecurity.");
+            break;
+        case JsonParseStatus::InternalError:
+            err->assign("Internal JSON backend failure.");
+            break;
+        case JsonParseStatus::Ok:
+            err->clear();
+            break;
+    }
+}
+
+JsonSinkStatus startContainer(
+    std::deque<std::unique_ptr<JSONContainer>> *containers,
+    std::unique_ptr<JSONContainer> container, int64_t *current_depth,
+    double max_depth, bool *depth_limit_exceeded) {
+    containers->push_back(std::move(container));
     (*current_depth)++;
     if (*current_depth > max_depth) {
         *depth_limit_exceeded = true;
@@ -46,19 +81,17 @@ JsonSinkStatus startContainer(std::deque<JSONContainer *> *containers,
     return JsonSinkStatus::Continue;
 }
 
-JsonSinkStatus endContainer(std::deque<JSONContainer *> *containers,
+JsonSinkStatus endContainer(
+    std::deque<std::unique_ptr<JSONContainer>> *containers,
     int64_t *current_depth) {
     if (containers->empty()) {
         return JsonSinkStatus::InternalError;
     }
 
-    JSONContainer *container = containers->back();
     containers->pop_back();
-    delete container;
 
-    if (containers->empty() == false) {
-        JSONContainerArray *array = dynamic_cast<JSONContainerArray *>(
-            containers->back());
+    if (!containers->empty()) {
+        auto *array = dynamic_cast<JSONContainerArray *>(containers->back().get());
         if (array != nullptr) {
             array->m_elementCounter++;
         }
@@ -71,6 +104,16 @@ JsonSinkStatus endContainer(std::deque<JSONContainer *> *containers,
     }
 
     return JsonSinkStatus::Continue;
+}
+
+JsonSinkStatus addArgumentAsSinkStatus(JSON *json,
+    const std::string &argument_value) {
+    return json->addArgument(argument_value) != 0 ? JsonSinkStatus::Continue
+        : JsonSinkStatus::EngineAbort;
+}
+
+JsonSinkStatus addStringViewAsSinkStatus(JSON *json, std::string_view value) {
+    return addArgumentAsSinkStatus(json, std::string(value.data(), value.size()));
 }
 
 }  // namespace
@@ -130,48 +173,7 @@ bool JSON::complete(std::string *err) {
         if (result.sink_status == JsonSinkStatus::DepthLimitExceeded) {
             m_depth_limit_exceeded = true;
         }
-        if (err != nullptr) {
-            switch (result.parse_status) {
-                case JsonParseStatus::ParseError:
-                    if (result.detail.empty()) {
-                        err->assign("Invalid JSON body.");
-                    } else {
-                        err->assign(result.detail);
-                    }
-                    break;
-                case JsonParseStatus::TruncatedInput:
-                    if (result.detail.empty()) {
-                        err->assign("Incomplete JSON body.");
-                    } else {
-                        err->assign(result.detail);
-                    }
-                    break;
-                case JsonParseStatus::Utf8Error:
-                    if (result.detail.empty()) {
-                        err->assign("Invalid UTF-8 in JSON body.");
-                    } else {
-                        err->assign(result.detail);
-                    }
-                    break;
-                case JsonParseStatus::EngineAbort:
-                    if (result.detail.empty()) {
-                        err->assign("JSON traversal aborted by ModSecurity.");
-                    } else {
-                        err->assign(result.detail);
-                    }
-                    break;
-                case JsonParseStatus::InternalError:
-                    if (result.detail.empty()) {
-                        err->assign("Internal JSON backend failure.");
-                    } else {
-                        err->assign(result.detail);
-                    }
-                    break;
-                case JsonParseStatus::Ok:
-                    err->clear();
-                    break;
-            }
-        }
+        assignJsonErrorMessage(err, result.parse_status, result.detail);
         if (m_depth_limit_exceeded && err != nullptr) {
             err->append(json_depth_limit_exceeded_msg);
         }
@@ -188,9 +190,9 @@ int JSON::addArgument(const std::string& value) {
 
     for (size_t i =  0; i < m_containers.size(); i++) {
         const JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
-            m_containers[i]);
+            m_containers[i].get());
         path = path + m_containers[i]->m_name;
-        if (a != NULL) {
+        if (a != nullptr) {
             path = path + ".array_" + std::to_string(a->m_elementCounter);
         } else {
             path = path + ".";
@@ -199,7 +201,7 @@ int JSON::addArgument(const std::string& value) {
 
     if (m_containers.size() > 0) {
         JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
-            m_containers.back());
+            m_containers.back().get());
         if (a) {
             a->m_elementCounter++;
         } else {
@@ -226,35 +228,28 @@ JsonSinkStatus JSON::on_key(std::string_view value) {
 
 
 JsonSinkStatus JSON::on_null() {
-    return addArgument("") != 0 ? JsonSinkStatus::Continue
-        : JsonSinkStatus::EngineAbort;
+    return addArgumentAsSinkStatus(this, "");
 }
 
 
 JsonSinkStatus JSON::on_boolean(bool value) {
-    if (value) {
-        return addArgument("true") != 0 ? JsonSinkStatus::Continue
-            : JsonSinkStatus::EngineAbort;
-    }
-    return addArgument("false") != 0 ? JsonSinkStatus::Continue
-        : JsonSinkStatus::EngineAbort;
+    return addArgumentAsSinkStatus(this, value ? "true" : "false");
 }
 
 
 JsonSinkStatus JSON::on_string(std::string_view value) {
-    return addArgument(std::string(value.data(), value.size())) != 0
-        ? JsonSinkStatus::Continue : JsonSinkStatus::EngineAbort;
+    return addStringViewAsSinkStatus(this, value);
 }
 
 
 JsonSinkStatus JSON::on_number(std::string_view value) {
-    return addArgument(std::string(value.data(), value.size())) != 0
-        ? JsonSinkStatus::Continue : JsonSinkStatus::EngineAbort;
+    return addStringViewAsSinkStatus(this, value);
 }
 
 
 JsonSinkStatus JSON::on_start_array() {
-    return startContainer(&m_containers, new JSONContainerArray(getCurrentKey()),
+    return startContainer(&m_containers,
+        std::make_unique<JSONContainerArray>(getCurrentKey()),
         &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
@@ -265,7 +260,8 @@ JsonSinkStatus JSON::on_end_array() {
 
 
 JsonSinkStatus JSON::on_start_object() {
-    return startContainer(&m_containers, new JSONContainerMap(getCurrentKey()),
+    return startContainer(&m_containers,
+        std::make_unique<JSONContainerMap>(getCurrentKey()),
         &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
@@ -275,11 +271,7 @@ JsonSinkStatus JSON::on_end_object() {
 }
 
 void JSON::clearContainers() {
-    while (m_containers.size() > 0) {
-        JSONContainer *a = m_containers.back();
-        m_containers.pop_back();
-        delete a;
-    }
+    m_containers.clear();
 }
 
 }  // namespace modsecurity::RequestBodyProcessor

@@ -25,10 +25,19 @@ namespace modsecurity::RequestBodyProcessor {
 class JSONAdapter {
  public:
     JsonParseResult parse(std::string &input, JsonEventSink *sink,
-        const JsonBackendParseOptions &options = JsonBackendParseOptions()) const;
+        const JsonBackendParseOptions &options [[maybe_unused]]
+            = JsonBackendParseOptions()) const;
 
     JsonParseResult parse(const std::string &input, JsonEventSink *sink,
-        const JsonBackendParseOptions &options = JsonBackendParseOptions()) const;
+        const JsonBackendParseOptions &options [[maybe_unused]]
+            = JsonBackendParseOptions()) const;
+
+ private:
+    JsonParseResult parseImpl(std::string &input, JsonEventSink *sink,
+        const JsonBackendParseOptions &options [[maybe_unused]]) const;
+
+    JsonParseResult parseImpl(const std::string &input, JsonEventSink *sink,
+        const JsonBackendParseOptions &options [[maybe_unused]]) const;
 };
 
 }  // namespace modsecurity::RequestBodyProcessor
