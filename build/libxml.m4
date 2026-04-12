@@ -1,0 +1,12 @@
+dnl Check for LIBXML2 Libraries
+dnl Sets:
+dnl  LIBXML2_CFLAGS
+dnl  LIBXML2_LDADD
+dnl  LIBXML2_LDFLAGS
+dnl  LIBXML2_VERSION
+dnl  LIBXML2_DISPLAY
+dnl  LIBXML2_FOUND
+
+AC_DEFUN([CHECK_LIBXML2], [
+MSC_CHECK_LIB([LIBXML2], [libxml-2.0], [libxml/parser.h], [xml2], [-DWITH_LIBXML2], [2.6.29], [libxml])
+]) # AC_DEFUN [CHECK_LIBXML2]

@@ -1,0 +1,11 @@
+dnl Check for SSDEEP Libraries
+dnl Sets:
+dnl  SSDEEP_CFLAGS
+dnl  SSDEEP_LDADD
+dnl  SSDEEP_LDFLAGS
+dnl  SSDEEP_DISPLAY
+dnl  SSDEEP_FOUND
+
+AC_DEFUN([CHECK_SSDEEP], [
+MSC_CHECK_LIB([SSDEEP], [fuzzy], [fuzzy.h], [fuzzy], [-DWITH_SSDEEP])
+]) # AC_DEFUN [CHECK_SSDEEP]
