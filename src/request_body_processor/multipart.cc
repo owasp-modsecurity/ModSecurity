@@ -417,6 +417,9 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
             if (*p == quote) {
                 p++; /* go over the quote at the end */
+            } else {
+                m_flag_invalid_quoting = 1;
+                return -15; /* closing quote not found */
             }
 
         } else {
