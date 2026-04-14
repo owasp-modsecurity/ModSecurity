@@ -26,6 +26,7 @@
 
 
 #include "modsecurity/variable_value.h"
+#include <stdint.h>
 
 
 #ifndef HEADERS_MODSECURITY_COLLECTION_COLLECTION_H_
