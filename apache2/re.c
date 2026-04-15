@@ -986,38 +986,44 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
-// Return 1 if "name=value" is present in table (for supplied action)
+/** 
+ * Helper function for action_exists. It checks if "name=value" is present in table for supplied action.
+ */
 static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
-	if (strcmp(name, action) != 0) return 0;
+    if (strcmp(name, action) != 0) return 0;
 
-	const char* vars = apr_table_getm(p, vartable, name);
-	if (!vars) return 0;
+    const char* vars = apr_table_getm(p, vartable, name);
+    if (!vars) return 0;
 
-	char pattern[200];
-	sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
+    char pattern[200];
+    sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
 
-	const char* errptr = NULL;
-	int erroffset;
-	const pcre* regex = pcre_compile(pattern, 0, &errptr, &erroffset, NULL);
-	return !pcre_exec(regex, NULL, vars, strlen(vars), 0, 0, 0, 0);
+    char* error_msg = NULL;
+    msc_regex_t* regex = msc_pregcomp(p, pattern, 0, NULL, NULL);
+    if (regex == NULL) return 0; // we could log an error here
+
+    return (msc_regexec(regex, vars, strlen(vars), &error_msg) >= 0);
 }
 
-// Return 1 if "name=value" is present in table for tags, logdata (and others)
+/**
+ * Checks if "name=value" is present in table for tags, logdata (and others).
+ */
 static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
-	if (apr_table_action_exists(p, vartable, "capture", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "chain", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "initcol", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "logdata", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "sanitiseArg", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "sanitiseMatched", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "sanitiseMatchedBytes", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "sanitiseRequestHeader", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "sanitiseResponseHeader", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
-	if (apr_table_action_exists(p, vartable, "tag", name, value)) return 1;
+    /* logdata & msg cannot be used because ',' is used as entries separators */
+    if (apr_table_action_exists(p, vartable, "capture", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "chain", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "initcol", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "phase", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeArg", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeMatched", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeMatchedBytes", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeRequestHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeResponseHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "tag", name, value)) return 1;
 	return 0;
 }
 
