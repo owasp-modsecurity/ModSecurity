@@ -996,11 +996,11 @@ static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, c
     if (!vars) return 0;
 
     char pattern[200];
-    sprintf(pattern, "(?:^|,)%.185s(?:,|$)", value);
+    apr_snprintf(pattern, sizeof(pattern), "(?:^|,)%.185s(?:,|$)", value);
 
     char* error_msg = NULL;
     msc_regex_t* regex = msc_pregcomp(p, pattern, 0, NULL, NULL);
-    if (regex == NULL) return 0; // we could log an error here
+    if (regex == NULL) return 0;
 
     return (msc_regexec(regex, vars, strlen(vars), &error_msg) >= 0);
 }
