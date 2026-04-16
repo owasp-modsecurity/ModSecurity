@@ -128,13 +128,46 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         while((*p == '\t') || (*p == ' ')) p++;
         if (*p == '\0') return -6;
 
-        /* Accept both quotes as some backends will accept them, but
-         * technically "'" is invalid and so flag_invalid_quoting is
-         * set so the user can deal with it in the rules if they so wish.
-         */
-
         char quote = '\0';
-        if ((*p == '"') || (*p == '\'')) {
+        if (strcmp(name, "filename*") == 0) {
+            /* filename*=charset'[optional-language]'filename */
+            /* Read beyond the charset and the optional language*/
+            const char* start_of_charset = p;
+            while ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p) )) {
+                p++;
+            }
+            if ((*p != '\'') || (p == start_of_charset)) {
+                return -16; // Must be at least one legit char before ' for start of language
+            }
+            p++;
+            while (isalnum(*p) || *p == '-') p++;
+            if (*p != '\'') {
+                return -17; // Single quote for end-of-language not found
+            }
+            p++;
+
+            /* Now read what should be the actual filename */
+            const char* start_of_filename = p;
+            while ((*p != '\0') && (*p != ';')) {
+                if (*p == '%') {
+                    if ((!isxdigit(*(p + 1))) || (!isxdigit(*(p + 2)))) {
+                        return -18;
+                    }
+                    p += 3;
+                }
+                else if ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p))) {
+                    p++;
+                }
+                else {
+                    return -19;
+                }
+            }
+            value = apr_pmemdup(msr->mp, start_of_filename, p - start_of_filename);
+        } else if ((*p == '"') || (*p == '\'')) {
+            /* Accept both quotes as some backends will accept them, but
+            * technically "'" is invalid and so flag_invalid_quoting is
+            * set so the user can deal with it in the rules if they so wish.
+            */
             /* quoted */
             quote = *p; // remember which quote character was used for the value
 
@@ -228,52 +261,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     log_escape_nq(msr->mp, value));
             }
             else if (strcmp(name, "filename*") == 0) {
-                /* old restrictive code
-                if (strncasecmp(value, "UTF-8''", 7) && strncasecmp(value, "ISO-8859-1''", 12)) {
-                    msr_log(msr, 4, "Multipart: filename* must contain encoding: %s", log_escape_nq(msr->mp, value));
-                    msr->mpd->flag_error = 1;
-                    return -16;
-                }
-                //msr_log(msr, 4, "Multipart: Warning: Content-Disposition filename* is obsolete (ignore it)");
-                */
-
-                /* filename*=charset'[optional-language]'filename */
-                /* Read beyond the charset and the optional language*/
-                const char* start_of_charset = p;
-                /*
-                if (strncasecmp(value, "UTF-8''", 7) == 0) p += 7;
-                else if (strncasecmp(value, "ISO-8859-1''", 12) == 0) p += 12;
-                */
-                while ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p) )) {
-                    p++;
-                }
-                if ((*p != '\'') || (p == start_of_charset)) {
-                    return -16; // Must be at least one legit char before ' for start of language
-                }
-                p++;
-                while (isalnum(*p) || *p == '-') p++;
-                if (*p != '\'') {
-                    return -17; // Single quote for end-of-language not found
-                }
-                p++;
-
-                /* Now read what should be the actual filename */
-                const char* start_of_filename = p;
-                while ((*p != '\0') && (*p != ';')) {
-                    if (*p == '%') {
-                        if ((!isxdigit(*(p + 1))) || (!isxdigit(*(p + 2)))) {
-                            return -18;
-                        }
-                        p += 3;
-                    }
-                    else if ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p))) {
-                        p++;
-                    }
-                    else {
-                        return -19;
-                    }
-                }
-                value = apr_pmemdup(msr->mp, start_of_filename, p - start_of_filename);
                 if (filenameStar != NULL) {
                     msr_log(msr, 4,
                         "Multipart: Warning: Duplicate Content-Disposition filename*: %s.", log_escape_nq(msr->mp, value));
