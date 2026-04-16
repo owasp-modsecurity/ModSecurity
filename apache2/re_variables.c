@@ -551,7 +551,7 @@ static int var_request_uri_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     // Query is never decoded, so always decode it
     if (msr->r->parsed_uri.query != NULL) {
         char* query = apr_pstrdup(mptmp, msr->r->parsed_uri.query);
-        urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
+        urldecode_nonstrict_inplace_ex(query, strlen(query), &invalid_count, &changed);
         value = apr_pstrcat(mptmp, value, "?", query, NULL);
     }
     return var_simple_generate(var, vartab, mptmp, value);
