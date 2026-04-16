@@ -313,16 +313,6 @@ static int yajl_end_map(void *ctx)
     return 1;
 }
 
-static void* yajl_fmalloc(void* ctx, size_t sz)
-{
-    assert(ctx != NULL);
-    return apr_palloc((apr_pool_t*)ctx, sz);
-}
-static void yajl_ffree(void* ctx, void* p)
-{
-    assert(ctx != NULL);
-}
-
 /**
  * Initialise JSON parser.
  */
