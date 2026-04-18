@@ -199,6 +199,7 @@ TESTS+=test/test-cases/secrules-language-tests/operators/contains.json
 TESTS+=test/test-cases/secrules-language-tests/operators/containsWord.json
 TESTS+=test/test-cases/secrules-language-tests/operators/detectSQLi.json
 TESTS+=test/test-cases/secrules-language-tests/operators/detectXSS.json
+TESTS+=test/test-cases/unit/operator-libinjection-error.json
 TESTS+=test/test-cases/secrules-language-tests/operators/endsWith.json
 TESTS+=test/test-cases/secrules-language-tests/operators/eq.json
 TESTS+=test/test-cases/secrules-language-tests/operators/ge.json

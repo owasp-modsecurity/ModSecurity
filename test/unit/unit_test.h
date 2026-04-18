@@ -47,7 +47,9 @@ class UnitTest {
     std::string type;
     std::string filename;
     std::string output;
+    std::string libinjection_override;
     int ret;
+    int capture;
     int skipped;
     UnitTestResult result;
 };
