@@ -17,6 +17,8 @@
 #define SRC_UTILS_SHA1_H_
 
 #include <array>
+#include <cassert>
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <string_view>
@@ -28,15 +30,15 @@ namespace modsecurity::Utils {
 
 class DigestCalculationException : public std::exception {
  public:
-    explicit DigestCalculationException(const char *message) noexcept
+    explicit DigestCalculationException(const char *message)
         : m_message(message) { }
 
     const char *what() const noexcept override {
-        return m_message;
+        return m_message.c_str();
     }
 
  private:
-    const char *m_message;
+    std::string m_message;
 };
 
 
@@ -44,19 +46,40 @@ template<mbedtls_md_type_t DigestType, int DigestSize>
 class DigestImpl {
  public:
     static std::string digest(const std::string& input) {
-        const auto digestBytes = calculateDigest(input);
-        return std::string(digestBytes.begin(), digestBytes.end());
+        try {
+            const auto digestBytes = calculateDigest(input);
+            return std::string(digestBytes.begin(), digestBytes.end());
+        } catch (const DigestCalculationException&) {
+            assert(false);
+            return std::string(DigestSize, '\0');
+        }
     }
 
     static void digestReplace(std::string& value) {
-        const auto digestBytes = calculateDigest(value);
-        value.assign(digestBytes.begin(), digestBytes.end());
+        try {
+            const auto digestBytes = calculateDigest(value);
+            value.assign(digestBytes.begin(), digestBytes.end());
+        } catch (const DigestCalculationException&) {
+            assert(false);
+            value.assign(DigestSize, '\0');
+        }
     }
 
     static std::string hexdigest(const std::string& input) {
-        const auto digestBytes = calculateDigest(input);
-        const std::string digestString(digestBytes.begin(), digestBytes.end());
-        return utils::string::string_to_hex(digestString);
+        try {
+            const auto digestBytes = calculateDigest(input);
+            const auto *digestByteData =
+                static_cast<const std::byte *>(static_cast<const void *>(digestBytes.data()));
+            return utils::string::string_to_hex(
+                digestByteData, digestBytes.size());
+        } catch (const DigestCalculationException&) {
+            assert(false);
+            const std::array<unsigned char, DigestSize> digestBytes = {};
+            const auto *digestByteData =
+                static_cast<const std::byte *>(static_cast<const void *>(digestBytes.data()));
+            return utils::string::string_to_hex(
+                digestByteData, digestBytes.size());
+        }
     }
 
  private:
