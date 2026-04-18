@@ -80,6 +80,7 @@ unit_tests_LDFLAGS = \
 unit_tests_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir)/ \
+	-I$(top_srcdir)/others/jsoncons/include \
 	-I$(top_srcdir)/others \
 	-g \
 	-I$(top_srcdir)/headers \

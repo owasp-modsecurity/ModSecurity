@@ -186,7 +186,7 @@ project(libModSecurityTests)
 
 function(setTestTargetProperties executable)
   target_compile_definitions(${executable} PRIVATE WITH_PCRE2)
-  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others)
+  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${JSONCONS_DIR})
   target_link_libraries(${executable} PRIVATE libModSecurity pcre2::pcre2 dirent::dirent)
 endfunction()
 
