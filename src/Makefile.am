@@ -187,6 +187,7 @@ OPERATORS = \
 	operators/contains_word.cc \
 	operators/detect_sqli.cc \
 	operators/detect_xss.cc \
+	operators/libinjection_adapter.cc \
 	operators/ends_with.cc \
 	operators/eq.cc \
 	operators/fuzzy_hash.cc \

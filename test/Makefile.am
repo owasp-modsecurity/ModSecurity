@@ -73,6 +73,7 @@ unit_tests_LDFLAGS = \
 unit_tests_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir)/ \
+	-I$(top_srcdir)/others \
 	-g \
 	-I$(top_builddir)/headers \
 	$(CURL_CFLAGS) \
