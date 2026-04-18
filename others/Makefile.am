@@ -15,6 +15,7 @@ noinst_HEADERS = \
 	libinjection/src/libinjection_sqli.h \
 	libinjection/src/libinjection_sqli_data.h \
 	libinjection/src/libinjection_xss.h \
+	libinjection/src/libinjection_error.h \
 	mbedtls/include/mbedtls/base64.h \
 	mbedtls/include/mbedtls/check_config.h \
 	mbedtls/include/mbedtls/mbedtls_config.h \
