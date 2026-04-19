@@ -389,7 +389,9 @@ if (parser->is_active != 0) return -1;
             child->depth = i;
             child->text = (char *)calloc(1, i + 2);
             /* ENH: Check alloc succeded */
-            for (j = 0; j <= i; j++) child->text[j] = pattern[j];
+            for (j = 0; j <= i; j++) {
+                child->text[j] = pattern[j];
+            }
         }
         if (i == length - 1) {
             if (child->is_last == 0) {
