@@ -516,7 +516,9 @@ apr_status_t acmp_add_pattern(ACMP *parser, const char *pattern,
             child->depth = i;
             child->text = apr_pcalloc(parser->pool, i + 2);
             /* ENH: Check alloc succeded */
-            for (j = 0; j <= i; j++) child->text[j] = pattern[j];
+            for (j = 0; j <= i; j++) {
+                child->text[j] = pattern[j];
+            }
         }
         if (i == length - 1) {
             if (child->is_last == 0) {
