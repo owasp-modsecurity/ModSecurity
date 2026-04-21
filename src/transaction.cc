@@ -28,6 +28,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -2322,6 +2323,48 @@ int Transaction::setRequestHostName(const std::string& hostname) {
 extern "C" int msc_set_request_hostname(Transaction *transaction,
     const unsigned char *hostname) {
     return transaction->setRequestHostName(reinterpret_cast<const char *>(hostname));
+}
+
+
+/**
+ * @name    msc_get_matched_rules_count
+ * @brief   Retrieve the number of matched rules on a transaction.
+ *
+ * Returns the number of rule-match records held on the transaction.
+ * Every rule that matched (disruptive or not) contributes one entry.
+ *
+ * @param transaction ModSecurity transaction.
+ *
+ * @returns The number of matched rule records on the transaction.
+ *
+ */
+extern "C" size_t msc_get_matched_rules_count(Transaction *transaction) {
+    return transaction->m_rulesMessages.size();
+}
+
+
+/**
+ * @name    msc_get_matched_rule_id
+ * @brief   Retrieve the rule id of the n-th matched rule.
+ *
+ * Returns the rule id of the n-th matched rule (0-based).
+ *
+ * @param transaction ModSecurity transaction.
+ * @param index       Zero-based index into the matched rule records.
+ *
+ * @returns The rule id at the given index.
+ * @retval >0 Rule id of the matched rule at the given index.
+ * @retval  0 Index is out of range.
+ *
+ */
+extern "C" int64_t msc_get_matched_rule_id(Transaction *transaction,
+    size_t index) {
+    if (index >= transaction->m_rulesMessages.size()) {
+        return 0;
+    }
+    auto it = transaction->m_rulesMessages.begin();
+    std::advance(it, index);
+    return it->m_rule.m_ruleId;
 }
 
 

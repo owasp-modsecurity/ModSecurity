@@ -739,6 +739,12 @@ int msc_update_status_code(Transaction *transaction, int status);
 /** @ingroup ModSecurity_C_API */
 int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
 
+/** @ingroup ModSecurity_C_API */
+size_t msc_get_matched_rules_count(Transaction *transaction);
+
+/** @ingroup ModSecurity_C_API */
+int64_t msc_get_matched_rule_id(Transaction *transaction, size_t index);
+
 #ifdef __cplusplus
 }
 }  // namespace modsecurity
