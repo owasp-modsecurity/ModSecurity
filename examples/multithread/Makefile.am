@@ -15,8 +15,7 @@ multithread_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
-	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(SSDEEP_LDADD)
 
 multithread_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -28,12 +27,11 @@ multithread_LDFLAGS = \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
 	$(MAXMIND_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(SSDEEP_LDFLAGS)
 
 multithread_CPPFLAGS = \
 	$(GLOBAL_CFLAGS) \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	-I$(top_builddir) \
 	-g \
 	-I../others \
@@ -43,7 +41,6 @@ multithread_CPPFLAGS = \
 	$(GEOIP_CFLAGS) \
 	$(GLOBAL_CPPFLAGS) \
 	$(MODSEC_NO_LOGS) \
-	$(YAJL_CFLAGS) \
 	$(LMDB_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(PCRE_CFLAGS) \
@@ -53,5 +50,3 @@ multithread_CPPFLAGS = \
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
-
-

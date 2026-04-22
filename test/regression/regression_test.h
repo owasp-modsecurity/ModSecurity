@@ -13,8 +13,6 @@
  *
  */
 
-#include <yajl/yajl_tree.h>
-
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -24,6 +22,8 @@
 #include <optional>
 #include <memory>
 
+#include "test/common/json.h"
+
 #ifndef TEST_REGRESSION_REGRESSION_TEST_H_
 #define TEST_REGRESSION_REGRESSION_TEST_H_
 
@@ -32,7 +32,10 @@ namespace modsecurity_test {
 
 class RegressionTest {
  public:
-    static std::unique_ptr<RegressionTest> from_yajl_node(const yajl_val &);
+    static std::unique_ptr<RegressionTest> from_json_document(
+        const modsecurity_test::json::JsonDocument *document);
+    static std::unique_ptr<RegressionTest> from_json_value(
+        modsecurity_test::json::JsonValue value);
 
     static std::string print();
     std::string filename;
@@ -69,12 +72,6 @@ class RegressionTest {
     std::string uri;
     std::string resource;
 
-    static inline std::string yajl_array_to_str(const yajl_val &node);
-    static inline std::vector<std::string> yajl_array_to_vec_str(
-        const yajl_val &node);
-    static inline std::vector<std::pair<std::string, std::string>>
-        yajl_array_to_map(const yajl_val &node);
-
     int http_code;
     std::string redirect_url;
 
@@ -86,17 +83,20 @@ class RegressionTest {
     void update_content_lengths();
 
 private:
-   void update_client_from_yajl_node(const yajl_val &val);
-   void update_server_from_yajl_node(const yajl_val &val);
-   void update_request_from_yajl_node(const yajl_val &val);
-   void update_response_from_yajl_node(const yajl_val &val);
-   void update_expected_from_yajl_node(const yajl_val &val);
-   void update_rules_from_yajl_node(const yajl_val &val);
+   void update_client_from_json_value(modsecurity_test::json::JsonValue value);
+   void update_server_from_json_value(modsecurity_test::json::JsonValue value);
+   void update_request_from_json_value(modsecurity_test::json::JsonValue value);
+   void update_response_from_json_value(modsecurity_test::json::JsonValue value);
+   void update_expected_from_json_value(modsecurity_test::json::JsonValue value);
+   void update_rules_from_json_value(modsecurity_test::json::JsonValue value);
 };
 
 class RegressionTests {
  public:
-    static std::unique_ptr<RegressionTests> from_yajl_node(const yajl_val &);
+    static std::unique_ptr<RegressionTests> from_json_document(
+        const modsecurity_test::json::JsonDocument *document);
+    static std::unique_ptr<RegressionTests> from_json_value(
+        modsecurity_test::json::JsonValue value);
     void update_content_lengths();
     std::string toJSON() const;
 

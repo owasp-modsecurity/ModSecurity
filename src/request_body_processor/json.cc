@@ -13,95 +13,149 @@
  *
  */
 
-
-#ifdef WITH_YAJL
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "src/request_body_processor/json.h"
 
-#include <list>
-#include <iostream>
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <string>
 
+#include "src/request_body_processor/json_adapter.h"
+#include "src/request_body_processor/json_instrumentation.h"
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+
+namespace modsecurity::RequestBodyProcessor {
 
 static const double json_depth_limit_default = 10000.0;
 static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
 
+namespace {
+
+void assignJsonErrorMessage(std::string *err, JsonParseStatus parse_status,
+    const std::string &detail) {
+    if (err == nullptr) {
+        return;
+    }
+
+    if (!detail.empty()) {
+        err->assign(detail);
+        return;
+    }
+
+    switch (parse_status) {
+        case JsonParseStatus::ParseError:
+            err->assign("Invalid JSON body.");
+            break;
+        case JsonParseStatus::TruncatedInput:
+            err->assign("Incomplete JSON body.");
+            break;
+        case JsonParseStatus::Utf8Error:
+            err->assign("Invalid UTF-8 in JSON body.");
+            break;
+        case JsonParseStatus::EngineAbort:
+            err->assign("JSON traversal aborted by ModSecurity.");
+            break;
+        case JsonParseStatus::InternalError:
+            err->assign("Internal JSON backend failure.");
+            break;
+        case JsonParseStatus::Ok:
+            err->clear();
+            break;
+    }
+}
+
+JsonSinkStatus startContainer(
+    std::deque<std::unique_ptr<JSONContainer>> *containers,
+    std::unique_ptr<JSONContainer> container, int64_t *current_depth,
+    double max_depth, bool *depth_limit_exceeded) {
+    containers->push_back(std::move(container));
+    (*current_depth)++;
+    if (*current_depth > max_depth) {
+        *depth_limit_exceeded = true;
+        return JsonSinkStatus::DepthLimitExceeded;
+    }
+    return JsonSinkStatus::Continue;
+}
+
+JsonSinkStatus endContainer(
+    std::deque<std::unique_ptr<JSONContainer>> *containers,
+    int64_t *current_depth) {
+    if (containers->empty()) {
+        return JsonSinkStatus::InternalError;
+    }
+
+    containers->pop_back();
+
+    if (!containers->empty()) {
+        auto *array = dynamic_cast<JSONContainerArray *>(containers->back().get());
+        if (array != nullptr) {
+            array->m_elementCounter++;
+        }
+    }
+
+    (*current_depth)--;
+    if (*current_depth < 0) {
+        *current_depth = 0;
+        return JsonSinkStatus::InternalError;
+    }
+
+    return JsonSinkStatus::Continue;
+}
+
+JsonSinkStatus addArgumentAsSinkStatus(JSON *json,
+    const std::string &argument_value) {
+    return json->addArgument(argument_value) != 0 ? JsonSinkStatus::Continue
+        : JsonSinkStatus::EngineAbort;
+}
+
+JsonSinkStatus addStringViewAsSinkStatus(JSON *json, std::string_view value) {
+    return addArgumentAsSinkStatus(json, std::string(value.data(), value.size()));
+}
+
+}  // namespace
+
 JSON::JSON(Transaction *transaction) : m_transaction(transaction),
-    m_handle(NULL),
     m_current_key(""),
+    m_data(""),
     m_max_depth(json_depth_limit_default),
     m_current_depth(0),
     m_depth_limit_exceeded(false) {
-    /**
-     * yajl callback functions
-     * For more information on the function signatures and order, check
-     * http://lloyd.github.com/yajl/yajl-1.0.12/structyajl__callbacks.html
-     */
-
-    /**
-     * yajl configuration and callbacks
-     */
-    static yajl_callbacks callbacks = {
-        yajl_null,
-        yajl_boolean,
-        NULL /* yajl_integer  */,
-        NULL /* yajl_double */,
-        yajl_number,
-        yajl_string,
-        yajl_start_map,
-        yajl_map_key,
-        yajl_end_map,
-        yajl_start_array,
-        yajl_end_array
-    };
-
-
-    /**
-     * yajl initialization
-     *
-     * yajl_parser_config definition:
-     * http://lloyd.github.io/yajl/yajl-2.0.1/yajl__parse_8h.html#aec816c5518264d2ac41c05469a0f986c
-     *
-     * TODO: make UTF8 validation optional, as it depends on Content-Encoding
-     */
-    m_handle = yajl_alloc(&callbacks, NULL, this);
-
-    yajl_config(m_handle, yajl_allow_partial_values, 0);
 }
 
 
 JSON::~JSON() {
-    while (m_containers.size() > 0) {
-        JSONContainer *a = m_containers.back();
-        m_containers.pop_back();
-        delete a;
-    }
-    yajl_free(m_handle);
+    clearContainers();
 }
 
 
 bool JSON::init() {
+    clearContainers();
+    m_current_key.clear();
+    m_data.clear();
+    m_current_depth = 0;
+    m_depth_limit_exceeded = false;
+
     return true;
 }
 
 
-bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
-    /* Feed our parser and catch any errors */
-    m_status = yajl_parse(m_handle,
-        (const unsigned char *)buf, size);
-    if (m_status != yajl_status_ok) {
-        unsigned char *e = yajl_get_error(m_handle, 0,
-            (const unsigned char *)buf, size);
-        /* We need to free the yajl error message later, how to do this? */
-        err->assign((const char *)e);
-        if (m_depth_limit_exceeded) {
-            err->append(json_depth_limit_exceeded_msg);
-	}
-        yajl_free_error(m_handle, e);
-        return false;
+bool JSON::processChunk(const char *buf, unsigned int size,
+    const std::string *err) {
+    (void) err;
+    if (buf != nullptr && size > 0) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+        const auto start_time = std::chrono::steady_clock::now();
+        m_data.append(buf, size);
+        recordJsonProcessChunkAppend(size, static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - start_time).count()));
+#else
+        m_data.append(buf, size);
+#endif
     }
 
     return true;
@@ -109,16 +163,20 @@ bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
 
 
 bool JSON::complete(std::string *err) {
-    /* Wrap up the parsing process */
-    m_status = yajl_complete_parse(m_handle);
-    if (m_status  != yajl_status_ok) {
-        unsigned char *e = yajl_get_error(m_handle, 0, NULL, 0);
-        /* We need to free the yajl error message later, how to do this? */
-        err->assign((const char *)e);
-        if (m_depth_limit_exceeded) {
+    if (m_data.empty()) {
+        return true;
+    }
+
+    JSONAdapter adapter;
+    if (JsonParseResult result = adapter.parse(m_data,
+            static_cast<JsonEventSink *>(this)); !result.ok()) {
+        if (result.sink_status == JsonSinkStatus::DepthLimitExceeded) {
+            m_depth_limit_exceeded = true;
+        }
+        assignJsonErrorMessage(err, result.parse_status, result.detail);
+        if (m_depth_limit_exceeded && err != nullptr) {
             err->append(json_depth_limit_exceeded_msg);
-	}
-        yajl_free_error(m_handle, e);
+        }
         return false;
     }
 
@@ -132,9 +190,9 @@ int JSON::addArgument(const std::string& value) {
 
     for (size_t i =  0; i < m_containers.size(); i++) {
         const JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
-            m_containers[i]);
+            m_containers[i].get());
         path = path + m_containers[i]->m_name;
-        if (a != NULL) {
+        if (a != nullptr) {
             path = path + ".array_" + std::to_string(a->m_elementCounter);
         } else {
             path = path + ".";
@@ -143,7 +201,7 @@ int JSON::addArgument(const std::string& value) {
 
     if (m_containers.size() > 0) {
         JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
-            m_containers.back());
+            m_containers.back().get());
         if (a) {
             a->m_elementCounter++;
         } else {
@@ -163,158 +221,57 @@ int JSON::addArgument(const std::string& value) {
 }
 
 
-/**
- * Callback for hash key values; we use those to define the variable names
- * under ARGS. Whenever we reach a new key, we update the current key value.
- */
-int JSON::yajl_map_key(void *ctx, const unsigned char *key, size_t length) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    std::string safe_key;
-
-    /**
-     * yajl does not provide us with null-terminated strings, but
-     * rather expects us to copy the data from the key up to the
-     * length informed; we create a standalone null-termined copy
-     * in safe_key
-     */
-    safe_key.assign((const char *)key, length);
-
-    tthis->m_current_key = safe_key;
-
-    return 1;
+JsonSinkStatus JSON::on_key(std::string_view value) {
+    m_current_key.assign(value.data(), value.size());
+    return JsonSinkStatus::Continue;
 }
 
 
-/**
- * Callback for null values
- *
- */
-int JSON::yajl_null(void *ctx) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    return tthis->addArgument("");
+JsonSinkStatus JSON::on_null() {
+    return addArgumentAsSinkStatus(this, "");
 }
 
 
-/**
- * Callback for boolean values
- */
-int JSON::yajl_boolean(void *ctx, int value) {
-    JSON *tthis =  reinterpret_cast<JSON *>(ctx);
-    if (value) {
-        return tthis->addArgument("true");
-    }
-    return tthis->addArgument("false");
+JsonSinkStatus JSON::on_boolean(bool value) {
+    return addArgumentAsSinkStatus(this, value ? "true" : "false");
 }
 
 
-/**
- * Callback for string values
- */
-int JSON::yajl_string(void *ctx, const unsigned char *value, size_t length) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    std::string v = std::string((const char*)value, length);
-    return tthis->addArgument(v);
+JsonSinkStatus JSON::on_string(std::string_view value) {
+    return addStringViewAsSinkStatus(this, value);
 }
 
 
-/**
- * Callback for numbers; YAJL can use separate callbacks for integers/longs and
- * float/double values, but since we are not interested in using the numeric
- * values here, we use a generic handler which uses numeric strings
- */
-int JSON::yajl_number(void *ctx, const char *value, size_t length) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    std::string v = std::string((const char*)value, length);
-    return tthis->addArgument(v);
+JsonSinkStatus JSON::on_number(std::string_view value) {
+    return addStringViewAsSinkStatus(this, value);
 }
 
 
-/**
- * Callback for a new hash, which indicates a new subtree, labeled as the
- * current argument name, is being created
- */
-int JSON::yajl_start_array(void *ctx) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    std::string name = tthis->getCurrentKey();
-    tthis->m_containers.push_back(
-        reinterpret_cast<JSONContainer *>(new JSONContainerArray(name)));
-    tthis->m_current_depth++;
-    if (tthis->m_current_depth > tthis->m_max_depth) {
-        tthis->m_depth_limit_exceeded = true;
-        return 0;
-    }
-    return 1;
+JsonSinkStatus JSON::on_start_array() {
+    return startContainer(&m_containers,
+        std::make_unique<JSONContainerArray>(getCurrentKey()),
+        &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
 
-int JSON::yajl_end_array(void *ctx) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    if (tthis->m_containers.empty()) {
-        tthis->m_current_depth--;
-        return 1;
-    }
-
-    JSONContainer *a = tthis->m_containers.back();
-    tthis->m_containers.pop_back();
-    delete a;
-    if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
-            tthis->m_containers.back());
-        if (ja) {
-            ja->m_elementCounter++;
-        }
-    }
-    tthis->m_current_depth--;
-
-    return 1;
+JsonSinkStatus JSON::on_end_array() {
+    return endContainer(&m_containers, &m_current_depth);
 }
 
 
-int JSON::yajl_start_map(void *ctx) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    std::string name(tthis->getCurrentKey());
-    tthis->m_containers.push_back(
-        reinterpret_cast<JSONContainer *>(new JSONContainerMap(name)));
-    tthis->m_current_depth++;
-    if (tthis->m_current_depth > tthis->m_max_depth) {
-        tthis->m_depth_limit_exceeded = true;
-        return 0;
-    }
-    return 1;
+JsonSinkStatus JSON::on_start_object() {
+    return startContainer(&m_containers,
+        std::make_unique<JSONContainerMap>(getCurrentKey()),
+        &m_current_depth, m_max_depth, &m_depth_limit_exceeded);
 }
 
 
-/**
- * Callback for end hash, meaning the current subtree is being closed, and that
- * we should go back to the parent variable label
- */
-int JSON::yajl_end_map(void *ctx) {
-    JSON *tthis = reinterpret_cast<JSON *>(ctx);
-    if (tthis->m_containers.empty()) {
-        tthis->m_current_depth--;
-        return 1;
-    }
-
-    JSONContainer *a = tthis->m_containers.back();
-    tthis->m_containers.pop_back();
-    delete a;
-
-    if (tthis->m_containers.size() > 0) {
-        JSONContainerArray *ja = dynamic_cast<JSONContainerArray *>(
-            tthis->m_containers.back());
-        if (ja) {
-            ja->m_elementCounter++;
-        }
-    }
-
-    tthis->m_current_depth--;
-    return 1;
+JsonSinkStatus JSON::on_end_object() {
+    return endContainer(&m_containers, &m_current_depth);
 }
 
+void JSON::clearContainers() {
+    m_containers.clear();
+}
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
-
-
-#endif  // WITH_YAJL
-
+}  // namespace modsecurity::RequestBodyProcessor

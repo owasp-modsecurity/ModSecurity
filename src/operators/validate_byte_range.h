@@ -16,11 +16,9 @@
 #ifndef SRC_OPERATORS_VALIDATE_BYTE_RANGE_H_
 #define SRC_OPERATORS_VALIDATE_BYTE_RANGE_H_
 
+#include <array>
 #include <string>
-#include <vector>
-#include <cstring>
 #include <memory>
-#include <utility>
 
 #include "src/operators/operator.h"
 
@@ -32,9 +30,7 @@ class ValidateByteRange : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit ValidateByteRange(std::unique_ptr<RunTimeString> param)
-        : Operator("ValidateByteRange", std::move(param)) {
-            std::memset(table, '\0', sizeof(char) * 32);
-        }
+        : Operator("ValidateByteRange", std::move(param)) { }
     ~ValidateByteRange() override { }
 
     bool evaluate(Transaction *transaction, RuleWithActions *rule,
@@ -42,9 +38,15 @@ class ValidateByteRange : public Operator {
         RuleMessage &ruleMessage) override;
     bool getRange(const std::string &rangeRepresentation, std::string *error);
     bool init(const std::string& file, std::string *error) override;
+
  private:
-    std::vector<std::string> ranges;
-    char table[32];
+    static constexpr size_t kTableSize = 32;
+
+    bool getRange(const std::string &rangeRepresentation,
+        std::array<unsigned char, kTableSize> *targetTable,
+        std::string *error) const;
+
+    std::array<unsigned char, kTableSize> table{};
 };
 
 }  // namespace operators

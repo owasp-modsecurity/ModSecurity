@@ -19,15 +19,12 @@ multi_LDFLAGS = \
 	-lstdc++ \
 	$(LUA_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
-	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(MAXMIND_LDFLAGS)
 
 multi_CFLAGS = \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	-I$(top_builddir) \
 	$(GLOBAL_CFLAGS)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
-
-

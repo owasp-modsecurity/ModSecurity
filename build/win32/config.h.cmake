@@ -57,11 +57,14 @@
 /* Define if SSDEEP is available */
 #cmakedefine HAVE_SSDEEP
 
-/* Define if YAJL is available */
-#cmakedefine HAVE_YAJL
-
 /* Define if libcurl is available */
 #cmakedefine HAVE_CURL
+
+/* Define if jsoncons is the selected internal JSON backend */
+#cmakedefine MSC_JSON_BACKEND_JSONCONS
+
+/* Define if simdjson is the selected internal JSON backend */
+#cmakedefine MSC_JSON_BACKEND_SIMDJSON
 
 /* Name of package */
 #define PACKAGE "@PACKAGE_NAME@"

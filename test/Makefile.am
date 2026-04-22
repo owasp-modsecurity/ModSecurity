@@ -23,7 +23,8 @@ noinst_PROGRAMS =
 EXTRA_DIST = \
 	test-cases/* \
 	custom-test-driver \
-	test-suite.sh
+	test-suite.sh \
+	run-json-backend-matrix.sh
 
 
 # unit_tests
@@ -34,12 +35,20 @@ unit_tests_SOURCES = \
         unit/unit_test.cc \
         common/custom_debug_log.cc
 
+noinst_PROGRAMS += json_backend_depth_tests
+json_backend_depth_tests_SOURCES = \
+        unit/json_backend_depth_tests.cc
+
 
 noinst_HEADERS = \
-       common/modsecurity_test.cc \
-       common/*.h \
-       unit/*.h \
-       regression/*.h
+       $(srcdir)/common/colors.h \
+       $(srcdir)/common/custom_debug_log.h \
+       $(srcdir)/common/json.h \
+       $(srcdir)/common/modsecurity_test.h \
+       $(srcdir)/common/modsecurity_test_context.h \
+       $(srcdir)/common/modsecurity_test_results.h \
+       $(srcdir)/unit/unit_test.h \
+       $(srcdir)/regression/regression_test.h
 
 
 unit_tests_LDADD = \
@@ -52,8 +61,7 @@ unit_tests_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
-	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(SSDEEP_LDADD)
 
 
 unit_tests_LDFLAGS = \
@@ -66,16 +74,16 @@ unit_tests_LDFLAGS = \
 	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(SSDEEP_LDFLAGS)
 
 
 unit_tests_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir)/ \
+	-I$(top_srcdir)/others/jsoncons/include \
 	-I$(top_srcdir)/others \
 	-g \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
@@ -84,10 +92,18 @@ unit_tests_CPPFLAGS = \
 	$(LMDB_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
-	$(YAJL_CFLAGS) \
 	$(LUA_CFLAGS) \
 	$(SSDEEP_CFLAGS) \
 	$(LIBXML2_CFLAGS)
+
+json_backend_depth_tests_LDADD = \
+	$(unit_tests_LDADD)
+
+json_backend_depth_tests_LDFLAGS = \
+	$(unit_tests_LDFLAGS)
+
+json_backend_depth_tests_CPPFLAGS = \
+	$(unit_tests_CPPFLAGS)
 
 
 # regression
@@ -108,8 +124,7 @@ regression_tests_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
-	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(SSDEEP_LDADD)
 
 
 regression_tests_LDFLAGS = \
@@ -120,7 +135,6 @@ regression_tests_LDFLAGS = \
 	-lm \
 	-lstdc++ \
 	$(MAXMIND_LDFLAGS) \
-	$(YAJL_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(SSDEEP_LDFLAGS) \
 	$(LUA_LDFLAGS)
@@ -129,8 +143,9 @@ regression_tests_LDFLAGS = \
 regression_tests_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir) \
+	-I$(top_srcdir)/others/jsoncons/include \
 	-g \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
@@ -141,7 +156,6 @@ regression_tests_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
-	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
 
@@ -162,8 +176,7 @@ rules_optimization_LDADD = \
 	$(LUA_LDADD) \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
-	$(SSDEEP_LDADD) \
-	$(YAJL_LDADD)
+	$(SSDEEP_LDADD)
 
 rules_optimization_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
@@ -175,14 +188,13 @@ rules_optimization_LDFLAGS = \
 	$(MAXMIND_LDFLAGS) \
 	$(LMDB_LDFLAGS) \
 	$(LUA_LDFLAGS) \
-	$(SSDEEP_LDFLAGS) \
-	$(YAJL_LDFLAGS)
+	$(SSDEEP_LDFLAGS)
 
 rules_optimization_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir)/ \
 	-g \
-	-I$(top_builddir)/headers \
+	-I$(top_srcdir)/headers \
 	$(CURL_CFLAGS) \
 	$(MODSEC_NO_LOGS) \
 	$(GEOIP_CFLAGS) \
@@ -193,6 +205,4 @@ rules_optimization_CPPFLAGS = \
 	$(SSDEEP_CFLAGS) \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
-	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
-

@@ -96,6 +96,7 @@ TESTS+=test/test-cases/regression/operator-verifycpf.json
 TESTS+=test/test-cases/regression/operator-verifyssn.json
 TESTS+=test/test-cases/regression/operator-verifysvnr.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
+TESTS+=test/test-cases/regression/request-body-parser-json-backend-edgecases.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart-crlf.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart.json
 TESTS+=test/test-cases/regression/request-body-parser-xml.json

@@ -22,12 +22,157 @@
 #include <string>
 #include <algorithm>
 #include <memory>
+#include <utility>
 
-#ifdef WITH_YAJL
-#include <yajl/yajl_gen.h>
-#endif
+#include "src/utils/json_writer.h"
 
 namespace modsecurity_test {
+namespace {
+
+std::string join_strings(const std::vector<std::string> &values) {
+    std::stringstream stream;
+
+    for (const auto &entry : values) {
+        stream << entry;
+    }
+
+    return stream.str();
+}
+
+std::vector<std::string> json_array_to_vec_string(
+    modsecurity_test::json::JsonValue value) {
+    modsecurity_test::json::JsonArray array;
+    std::vector<std::string> values;
+
+    if (modsecurity_test::json::get(value.get_array(), &array) == false) {
+        return values;
+    }
+
+    for (auto entry_result : array) {
+        modsecurity_test::json::JsonValue entry;
+
+        if (modsecurity_test::json::get(std::move(entry_result), &entry)
+                == false) {
+            continue;
+        }
+
+        values.push_back(modsecurity_test::json::get_string(entry));
+    }
+
+    return values;
+}
+
+std::vector<std::pair<std::string, std::string>> json_object_to_map(
+    modsecurity_test::json::JsonValue value) {
+    modsecurity_test::json::JsonObject object;
+    std::vector<std::pair<std::string, std::string>> values;
+
+    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
+        return values;
+    }
+
+    for (auto field_result : object) {
+        modsecurity_test::json::JsonField field;
+        std::string_view key;
+        modsecurity_test::json::JsonValue child;
+
+        if (modsecurity_test::json::get(field_result, &field)
+                == false) {
+            continue;
+        }
+        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
+            continue;
+        }
+        child = field.value();
+
+        values.emplace_back(std::string(key),
+            modsecurity_test::json::get_string(child));
+    }
+
+    return values;
+}
+
+template <typename Callback>
+void for_each_json_field(modsecurity_test::json::JsonValue value,
+    Callback callback) {
+    modsecurity_test::json::JsonObject object;
+
+    if (modsecurity_test::json::get(value.get_object(), &object) == false) {
+        return;
+    }
+
+    for (auto field_result : object) {
+        modsecurity_test::json::JsonField field;
+        std::string_view key;
+        modsecurity_test::json::JsonValue child;
+
+        if (modsecurity_test::json::get(field_result, &field) == false) {
+            continue;
+        }
+        if (modsecurity_test::json::get(field.unescaped_key(), &key) == false) {
+            continue;
+        }
+
+        child = field.value();
+        callback(key, child);
+    }
+}
+
+void set_int_from_json(int &dest, std::string_view want_key,
+    std::string_view key, modsecurity_test::json::JsonValue value) {
+    if (key == want_key) {
+        dest = static_cast<int>(modsecurity_test::json::get_integer(value));
+    }
+}
+
+void set_opt_int_from_json(std::optional<int> &dest, std::string_view want_key,
+    std::string_view key, modsecurity_test::json::JsonValue value) {
+    if (key == want_key) {
+        dest = static_cast<int>(modsecurity_test::json::get_integer(value));
+    }
+}
+
+void set_string_from_json(std::string &dest, std::string_view want_key,
+    std::string_view key, modsecurity_test::json::JsonValue value) {
+    if (key == want_key) {
+        dest = modsecurity_test::json::get_string(value);
+    }
+}
+
+std::unique_ptr<RegressionTest> make_empty_regression_test() {
+    auto test = std::make_unique<RegressionTest>();
+    test->enabled = 0;
+    test->version_min = 0;
+    test->clientPort = 0;
+    test->serverPort = 0;
+    test->http_code = 200;
+    return test;
+}
+
+void append_headers(modsecurity::utils::JsonWriter *writer,
+    const std::vector<std::pair<std::string, std::string>> &headers) {
+    writer->start_object();
+    for (const auto &[name, value] : headers) {
+        writer->key(name);
+        writer->string(value);
+    }
+    writer->end_object();
+}
+
+void append_string_array(modsecurity::utils::JsonWriter *writer,
+    std::vector<std::string> values) {
+    if (values.empty()) {
+        values.emplace_back("");
+    }
+
+    writer->start_array();
+    for (const auto &value : values) {
+        writer->string(value);
+    }
+    writer->end_array();
+}
+
+}  // namespace
 
 std::string RegressionTest::print() {
     std::stringstream i;
@@ -48,184 +193,148 @@ std::string RegressionTest::print() {
     return i.str();
 }
 
+std::unique_ptr<RegressionTest> RegressionTest::from_json_document(
+    const modsecurity_test::json::JsonDocument *document) {
+    modsecurity_test::json::JsonValue root;
 
-inline std::string RegressionTest::yajl_array_to_str(const yajl_val &node) {
-    std::stringstream i;
-    for (int z = 0; z < node->u.array.len; z++) {
-        yajl_val val3 = node->u.array.values[z];
-        const char *key = YAJL_GET_STRING(val3);
-        i << key;
+    if (modsecurity_test::json::get(document->get_value(), &root) == false) {
+        return make_empty_regression_test();
     }
-    return i.str();
-}
 
-
-inline std::vector<std::string> RegressionTest::yajl_array_to_vec_str(
-    const yajl_val &node) {
-    std::vector<std::string> vec;
-    for (int z = 0; z < node->u.array.len; z++) {
-        yajl_val val3 = node->u.array.values[z];
-        const char *key = YAJL_GET_STRING(val3);
-        vec.push_back(key);
+    modsecurity_test::json::JsonType type;
+    if (modsecurity_test::json::get(root.type(), &type) == false) {
+        return make_empty_regression_test();
     }
-    return vec;
-}
 
-
-inline std::vector<std::pair<std::string, std::string>>
-    RegressionTest::yajl_array_to_map(const yajl_val &node) {
-    std::vector<std::pair<std::string, std::string>> vec;
-    for (int z = 0; z < node->u.object.len; z++) {
-        const char *key = node->u.object.keys[z];
-        yajl_val val3 = node->u.object.values[z];
-        const char *value = YAJL_GET_STRING(val3);
-        std::pair<std::string, std::string> a(key, value);
-        vec.push_back(a);
-    }
-    return vec;
-}
-
-static inline void set_int_from_yajl(int &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
-    if (key == want_key) {
-        dest = YAJL_GET_INTEGER(val);
-    }
-}
-
-static inline void set_opt_int_from_yajl(std::optional<int> &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
-    if (key == want_key) {
-        dest = YAJL_GET_INTEGER(val);
-    }
-}
-
-static inline void set_string_from_yajl(std::string &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
-    if (key == want_key) {
-        dest = YAJL_GET_STRING(val);
-    }
-}
-
-std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &node) {
-    size_t nelem = node->u.object.len;
-    auto u = std::make_unique<RegressionTest>();
-    u->http_code = 200;
-
-    for (int i = 0; i < nelem; i++) {
-        const char *key = node->u.object.keys[ i ];
-        yajl_val val = node->u.object.values[ i ];
-
-        set_int_from_yajl(u->enabled, "enabled", key, val);
-        set_int_from_yajl(u->version_min, "version_min", key, val);
-        set_opt_int_from_yajl(u->version_max, "version_max", key, val);
-        set_string_from_yajl(u->title, "title", key, val);
-        set_string_from_yajl(u->url, "url", key, val);
-        set_string_from_yajl(u->resource, "resource", key, val);
-        set_opt_int_from_yajl(u->github_issue, "github_issue", key, val);
-        if (strcmp(key, "client") == 0) {
-            u->update_client_from_yajl_node(val);
+    if (type == modsecurity_test::json::JsonType::Array) {
+        modsecurity_test::json::JsonArray tests;
+        if (modsecurity_test::json::get(root.get_array(), &tests) == false) {
+            return make_empty_regression_test();
         }
-        if (strcmp(key, "server") == 0) {
-            u->update_server_from_yajl_node(val);
+
+        for (auto test_result : tests) {
+            modsecurity_test::json::JsonValue test;
+            if (modsecurity_test::json::get(std::move(test_result), &test)
+                    == false) {
+                continue;
+            }
+
+            return from_json_value(test);
         }
-        if (strcmp(key, "request") == 0) {
-            u->update_request_from_yajl_node(val);
-        }
-        if (strcmp(key, "response") == 0) {
-            u->update_response_from_yajl_node(val);
-        }
-        if (strcmp(key, "expected") == 0) {
-            u->update_expected_from_yajl_node(val);
-        }
-        if (strcmp(key, "rules") == 0) {
-            u->update_rules_from_yajl_node(val);
-        }
+
+        return make_empty_regression_test();
     }
 
-    u->name = u->title;
-
-    return u;
+    return from_json_value(root);
 }
 
-void RegressionTest::update_client_from_yajl_node(const yajl_val &val) {
-    for (int j = 0; j < val->u.object.len; j++) {
-        const char *key2 = val->u.object.keys[j];
-        yajl_val val2 = val->u.object.values[j];
+std::unique_ptr<RegressionTest> RegressionTest::from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    auto test = make_empty_regression_test();
 
-        set_string_from_yajl(clientIp, "ip", key2, val2);
-        set_int_from_yajl(clientPort, "port", key2, val2);
-    }
-}
+    for_each_json_field(value, [&test](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        set_int_from_json(test->enabled, "enabled", key, child);
+        set_int_from_json(test->version_min, "version_min", key, child);
+        set_opt_int_from_json(test->version_max, "version_max", key, child);
+        set_string_from_json(test->title, "title", key, child);
+        set_string_from_json(test->url, "url", key, child);
+        set_string_from_json(test->resource, "resource", key, child);
+        set_opt_int_from_json(test->github_issue, "github_issue", key, child);
 
-void RegressionTest::update_server_from_yajl_node(const yajl_val &val) {
-    for (int j = 0; j < val->u.object.len; j++) {
-        const char *key2 = val->u.object.keys[j];
-        yajl_val val2 = val->u.object.values[j];
-
-        set_string_from_yajl(serverIp, "ip", key2, val2);
-        set_int_from_yajl(serverPort, "port", key2, val2);
-        set_string_from_yajl(hostname, "hostname", key2, val2);
-    }
-}
-
-void RegressionTest::update_request_from_yajl_node(const yajl_val &val) {
-    for (int j = 0; j < val->u.object.len; j++) {
-        const char *key2 = val->u.object.keys[j];
-        yajl_val val2 = val->u.object.values[j];
-
-        set_string_from_yajl(uri, "uri", key2, val2);
-        set_string_from_yajl(method, "method", key2, val2);
-        if (strcmp(key2, "http_version") == 0) {
-            httpVersion = YAJL_GET_NUMBER(val2);
+        if (key == "client") {
+            test->update_client_from_json_value(child);
+        } else if (key == "server") {
+            test->update_server_from_json_value(child);
+        } else if (key == "request") {
+            test->update_request_from_json_value(child);
+        } else if (key == "response") {
+            test->update_response_from_json_value(child);
+        } else if (key == "expected") {
+            test->update_expected_from_json_value(child);
+        } else if (key == "rules") {
+            test->update_rules_from_json_value(child);
         }
-        if (strcmp(key2, "headers") == 0) {
-            request_headers = yajl_array_to_map(val2);
-        }
-        if (strcmp(key2, "body") == 0) {
-            request_body = yajl_array_to_str(val2);
-            request_body_lines = yajl_array_to_vec_str(val2);
-        }
-    }
+    });
+
+    test->name = test->title;
+    return test;
 }
 
-void RegressionTest::update_response_from_yajl_node(const yajl_val &val) {
-    for (int j = 0; j < val->u.object.len; j++) {
-        const char *key2 = val->u.object.keys[j];
-        yajl_val val2 = val->u.object.values[j];
+void RegressionTest::update_client_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        set_string_from_json(clientIp, "ip", key, child);
+        set_int_from_json(clientPort, "port", key, child);
+    });
+}
 
-        if (strcmp(key2, "headers") == 0) {
-            response_headers = yajl_array_to_map(val2);
+void RegressionTest::update_server_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        set_string_from_json(serverIp, "ip", key, child);
+        set_int_from_json(serverPort, "port", key, child);
+        set_string_from_json(hostname, "hostname", key, child);
+    });
+}
+
+void RegressionTest::update_request_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        set_string_from_json(uri, "uri", key, child);
+        set_string_from_json(method, "method", key, child);
+        if (key == "http_version") {
+            httpVersion = modsecurity_test::json::get_raw_number(child);
+        } else if (key == "headers") {
+            request_headers = json_object_to_map(child);
+        } else if (key == "body") {
+            request_body_lines = json_array_to_vec_string(child);
+            request_body = join_strings(request_body_lines);
         }
-        if (strcmp(key2, "body") == 0) {
-            response_body = yajl_array_to_str(val2);
-            response_body_lines = yajl_array_to_vec_str(val2);
+    });
+}
+
+void RegressionTest::update_response_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        if (key == "headers") {
+            response_headers = json_object_to_map(child);
+        } else if (key == "body") {
+            response_body_lines = json_array_to_vec_string(child);
+            response_body = join_strings(response_body_lines);
         }
-        set_string_from_yajl(response_protocol, "protocol", key2, val2);
-    }
+        set_string_from_json(response_protocol, "protocol", key, child);
+    });
 }
 
-void RegressionTest::update_expected_from_yajl_node(const yajl_val &val) {
-    for (int j = 0; j < val->u.object.len; j++) {
-        const char *key2 = val->u.object.keys[j];
-        yajl_val val2 = val->u.object.values[j];
-
-        set_string_from_yajl(audit_log, "audit_log", key2, val2);
-        set_string_from_yajl(debug_log, "debug_log", key2, val2);
-        set_string_from_yajl(error_log, "error_log", key2, val2);
-        set_int_from_yajl(http_code, "http_code", key2, val2);
-        set_string_from_yajl(redirect_url, "redirect_url", key2, val2);
-        set_string_from_yajl(parser_error, "parser_error", key2, val2);
-    }
+void RegressionTest::update_expected_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    for_each_json_field(value, [this](std::string_view key,
+        modsecurity_test::json::JsonValue child) {
+        set_string_from_json(audit_log, "audit_log", key, child);
+        set_string_from_json(debug_log, "debug_log", key, child);
+        set_string_from_json(error_log, "error_log", key, child);
+        set_int_from_json(http_code, "http_code", key, child);
+        set_string_from_json(redirect_url, "redirect_url", key, child);
+        set_string_from_json(parser_error, "parser_error", key, child);
+    });
 }
 
-void RegressionTest::update_rules_from_yajl_node(const yajl_val &val) {
-    std::stringstream si;
-    for (int j = 0; j < val->u.array.len; j++) {
-        yajl_val val2 = val->u.array.values[ j ];
-        const char *keyj = YAJL_GET_STRING(val2);
-        si << keyj << "\n";
-    }
-    rules = si.str();
-    rules_lines = yajl_array_to_vec_str(val);
-}
+void RegressionTest::update_rules_from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    std::stringstream stream;
 
+    rules_lines = json_array_to_vec_string(value);
+    for (const auto &line : rules_lines) {
+        stream << line << "\n";
+    }
+
+    rules = stream.str();
+}
 
 constexpr char ascii_tolower(char c) {
     return 'A' <= c && c <= 'Z' ? (c + ('a' - 'A')) : c;
@@ -239,15 +348,18 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
             });
 }
 
-static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
+static bool has_chunked_header(
+    const std::vector<std::pair<std::string, std::string>> &headers) {
     return std::any_of(std::begin(headers), std::end(headers),
         [](const auto &header) {
             const auto &[name, value]{header};
-            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
+            return iequals_ascii(name, "Transfer-Encoding")
+                && iequals_ascii(value, "chunked");
         });
 }
 
-static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
+static void update_content_length(
+    std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
     if (has_chunked_header(headers)) {
         return;
     }
@@ -260,7 +372,8 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
         }
     }
     if (!has_content_length) {
-        headers.emplace_back(std::pair{"Content-Length", std::to_string(length)});
+        headers.emplace_back(
+            std::pair{"Content-Length", std::to_string(length)});
     }
 }
 
@@ -269,187 +382,149 @@ void RegressionTest::update_content_lengths() {
     update_content_length(response_headers, response_body.size());
 }
 
-std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val &node) {
-    auto u = std::make_unique<RegressionTests>();
-    size_t num_tests = node->u.array.len;
-    for (int i = 0; i < num_tests; i++) {
-        yajl_val obj = node->u.array.values[i];
-        u->tests.emplace_back(std::move(RegressionTest::from_yajl_node(obj)));
+std::unique_ptr<RegressionTests> RegressionTests::from_json_document(
+    const modsecurity_test::json::JsonDocument *document) {
+    modsecurity_test::json::JsonValue root;
+
+    if (modsecurity_test::json::get(document->get_value(), &root) == false) {
+        return std::make_unique<RegressionTests>();
     }
-    return u;
+
+    return from_json_value(root);
+}
+
+std::unique_ptr<RegressionTests> RegressionTests::from_json_value(
+    modsecurity_test::json::JsonValue value) {
+    auto tests = std::make_unique<RegressionTests>();
+    modsecurity_test::json::JsonType type;
+
+    if (modsecurity_test::json::get(value.type(), &type) == false) {
+        return tests;
+    }
+
+    if (type == modsecurity_test::json::JsonType::Array) {
+        modsecurity_test::json::JsonArray array;
+
+        if (modsecurity_test::json::get(value.get_array(), &array) == false) {
+            return tests;
+        }
+
+        for (auto test_result : array) {
+            modsecurity_test::json::JsonValue test_value;
+            if (modsecurity_test::json::get(std::move(test_result), &test_value)
+                    == false) {
+                continue;
+            }
+            tests->tests.emplace_back(
+                RegressionTest::from_json_value(test_value));
+        }
+        return tests;
+    }
+
+    if (type == modsecurity_test::json::JsonType::Object) {
+        tests->tests.emplace_back(RegressionTest::from_json_value(value));
+    }
+
+    return tests;
 }
 
 void RegressionTests::update_content_lengths() {
-    for (auto & test : tests) {
+    for (auto &test : tests) {
         test->update_content_lengths();
     }
 }
 
-#ifdef WITH_YAJL
-
-static yajl_gen_status gen_string_view(yajl_gen g, std::string_view s) {
-    return yajl_gen_string(g, reinterpret_cast<const unsigned char *>(s.data()), s.length());
-}
-
-static yajl_gen_status gen_key_str(yajl_gen g, std::string_view key, std::string_view val) {
-    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    return gen_string_view(g, val);
-}
-
-static yajl_gen_status gen_key_str_if_non_empty(yajl_gen g, std::string_view key, std::string_view val) {
-    if (val.empty()) {
-        return yajl_gen_status_ok;
-    }
-    return gen_key_str(g, key, val);
-}
-
-static yajl_gen_status gen_key_int(yajl_gen g, std::string_view key, int val) {
-    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    return yajl_gen_integer(g, val);
-}
-
-static yajl_gen_status gen_key_opt_int(yajl_gen g, std::string_view key, std::optional<int> val) {
-    if (!val.has_value()) {
-        return yajl_gen_status_ok;
-    }
-    return gen_key_int(g, key, val.value());
-}
-
-static yajl_gen_status gen_key_int_if_non_zero(yajl_gen g, std::string_view key, int val) {
-    if (val == 0) {
-        return yajl_gen_status_ok;
-    }
-    return gen_key_int(g, key, val);
-}
-
-static yajl_gen_status gen_key_number(yajl_gen g, std::string_view key, std::string_view raw_val) {
-    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    return yajl_gen_number(g, reinterpret_cast<const char *>(raw_val.data()), raw_val.length());
-}
-
-static yajl_gen_status gen_key_str_array(yajl_gen g, std::string_view key, const std::vector<std::string> &lines) {
-    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    if (auto s{yajl_gen_array_open(g)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    for (const auto &line : lines) {
-        if (auto s{gen_string_view(g, line)}; s != yajl_gen_status_ok) {
-            return s;
-        }
-    }
-    return yajl_gen_array_close(g);
-}
-
-static yajl_gen_status gen_key_headers(yajl_gen g, std::string_view key, const std::vector<std::pair<std::string, std::string>> &headers) {
-    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    if (auto s{yajl_gen_map_open(g)}; s != yajl_gen_status_ok) {
-        return s;
-    }
-    for (const auto &[name, value] : headers) {
-        if (auto s{gen_key_str(g, name, value)}; s != yajl_gen_status_ok) {
-            return s;
-        }
-    }
-    return yajl_gen_map_close(g);
-}
-
 std::string RegressionTests::toJSON() const {
-    const unsigned char *buf;
-    size_t len;
-    yajl_gen g;
+    modsecurity::utils::JsonWriter writer(true, "  ");
 
-    g = yajl_gen_alloc(NULL);
-    if (g == NULL) {
-        return "";
-    }
-    yajl_gen_config(g, yajl_gen_beautify, 1);
-    yajl_gen_config(g, yajl_gen_indent_string, "  ");
+    const auto addString = [&writer](std::string_view key,
+        const std::string &value) {
+        writer.key(key);
+        writer.string(value);
+    };
+    const auto addStringIfNonEmpty = [&addString](
+        std::string_view key, const std::string &value) {
+        if (value.empty() == false) {
+            addString(key, value);
+        }
+    };
+    const auto addInteger = [&writer](std::string_view key, int value) {
+        writer.key(key);
+        writer.integer(value);
+    };
+    const auto addOptionalInteger = [&writer](std::string_view key,
+        const std::optional<int> &value) {
+        if (value.has_value()) {
+            writer.key(key);
+            writer.integer(value.value());
+        }
+    };
 
-    yajl_gen_array_open(g);
+    writer.start_array();
     for (const auto &t : tests) {
-        yajl_gen_map_open(g);
-        gen_key_int(g, "enabled", t->enabled);
-        gen_key_int(g, "version_min", t->version_min);
-        gen_key_opt_int(g, "version_max", t->version_max);
-        gen_key_str(g, "title", t->title);
-        gen_key_str_if_non_empty(g, "url", t->url);
-        gen_key_str_if_non_empty(g, "resource", t->resource);
-        gen_key_opt_int(g, "github_issue", t->github_issue);
+        writer.start_object();
+        addInteger("enabled", t->enabled);
+        addInteger("version_min", t->version_min);
+        addOptionalInteger("version_max", t->version_max);
+        addString("title", t->title);
+        addStringIfNonEmpty("url", t->url);
+        addStringIfNonEmpty("resource", t->resource);
+        addOptionalInteger("github_issue", t->github_issue);
 
-        gen_string_view(g, "client");
-        yajl_gen_map_open(g);
-        gen_key_str(g, "ip", t->clientIp);
-        gen_key_int(g, "port", t->clientPort);
-        yajl_gen_map_close(g);
+        writer.key("client");
+        writer.start_object();
+        addString("ip", t->clientIp);
+        addInteger("port", t->clientPort);
+        writer.end_object();
 
-        gen_string_view(g, "server");
-        yajl_gen_map_open(g);
-        gen_key_str(g, "ip", t->serverIp);
-        gen_key_int(g, "port", t->serverPort);
-        yajl_gen_map_close(g);
+        writer.key("server");
+        writer.start_object();
+        addString("ip", t->serverIp);
+        addInteger("port", t->serverPort);
+        writer.end_object();
 
-        gen_string_view(g, "request");
-        yajl_gen_map_open(g);
-        gen_key_headers(g, "headers", t->request_headers);
-        gen_key_str(g, "uri", t->uri);
-        gen_key_str(g, "method", t->method);
+        writer.key("request");
+        writer.start_object();
+        writer.key("headers");
+        append_headers(&writer, t->request_headers);
+        addString("uri", t->uri);
+        addString("method", t->method);
         if (!t->httpVersion.empty()) {
-            gen_key_number(g, "http_version", t->httpVersion);
+            writer.key("http_version");
+            writer.number(t->httpVersion);
         }
 
-        auto request_body_lines{t->request_body_lines};
-        if (request_body_lines.empty()) {
-            request_body_lines.emplace_back("");
-        }
-        gen_key_str_array(g, "body", request_body_lines);
+        writer.key("body");
+        append_string_array(&writer, t->request_body_lines);
+        writer.end_object();
 
-        yajl_gen_map_close(g);
+        writer.key("response");
+        writer.start_object();
+        writer.key("headers");
+        append_headers(&writer, t->response_headers);
+        writer.key("body");
+        append_string_array(&writer, t->response_body_lines);
+        addStringIfNonEmpty("protocol", t->response_protocol);
+        writer.end_object();
 
-        gen_string_view(g, "response");
-        yajl_gen_map_open(g);
-        gen_key_headers(g, "headers", t->response_headers);
+        writer.key("expected");
+        writer.start_object();
+        addStringIfNonEmpty("audit_log", t->audit_log);
+        addStringIfNonEmpty("debug_log", t->debug_log);
+        addStringIfNonEmpty("error_log", t->error_log);
+        addInteger("http_code", t->http_code);
+        addStringIfNonEmpty("redirect_url", t->redirect_url);
+        addStringIfNonEmpty("parser_error", t->parser_error);
+        writer.end_object();
 
-        auto response_body_lines{t->response_body_lines};
-        if (response_body_lines.empty()) {
-            response_body_lines.emplace_back("");
-        }
-        gen_key_str_array(g, "body", response_body_lines);
+        writer.key("rules");
+        append_string_array(&writer, t->rules_lines);
 
-        gen_key_str_if_non_empty(g, "protocol", t->response_protocol);
-        yajl_gen_map_close(g);
-
-        gen_string_view(g, "expected");
-        yajl_gen_map_open(g);
-        gen_key_str_if_non_empty(g, "audit_log", t->audit_log);
-        gen_key_str_if_non_empty(g, "debug_log", t->debug_log);
-        gen_key_str_if_non_empty(g, "error_log", t->error_log);
-        gen_key_int(g, "http_code", t->http_code);
-        gen_key_str_if_non_empty(g, "redirect_url", t->redirect_url);
-        gen_key_str_if_non_empty(g, "parser_error", t->parser_error);
-        yajl_gen_map_close(g);
-
-        gen_key_str_array(g, "rules", t->rules_lines);
-
-        yajl_gen_map_close(g);
+        writer.end_object();
     }
-    yajl_gen_array_close(g);
+    writer.end_array();
 
-    yajl_gen_get_buf(g, &buf, &len);
-    std::string s{reinterpret_cast<const char*>(buf), len};
-    yajl_gen_free(g);
-    return s;
+    return writer.to_string();
 }
-
-#endif // WITH_YAJL
 
 }  // namespace modsecurity_test

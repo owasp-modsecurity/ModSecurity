@@ -439,7 +439,6 @@ int main(int argc, char **argv)
     test.cmd_options(argc, argv);
 
     if (test.m_format) {
-#ifdef WITH_YAJL
         std::cout << "start formatting test case JSON files" << std::endl;
         ModSecurityTest<RegressionTests> test2;
         test2.cmd_options(argc, argv);
@@ -459,11 +458,6 @@ int main(int argc, char **argv)
         }
         std::cout << "finished formatting files." << std::endl;
         return 0;
-#else
-        std::cout << "Test utility cannot format test case JSON files without being built with YAJL." \
-            << std::endl;
-        return 1;
-#endif
     }
 
     if (!test.m_automake_output && !test.m_count_all) {

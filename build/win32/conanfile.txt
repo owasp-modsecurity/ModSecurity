@@ -1,5 +1,4 @@
 [requires]
-yajl/2.1.0
 pcre2/10.42
 libxml2/2.12.6
 lua/5.4.6

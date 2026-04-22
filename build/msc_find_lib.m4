@@ -10,11 +10,11 @@ dnl Sets and AC_SUBSTs:
 dnl   ${NAME}_CFLAGS, ${NAME}_LDADD, ${NAME}_LDFLAGS,
 dnl   ${NAME}_VERSION, ${NAME}_DISPLAY, ${NAME}_FOUND (0/1/2)
 dnl
-dnl NAME         - Variable prefix (e.g., YAJL, CURL, LIBXML2)
+dnl NAME         - Variable prefix (e.g., CURL, LIBXML2, LMDB)
 dnl PKG_NAMES    - Space-separated pkg-config names to try
-dnl HEADER       - Header file to look for (e.g., yajl/yajl_parse.h)
+dnl HEADER       - Header file to look for (e.g., libxml/parser.h)
 dnl LIB_NAMES    - Space-separated library names for -l flags
-dnl EXTRA_CFLAGS - Additional CFLAGS when found (e.g., -DWITH_YAJL)
+dnl EXTRA_CFLAGS - Additional CFLAGS when found (e.g., -DWITH_LIBXML2)
 dnl MIN_VERSION  - Optional minimum version for pkg-config check
 dnl WITH_NAME    - Optional --with-X name if different from lowercased NAME
 
@@ -208,7 +208,7 @@ if test "${_msc_header_dir}" = "."; then
         _msc_check_inc_path="$4"
     fi
 else
-    # Header with subdirectory (e.g., "yajl/yajl_parse.h")
+    # Header with subdirectory (e.g., "libxml/parser.h")
     if test -e "$4/include/$2"; then
         _msc_check_inc_path="$4/include"
     elif test -e "$4/$2"; then

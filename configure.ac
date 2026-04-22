@@ -27,7 +27,7 @@ m4_define([msc_version_with_patchlevel],
     [msc_version_major.msc_version_minor.msc_version_patchlevel])
 
 m4_define([msc_version_git],
-    [m4_esyscmd_s(git describe)])
+    [m4_esyscmd_s(git describe --tags --always 2>/dev/null || echo unknown)])
 
 m4_define([msc_version_info],
     [msc_version_c_plus_a:msc_version_patchlevel:msc_version_minor])
@@ -62,6 +62,23 @@ PKG_PROG_PKG_CONFIG
 # Set C++ standard version and check if compiler supports it.
 AX_CXX_COMPILE_STDCXX(17, noext, mandatory)
 
+AC_ARG_WITH([json-backend],
+    [AS_HELP_STRING([--with-json-backend=BACKEND],
+        [Select internal JSON backend: simdjson or jsoncons [default=simdjson]])],
+    [json_backend="$withval"],
+    [json_backend="simdjson"])
+
+case "$json_backend" in
+    simdjson|jsoncons)
+        ;;
+    *)
+        AC_MSG_ERROR([Unsupported JSON backend '$json_backend'. Use simdjson or jsoncons.])
+        ;;
+esac
+
+JSON_BACKEND="$json_backend"
+AC_SUBST([JSON_BACKEND])
+
 # Check for libinjection
 if ! test -f "${srcdir}/others/libinjection/src/libinjection_html5.c"; then
 AC_MSG_ERROR([\
@@ -80,7 +97,7 @@ AC_MSG_ERROR([\
    ])
 fi
 # Libinjection version
-AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe && cd ../..))
+AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && (git describe --tags --always 2>/dev/null || echo unknown) && cd ../..))
 AC_SUBST([LIBINJECTION_VERSION])
 
 # Check for Mbed TLS
@@ -101,16 +118,68 @@ AC_MSG_ERROR([\
    ])
 fi
 # Mbed TLS version
-AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && git describe && cd ../..))
+AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && (git describe --tags --always 2>/dev/null || echo unknown) && cd ../..))
+
+# Check for selected JSON backend
+if test "x$json_backend" = "xsimdjson"; then
+if ! test -f "${srcdir}/others/simdjson/singleheader/simdjson.h" || \
+   ! test -f "${srcdir}/others/simdjson/singleheader/simdjson.cpp"; then
+AC_MSG_ERROR([\
+
+
+  simdjson was not found within ModSecurity source directory.
+
+  simdjson code is available as part of ModSecurity source code in a format
+  of a git-submodule. git-submodule allow us to specify the correct version of
+  simdjson and still uses the simdjson repository to download it.
+
+  You can download simdjson using git:
+
+     $ git submodule update --init --recursive
+
+   ])
+fi
+JSON_BACKEND_VERSION=`cd "${srcdir}/others/simdjson" && git describe --tags --always 2>/dev/null || echo unknown`
+AC_DEFINE([MSC_JSON_BACKEND_SIMDJSON], [1],
+    [Define if simdjson is the selected internal JSON backend])
+elif test "x$json_backend" = "xjsoncons"; then
+if ! test -d "${srcdir}/others/jsoncons/include" || \
+   ! test -f "${srcdir}/others/jsoncons/include/jsoncons/json.hpp"; then
+AC_MSG_ERROR([\
+
+
+  jsoncons was not found within ModSecurity source directory.
+
+  jsoncons code is available as part of ModSecurity source code in a format
+  of a git-submodule. git-submodule allow us to specify the correct version of
+  jsoncons and still uses the jsoncons repository to download it.
+
+  You can download jsoncons using git:
+
+     $ git submodule update --init --recursive
+
+   ])
+fi
+JSON_BACKEND_VERSION=`cd "${srcdir}/others/jsoncons" && git describe --tags --always 2>/dev/null || echo unknown`
+AC_DEFINE([MSC_JSON_BACKEND_JSONCONS], [1],
+    [Define if jsoncons is the selected internal JSON backend])
+fi
+AC_SUBST([JSON_BACKEND_VERSION])
+
+AC_ARG_ENABLE([json-audit-instrumentation],
+    [AS_HELP_STRING([--enable-json-audit-instrumentation],
+        [Enable optional JSON audit instrumentation for benchmark builds [default=no]])],
+    [enable_json_audit_instrumentation="$enableval"],
+    [enable_json_audit_instrumentation="no"])
+
+AS_CASE([$enable_json_audit_instrumentation],
+    [yes], [AC_DEFINE([MSC_JSON_AUDIT_INSTRUMENTATION], [1],
+                [Define if optional JSON audit instrumentation is enabled])],
+    [no], [],
+    [AC_MSG_ERROR([Unsupported value '$enable_json_audit_instrumentation' for --enable-json-audit-instrumentation. Use yes or no.])])
 
 # SecLang test version
 AC_DEFUN([SECLANG_TEST_VERSION], m4_esyscmd_s(cd "test/test-cases/secrules-language-tests" && git log -1 --format="%h" --abbrev-commit && cd ../../..))
-
-
-# Check for yajl
-PROG_YAJL
-
-AM_CONDITIONAL([YAJL_VERSION], [test "$YAJL_VERSION" != ""])
 
 # Check for LibGeoIP
 PROG_GEOIP
@@ -306,14 +375,7 @@ fi
 
 
 # Decide if we want to build the tests or not.
-buildTestUtilities=false
-if test "x$YAJL_FOUND" = "x1"; then
-    # Regression tests will not be able to run without the logging support.
-    # But we still have the unit tests.
-    # if test "$debugLogs" = "true"; then
-        buildTestUtilities=true
-    # fi
-fi
+buildTestUtilities=true
 
 
 AM_CONDITIONAL([TEST_UTILITIES], [test $buildTestUtilities = true])
@@ -328,6 +390,8 @@ fi
 AM_CONDITIONAL([EXAMPLES], [test $buildExamples = true])
 AM_CONDITIONAL([BUILD_PARSER], [test $buildParser = true])
 AM_CONDITIONAL([USE_MUTEX_ON_PM], [test $mutexPm = true])
+AM_CONDITIONAL([JSON_BACKEND_SIMDJSON], [test "x$json_backend" = "xsimdjson"])
+AM_CONDITIONAL([JSON_BACKEND_JSONCONS], [test "x$json_backend" = "xjsoncons"])
 
 
 # General link options
@@ -422,6 +486,8 @@ AS_ECHO_N("   + libInjection                                  ....")
 echo LIBINJECTION_VERSION
 AS_ECHO_N("   + Mbed TLS                                      ....")
 echo MBEDTLS_VERSION
+AS_ECHO_N("   + JSON backend                                  ....")
+echo "$JSON_BACKEND ($JSON_BACKEND_VERSION)"
 AS_ECHO_N("   + SecLang tests                                 ....")
 echo SECLANG_TEST_VERSION
 
@@ -451,7 +517,6 @@ if test "x$GEOIP_FOUND" = "x2" && test "x$MAXMIND_FOUND" = "x2"; then
 fi
 
 MSC_STATUS_LIB([LibCURL                                      ], [CURL])
-MSC_STATUS_LIB([YAJL                                         ], [YAJL])
 MSC_STATUS_LIB([LMDB                                         ], [LMDB])
 MSC_STATUS_LIB([LibXML2                                      ], [LIBXML2])
 MSC_STATUS_LIB([SSDEEP                                       ], [SSDEEP])
@@ -532,4 +597,3 @@ if test "$aflFuzzer" = "true"; then
     echo "  $ export CC=afl-clang-fast "
     echo " "
 fi
-

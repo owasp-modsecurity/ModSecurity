@@ -77,25 +77,6 @@ typedef struct Rules_t RulesSet;
     do { } while (0);
 #endif
 
-
-#define LOGFY_ADD(a, b) \
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
-    if (b.data() == NULL) { \
-      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(""), \
-          strlen("")); \
-    } else { \
-      yajl_gen_string(g, reinterpret_cast<const unsigned char*>(b.data()), \
-          b.length()); \
-    }
-
-#define LOGFY_ADD_INT(a, b) \
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
-    yajl_gen_number(g, reinterpret_cast<const char*>(b), strlen(b));
-
-#define LOGFY_ADD_NUM(a, b) \
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>(a), strlen(a)); \
-    yajl_gen_integer(g, b);
-
 #ifdef __cplusplus
 
 namespace modsecurity {

@@ -13,12 +13,11 @@
  *
  */
 
-#include "modsecurity/transaction.h"
-
-#ifdef WITH_YAJL
-#include <yajl/yajl_tree.h>
-#include <yajl/yajl_gen.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
+
+#include "modsecurity/transaction.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -36,16 +35,16 @@
 #include "src/actions/disruptive/deny.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
+#include "src/request_body_processor/json.h"
+#include "src/request_body_processor/json_instrumentation.h"
 #include "src/request_body_processor/multipart.h"
 #include "src/request_body_processor/xml.h"
-#ifdef WITH_YAJL
-#include "src/request_body_processor/json.h"
-#endif
 #include "modsecurity/audit_log.h"
 #include "src/unique_id.h"
 #include "src/utils/string.h"
 #include "src/utils/system.h"
 #include "src/utils/decode.h"
+#include "src/utils/json_writer.h"
 #include "src/utils/random.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
@@ -59,6 +58,7 @@
 
 
 using modsecurity::actions::Action;
+using modsecurity::RequestBodyProcessor::captureRequestBodySnapshot;
 using modsecurity::RequestBodyProcessor::Multipart;
 using modsecurity::RequestBodyProcessor::XML;
 
@@ -142,11 +142,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
 #else
     m_xml(nullptr),
 #endif
-#ifdef WITH_YAJL
     m_json(new RequestBodyProcessor::JSON(this)),
-#else
-    m_json(nullptr),
-#endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_secXMLParseXmlIntoArgs(rules->m_secXMLParseXmlIntoArgs),
     m_logCbData(logCbData),
@@ -173,9 +169,7 @@ Transaction::~Transaction() {
     intervention::free(&m_it);
     intervention::clean(&m_it);
 
-#ifdef WITH_YAJL
     delete m_json;
-#endif
 #ifdef WITH_LIBXML2
     delete m_xml;
 #endif
@@ -693,13 +687,17 @@ int Transaction::processRequestBody() {
      */
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
+    const std::string requestBodySnapshot = captureRequestBodySnapshot(
+        m_requestBody);
+    const std::size_t requestBodySnapshotSize = requestBodySnapshot.size();
 
     bool requestBodyNoFilesLimitExceeded = false;
     if ((m_requestBodyType == WWWFormUrlEncoded) ||
         (m_requestBodyProcessor == JSONRequestBody) ||
         (m_requestBodyProcessor == XMLRequestBody)) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
-            && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
+            && (requestBodySnapshotSize
+                > m_rules->m_requestBodyNoFilesLimit.m_value)) {
             m_variableReqbodyError.set("1", 0);
             m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
             m_variableInboundDataError.set("1", m_variableOffset);
@@ -709,14 +707,40 @@ int Transaction::processRequestBody() {
 	}
     }
 
+    if (m_requestBodyProcessor == JSONRequestBody) {
+        // large size might cause issues in the parsing itself; omit if exceeded
+        if (!requestBodyNoFilesLimitExceeded) {
+            std::string error;
+            if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
+                m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
+            }
+            if (m_json->init() == true) {
+                m_json->processChunk(requestBodySnapshot.c_str(),
+                    requestBodySnapshotSize,
+                    &error);
+                m_json->complete(&error);
+            }
+            if (error.empty() == false && requestBodySnapshotSize > 0) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
+                    + error, m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
+        }
+    }
 #ifdef WITH_LIBXML2
-    if (m_requestBodyProcessor == XMLRequestBody) {
+    else if (m_requestBodyProcessor == XMLRequestBody) {
         // large size might cause issues in the parsing itself; omit if exceeded
         if (!requestBodyNoFilesLimitExceeded) {
             std::string error;
             if (m_xml->init() == true) {
-                m_xml->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                m_xml->processChunk(requestBodySnapshot.c_str(),
+                    requestBodySnapshotSize,
                     &error);
                 m_xml->complete(&error);
             }
@@ -732,49 +756,15 @@ int Transaction::processRequestBody() {
                 m_variableReqbodyProcessorError.set("0", m_variableOffset);
             }
         }
+    }
 #endif
-#if WITH_YAJL
-#ifdef WITH_LIBXML2
-    } else if (m_requestBodyProcessor == JSONRequestBody) {
-#else
-    if (m_requestBodyProcessor == JSONRequestBody) {
-#endif
-        // large size might cause issues in the parsing itself; omit if exceeded
-        if (!requestBodyNoFilesLimitExceeded) {
-            std::string error;
-            if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
-                m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
-            }
-            if (m_json->init() == true) {
-                m_json->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
-                    &error);
-                m_json->complete(&error);
-            }
-            if (error.empty() == false && m_requestBody.str().size() > 0) {
-                m_variableReqbodyError.set("1", m_variableOffset);
-                m_variableReqbodyProcessorError.set("1", m_variableOffset);
-                m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
-                    m_variableOffset);
-                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
-                    + error, m_variableOffset);
-            } else {
-                m_variableReqbodyError.set("0", m_variableOffset);
-                m_variableReqbodyProcessorError.set("0", m_variableOffset);
-            }
-        }
-#endif
-#if defined(WITH_LIBXML2) or defined(WITH_YAJL)
-    } else if (m_requestBodyType == MultiPartRequestBody) {
-#else
-    if (m_requestBodyType == MultiPartRequestBody) {
-#endif
+    else if (m_requestBodyType == MultiPartRequestBody) {
         std::string error;
         int reqbodyNoFilesLength = 0;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
-                m.process(m_requestBody.str(), &error, m_variableOffset);
+                m.process(requestBodySnapshot, &error, m_variableOffset);
             }
             reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
@@ -801,7 +791,7 @@ int Transaction::processRequestBody() {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
         if (!requestBodyNoFilesLimitExceeded) {
-            extractArguments("POST", m_requestBody.str(), m_variableOffset);
+            extractArguments("POST", requestBodySnapshot, m_variableOffset);
 	}
     } else if (m_requestBodyType != UnknownFormat) {
         /**
@@ -855,16 +845,16 @@ int Transaction::processRequestBody() {
     }
 
     fullRequest = fullRequest + "\n\n";
-    fullRequest = fullRequest + m_requestBody.str();
+    fullRequest = fullRequest + requestBodySnapshot;
     m_variableFullRequest.set(fullRequest, m_variableOffset);
     m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
         m_variableOffset);
 
     if (m_requestBody.tellp() > 0) {
-        m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
+        m_variableRequestBody.set(requestBodySnapshot, m_variableOffset);
         m_variableRequestBodyLength.set(std::to_string(
-            m_requestBody.str().size()),
-            m_variableOffset, m_requestBody.str().size());
+            requestBodySnapshotSize),
+            m_variableOffset, requestBodySnapshotSize);
     }
 
     this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
@@ -1564,197 +1554,139 @@ std::string Transaction::toOldAuditLogFormat(int parts,
 
 
 std::string Transaction::toJSON(int parts) {
-#ifdef WITH_YAJL
-    const unsigned char *buf;
-    size_t len;
-    yajl_gen g;
     std::string log;
     std::string ts = utils::string::ascTime(&m_timeStamp);
     std::string uniqueId = UniqueId::uniqueId();
+    utils::JsonWriter writer(false);
 
-    g = yajl_gen_alloc(NULL);
-    if (g == NULL) {
-      return "";
-    }
-    yajl_gen_config(g, yajl_gen_beautify, 0);
+    const auto addString = [&writer](std::string_view key,
+        const std::string &value) {
+        writer.key(key);
+        writer.string(value);
+    };
+    const auto addInteger = [&writer](std::string_view key, int64_t value) {
+        writer.key(key);
+        writer.integer(value);
+    };
 
-    /* main */
-    yajl_gen_map_open(g);
+    writer.start_object();
+    writer.key("transaction");
+    writer.start_object();
 
-    /* trasaction */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("transaction"),
-        strlen("transaction"));
+    addString("client_ip", m_clientIpAddress);
+    addString("time_stamp", ts);
+    addString("server_id", uniqueId);
+    addInteger("client_port", m_clientPort);
+    addString("host_ip", m_serverIpAddress);
+    addInteger("host_port", m_serverPort);
+    addString("unique_id", m_id);
 
-    yajl_gen_map_open(g);
-    /* Part: A (header mandatory) */
-    LOGFY_ADD("client_ip", m_clientIpAddress);
-    LOGFY_ADD("time_stamp", ts);
-    LOGFY_ADD("server_id", uniqueId);
-    LOGFY_ADD_NUM("client_port", m_clientPort);
-    LOGFY_ADD("host_ip", m_serverIpAddress);
-    LOGFY_ADD_NUM("host_port", m_serverPort);
-    LOGFY_ADD("unique_id", m_id);
-
-    /* request */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
-        strlen("request"));
-    yajl_gen_map_open(g);
-
-    LOGFY_ADD("method",
-        utils::string::dash_if_empty(
-            m_variableRequestMethod.evaluate()));
-
-    LOGFY_ADD("http_version", m_httpVersion);
-    LOGFY_ADD("hostname", m_requestHostName);
-    LOGFY_ADD("uri", this->m_uri);
+    writer.key("request");
+    writer.start_object();
+    addString("method",
+        utils::string::dash_if_empty(m_variableRequestMethod.evaluate()));
+    addString("http_version", m_httpVersion);
+    addString("hostname", m_requestHostName);
+    addString("uri", this->m_uri);
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
-        // FIXME: check for the binary content size.
-        LOGFY_ADD("body", utils::string::toHexIfNeeded(this->m_requestBody.str()));
+        addString("body", utils::string::toHexIfNeeded(this->m_requestBody.str()));
     }
 
-    /* request headers */
     if (parts & audit_log::AuditLog::BAuditLogPart) {
         std::vector<const VariableValue *> l;
-        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
-            strlen("headers"));
-        yajl_gen_map_open(g);
 
+        writer.key("headers");
+        writer.start_object();
         m_variableRequestHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(utils::string::toHexIfNeeded(h->getKey().c_str()).c_str(), utils::string::toHexIfNeeded(h->getValue()));
+            std::string header_name =
+                utils::string::toHexIfNeeded(h->getKey());
+            std::string header_value =
+                utils::string::toHexIfNeeded(h->getValue());
+            addString(header_name, header_value);
             delete h;
         }
-
-        /* end: request headers */
-        yajl_gen_map_close(g);
+        writer.end_object();
     }
+    writer.end_object();
 
-    /* end: request */
-    yajl_gen_map_close(g);
-
-    /* response */
-    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("response"),
-        strlen("response"));
-    yajl_gen_map_open(g);
-
+    writer.key("response");
+    writer.start_object();
     if (parts & audit_log::AuditLog::EAuditLogPart) {
-        LOGFY_ADD("body", this->m_responseBody.str());
+        addString("body", this->m_responseBody.str());
     }
-    LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
+    addInteger("http_code", m_httpCodeReturned);
 
-    /* response headers */
     if (parts & audit_log::AuditLog::FAuditLogPart) {
         std::vector<const VariableValue *> l;
-        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("headers"),
-            strlen("headers"));
-        yajl_gen_map_open(g);
 
+        writer.key("headers");
+        writer.start_object();
         m_variableResponseHeaders.resolve(&l);
         for (auto &h : l) {
-            LOGFY_ADD(h->getKey().c_str(), h->getValue());
+            addString(h->getKey(), h->getValue());
             delete h;
         }
-
-        /* end: response headers */
-        yajl_gen_map_close(g);
+        writer.end_object();
     }
-    /* end: response */
-    yajl_gen_map_close(g);
+    writer.end_object();
 
-    /* producer */
     if (parts & audit_log::AuditLog::HAuditLogPart) {
-        yajl_gen_string(g, reinterpret_cast<const unsigned char*>("producer"),
-            strlen("producer"));
-        yajl_gen_map_open(g);
-
-        /* producer > libmodsecurity */
-        LOGFY_ADD("modsecurity", m_ms->whoAmI());
-
-        /* producer > connector */
-        LOGFY_ADD("connector", m_ms->getConnectorInformation());
-
-        /* producer > engine state */
-        LOGFY_ADD("secrules_engine",
+        writer.key("producer");
+        writer.start_object();
+        addString("modsecurity", m_ms->whoAmI());
+        addString("connector", m_ms->getConnectorInformation());
+        addString("secrules_engine",
             RulesSet::ruleEngineStateString(
-            (RulesSetProperties::RuleEngine) getRuleEngineState()));
+                (RulesSetProperties::RuleEngine) getRuleEngineState()));
 
-        /* producer > components */
-        yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>("components"),
-            strlen("components"));
-
-        yajl_gen_array_open(g);
+        writer.key("components");
+        writer.start_array();
         for (const auto &a : m_rules->m_components) {
-            yajl_gen_string(g,
-                reinterpret_cast<const unsigned char*>
-                    (a.data()), a.length());
+            writer.string(a);
         }
-        yajl_gen_array_close(g);
+        writer.end_array();
+        writer.end_object();
 
-        /* end: producer */
-        yajl_gen_map_close(g);
+        writer.key("messages");
+        writer.start_array();
+        for (const auto &a : m_rulesMessages) {
+            writer.start_object();
+            addString("message", a.m_message);
+            writer.key("details");
+            writer.start_object();
+            addString("match", a.m_match);
+            addString("reference", a.m_reference);
+            addString("ruleId", std::to_string(a.m_rule.m_ruleId));
+            addString("file", a.m_rule.getFileName());
+            addString("lineNumber", std::to_string(a.m_rule.getLineNumber()));
+            addString("data", utils::string::toHexIfNeeded(a.m_data));
+            addString("severity", std::to_string(a.m_severity));
+            addString("ver", a.m_rule.m_ver);
+            addString("rev", a.m_rule.m_rev);
 
-        /* messages */
-        yajl_gen_string(g,
-            reinterpret_cast<const unsigned char*>("messages"),
-            strlen("messages"));
-        yajl_gen_array_open(g);
-        for (auto a : m_rulesMessages) {
-            yajl_gen_map_open(g);
-            LOGFY_ADD("message", a.m_message);
-            yajl_gen_string(g,
-                reinterpret_cast<const unsigned char*>("details"),
-                strlen("details"));
-            yajl_gen_map_open(g);
-            LOGFY_ADD("match", a.m_match);
-            LOGFY_ADD("reference", a.m_reference);
-            LOGFY_ADD("ruleId", std::to_string(a.m_rule.m_ruleId));
-            LOGFY_ADD("file", a.m_rule.getFileName());
-            LOGFY_ADD("lineNumber", std::to_string(a.m_rule.getLineNumber()));
-            LOGFY_ADD("data", utils::string::toHexIfNeeded(a.m_data));
-            LOGFY_ADD("severity", std::to_string(a.m_severity));
-            LOGFY_ADD("ver", a.m_rule.m_ver);
-            LOGFY_ADD("rev", a.m_rule.m_rev);
-
-            yajl_gen_string(g,
-                reinterpret_cast<const unsigned char*>("tags"),
-                strlen("tags"));
-            yajl_gen_array_open(g);
-            for (auto b : a.m_tags) {
-                yajl_gen_string(g,
-                    reinterpret_cast<const unsigned char*>(b.data()),
-                    b.length());
+            writer.key("tags");
+            writer.start_array();
+            for (const auto &b : a.m_tags) {
+                writer.string(b);
             }
-            yajl_gen_array_close(g);
+            writer.end_array();
 
-            LOGFY_ADD("maturity", std::to_string(a.m_rule.m_maturity));
-            LOGFY_ADD("accuracy", std::to_string(a.m_rule.m_accuracy));
-            yajl_gen_map_close(g);
-            yajl_gen_map_close(g);
+            addString("maturity", std::to_string(a.m_rule.m_maturity));
+            addString("accuracy", std::to_string(a.m_rule.m_accuracy));
+            writer.end_object();
+            writer.end_object();
         }
-        yajl_gen_array_close(g);
-        /* end: messages */
+        writer.end_array();
     }
 
-    /* end: transaction */
-    yajl_gen_map_close(g);
+    writer.end_object();
+    writer.end_object();
 
-    /* end: main */
-    yajl_gen_map_close(g);
-
-    yajl_gen_get_buf(g, &buf, &len);
-
-    log.assign(reinterpret_cast<const char*>(buf), len);
+    log = writer.to_string();
     log.append("\n");
-
-    yajl_gen_free(g);
-
     return log;
-#else
-    return std::string("{\"error\":\"ModSecurity was " \
-        "not compiled with JSON support.\"}");
-#endif
 }
 
 
@@ -2326,4 +2258,3 @@ extern "C" int msc_set_request_hostname(Transaction *transaction,
 
 
 }  // namespace modsecurity
-

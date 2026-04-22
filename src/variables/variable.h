@@ -98,6 +98,59 @@ class n : public Variable { \
     } \
 };
 
+#define VARIABLE_MONKEY_SIMPLE_VARIABLES(X) \
+    X("RESPONSE_CONTENT_TYPE", m_variableResponseContentType) \
+    X("ARGS_COMBINED_SIZE", m_variableARGScombinedSize) \
+    X("AUTH_TYPE", m_variableAuthType) \
+    X("FILES_COMBINED_SIZE", m_variableFilesCombinedSize) \
+    X("FULL_REQUEST", m_variableFullRequest) \
+    X("FULL_REQUEST_LENGTH", m_variableFullRequestLength) \
+    X("INBOUND_DATA_ERROR", m_variableInboundDataError) \
+    X("MATCHED_VAR", m_variableMatchedVar) \
+    X("MATCHED_VAR_NAME", m_variableMatchedVarName) \
+    X("MSC_PCRE_ERROR", m_variableMscPcreError) \
+    X("MSC_PCRE_LIMITS_EXCEEDED", m_variableMscPcreLimitsExceeded) \
+    X("MULTIPART_CRLF_LF_LINES", m_variableMultipartCrlfLFLines) \
+    X("MULTIPART_DATA_AFTER", m_variableMultipartDataAfter) \
+    X("MULTIPART_FILE_LIMIT_EXCEEDED", m_variableMultipartFileLimitExceeded) \
+    X("MULTIPART_STRICT_ERROR", m_variableMultipartStrictError) \
+    X("MULTIPART_HEADER_FOLDING", m_variableMultipartHeaderFolding) \
+    X("MULTIPART_INVALID_QUOTING", m_variableMultipartInvalidQuoting) \
+    X("MULTIPART_INVALID_HEADER_FOLDING", m_variableMultipartInvalidHeaderFolding) \
+    X("MULTIPART_UNMATCHED_BOUNDARY", m_variableMultipartUnmatchedBoundary) \
+    X("OUTBOUND_DATA_ERROR", m_variableOutboundDataError) \
+    X("PATH_INFO", m_variablePathInfo) \
+    X("QUERY_STRING", m_variableQueryString) \
+    X("REMOTE_ADDR", m_variableRemoteAddr) \
+    X("REMOTE_HOST", m_variableRemoteHost) \
+    X("REMOTE_PORT", m_variableRemotePort) \
+    X("REQBODY_ERROR", m_variableReqbodyError) \
+    X("REQBODY_ERROR_MSG", m_variableReqbodyErrorMsg) \
+    X("REQBODY_PROCESSOR_ERROR_MSG", m_variableReqbodyProcessorErrorMsg) \
+    X("REQBODY_PROCESSOR_ERROR", m_variableReqbodyProcessorError) \
+    X("REQBODY_PROCESSOR", m_variableReqbodyProcessor) \
+    X("REQUEST_BASENAME", m_variableRequestBasename) \
+    X("REQUEST_BODY", m_variableRequestBody) \
+    X("REQUEST_BODY_LENGTH", m_variableRequestBodyLength) \
+    X("REQUEST_FILENAME", m_variableRequestFilename) \
+    X("REQUEST_LINE", m_variableRequestLine) \
+    X("REQUEST_METHOD", m_variableRequestMethod) \
+    X("REQUEST_PROTOCOL", m_variableRequestProtocol) \
+    X("REQUEST_URI", m_variableRequestURI) \
+    X("REQUEST_URI_RAW", m_variableRequestURIRaw) \
+    X("RESOURCE", m_variableResource) \
+    X("RESPONSE_BODY", m_variableResponseBody) \
+    X("RESPONSE_CONTENT_LENGTH", m_variableResponseContentLength) \
+    X("RESPONSE_PROTOCOL", m_variableResponseProtocol) \
+    X("RESPONSE_STATUS", m_variableResponseStatus) \
+    X("SERVER_ADDR", m_variableServerAddr) \
+    X("SERVER_NAME", m_variableServerName) \
+    X("SERVER_PORT", m_variableServerPort) \
+    X("SESSIONID", m_variableSessionID) \
+    X("UNIQUE_ID", m_variableUniqueID) \
+    X("URLENCODED_ERROR", m_variableUrlEncodedError) \
+    X("USERID", m_variableUserID)
+
 
 namespace modsecurity {
 
@@ -274,109 +327,16 @@ class VariableMonkeyResolution {
             throw std::invalid_argument("Variable not found.");
         }
 
-        if (comp(variable, "RESPONSE_CONTENT_TYPE")) {
-            t->m_variableResponseContentType.evaluate(l);
-        } else if (comp(variable, "ARGS_COMBINED_SIZE")) {
-            t->m_variableARGScombinedSize.evaluate(l);
-        } else if (comp(variable, "AUTH_TYPE")) {
-            t->m_variableAuthType.evaluate(l);
-        } else if (comp(variable, "FILES_COMBINED_SIZE")) {
-            t->m_variableFilesCombinedSize.evaluate(l);
-        } else if (comp(variable, "FULL_REQUEST")) {
-            t->m_variableFullRequest.evaluate(l);
-        } else if (comp(variable, "FULL_REQUEST_LENGTH")) {
-            t->m_variableFullRequestLength.evaluate(l);
-        } else if (comp(variable, "INBOUND_DATA_ERROR")) {
-            t->m_variableInboundDataError.evaluate(l);
-        } else if (comp(variable, "MATCHED_VAR")) {
-            t->m_variableMatchedVar.evaluate(l);
-        } else if (comp(variable, "MATCHED_VAR_NAME")) {
-            t->m_variableMatchedVarName.evaluate(l);
-        } else if (comp(variable, "MSC_PCRE_ERROR")) {
-            t->m_variableMscPcreError.evaluate(l);
-        } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
-            t->m_variableMscPcreLimitsExceeded.evaluate(l);
-        } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
-            t->m_variableMultipartCrlfLFLines.evaluate(l);
-        } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
-            t->m_variableMultipartDataAfter.evaluate(l);
-        } else if (comp(variable, "MULTIPART_FILE_LIMIT_EXCEEDED")) {
-            t->m_variableMultipartFileLimitExceeded.evaluate(l);
-        } else if (comp(variable, "MULTIPART_STRICT_ERROR")) {
-            t->m_variableMultipartStrictError.evaluate(l);
-        } else if (comp(variable, "MULTIPART_HEADER_FOLDING")) {
-            t->m_variableMultipartHeaderFolding.evaluate(l);
-        } else if (comp(variable, "MULTIPART_INVALID_QUOTING")) {
-            t->m_variableMultipartInvalidQuoting.evaluate(l);
-        } else if (comp(variable, "MULTIPART_INVALID_HEADER_FOLDING")) {
-            t->m_variableMultipartInvalidHeaderFolding.evaluate(l);
-        } else if (comp(variable, "MULTIPART_UNMATCHED_BOUNDARY")) {
-            t->m_variableMultipartUnmatchedBoundary.evaluate(l);
-        } else if (comp(variable, "OUTBOUND_DATA_ERROR")) {
-            t->m_variableOutboundDataError.evaluate(l);
-        } else if (comp(variable, "PATH_INFO")) {
-            t->m_variablePathInfo.evaluate(l);
-        } else if (comp(variable, "QUERY_STRING")) {
-            t->m_variableQueryString.evaluate(l);
-        } else if (comp(variable, "REMOTE_ADDR")) {
-            t->m_variableRemoteAddr.evaluate(l);
-        } else if (comp(variable, "REMOTE_HOST")) {
-            t->m_variableRemoteHost.evaluate(l);
-        } else if (comp(variable, "REMOTE_PORT")) {
-            t->m_variableRemotePort.evaluate(l);
-        } else if (comp(variable, "REQBODY_ERROR")) {
-            t->m_variableReqbodyError.evaluate(l);
-        } else if (comp(variable, "REQBODY_ERROR_MSG")) {
-            t->m_variableReqbodyErrorMsg.evaluate(l);
-        } else if (comp(variable, "REQBODY_PROCESSOR_ERROR_MSG")) {
-            t->m_variableReqbodyProcessorErrorMsg.evaluate(l);
-        } else if (comp(variable, "REQBODY_PROCESSOR_ERROR")) {
-            t->m_variableReqbodyProcessorError.evaluate(l);
-        } else if (comp(variable, "REQBODY_PROCESSOR")) {
-            t->m_variableReqbodyProcessor.evaluate(l);
-        } else if (comp(variable, "REQUEST_BASENAME")) {
-            t->m_variableRequestBasename.evaluate(l);
-        } else if (comp(variable, "REQUEST_BODY")) {
-            t->m_variableRequestBody.evaluate(l);
-        } else if (comp(variable, "REQUEST_BODY_LENGTH")) {
-            t->m_variableRequestBodyLength.evaluate(l);
-        } else if (comp(variable, "REQUEST_FILENAME")) {
-            t->m_variableRequestFilename.evaluate(l);
-        } else if (comp(variable, "REQUEST_LINE")) {
-            t->m_variableRequestLine.evaluate(l);
-        } else if (comp(variable, "REQUEST_METHOD")) {
-            t->m_variableRequestMethod.evaluate(l);
-        } else if (comp(variable, "REQUEST_PROTOCOL")) {
-            t->m_variableRequestProtocol.evaluate(l);
-        } else if (comp(variable, "REQUEST_URI")) {
-            t->m_variableRequestURI.evaluate(l);
-        } else if (comp(variable, "REQUEST_URI_RAW")) {
-            t->m_variableRequestURIRaw.evaluate(l);
-        } else if (comp(variable, "RESOURCE")) {
-            t->m_variableResource.evaluate(l);
-        } else if (comp(variable, "RESPONSE_BODY")) {
-            t->m_variableResponseBody.evaluate(l);
-        } else if (comp(variable, "RESPONSE_CONTENT_LENGTH")) {
-            t->m_variableResponseContentLength.evaluate(l);
-        } else if (comp(variable, "RESPONSE_PROTOCOL")) {
-            t->m_variableResponseProtocol.evaluate(l);
-        } else if (comp(variable, "RESPONSE_STATUS")) {
-            t->m_variableResponseStatus.evaluate(l);
-        } else if (comp(variable, "SERVER_ADDR")) {
-            t->m_variableServerAddr.evaluate(l);
-        } else if (comp(variable, "SERVER_NAME")) {
-            t->m_variableServerName.evaluate(l);
-        } else if (comp(variable, "SERVER_PORT")) {
-            t->m_variableServerPort.evaluate(l);
-        } else if (comp(variable, "SESSIONID")) {
-            t->m_variableSessionID.evaluate(l);
-        } else if (comp(variable, "UNIQUE_ID")) {
-            t->m_variableUniqueID.evaluate(l);
-        } else if (comp(variable, "URLENCODED_ERROR")) {
-            t->m_variableUrlEncodedError.evaluate(l);
-        } else if (comp(variable, "USERID")) {
-            t->m_variableUserID.evaluate(l);
-        } else {
+        bool matched = false;
+#define VARIABLE_MONKEY_EVALUATE_DISPATCH(name, member) \
+        if (matched == false && comp(variable, name)) { \
+            t->member.evaluate(l); \
+            matched = true; \
+        }
+        VARIABLE_MONKEY_SIMPLE_VARIABLES(VARIABLE_MONKEY_EVALUATE_DISPATCH);
+#undef VARIABLE_MONKEY_EVALUATE_DISPATCH
+
+        if (matched == false) {
             throw std::invalid_argument("Variable not found.");
         }
     }
@@ -389,126 +349,41 @@ class VariableMonkeyResolution {
             collection = variable.find(":");
         }
         if (collection == std::string::npos) {
-            if (comp(variable, "RESPONSE_CONTENT_TYPE")) {
-                vv = t->m_variableResponseContentType.resolveFirst();
-            } else if (comp(variable, "ARGS_COMBINED_SIZE")) {
-                vv = t->m_variableARGScombinedSize.resolveFirst();
-            } else if (comp(variable, "AUTH_TYPE")) {
-                vv = t->m_variableAuthType.resolveFirst();
-            } else if (comp(variable, "FILES_COMBINED_SIZE")) {
-                vv = t->m_variableFilesCombinedSize.resolveFirst();
-            } else if (comp(variable, "FULL_REQUEST")) {
-                vv = t->m_variableFullRequest.resolveFirst();
-            } else if (comp(variable, "FULL_REQUEST_LENGTH")) {
-                vv = t->m_variableFullRequestLength.resolveFirst();
-            } else if (comp(variable, "INBOUND_DATA_ERROR")) {
-                vv = t->m_variableInboundDataError.resolveFirst();
-            } else if (comp(variable, "MATCHED_VAR")) {
-                vv = t->m_variableMatchedVar.resolveFirst();
-            } else if (comp(variable, "MATCHED_VAR_NAME")) {
-                vv = t->m_variableMatchedVarName.resolveFirst();
-            } else if (comp(variable, "MSC_PCRE_ERROR")) {
-                vv = t->m_variableMscPcreError.resolveFirst();
-            } else if (comp(variable, "MSC_PCRE_LIMITS_EXCEEDED")) {
-                vv = t->m_variableMscPcreLimitsExceeded.resolveFirst();
-            } else if (comp(variable, "MULTIPART_CRLF_LF_LINES")) {
-                vv = t->m_variableMultipartCrlfLFLines.resolveFirst();
-            } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
-                vv = t->m_variableMultipartDataAfter.resolveFirst();
-            } else if (comp(variable, "MULTIPART_FILE_LIMIT_EXCEEDED")) {
-                vv = t->m_variableMultipartFileLimitExceeded.resolveFirst();
-            } else if (comp(variable, "MULTIPART_STRICT_ERROR")) {
-                vv = t->m_variableMultipartStrictError.resolveFirst();
-            } else if (comp(variable, "MULTIPART_HEADER_FOLDING")) {
-                vv = t->m_variableMultipartHeaderFolding.resolveFirst();
-            } else if (comp(variable, "MULTIPART_INVALID_QUOTING")) {
-                vv = t->m_variableMultipartInvalidQuoting.resolveFirst();
-            } else if (comp(variable, "MULTIPART_INVALID_HEADER_FOLDING")) {
-                vv = t->m_variableMultipartInvalidHeaderFolding.resolveFirst();
-            } else if (comp(variable, "MULTIPART_UNMATCHED_BOUNDARY")) {
-                vv = t->m_variableMultipartUnmatchedBoundary.resolveFirst();
-            } else if (comp(variable, "OUTBOUND_DATA_ERROR")) {
-                vv = t->m_variableOutboundDataError.resolveFirst();
-            } else if (comp(variable, "PATH_INFO")) {
-                vv = t->m_variablePathInfo.resolveFirst();
-            } else if (comp(variable, "QUERY_STRING")) {
-                vv = t->m_variableQueryString.resolveFirst();
-            } else if (comp(variable, "REMOTE_ADDR")) {
-                vv = t->m_variableRemoteAddr.resolveFirst();
-            } else if (comp(variable, "REMOTE_HOST")) {
-                vv = t->m_variableRemoteHost.resolveFirst();
-            } else if (comp(variable, "REMOTE_PORT")) {
-                vv = t->m_variableRemotePort.resolveFirst();
-            } else if (comp(variable, "REQBODY_ERROR")) {
-                vv = t->m_variableReqbodyError.resolveFirst();
-            } else if (comp(variable, "REQBODY_ERROR_MSG")) {
-                vv = t->m_variableReqbodyErrorMsg.resolveFirst();
-            } else if (comp(variable, "REQBODY_PROCESSOR_ERROR_MSG")) {
-                vv = t->m_variableReqbodyProcessorErrorMsg.resolveFirst();
-            } else if (comp(variable, "REQBODY_PROCESSOR_ERROR")) {
-                vv = t->m_variableReqbodyProcessorError.resolveFirst();
-            } else if (comp(variable, "REQBODY_PROCESSOR")) {
-                vv = t->m_variableReqbodyProcessor.resolveFirst();
-            } else if (comp(variable, "REQUEST_BASENAME")) {
-                vv = t->m_variableRequestBasename.resolveFirst();
-            } else if (comp(variable, "REQUEST_BODY")) {
-                vv = t->m_variableRequestBody.resolveFirst();
-            } else if (comp(variable, "REQUEST_BODY_LENGTH")) {
-                vv = t->m_variableRequestBodyLength.resolveFirst();
-            } else if (comp(variable, "REQUEST_FILENAME")) {
-                vv = t->m_variableRequestFilename.resolveFirst();
-            } else if (comp(variable, "REQUEST_LINE")) {
-                vv = t->m_variableRequestLine.resolveFirst();
-            } else if (comp(variable, "REQUEST_METHOD")) {
-                vv = t->m_variableRequestMethod.resolveFirst();
-            } else if (comp(variable, "REQUEST_PROTOCOL")) {
-                vv = t->m_variableRequestProtocol.resolveFirst();
-            } else if (comp(variable, "REQUEST_URI")) {
-                vv = t->m_variableRequestURI.resolveFirst();
-            } else if (comp(variable, "REQUEST_URI_RAW")) {
-                vv = t->m_variableRequestURIRaw.resolveFirst();
-            } else if (comp(variable, "RESOURCE")) {
-                vv = t->m_variableResource.resolveFirst();
-            } else if (comp(variable, "RESPONSE_BODY")) {
-                vv = t->m_variableResponseBody.resolveFirst();
-            } else if (comp(variable, "RESPONSE_CONTENT_LENGTH")) {
-                vv = t->m_variableResponseContentLength.resolveFirst();
-            } else if (comp(variable, "RESPONSE_PROTOCOL")) {
-                vv = t->m_variableResponseProtocol.resolveFirst();
-            } else if (comp(variable, "RESPONSE_STATUS")) {
-                vv = t->m_variableResponseStatus.resolveFirst();
-            } else if (comp(variable, "SERVER_ADDR")) {
-                vv = t->m_variableServerAddr.resolveFirst();
-            } else if (comp(variable, "SERVER_NAME")) {
-                vv = t->m_variableServerName.resolveFirst();
-            } else if (comp(variable, "SERVER_PORT")) {
-                vv = t->m_variableServerPort.resolveFirst();
-            } else if (comp(variable, "SESSIONID")) {
-                vv = t->m_variableSessionID.resolveFirst();
-            } else if (comp(variable, "UNIQUE_ID")) {
-                vv = t->m_variableUniqueID.resolveFirst();
-            } else if (comp(variable, "URLENCODED_ERROR")) {
-                vv = t->m_variableUrlEncodedError.resolveFirst();
-            } else if (comp(variable, "USERID")) {
-                vv = t->m_variableUserID.resolveFirst();
-            } else if (comp(variable, "TX")) {
+            bool matched = false;
+#define VARIABLE_MONKEY_RESOLVE_DISPATCH(name, member) \
+            if (matched == false && comp(variable, name)) { \
+                vv = t->member.resolveFirst(); \
+                matched = true; \
+            }
+            VARIABLE_MONKEY_SIMPLE_VARIABLES(VARIABLE_MONKEY_RESOLVE_DISPATCH);
+#undef VARIABLE_MONKEY_RESOLVE_DISPATCH
+
+            if (matched == false && comp(variable, "TX")) {
                 vv = t->m_collections.m_tx_collection->resolveFirst("");
-            } else if (comp(variable, "RESOURCE")) {
+                matched = true;
+            } else if (matched == false && comp(variable, "RESOURCE")) {
                 vv = t->m_collections.m_resource_collection->resolveFirst("",
                     t->m_collections.m_resource_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else if (comp(variable, "USER")) {
+                matched = true;
+            } else if (matched == false && comp(variable, "USER")) {
                 vv = t->m_collections.m_user_collection->resolveFirst("",
                     t->m_collections.m_user_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else if (comp(variable, "SESSION")) {
+                matched = true;
+            } else if (matched == false && comp(variable, "SESSION")) {
                 vv = t->m_collections.m_session_collection->resolveFirst("",
                     t->m_collections.m_session_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else if (comp(variable, "IP")) {
+                matched = true;
+            } else if (matched == false && comp(variable, "IP")) {
                 vv = t->m_collections.m_ip_collection->resolveFirst("",
                     t->m_collections.m_ip_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else if (comp(variable, "GLOBAL")) {
+                matched = true;
+            } else if (matched == false && comp(variable, "GLOBAL")) {
                 vv = t->m_collections.m_global_collection->resolveFirst("",
                     t->m_collections.m_global_collection_key, t->m_rules->m_secWebAppId.m_value);
-            } else {
+                matched = true;
+            }
+
+            if (matched == false) {
                 throw std::invalid_argument("Variable not found.");
             }
         } else {
@@ -728,5 +603,7 @@ std::string operator+(const std::string &a, const modsecurity::variables::Variab
 
 }  // namespace variables
 }  // namespace modsecurity
+
+#undef VARIABLE_MONKEY_SIMPLE_VARIABLES
 
 #endif  // SRC_VARIABLES_VARIABLE_H_

@@ -15,9 +15,6 @@
 
 #include "test/common/modsecurity_test.h"
 
-#ifdef WITH_YAJL
-#include <yajl/yajl_tree.h>
-#endif
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -29,6 +26,7 @@
 #include <iostream>
 
 #include "modsecurity/modsecurity.h"
+#include "test/common/json.h"
 
 namespace modsecurity_test {
 
@@ -47,8 +45,8 @@ std::string ModSecurityTest<T>::header() {
 
 template <class T>
 bool ModSecurityTest<T>::load_test_json(const std::string &file) {
-    char errbuf[1024];
-    yajl_val node;
+    std::string error;
+    modsecurity_test::json::JsonDocument document;
 
     std::ifstream myfile;
     myfile.open(file.c_str());
@@ -56,37 +54,51 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
         std::cout << "Problems opening file: " << file << std::endl;
         return false;
     }
+    myfile.close();
 
-    std::string str((std::istreambuf_iterator<char>(myfile)),
-        std::istreambuf_iterator<char>());
-    node = yajl_tree_parse((const char *) str.c_str(), errbuf, sizeof(errbuf));
-    if (node == NULL) {
+    if (modsecurity_test::json::load_document(file, &document, &error)
+            == false) {
         std::cout << "Problems parsing file: " << file << std::endl;
-        if (strlen(errbuf) > 0) {
-            std::cout << errbuf << std::endl;
+        if (error.empty() == false) {
+            std::cout << error << std::endl;
         }
         return false;
     }
 
     if (m_format) {
-        auto u = T::from_yajl_node(node);
+        auto u = T::from_json_document(&document);
         u->filename = file;
 
         (*this)[file].push_back(std::move(u));
     } else {
-        size_t num_tests = node->u.array.len;
-        for ( int i = 0; i < num_tests; i++ ) {
-            yajl_val obj = node->u.array.values[i];
+        modsecurity_test::json::JsonArray tests;
+        if (modsecurity_test::json::get(document.get_array(), &tests,
+                &error) == false) {
+            std::cout << "Problems parsing file: " << file << std::endl;
+            if (error.empty() == false) {
+                std::cout << error << std::endl;
+            }
+            return false;
+        }
 
-            auto u = T::from_yajl_node(obj);
+        for (auto test_result : tests) {
+            modsecurity_test::json::JsonValue value;
+            if (modsecurity_test::json::get(std::move(test_result), &value,
+                    &error) == false) {
+                std::cout << "Problems parsing file: " << file << std::endl;
+                if (error.empty() == false) {
+                    std::cout << error << std::endl;
+                }
+                return false;
+            }
+
+            auto u = T::from_json_value(value);
             u->filename = file;
 
             const auto key = u->filename + ":" + u->name;
             (*this)[key].push_back(std::move(u));
         }
     }
-
-    yajl_tree_free(node);
 
     return true;
 }

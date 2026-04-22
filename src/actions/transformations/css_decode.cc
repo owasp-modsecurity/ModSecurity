@@ -15,6 +15,8 @@
 
 #include "css_decode.h"
 
+#include <cctype>
+
 #include "src/utils/string.h"
 
 using namespace modsecurity::utils::string;
@@ -138,7 +140,17 @@ static inline bool css_decode_inplace(std::string &val) {
                 /* The character after backslash is not a hexadecimal digit,
                  * nor a newline. */
                     /* Use one character after backslash as is. */
-                    *d++ = input[i++];
+                    const auto escaped = input[i++];
+                    *d++ = escaped;
+
+                    /*
+                     * Preserve legacy behaviour for escaped NUL by consuming
+                     * one trailing whitespace character.
+                     */
+                    if ((escaped == '\0') && (i < input_len)
+                            && std::isspace(input[i])) {
+                        i++;
+                    }
                 }
             } else {
             /* No characters after backslash. */

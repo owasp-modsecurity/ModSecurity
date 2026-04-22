@@ -6,7 +6,8 @@ ACLOCAL_AMFLAGS = -I build
 
 # distribution of the Doxygen configuration file
 EXTRA_DIST = \
-	doxygen.cfg
+	doxygen.cfg \
+	jsoncons_number_scan_assessment.md
 
 
 MAINTAINERCLEANFILES = \
@@ -14,4 +15,3 @@ MAINTAINERCLEANFILES = \
 	doxygen_sqlite3.db \
 	html \
 	latex
-

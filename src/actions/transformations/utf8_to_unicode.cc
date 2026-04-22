@@ -27,6 +27,42 @@ constexpr int UNICODE_ERROR_INVALID_ENCODING     = -2;
 namespace modsecurity::actions::transformations {
 
 
+static inline char *appendUnicodeEscape(char *data,
+    unsigned char (&unicode)[8], unsigned int d) {
+    int length = 0;
+
+    *data++ = '%';
+    *data++ = 'u';
+    snprintf(reinterpret_cast<char *>(unicode), sizeof(unicode), "%x", d);
+    length = strlen(reinterpret_cast<char *>(unicode));
+
+    switch (length) {
+        case 1:
+            *data++ = '0';
+            *data++ = '0';
+            *data++ = '0';
+            break;
+        case 2:
+            *data++ = '0';
+            *data++ = '0';
+            break;
+        case 3:
+            *data++ = '0';
+            break;
+        case 4:
+        case 5:
+            break;
+    }
+
+    for (std::string::size_type j = 0;
+        j < static_cast<std::string::size_type>(length); j++) {
+        *data++ = unicode[j];
+    }
+
+    return data;
+}
+
+
 static inline bool encode(std::string &value) {
     auto input = reinterpret_cast<unsigned char*>(value.data());
     const auto input_len = value.length();
@@ -76,38 +112,9 @@ static inline bool encode(std::string &value) {
                 unicode_len = 2;
                 count += 6;
                 if (count <= len) {
-                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x1F) << 6) | (*(utf + 1) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    snprintf(reinterpret_cast<char *>(unicode),
-                             sizeof(reinterpret_cast<char *>(unicode)),
-                             "%x", d);
-                    length = strlen(reinterpret_cast<char *>(unicode));
-
-                    switch (length) {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (std::string::size_type j = 0; j < length; j++) {
-                        *data++ = unicode[j];
-                    }
-
+                    data = appendUnicodeEscape(data, unicode, d);
                     changed = true;
                 }
             }
@@ -126,40 +133,11 @@ static inline bool encode(std::string &value) {
                 unicode_len = 3;
                 count+=6;
                 if (count <= len) {
-                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x0F) << 12)
                         | ((*(utf + 1) & 0x3F) << 6)
                         | (*(utf + 2) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    snprintf(reinterpret_cast<char *>(unicode),
-                             sizeof(reinterpret_cast<char *>(unicode)),
-                             "%x", d);
-                    length = strlen(reinterpret_cast<char *>(unicode));
-
-                    switch (length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (std::string::size_type j = 0; j < length; j++) {
-                        *data++ = unicode[j];
-                    }
-
+                    data = appendUnicodeEscape(data, unicode, d);
                     changed = true;
                 }
             }
@@ -187,41 +165,12 @@ static inline bool encode(std::string &value) {
                 unicode_len = 4;
                 count+=7;
                 if (count <= len) {
-                    int length = 0;
                     /* compute character number */
                     d = ((c & 0x07) << 18)
                         | ((*(utf + 1) & 0x3F) << 12)
                         | ((*(utf + 2) & 0x3F) << 6)
                         | (*(utf + 3) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    snprintf(reinterpret_cast<char *>(unicode),
-                             sizeof(reinterpret_cast<char *>(unicode)),
-                             "%x", d);
-                    length = strlen(reinterpret_cast<char *>(unicode));
-
-                    switch (length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (std::string::size_type j = 0; j < length; j++) {
-                        *data++ = unicode[j];
-                    }
-
+                    data = appendUnicodeEscape(data, unicode, d);
                     changed = true;
                 }
             }

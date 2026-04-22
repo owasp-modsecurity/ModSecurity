@@ -16,15 +16,24 @@
 #include <string.h>
 
 #include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
 
 using modsecurity::Transaction;
 
-char request_uri[] = "/test.pl?param1=test&para2=test2";
+namespace {
+
+constexpr const char *kRequestUri = "/test.pl?param1=test&para2=test2";
+constexpr const char *kClientIp = "198.51.100.10";  // RFC 5737 documentation range
+constexpr const char *kServerIp = "198.51.100.20";  // RFC 5737 documentation range
+constexpr const char *kRulesFile = "basic_rules.conf";
+
+}  // namespace
 
 unsigned char response_body[] = "" \
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\r" \
@@ -37,10 +46,6 @@ unsigned char response_body[] = "" \
     "  </EnlightenResponse>\n\r" \
     "  </soap:Body>\n\r" \
     "</soap:Envelope>\n\r";
-
-char ip[] = "200.249.12.31";
-
-char rules_file[] = "basic_rules.conf";
 
 const char* const help_message = "Usage: benchmark [num_iterations|-h|-?|--help]";
 
@@ -79,23 +84,26 @@ int main(int argc, const char *argv[]) {
             " (ModSecurity benchmark utility)");
 
     rules = new modsecurity::RulesSet();
-    if (rules->loadFromUri(rules_file) < 0) {
+    if (rules->loadFromUri(kRulesFile) < 0) {
         std::cout << "Problems loading the rules..." << std::endl;
         std::cout << rules->m_parserError.str() << std::endl;
         return -1;
     }
 
+    // Start timing after one-time setup to measure only transaction processing.
+    const auto benchmark_start = std::chrono::steady_clock::now();
+
     for (unsigned long long i = 0; i < NUM_REQUESTS; i++) {
         //std::cout << "Proceeding with request " << i << std::endl;
 
         Transaction *modsecTransaction = new Transaction(modsec, rules, NULL);
-        modsecTransaction->processConnection(ip, 12345, "127.0.0.1", 80);
+        modsecTransaction->processConnection(kClientIp, 12345, kServerIp, 80);
 
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             goto next_request;
         }
-        modsecTransaction->processURI(request_uri, "GET", "1.1");
+        modsecTransaction->processURI(kRequestUri, "GET", "1.1");
         if (modsecTransaction->intervention(&it)) {
             std::cout << "There is an intervention" << std::endl;
             goto next_request;
@@ -173,4 +181,19 @@ next_request:
 
     delete rules;
     delete modsec;
+
+    const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - benchmark_start);
+    const long double elapsed_seconds =
+        static_cast<long double>(elapsed.count()) / 1000000000.0L;
+    const long double avg_tx_ns = static_cast<long double>(elapsed.count())
+        / static_cast<long double>(NUM_REQUESTS);
+    const long double tx_per_sec = static_cast<long double>(NUM_REQUESTS)
+        / elapsed_seconds;
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Summary:\n";
+    std::cout << "  elapsed_seconds: " << elapsed_seconds << "\n";
+    std::cout << "  avg_transaction_ns: " << avg_tx_ns << "\n";
+    std::cout << "  throughput_tx_per_sec: " << tx_per_sec << "\n";
 }

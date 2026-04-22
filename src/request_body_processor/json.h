@@ -16,21 +16,17 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 #define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
-
-#ifdef WITH_YAJL
-
-#include <yajl/yajl_parse.h>
-
-#include <string>
-#include <iostream>
+#include <cstdint>
 #include <deque>
+#include <memory>
+#include <string>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules_set.h"
+#include "src/request_body_processor/json_backend.h"
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 
 class JSONContainer {
@@ -55,37 +51,39 @@ class JSONContainerMap : public JSONContainer {
 };
 
 
-class JSON {
+class JSON : public JsonEventSink {
  public:
     explicit JSON(Transaction *transaction);
-    ~JSON();
+    ~JSON() override;
+    JSON(const JSON &) = delete;
+    JSON &operator=(const JSON &) = delete;
+    JSON(JSON &&) = delete;
+    JSON &operator=(JSON &&) = delete;
 
-    static bool init();
-    bool processChunk(const char *buf, unsigned int size, std::string *err);
+    bool init();
+    bool processChunk(const char *buf, unsigned int size,
+        const std::string *err);
     bool complete(std::string *err);
 
     int addArgument(const std::string& value);
 
-    static int yajl_number(void *ctx, const char *value, size_t length);
-    static int yajl_string(void *ctx, const unsigned char *value,
-        size_t length);
-    static int yajl_boolean(void *ctx, int value);
-    static int yajl_null(void *ctx);
-    static int yajl_map_key(void *ctx, const unsigned char *key,
-        size_t length);
-    static int yajl_end_map(void *ctx);
-    static int yajl_start_map(void *ctx);
-    static int yajl_start_array(void *ctx);
-    static int yajl_end_array(void *ctx);
+    JsonSinkStatus on_start_object() override;
+    JsonSinkStatus on_end_object() override;
+    JsonSinkStatus on_start_array() override;
+    JsonSinkStatus on_end_array() override;
+    JsonSinkStatus on_key(std::string_view value) override;
+    JsonSinkStatus on_string(std::string_view value) override;
+    JsonSinkStatus on_number(std::string_view value) override;
+    JsonSinkStatus on_boolean(bool value) override;
+    JsonSinkStatus on_null() override;
 
     bool isPreviousArray() const {
-        const JSONContainerArray *prev = NULL;
-        if (m_containers.size() < 1) {
+        if (m_containers.empty()) {
             return false;
         }
-        prev = dynamic_cast<JSONContainerArray *>(
-            m_containers[m_containers.size() - 1]);
-        return prev != NULL;
+        const JSONContainerArray *prev = dynamic_cast<JSONContainerArray *>(
+            m_containers.back().get());
+        return prev != nullptr;
     }
 
     std::string getCurrentKey(bool emptyIsNull = false) {
@@ -93,8 +91,8 @@ class JSON {
         if (m_containers.size() == 0) {
             return "json";
         }
-        if (m_current_key.empty() == true) {
-            if (isPreviousArray() || emptyIsNull == true) {
+        if (m_current_key.empty()) {
+            if (isPreviousArray() || emptyIsNull) {
                 return "";
             }
             return "empty-key";
@@ -108,21 +106,18 @@ class JSON {
     }
 
  private:
-    std::deque<JSONContainer *> m_containers;
+    void clearContainers();
+
+    std::deque<std::unique_ptr<JSONContainer>> m_containers;
     Transaction *m_transaction;
-    yajl_handle m_handle;
-    yajl_status m_status;
     std::string m_current_key;
+    std::string m_data;
     double m_max_depth;
     int64_t m_current_depth;
     bool m_depth_limit_exceeded;
 };
 
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
-
-#endif  // WITH_YAJL
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_JSON_H_
-
