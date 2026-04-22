@@ -28,7 +28,10 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: autogen.sh
         run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
@@ -98,7 +101,10 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: autogen.sh
         run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
@@ -125,7 +131,10 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: autogen.sh
         run: ./autogen.sh
       - name: configure ${{ matrix.configure.label }}
@@ -162,10 +171,11 @@ jobs:
               libfuzzy-dev \
               ssdeep \
               curl \
-              ca-certificates
+              ca-certificates \
+              git
       - uses: actions/checkout@v4
         with:
-          submodules: false
+          submodules: recursive
           fetch-depth: 0
       - name: configure
         run: |
