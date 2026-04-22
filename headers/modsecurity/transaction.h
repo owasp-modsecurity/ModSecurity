@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifndef __cplusplus
 typedef struct ModSecurity_t ModSecurity;
