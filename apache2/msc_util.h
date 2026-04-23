@@ -121,6 +121,8 @@ int DSOLOCAL convert_to_int(const char c);
 
 int DSOLOCAL set_match_to_tx(modsec_rec *msr, int capture, const char *match, int tx_n);
 
+int DSOLOCAL set_match_to_tx_safe(modsec_rec *msr, int capture, const char *match, unsigned int match_len, int tx_n);
+
 int DSOLOCAL js_decode_nonstrict_inplace(unsigned char *input, long int input_len);
 
 int DSOLOCAL urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_length, int * changed);

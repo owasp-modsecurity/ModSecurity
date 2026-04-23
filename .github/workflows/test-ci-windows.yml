@@ -20,7 +20,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
-
+      with:
+        submodules: recursive
+        fetch-depth: 0
     - name: Install Apache for x86
       if: matrix.arch == 'x86'
       shell: pwsh
@@ -122,6 +124,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
+      with:
+        submodules: recursive
+        fetch-depth: 0
 
     - name: Download x64 artifacts
       uses: actions/download-artifact@v4
@@ -159,6 +164,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
+      with:
+        submodules: recursive
+        fetch-depth: 0
 
     - name: Download MSI files
       uses: actions/download-artifact@v4
