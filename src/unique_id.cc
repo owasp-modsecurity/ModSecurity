@@ -55,6 +55,7 @@
 #include <io.h>
 #endif
 #include <string.h>
+#include <utility>
 
 #include "src/utils/sha1.h"
 
@@ -72,7 +73,12 @@ void UniqueId::fillUniqueId() {
 
     data = macAddress + name;
 
-    this->uniqueId_str = Utils::Sha1::hexdigest(data);
+    std::string uniqueIdHex;
+    if (Utils::Sha1::hexdigest(data, &uniqueIdHex)) {
+        this->uniqueId_str = std::move(uniqueIdHex);
+    } else {
+        this->uniqueId_str.clear();
+    }
 }
 
 // Based on:
