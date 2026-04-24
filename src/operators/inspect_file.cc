@@ -19,8 +19,10 @@
 #include <string.h>
 
 #include <iostream>
+#include <array>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "src/operators/operator.h"
 #include "src/utils/system.h"
@@ -141,8 +143,8 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
         return m_lua.run(transaction, str);
     } else {
 #ifndef WIN32
-        int pipefd[2];
-        if (pipe(pipefd) == -1) {
+        std::array<int, 2> pipefd = {{-1, -1}};
+        if (pipe(pipefd.data()) == -1) {
             return false;
         }
 
@@ -173,13 +175,19 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
             return false;
         }
 
-        char *argv[3];
-        argv[0] = const_cast<char *>(m_file.c_str());
-        argv[1] = const_cast<char *>(str.c_str());
-        argv[2] = nullptr;
+        std::vector<std::string> argv_storage;
+        argv_storage.emplace_back(m_file);
+        argv_storage.emplace_back(str);
+
+        std::vector<char *> argv;
+        argv.reserve(argv_storage.size() + 1);
+        for (std::string &arg : argv_storage) {
+            argv.push_back(arg.data());
+        }
+        argv.push_back(nullptr);
 
         pid_t pid = 0;
-        int spawn_rc = posix_spawn(&pid, m_file.c_str(), &actions, nullptr, argv,
+        int spawn_rc = posix_spawn(&pid, m_file.c_str(), &actions, nullptr, argv.data(),
             environ);
 
         posix_spawn_file_actions_destroy(&actions);
@@ -191,20 +199,19 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
             return false;
         }
 
-        char buff[512];
+        std::array<char, 512> buff = {};
         std::stringstream s;
         bool read_error = false;
-        while (true) {
-            ssize_t count = read(pipefd[0], buff, sizeof(buff));
+        bool done_reading = false;
+        while (!done_reading) {
+            ssize_t count = read(pipefd[0], buff.data(), buff.size());
             if (count > 0) {
-                s.write(buff, count);
+                s.write(buff.data(), count);
             } else if (count == 0) {
-                break;
-            } else if (errno == EINTR) {
-                continue;
-            } else {
+                done_reading = true;
+            } else if (errno != EINTR) {
                 read_error = true;
-                break;
+                done_reading = true;
             }
         }
 

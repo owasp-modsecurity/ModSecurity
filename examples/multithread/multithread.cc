@@ -95,7 +95,7 @@ int main (int argc, const char *argv[]) {
 
     std::vector<std::thread> threads;
     threads.resize(thread_count);
-    std::atomic<int> completed_threads{0};
+    std::atomic completed_threads{0};
 
 #ifndef WIN32
     const int open_fds_before = count_open_fds();
