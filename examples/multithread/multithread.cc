@@ -61,7 +61,7 @@ static int count_open_fds(void) {
 }
 #endif
 
-int main (int argc, const char *argv[]) {
+int main (int argc, char *argv[]) {
     auto modsec = std::make_unique<modsecurity::ModSecurity>();
     modsec->setConnectorInformation("ModSecurity-test v0.0.1-alpha (Simple " \
         "example on how to use ModSecurity API");

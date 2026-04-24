@@ -21,7 +21,12 @@ trap 'rm -f "$TMP_OUT"' EXIT
 
 cd "$EXAMPLE_DIR"
 set +e
-timeout "$TIMEOUT_SECS" "$BIN" "$RULES" "$THREADS" "$ITERATIONS" >"$TMP_OUT" 2>&1
+if command -v timeout >/dev/null 2>&1; then
+  timeout "$TIMEOUT_SECS" "$BIN" "$RULES" "$THREADS" "$ITERATIONS" >"$TMP_OUT" 2>&1
+else
+  echo "stress-test: warning: 'timeout' command not found, running without timeout" >&2
+  "$BIN" "$RULES" "$THREADS" "$ITERATIONS" >"$TMP_OUT" 2>&1
+fi
 STATUS=$?
 set -e
 if [ "$STATUS" -ne 0 ]; then
