@@ -59,8 +59,14 @@ bool stringToWide(const std::string &input, std::wstring *output) {
         return false;
     }
 
-    output->resize(needed - 1);
-    return MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, &(*output)[0], needed) == needed;
+    output->resize(needed);
+    int written = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, &(*output)[0], needed);
+    if (written != needed) {
+        return false;
+    }
+
+    output->pop_back();
+    return true;
 }
 
 std::wstring quoteWindowsArg(const std::wstring &arg) {
