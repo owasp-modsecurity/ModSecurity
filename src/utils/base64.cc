@@ -23,9 +23,7 @@
 #include "mbedtls/base64.h"
 
 namespace {
-using Base64MbedtlsOperation = int(*)(unsigned char *, size_t, size_t *,
-    const unsigned char *, size_t);
-
+template<typename Base64MbedtlsOperation>
 bool base64HelperMbedtls(const char *data, const unsigned int len,
     Base64MbedtlsOperation op, std::string *output) {
     if (output == nullptr) {
@@ -34,19 +32,18 @@ bool base64HelperMbedtls(const char *data, const unsigned int len,
 
     size_t out_len = 0;
 
-    const int sizingRet = op(nullptr, 0, &out_len,
-        reinterpret_cast<const unsigned char *>(data), len);
-
-    if (sizingRet != 0 && sizingRet != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
+    if (const int sizingRet = op(nullptr, 0, &out_len,
+            reinterpret_cast<const unsigned char *>(data), len);
+        sizingRet != 0 && sizingRet != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         return false;
     }
 
     std::string ret(out_len, {});
     if (out_len > 0) {
-        const int retCode = op(reinterpret_cast<unsigned char *>(ret.data()),
-            ret.size(), &out_len,
-            reinterpret_cast<const unsigned char *>(data), len);
-        if (retCode != 0) {
+        if (const int retCode = op(reinterpret_cast<unsigned char *>(ret.data()),
+                ret.size(), &out_len,
+                reinterpret_cast<const unsigned char *>(data), len);
+            retCode != 0) {
             return false;
         }
 
@@ -57,9 +54,7 @@ bool base64HelperMbedtls(const char *data, const unsigned int len,
     return true;
 }
 
-using Base64ForgivenOperation = void(*)(unsigned char *, size_t, size_t *,
-    const unsigned char *, size_t);
-
+template<typename Base64ForgivenOperation>
 bool base64HelperForgiven(const char *data, const unsigned int len,
     Base64ForgivenOperation op, std::string *output) {
     if (output == nullptr) {
