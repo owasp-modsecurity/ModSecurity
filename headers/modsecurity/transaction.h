@@ -594,6 +594,14 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     ModSecurityIntervention m_it;
 
     /**
+     * Sticky flag: set to true the first time the connector consumes a
+     * disruptive intervention via Transaction::intervention(). Unlike
+     * m_it.disruptive, this is NOT cleared by intervention::reset(), so
+     * it remains a reliable signal at audit-log time.
+     */
+    bool m_isInterrupted = false;
+
+    /**
      * Holds the creation time stamp, using std::time.
      *
      * TODO: m_timeStamp and m_creationTimeStamp may be merged into a single

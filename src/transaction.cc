@@ -1366,6 +1366,7 @@ int Transaction::processLogging() {
 bool Transaction::intervention(ModSecurityIntervention *it) {
     const auto disruptive = m_it.disruptive;
     if (m_it.disruptive) {
+        m_isInterrupted = true;
         if (m_it.url) {
             it->url = strdup(m_it.url);
         } else {
@@ -1594,6 +1595,10 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD("host_ip", m_serverIpAddress);
     LOGFY_ADD_NUM("host_port", m_serverPort);
     LOGFY_ADD("unique_id", m_id);
+
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("is_interrupted"),
+        strlen("is_interrupted"));
+    yajl_gen_bool(g, m_isInterrupted);
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
