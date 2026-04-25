@@ -187,6 +187,7 @@ bool InspectFile::evaluate(Transaction *transaction, const std::string &str) {
 
         std::vector<char *> argv;
         argv.reserve(argv_storage.size() + 1);
+        // cppcheck-suppress constVariableReference
         for (std::string &arg : argv_storage) {
             argv.push_back(arg.data());
         }
