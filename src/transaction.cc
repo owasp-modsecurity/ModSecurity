@@ -28,7 +28,6 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <iterator>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -2327,44 +2326,57 @@ extern "C" int msc_set_request_hostname(Transaction *transaction,
 
 
 /**
- * @name    msc_get_matched_rules_count
- * @brief   Retrieve the number of matched rules on a transaction.
+ * @name    msc_get_rules_messages_size
+ * @brief   Retrieve the number of RuleMessage records on a transaction.
  *
- * Returns the number of rule-match records held on the transaction.
- * Every rule that matched (disruptive or not) contributes one entry.
+ * Returns the size of Transaction::m_rulesMessages: the number of
+ * RuleMessage records that were selected to be logged on the
+ * transaction. This is not necessarily the total number of rules that
+ * matched!
  *
  * @param transaction ModSecurity transaction.
  *
- * @returns The number of matched rule records on the transaction.
+ * @returns The number of RuleMessage records on the transaction.
  *
  */
-extern "C" size_t msc_get_matched_rules_count(const Transaction *transaction) {
+extern "C" size_t msc_get_rules_messages_size(const Transaction *transaction) {
     return transaction->m_rulesMessages.size();
 }
 
 
 /**
- * @name    msc_get_matched_rule_id
- * @brief   Retrieve the rule id of the n-th matched rule.
+ * @name    msc_get_rules_messages_rule_ids
+ * @brief   Copy the rule ids from Transaction::m_rulesMessages into a buffer.
  *
- * Returns the rule id of the n-th matched rule (0-based).
+ * Copies the rule id of each RuleMessage into the caller-provided buffer.
+ * Only rule messages that were selected to be logged are included.
+ *
+ * The caller is expected to size the buffer using
+ * msc_get_rules_messages_size. If @p ids_len is smaller than the number
+ * of available records, only the first @p ids_len ids are written and
+ * the remaining records are skipped.
  *
  * @param transaction ModSecurity transaction.
- * @param index       Zero-based index into the matched rule records.
+ * @param ids         Caller-provided buffer to receive the rule ids.
+ *                    May be NULL only if @p ids_len is 0.
+ * @param ids_len     Capacity of @p ids, in number of int64_t slots.
  *
- * @returns The rule id at the given index.
- * @retval >0 Rule id of the matched rule at the given index.
- * @retval  0 Index is out of range.
+ * @returns The number of rule ids written into @p ids.
  *
  */
-extern "C" int64_t msc_get_matched_rule_id(const Transaction *transaction,
-    size_t index) {
-    if (index >= transaction->m_rulesMessages.size()) {
+extern "C" size_t msc_get_rules_messages_rule_ids(const Transaction *transaction,
+    int64_t *ids, size_t ids_len) {
+    if (ids == nullptr || ids_len == 0) {
         return 0;
     }
-    auto it = transaction->m_rulesMessages.begin();
-    std::advance(it, index);
-    return it->m_rule.m_ruleId;
+    size_t written = 0;
+    for (const auto &msg : transaction->m_rulesMessages) {
+        if (written >= ids_len) {
+            break;
+        }
+        ids[written++] = msg.m_rule.m_ruleId;
+    }
+    return written;
 }
 
 

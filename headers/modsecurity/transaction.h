@@ -741,10 +741,11 @@ int msc_update_status_code(Transaction *transaction, int status);
 int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
 
 /** @ingroup ModSecurity_C_API */
-size_t msc_get_matched_rules_count(const Transaction *transaction);
+size_t msc_get_rules_messages_size(const Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
-int64_t msc_get_matched_rule_id(const Transaction *transaction, size_t index);
+size_t msc_get_rules_messages_rule_ids(const Transaction *transaction,
+    int64_t *ids, size_t ids_len);
 
 #ifdef __cplusplus
 }
