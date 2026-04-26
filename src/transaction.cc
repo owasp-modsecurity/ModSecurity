@@ -2338,7 +2338,7 @@ extern "C" int msc_set_request_hostname(Transaction *transaction,
  * @returns The number of matched rule records on the transaction.
  *
  */
-extern "C" size_t msc_get_matched_rules_count(Transaction *transaction) {
+extern "C" size_t msc_get_matched_rules_count(const Transaction *transaction) {
     return transaction->m_rulesMessages.size();
 }
 
@@ -2357,7 +2357,7 @@ extern "C" size_t msc_get_matched_rules_count(Transaction *transaction) {
  * @retval  0 Index is out of range.
  *
  */
-extern "C" int64_t msc_get_matched_rule_id(Transaction *transaction,
+extern "C" int64_t msc_get_matched_rule_id(const Transaction *transaction,
     size_t index) {
     if (index >= transaction->m_rulesMessages.size()) {
         return 0;
