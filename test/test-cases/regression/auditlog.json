@@ -782,5 +782,106 @@
       "SecAuditLogType Serial",
       "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : is_interrupted is true when a disruptive rule blocks the request",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=test",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
+      },
+      "body": [
+        "test"
+      ]
+    },
+    "expected": {
+      "audit_log": "\"is_interrupted\":true",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains test\" \"id:1900,phase:1,deny,auditlog\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/audit_test_is_interrupted_true.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0600",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : is_interrupted is false when SecRuleEngine is DetectionOnly",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=test",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
+      },
+      "body": [
+        "test"
+      ]
+    },
+    "expected": {
+      "audit_log": "\"is_interrupted\":false",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine DetectionOnly",
+      "SecRule ARGS \"@contains test\" \"id:1901,phase:1,deny,auditlog\"",
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/audit_test_is_interrupted_false.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0600",
+      "SecAuditLogType Serial"
+    ]
   }
 ]
