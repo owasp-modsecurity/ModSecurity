@@ -2459,7 +2459,8 @@ static int var_query_string_generate(modsec_rec *msr, msre_var *var, msre_rule *
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    int invalid_count, changed;
+    int invalid_count;
+    int changed;
     char* value = "";
     // Query is never decoded, so always decode it
     if (msr->query_string) {
@@ -2965,7 +2966,8 @@ static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_ru
 #ifdef REQUEST_EARLY
     // Before (real) phase 2, URI value is raw, httpd decodes it in before phase 2
     if (msr->phase == 1) {
-        int invalid_count, changed;
+        int invalid_count;
+        int changed;
         urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
     }
 #endif
