@@ -86,6 +86,7 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
     assert(error_msg != NULL);
     *error_msg = NULL;
+    apr_status_t rc;
     msr->msc_reqbody_length = 0;
     msr->stream_input_length = 0;
 
@@ -93,7 +94,13 @@ apr_status_t modsecurity_request_body_start(modsec_rec *msr, char **error_msg) {
      * to allocate structures from (not data, which is allocated
      * via malloc).
      */
-    apr_pool_create(&msr->msc_reqbody_mp, NULL);
+    rc = apr_pool_create(&msr->msc_reqbody_mp, NULL);
+    if (rc != APR_SUCCESS) {
+        *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to create memory pool for request body: %s",
+            get_apr_error(msr->mp, rc));
+        return -1;
+    }
+
     apr_pool_abort_set(apr_pool_abort_get(msr->mp), msr->msc_reqbody_mp);
     /* Initialise request body processors, if any. */
 
