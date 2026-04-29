@@ -543,7 +543,8 @@ static int var_request_uri_generate(modsec_rec *msr, msre_var *var, msre_rule *r
     assert(msr != NULL);
     assert(msr->r != NULL);
     char* value = apr_pstrdup(mptmp, msr->r->parsed_uri.path);
-    int invalid_count, changed;
+    int invalid_count;
+    int changed;
 #ifdef REQUEST_EARLY
     // Before (real) phase 2, URI value is raw, httpd decodes it in before phase 2
     if (msr->phase == 1) urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
