@@ -383,11 +383,15 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, (unsigned char*)base_offset, size);
     if (msr->json->status != yajl_status_ok) {
-        if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
-        else {
-            char* yajl_err = yajl_get_error(msr->json->handle, 0, base_offset, size);
-            *error_msg = apr_pstrdup(msr->mp, yajl_err);
-            yajl_free_error(msr->json->handle, yajl_err);
+        if (msr->json->depth_limit_exceeded) {
+           *error_msg = "JSON depth limit exceeded";
+	    } else {
+            if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
+            else {
+                char* yajl_err = yajl_get_error(msr->json->handle, 0, base_offset, size);
+                *error_msg = apr_pstrdup(msr->mp, yajl_err);
+                yajl_free_error(msr->json->handle, yajl_err);
+            }
         }
         return -1;
 	}
