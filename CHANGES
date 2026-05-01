@@ -1,3 +1,37 @@
+28 Apr 2026 - 2.9.13
+--------------------
+
+ * fix: heap buffer overflow in acmp pm
+   [Issue #3545 - @fumfel,@airween]
+ * fix: probably UB (left shift of neg. val) in ip_tree code
+   [Issue #3542 - @fumfel,@airween]
+ * feat(libinjection): add libinjection 4 final to v2
+   [Issue #3535 - @airween]
+ * fix: cppcheck warnings
+   [Issue #3530 - @airween]
+ * feat: add Lua 5.5 support when available
+   [Issue #3527 - @fzipi,@airween]
+ * refactor: remove NGINX support from v2 (#3498)
+   [Issue #3502 - @sanjib2006]
+ * fix: cppcheck warnings in nginx/
+   [Issue #3493 - @umprayz]
+ * fix: cppcheck warnings in standalone/
+   [Issue #3488 - @umprayz]
+ * v2: Accept requests whose body length is exactly equal to SecRequestBodyNoFilesLimit
+   [Issue #3480 - @hnakamur]
+ * fix: yajl detection for source installations (#3457)
+   [Issue #3458 - @weida]
+ * feat: fix regression test, add a new CI workflow
+   [Issue #3456 - @airween]
+ * Fix libxml2 related deprecated issues
+   [Issue #3454 - @airween]
+ * Add CMake and CI Pipeline for ModSecurityIIS in ModSecurity V2
+   [Issue #3452 - @A13501350]
+ * fix(iis):  IPv6 Handling in ModSecurity IIS Module
+   [Issue #3443 - @A13501350]
+ * fix: add event message resources to ModSecurityIIS.dll and resolve "Invalid function" errors (#3408)
+   [Issue #3438 - @A13501350]
+
 05 Aug 2025 - 2.9.12
 --------------------
 
