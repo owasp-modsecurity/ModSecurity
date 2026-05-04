@@ -227,6 +227,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         return true;
     }
 
+    const std::string opName = (m_operator->m_negation ? "!" : "") + m_operator->m_op;
+
     if (m_operator->m_string) {
         eparam = m_operator->m_string->evaluate(trans);
 
@@ -236,15 +238,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         } else {
             eparam = "\"" + eparam + "\"";
         }
-    ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-        + ") Executing operator \"" + getOperatorName() \
-        + "\" with param " \
-        + eparam \
-        + " against " \
-        + m_variables + ".");
+    
+        ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
+            + ") Executing operator \"" + opName \
+            + "\" with param " \
+            + eparam \
+            + " against " \
+            + m_variables + ".");
     } else {
         ms_dbg_a(trans, 4, "(Rule: " + std::to_string(m_ruleId) \
-            + ") Executing operator \"" + getOperatorName() \
+            + ") Executing operator \"" + opName \
             + " against " \
             + m_variables + ".");
     }
