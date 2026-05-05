@@ -883,5 +883,45 @@
       "SecAuditLogFileMode 0600",
       "SecAuditLogType Serial"
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : validate the SecComponentSignature value",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "Content-Length": "0"
+      },
+      "uri": "/index.php",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "audit_log": "[\"OWASP_CRS/4.25.0\"]",
+      "http_code": 200
+    },
+    "rules": [
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogParts ABCFHZ",
+      "SecComponentSignature \"OWASP_CRS/4.25.0\"",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0600",
+      "SecAuditLog /tmp/audit_component_signature.log",
+      "SecAuditLogType Serial"
+    ]
   }
 ]
