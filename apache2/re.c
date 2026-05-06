@@ -990,19 +990,46 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
  * Helper function for action_exists. It checks if "name=value" is present in table for supplied action.
  */
 static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *elts = NULL;
+    int i = 0;
+    apr_size_t value_len = 0;
+    (void)p;
     if (strcmp(name, action) != 0) return 0;
-
-    const char* vars = apr_table_getm(p, vartable, name);
-    if (!vars) return 0;
-
-    char pattern[200];
-    apr_snprintf(pattern, sizeof(pattern), "(?:^|,)%.185s(?:,|$)", value);
-
-    char* error_msg = NULL;
-    msc_regex_t* regex = msc_pregcomp(p, pattern, 0, NULL, NULL);
-    if (regex == NULL) return 0;
-
-    return (msc_regexec(regex, vars, strlen(vars), &error_msg) >= 0);
+    if ((vartable == NULL) || (value == NULL)) return 0;
+    value_len = strlen(value);
+    arr = apr_table_elts(vartable);
+    if (arr == NULL) return 0;
+    elts = (const apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        const char *vars = NULL;
+        const char *segment_start = NULL;
+        const char *cursor = NULL;
+        if ((elts[i].key == NULL) || (strcmp(elts[i].key, name) != 0)) {
+            continue;
+        }
+        vars = elts[i].val;
+        if (vars == NULL) {
+            continue;
+        }
+        segment_start = vars;
+        cursor = vars;
+        for (;;) {
+            if ((*cursor == ',') || (*cursor == '\0')) {
+                apr_size_t segment_len = (apr_size_t)(cursor - segment_start);
+                if ((segment_len == value_len) &&
+                    (strncmp(segment_start, value, value_len) == 0)) {
+                    return 1;
+                }
+                if (*cursor == '\0') {
+                    break;
+                }
+                segment_start = cursor + 1;
+            }
+            cursor++;
+        }
+    }
+    return 0;
 }
 
 /**
