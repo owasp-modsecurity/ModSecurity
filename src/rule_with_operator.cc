@@ -227,7 +227,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         return true;
     }
 
-    const std::string opName = (m_operator->m_negation ? "!" : "") + m_operator->m_op;
+    const std::string opName = (m_operator->m_negation ? "!" : "") + m_operator->m_op; // cppcheck-suppress unreadVariable
 
     if (m_operator->m_string) {
         eparam = m_operator->m_string->evaluate(trans);
