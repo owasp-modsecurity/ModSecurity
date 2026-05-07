@@ -1235,7 +1235,7 @@ int Multipart::multipart_complete(std::string *error) {
                                     error->assign("Multipart: Invalid final boundary.");
                                     return false;
                                 }
-                            } else if ((*(m_buf + 2 + m_boundary.size()) != '\r') 
+                            } else if ((*(m_buf + 2 + m_boundary.size()) != '\r')
                                 || ((buf_data_len >= 2 + m_boundary.size() + 2)
                                     && (*(m_buf + 2 + m_boundary.size() + 1) != '\n'))) {
                                 ms_dbg_a(m_transaction, 1,

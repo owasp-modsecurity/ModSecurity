@@ -647,9 +647,16 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     void *m_logCbData;
 
     /**
+     * Whether the request body was bigger than RequestNoFilesBodyLimit.
+     */
+    bool m_requestBodyNoFilesLimitExceeded;
+
+    /**
      * Whether the request body was bigger than RequestBodyLimit.
      */
     bool m_requestBodyLimitExceeded;
+
+    size_t requestBodyLengthToProcess() const;
 };
 
 
