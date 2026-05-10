@@ -61,7 +61,10 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         }
 
         blob_offset += 2;
-        if (var->name_len < 1 || blob_offset + var->name_len > blob_size) return NULL;
+        /* Need name_len bytes for the name body plus 2 more for the value_len header.
+         * name_len == 0 is already handled by the early break above, so no zero-check
+         * is required at this point. */
+        if (blob_offset + var->name_len + 2 > blob_size) return NULL;
         var->name = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->name_len - 1);
         blob_offset += var->name_len;
         var->name_len--;
