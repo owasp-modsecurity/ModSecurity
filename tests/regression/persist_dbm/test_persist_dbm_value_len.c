@@ -68,7 +68,8 @@ static int unpack_buggy(const unsigned char *blob, unsigned int blob_size,
                         size_t *out_copy_len)
 {
     unsigned int blob_offset = 3;          /* skip 3-byte header */
-    unsigned int name_len, value_len;
+    unsigned int name_len;
+    unsigned int value_len;
 
     if (blob_offset + 1 >= blob_size) return -1;
     name_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
@@ -100,7 +101,7 @@ static int unpack_buggy(const unsigned char *blob, unsigned int blob_size,
      * with var->value_len declared `unsigned int`. If value_len == 0,
      * `value_len - 1` wraps to UINT_MAX. Reproduce that arithmetic
      * verbatim so the sanitizers see exactly the same operation. */
-    size_t copy_len = (size_t)(unsigned int)(value_len - 1);
+    size_t copy_len = (size_t)(value_len - 1);
     if (out_copy_len) *out_copy_len = copy_len;
     return 1;
 }
@@ -109,7 +110,8 @@ static int unpack_patched(const unsigned char *blob, unsigned int blob_size,
                           size_t *out_copy_len)
 {
     unsigned int blob_offset = 3;
-    unsigned int name_len, value_len;
+    unsigned int name_len;
+    unsigned int value_len;
 
     if (blob_offset + 1 >= blob_size) return -1;
     name_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
@@ -129,7 +131,7 @@ static int unpack_patched(const unsigned char *blob, unsigned int blob_size,
     /* === patched bound check on value (the fix from 4f33f5b) ============= */
     if (value_len < 1 || blob_offset + value_len > blob_size) return 0;
 
-    size_t copy_len = (size_t)(unsigned int)(value_len - 1);
+    size_t copy_len = (size_t)(value_len - 1);
     if (out_copy_len) *out_copy_len = copy_len;
     return 1;
 }
@@ -229,7 +231,8 @@ static const size_t n_cases = sizeof(cases) / sizeof(cases[0]);
 
 static int run_one(const struct case_t *c)
 {
-    size_t buggy_copy = 0, patched_copy = 0;
+    size_t buggy_copy = 0;
+    size_t patched_copy = 0;
     int buggy_rc   = unpack_buggy  (c->blob, c->blob_size, &buggy_copy);
     int patched_rc = unpack_patched(c->blob, c->blob_size, &patched_copy);
 
@@ -274,7 +277,7 @@ int main(void)
      * even on the buggy code. Force a runtime assert. */
     {
         unsigned int v = 0;
-        size_t got = (size_t)(unsigned int)(v - 1);
+        size_t got = (size_t)(v - 1);
         if (got != (size_t)UINT_MAX) {
             fprintf(stderr,
                     "FATAL: this platform's unsigned int wrap is %zu,"
