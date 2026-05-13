@@ -1,11 +1,14 @@
+%require "3.8"
+%language "c++"
 %skeleton "lalr1.cc" /* -*- C++ -*- */
-%require "3.0.2"
-%defines
-%define parser_class_name {seclang_parser}
+%output "seclang-parser.cc"
+%header "seclang-parser.hh"
+%define api.parser.class {seclang_parser}
 %define api.token.constructor
 %define api.value.type variant
 //%define api.namespace {modsecurity::yy}
 %define parse.assert
+%expect 1344
 %code requires
 {
 #include <string>
@@ -163,10 +166,16 @@ class Driver;
 #include "src/variables/args_combined_size.h"
 #include "src/variables/args_get.h"
 #include "src/variables/args_get_names.h"
+#include "src/variables/args_get_names_raw.h"
+#include "src/variables/args_get_raw.h"
 #include "src/variables/args.h"
 #include "src/variables/args_names.h"
+#include "src/variables/args_names_raw.h"
 #include "src/variables/args_post.h"
 #include "src/variables/args_post_names.h"
+#include "src/variables/args_post_names_raw.h"
+#include "src/variables/args_post_raw.h"
+#include "src/variables/args_raw.h"
 #include "src/variables/auth_type.h"
 #include "src/variables/duration.h"
 #include "src/variables/env.h"
@@ -343,8 +352,11 @@ using namespace modsecurity::operators;
   VAR_COUNT
   VAR_EXCLUSION
   VARIABLE_ARGS
+  VARIABLE_ARGS_RAW
   VARIABLE_ARGS_POST
+  VARIABLE_ARGS_POST_RAW
   VARIABLE_ARGS_GET
+  VARIABLE_ARGS_GET_RAW
   VARIABLE_FILES_SIZES
   VARIABLE_FILES_NAMES
   VARIABLE_FILES_TMP_CONTENT
@@ -361,9 +373,12 @@ using namespace modsecurity::operators;
   VARIABLE_MULTIPART_PART_HEADERS
   VARIABLE_ARGS_COMBINED_SIZE
   VARIABLE_ARGS_GET_NAMES
+  VARIABLE_ARGS_GET_NAMES_RAW
   VARIABLE_RULE
   VARIABLE_ARGS_NAMES           "Variable ARGS_NAMES"
+  VARIABLE_ARGS_NAMES_RAW
   VARIABLE_ARGS_POST_NAMES
+  VARIABLE_ARGS_POST_NAMES_RAW
   VARIABLE_AUTH_TYPE            "AUTH_TYPE"
   VARIABLE_FILES_COMBINED_SIZE  "FILES_COMBINED_SIZE"
   VARIABLE_FILES_TMP_NAMES       "FILES_TMPNAMES"
@@ -986,6 +1001,8 @@ op_before_init:
     | OPERATOR_VALIDATE_HASH run_time_string
       {
         /* $$ = new operators::ValidateHash($1); */
+        $$ = nullptr;
+        (void)$2;
         OPERATOR_NOT_SUPPORTED("ValidateHash", @0);
       }
     | OPERATOR_VALIDATE_SCHEMA run_time_string
@@ -1011,11 +1028,15 @@ op_before_init:
     | OPERATOR_GSB_LOOKUP run_time_string
       {
         /* $$ = new operators::GsbLookup($1); */
+        $$ = nullptr;
+        (void)$2;
         OPERATOR_NOT_SUPPORTED("GsbLookup", @0);
       }
     | OPERATOR_RSUB run_time_string
       {
         /* $$ = new operators::Rsub($1); */
+        $$ = nullptr;
+        (void)$2;
         OPERATOR_NOT_SUPPORTED("Rsub", @0);
       }
     | OPERATOR_WITHIN run_time_string
@@ -1957,6 +1978,30 @@ var:
       {
         VARIABLE_CONTAINER($$, new variables::ArgsPost_NoDictElement());
       }
+    | VARIABLE_ARGS_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsRaw_NoDictElement());
+      }
+    | VARIABLE_ARGS_POST_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_POST_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_POST_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostRaw_NoDictElement());
+      }
     | VARIABLE_ARGS_GET DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new variables::ArgsGet_DictElement($2));
@@ -1968,6 +2013,18 @@ var:
     | VARIABLE_ARGS_GET
       {
         VARIABLE_CONTAINER($$, new variables::ArgsGet_NoDictElement());
+      }
+    | VARIABLE_ARGS_GET_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_GET_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_GET_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetRaw_NoDictElement());
       }
     | VARIABLE_FILES_SIZES DICT_ELEMENT
       {
@@ -2293,6 +2350,18 @@ var:
       {
         VARIABLE_CONTAINER($$, new variables::ArgsNames_NoDictElement());
       }
+    | VARIABLE_ARGS_NAMES_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsNamesRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_NAMES_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsNamesRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_NAMES_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsNamesRaw_NoDictElement());
+      }
     | VARIABLE_ARGS_GET_NAMES DICT_ELEMENT
       {
         VARIABLE_CONTAINER($$, new variables::ArgsGetNames_DictElement($2));
@@ -2304,6 +2373,18 @@ var:
     | VARIABLE_ARGS_GET_NAMES
       {
         VARIABLE_CONTAINER($$, new variables::ArgsGetNames_NoDictElement());
+      }
+    | VARIABLE_ARGS_GET_NAMES_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNamesRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_GET_NAMES_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNamesRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_GET_NAMES_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsGetNamesRaw_NoDictElement());
       }
 
     | VARIABLE_ARGS_POST_NAMES DICT_ELEMENT
@@ -2317,6 +2398,18 @@ var:
     | VARIABLE_ARGS_POST_NAMES
       {
         VARIABLE_CONTAINER($$, new variables::ArgsPostNames_NoDictElement());
+      }
+    | VARIABLE_ARGS_POST_NAMES_RAW DICT_ELEMENT
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNamesRaw_DictElement($2));
+      }
+    | VARIABLE_ARGS_POST_NAMES_RAW DICT_ELEMENT_REGEXP
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNamesRaw_DictElementRegexp($2));
+      }
+    | VARIABLE_ARGS_POST_NAMES_RAW
+      {
+        VARIABLE_CONTAINER($$, new variables::ArgsPostNamesRaw_NoDictElement());
       }
 
     | VARIABLE_REQUEST_HEADERS_NAMES DICT_ELEMENT
@@ -2690,6 +2783,7 @@ act:
       }
     | ACTION_APPEND
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("Append", @0);
       }
     | ACTION_AUDIT_LOG
@@ -2802,6 +2896,7 @@ act:
       }
     | ACTION_DEPRECATE_VAR
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("DeprecateVar", @0);
       }
     | ACTION_DROP
@@ -2858,6 +2953,7 @@ act:
       }
     | ACTION_PAUSE
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("Pause", @0);
       }
     | ACTION_PHASE
@@ -2866,10 +2962,12 @@ act:
       }
     | ACTION_PREPEND
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("Prepend", @0);
       }
     | ACTION_PROXY
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("Proxy", @0);
       }
     | ACTION_REDIRECT run_time_string
@@ -2882,22 +2980,27 @@ act:
       }
     | ACTION_SANITISE_ARG
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("SanitiseArg", @0);
       }
     | ACTION_SANITISE_MATCHED
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("SanitiseMatched", @0);
       }
     | ACTION_SANITISE_MATCHED_BYTES
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("SanitiseMatchedBytes", @0);
       }
     | ACTION_SANITISE_REQUEST_HEADER
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("SanitiseRequestHeader", @0);
       }
     | ACTION_SANITISE_RESPONSE_HEADER
       {
+        $$ = nullptr;
         ACTION_NOT_SUPPORTED("SanitiseResponseHeader", @0);
       }
     | ACTION_SETENV run_time_string

@@ -190,6 +190,9 @@ class TransactionAnchoredVariables {
         m_variableArgs(t, "ARGS"),
         m_variableArgsGet(t, "ARGS_GET"),
         m_variableArgsPost(t, "ARGS_POST"),
+        m_variableArgsRaw(t, "ARGS_RAW"),
+        m_variableArgsGetRaw(t, "ARGS_GET_RAW"),
+        m_variableArgsPostRaw(t, "ARGS_POST_RAW"),
         m_variableFilesSizes(t, "FILES_SIZES"),
         m_variableFilesNames(t, "FILES_NAMES"),
         m_variableFilesTmpContent(t, "FILES_TMP_CONTENT"),
@@ -208,7 +211,10 @@ class TransactionAnchoredVariables {
         m_variableOffset(0),
         m_variableArgsNames("ARGS_NAMES", &m_variableArgs),
         m_variableArgsGetNames("ARGS_GET_NAMES", &m_variableArgsGet),
-        m_variableArgsPostNames("ARGS_POST_NAMES", &m_variableArgsPost)
+        m_variableArgsPostNames("ARGS_POST_NAMES", &m_variableArgsPost),
+        m_variableArgsNamesRaw("ARGS_NAMES_RAW", &m_variableArgsRaw),
+        m_variableArgsGetNamesRaw("ARGS_GET_NAMES_RAW", &m_variableArgsGetRaw),
+        m_variableArgsPostNamesRaw("ARGS_POST_NAMES_RAW", &m_variableArgsPostRaw)
         { }
 
     AnchoredSetVariable m_variableRequestHeadersNames;
@@ -274,6 +280,9 @@ class TransactionAnchoredVariables {
     AnchoredSetVariable m_variableArgs;
     AnchoredSetVariable m_variableArgsGet;
     AnchoredSetVariable m_variableArgsPost;
+    AnchoredSetVariable m_variableArgsRaw;
+    AnchoredSetVariable m_variableArgsGetRaw;
+    AnchoredSetVariable m_variableArgsPostRaw;
     AnchoredSetVariable m_variableFilesSizes;
     AnchoredSetVariable m_variableFilesNames;
     AnchoredSetVariable m_variableFilesTmpContent;
@@ -295,6 +304,9 @@ class TransactionAnchoredVariables {
     AnchoredSetVariableTranslationProxy m_variableArgsNames;
     AnchoredSetVariableTranslationProxy m_variableArgsGetNames;
     AnchoredSetVariableTranslationProxy m_variableArgsPostNames;
+    AnchoredSetVariableTranslationProxy m_variableArgsNamesRaw;
+    AnchoredSetVariableTranslationProxy m_variableArgsGetNamesRaw;
+    AnchoredSetVariableTranslationProxy m_variableArgsPostNamesRaw;
 };
 
 class TransactionSecMarkerManagement {

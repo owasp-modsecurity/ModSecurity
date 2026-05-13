@@ -201,10 +201,16 @@ class VariableMonkeyResolution {
         AnchoredSetVariable* anchoredSetVariable = NULL;
         if (comp(col, "ARGS")) {
             anchoredSetVariable = &t->m_variableArgs;
+        } else if (comp(col, "ARGS_RAW")) {
+            anchoredSetVariable = &t->m_variableArgsRaw;
         } else if (comp(col, "ARGS_GET")) {
             anchoredSetVariable = &t->m_variableArgsGet;
+        } else if (comp(col, "ARGS_GET_RAW")) {
+            anchoredSetVariable = &t->m_variableArgsGetRaw;
         } else if (comp(col, "ARGS_POST")) {
             anchoredSetVariable = &t->m_variableArgsPost;
+        } else if (comp(col, "ARGS_POST_RAW")) {
+            anchoredSetVariable = &t->m_variableArgsPostRaw;
         } else if (comp(col, "FILES_SIZES")) {
             anchoredSetVariable = &t->m_variableFilesSizes;
         } else if (comp(col, "FILES_NAMES")) {
@@ -253,10 +259,14 @@ class VariableMonkeyResolution {
         AnchoredSetVariableTranslationProxy* anchoredSetVariableTranslationProxy = NULL;
         if (comp(col, "ARGS_NAMES")) {
             anchoredSetVariableTranslationProxy = &t->m_variableArgsNames;
+        } else if (comp(col, "ARGS_NAMES_RAW")) {
+            anchoredSetVariableTranslationProxy = &t->m_variableArgsNamesRaw;
         } else if (comp(col, "ARGS_GET_NAMES")) {
             anchoredSetVariableTranslationProxy = &t->m_variableArgsGetNames;
+            anchoredSetVariableTranslationProxy = &t->m_variableArgsGetNamesRaw;
         } else if (comp(col, "ARGS_POST_NAMES")) {
             anchoredSetVariableTranslationProxy = &t->m_variableArgsPostNames;
+            anchoredSetVariableTranslationProxy = &t->m_variableArgsPostNamesRaw;
         }
         if (anchoredSetVariableTranslationProxy != NULL) {
             if (collection_delimiter_offset == std::string::npos) {
@@ -517,16 +527,26 @@ class VariableMonkeyResolution {
                 variable.length() - (collection + 1));
             if (comp(col, "ARGS")) {
                 vv = t->m_variableArgs.resolveFirst(var);
+            } else if (comp(col, "ARGS_RAW")) {
+                vv = t->m_variableArgsRaw.resolveFirst(var);
             } else if (comp(variable, "ARGS_NAMES")) {
                 vv = t->m_variableArgsNames.resolveFirst(var);
+            } else if (comp(variable, "ARGS_NAMES_RAW")) {
+                vv = t->m_variableArgsNamesRaw.resolveFirst(var);
             } else if (comp(variable, "ARGS_GET_NAMES")) {
                 vv = t->m_variableArgsGetNames.resolveFirst(var);
+                vv = t->m_variableArgsGetNamesRaw.resolveFirst(var);
             } else if (comp(variable, "ARGS_POST_NAMES")) {
                 vv = t->m_variableArgsPostNames.resolveFirst(var);
+                vv = t->m_variableArgsPostNamesRaw.resolveFirst(var);
             } else if (comp(col, "ARGS_GET")) {
                 vv = t->m_variableArgsGet.resolveFirst(var);
+            } else if (comp(col, "ARGS_GET_RAW")) {
+                vv = t->m_variableArgsGetRaw.resolveFirst(var);
             } else if (comp(col, "ARGS_POST")) {
                 vv = t->m_variableArgsPost.resolveFirst(var);
+            } else if (comp(col, "ARGS_POST_RAW")) {
+                vv = t->m_variableArgsPostRaw.resolveFirst(var);
             } else if (comp(col, "FILES_SIZES")) {
                 vv = t->m_variableFilesSizes.resolveFirst(var);
             } else if (comp(col, "FILES_NAMES")) {
