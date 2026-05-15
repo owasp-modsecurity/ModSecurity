@@ -643,9 +643,9 @@ class VariableDictElement : public Variable {
 class VariableRegex : public Variable {
  public:
     VariableRegex(const std::string &name, const std::string &regex)
-        :  m_r(regex, true),
-        m_regex(regex),
-        Variable(name + ":" + "regex(" + regex + ")") { }
+        : Variable(name + ":" + "regex(" + regex + ")"),
+        m_r(regex, true),
+        m_regex(regex) { }
 
     Utils::Regex m_r;
     // FIXME: no need for that.
