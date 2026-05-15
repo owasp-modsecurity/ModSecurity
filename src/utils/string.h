@@ -89,7 +89,7 @@ inline std::string dash_if_empty(const std::string *str) {
 }
 
 
-inline std::string limitTo(int amount, const std::string &str) {
+inline std::string limitTo(std::string::size_type amount, const std::string &str) {
     std::string ret;
 
     if (str.length() > amount) {
