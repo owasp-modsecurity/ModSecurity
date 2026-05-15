@@ -258,5 +258,92 @@
       "SecRule REQUEST_FILENAME \"@endsWith /index.html\" \"id:9002100,phase:2,t:none,nolog,pass,ctl:ruleRemoveTargetById=1;ARGS:@foo\"",
       "SecRule ARGS \"@contains attack\" \"id:1,phase:3,t:none,status:403,block,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById with = character",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Accept": "*/*"
+      },
+      "uri": "/index.html?foo=bar=attack",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetById=1;ARGS:foo=bar\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById with ( and ) characters",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Accept": "*/*"
+      },
+      "uri": "/index.html?foo(bar)=attack",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetById=1;ARGS:foo(bar)\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById with ' character",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Accept": "*/*"
+      },
+      "uri": "/index.html?foo'bar=attack",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetById=1;ARGS:foo'bar\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny\""
+    ]
   }
 ]
