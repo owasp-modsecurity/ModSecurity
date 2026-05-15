@@ -33,7 +33,7 @@ bool PmFromFile::isComment(const std::string &s) {
     }
     size_t pos = s.find("#");
     if (pos != std::string::npos) {
-        for (int i = 0; i < pos; i++) {
+        for (size_t i = 0; i < pos; i++) {
 	    if (!std::isspace(s[i])) {
 		return false;
 	    }
