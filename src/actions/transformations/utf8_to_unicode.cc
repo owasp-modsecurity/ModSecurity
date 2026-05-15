@@ -15,7 +15,7 @@
 
 #include "utf8_to_unicode.h"
 
-#include <cstring>
+#include <cstdio>
 
 #include "src/utils/string.h"
 
@@ -78,12 +78,18 @@ static inline bool encode(std::string &value) {
                 unicode_len = 2;
                 count += 6;
                 if (count <= len) {
-                    int length = 0;
+                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x1F) << 6) | (*(utf + 1) & 0x3F);
                     *data++ = '%';
                     *data++ = 'u';
-                    length = snprintf(unicode, sizeof(unicode), "%x", d);
+                    const int written = std::snprintf(unicode, sizeof(unicode),
+                        "%x", d);
+                    if (written < 0
+                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                        return changed;
+                    }
+                    length = static_cast<size_t>(written);
 
                     switch (length) {
                         case 1:
@@ -103,7 +109,7 @@ static inline bool encode(std::string &value) {
                             break;
                     }
 
-                    for (int j = 0; j < length; j++) {
+                    for (size_t j = 0; j < length; j++) {
                         *data++ = unicode[j];
                     }
 
@@ -125,14 +131,20 @@ static inline bool encode(std::string &value) {
                 unicode_len = 3;
                 count+=6;
                 if (count <= len) {
-                    int length = 0;
+                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x0F) << 12)
                         | ((*(utf + 1) & 0x3F) << 6)
                         | (*(utf + 2) & 0x3F);
                     *data++ = '%';
                     *data++ = 'u';
-                    length = snprintf(unicode, sizeof(unicode), "%x", d);
+                    const int written = std::snprintf(unicode, sizeof(unicode),
+                        "%x", d);
+                    if (written < 0
+                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                        return changed;
+                    }
+                    length = static_cast<size_t>(written);
 
                     switch (length)  {
                         case 1:
@@ -152,7 +164,7 @@ static inline bool encode(std::string &value) {
                             break;
                     }
 
-                    for (int j = 0; j < length; j++) {
+                    for (size_t j = 0; j < length; j++) {
                         *data++ = unicode[j];
                     }
 
@@ -183,7 +195,7 @@ static inline bool encode(std::string &value) {
                 unicode_len = 4;
                 count+=7;
                 if (count <= len) {
-                    int length = 0;
+                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x07) << 18)
                         | ((*(utf + 1) & 0x3F) << 12)
@@ -191,7 +203,13 @@ static inline bool encode(std::string &value) {
                         | (*(utf + 3) & 0x3F);
                     *data++ = '%';
                     *data++ = 'u';
-                    length = snprintf(unicode, sizeof(unicode), "%x", d);
+                    const int written = std::snprintf(unicode, sizeof(unicode),
+                        "%x", d);
+                    if (written < 0
+                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                        return changed;
+                    }
+                    length = static_cast<size_t>(written);
 
                     switch (length)  {
                         case 1:
@@ -211,7 +229,7 @@ static inline bool encode(std::string &value) {
                             break;
                     }
 
-                    for (int j = 0; j < length; j++) {
+                    for (size_t j = 0; j < length; j++) {
                         *data++ = unicode[j];
                     }
 
