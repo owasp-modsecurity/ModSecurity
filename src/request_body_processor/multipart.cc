@@ -558,7 +558,7 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
         /* check if the file limit has been reached */
         if (extract && m_transaction->m_rules->m_uploadFileLimit.m_value
-            && (m_nfiles >=
+            && (static_cast<uint32_t>(m_nfiles) >=
                 m_transaction->m_rules->m_uploadFileLimit.m_value)) {
             if (m_flag_file_limit_exceeded == 0) {
                 ms_dbg_a(m_transaction, 1,
