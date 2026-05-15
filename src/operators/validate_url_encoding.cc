@@ -25,14 +25,13 @@ namespace operators {
 
 int ValidateUrlEncoding::validate_url_encoding(const char *input,
     uint64_t input_length, size_t *offset) {
-    int i;
+    uint64_t i = 0;
     *offset = 0;
 
     if ((input == NULL) || (input_length == 0)) {
         return -1;
     }
 
-    i = 0;
     while (i < input_length) {
         if (input[i] == '%') {
             if (i + 2 >= input_length) {
