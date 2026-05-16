@@ -30,7 +30,12 @@ namespace ctl {
 
 
 bool RuleRemoveTargetById::init(std::string *error) {
-    std::string what(m_parser_payload, 21, m_parser_payload.size() - 21);
+    size_t pos = m_parser_payload.find("=");
+    if (pos == std::string::npos) {
+        error->assign(m_parser_payload + " is not a valid `ID;VARIABLE'");
+        return false;
+    }
+    std::string what = m_parser_payload.substr(pos + 1);
     std::vector<std::string> param = utils::string::split(what, ';');
 
     if (param.size() < 2) {
