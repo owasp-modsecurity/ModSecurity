@@ -1,0 +1,65 @@
+[
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "javascript&colon;alert(1)",
+    "ret": 1,
+    "output": "javascript:alert(1)"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "it&apos;s",
+    "ret": 1,
+    "output": "it's"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&num;&dollar;&percnt;&lpar;&rpar;&ast;&plus;&comma;&hyphen;&period;&sol;&semi;&equals;&quest;&commat;",
+    "ret": 1,
+    "output": "#$%()*+,-./;=?@"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&lbrack;&bsol;&rbrack;&caret;&lowbar;&grave;&lbrace;&verbar;&rbrace;&tilde;",
+    "ret": 1,
+    "output": "[\\]^_`{|}~"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&COLON;&Apos;",
+    "ret": 1,
+    "output": ":'"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&ltest;",
+    "ret": 1,
+    "output": "&ltest;"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&amped;",
+    "ret": 1,
+    "output": "&amped;"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&gtfoo;",
+    "ret": 1,
+    "output": "&gtfoo;"
+  },
+  {
+    "type": "tfn",
+    "name": "htmlEntityDecode",
+    "input": "&unknown;",
+    "ret": 1,
+    "output": "&unknown;"
+  }
+]

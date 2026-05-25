@@ -28,6 +28,75 @@ using namespace modsecurity::utils::string;
 namespace modsecurity::actions::transformations {
 
 
+namespace {
+
+struct NamedEntity {
+    const char *name;
+    std::size_t len;
+    unsigned char ch;
+};
+
+/* Named-entity table for t:htmlEntityDecode.
+ *
+ * Compared case-insensitively against the full extracted token; the length
+ * must match exactly. Prior implementations used strncasecmp() with the name
+ * length only, which caused prefix collisions (e.g. "&ltest;" decoded to "<"
+ * and dropped "est"). See GHSA-cxqf-vgrr-xxrv.
+ *
+ * The set is limited to entities that map into the ASCII range, since those
+ * are what attackers use to evade rules expecting ASCII payload bytes.
+ */
+constexpr NamedEntity named_entities[] = {
+    {"amp",    3, '&'},
+    {"apos",   4, '\''},
+    {"ast",    3, '*'},
+    {"bsol",   4, '\\'},
+    {"caret",  5, '^'},
+    {"colon",  5, ':'},
+    {"comma",  5, ','},
+    {"commat", 6, '@'},
+    {"dollar", 6, '$'},
+    {"equals", 6, '='},
+    {"grave",  5, '`'},
+    {"gt",     2, '>'},
+    {"hyphen", 6, '-'},
+    {"lbrace", 6, '{'},
+    {"lbrack", 6, '['},
+    {"lowbar", 6, '_'},
+    {"lpar",   4, '('},
+    {"lt",     2, '<'},
+    {"nbsp",   4, NBSP},
+    {"num",    3, '#'},
+    {"percnt", 6, '%'},
+    {"period", 6, '.'},
+    {"plus",   4, '+'},
+    {"quest",  5, '?'},
+    {"quot",   4, '"'},
+    {"rbrace", 6, '}'},
+    {"rbrack", 6, ']'},
+    {"rpar",   4, ')'},
+    {"semi",   4, ';'},
+    {"sol",    3, '/'},
+    {"tilde",  5, '~'},
+    {"verbar", 6, '|'},
+};
+
+bool lookup_named_entity(const unsigned char *name, std::size_t name_len,
+                         unsigned char *out) {
+    for (const auto &e : named_entities) {
+        if (e.len == name_len &&
+            strncasecmp(reinterpret_cast<const char *>(name), e.name,
+                        name_len) == 0) {
+            *out = e.ch;
+            return true;
+        }
+    }
+    return false;
+}
+
+}  // namespace
+
+
 static inline bool inplace(std::string &value) {
     const auto input_len = value.length();
     auto d = reinterpret_cast<unsigned char*>(value.data());
@@ -118,27 +187,14 @@ static inline bool inplace(std::string &value) {
                 while ((j < input_len) && (isalnum(input[j]))) {
                     j++;
                 }
-                if (j > k) { /* Do we have at least one digit? */
-                    const auto *x = reinterpret_cast<const char*>(&input[k]);
-
-                    /* Decode the entity. */
-                    /* ENH What about others? */
-                    if (strncasecmp(x, "quot", 4) == 0) {
-                        *d++ = '"';
-                    } else if (strncasecmp(x, "amp", 3) == 0) {
-                        *d++ = '&';
-                    } else if (strncasecmp(x, "lt", 2) == 0) {
-                        *d++ = '<';
-                    } else if (strncasecmp(x, "gt", 2) == 0) {
-                        *d++ = '>';
-                    } else if (strncasecmp(x, "nbsp", 4) == 0) {
-                        *d++ = NBSP;
-                    } else {
-                        /* We do no want to convert this entity,
-                         * copy the raw data over. */
+                if (j > k) { /* Do we have at least one character? */
+                    unsigned char decoded = 0;
+                    if (!lookup_named_entity(&input[k], j - k, &decoded)) {
+                        /* Unknown entity: copy the raw data over. */
                         copy = j - k + 1;
                         goto HTML_ENT_OUT;
                     }
+                    *d++ = decoded;
 
                     /* Skip over the semicolon if it's there. */
                     if ((j < input_len) && (input[j] == ';')) {
