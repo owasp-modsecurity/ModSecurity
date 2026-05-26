@@ -708,9 +708,6 @@ int Transaction::processRequestBody() {
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
 
-    bool is_process_partial = (m_rules->m_requestBodyLimitAction
-        == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
-
     if ((m_requestBodyType == WWWFormUrlEncoded) ||
         (m_requestBodyProcessor == JSONRequestBody) ||
         (m_requestBodyProcessor == XMLRequestBody)) {
@@ -725,10 +722,17 @@ int Transaction::processRequestBody() {
 	    }
     }
 
+    bool is_full_body_in_limit = !m_requestBodyNoFilesLimitExceeded && !m_requestBodyLimitExceeded;
+    bool is_process_partial = (m_rules->m_requestBodyLimitAction
+        == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
+    ms_dbg(5, "[myDebug] m_requestBodyNoFilesLimitExceeded=" + std::to_string(m_requestBodyNoFilesLimitExceeded) \
+        + ", m_requestBodyLimitExceeded=" + std::to_string(m_requestBodyLimitExceeded) \
+        + ", is_process_partial=" + std::to_string(is_process_partial));
+
 #ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!m_requestBodyNoFilesLimitExceeded || is_process_partial) {
+        if (is_full_body_in_limit || is_process_partial) {
             std::string error;
             bool require_well_formed = !(is_process_partial && m_requestBodyLimitExceeded);
             if (!require_well_formed) {
@@ -760,7 +764,7 @@ int Transaction::processRequestBody() {
     if (m_requestBodyProcessor == JSONRequestBody) {
 #endif
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!m_requestBodyNoFilesLimitExceeded || is_process_partial) {
+        if (is_full_body_in_limit || is_process_partial) {
             std::string error;
             if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
                 m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
@@ -828,7 +832,7 @@ int Transaction::processRequestBody() {
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!m_requestBodyNoFilesLimitExceeded || is_process_partial) {
+        if (is_full_body_in_limit || is_process_partial) {
             bool partial_processing_enabled = is_process_partial && m_requestBodyLimitExceeded;
             extractArguments("POST", m_requestBody.str().substr(0, requestBodyLengthToProcess()),
                 m_variableOffset, partial_processing_enabled);
