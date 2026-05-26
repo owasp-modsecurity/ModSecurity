@@ -1689,6 +1689,68 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
     return count;
 }
 
+/* Named-entity table for t:htmlEntityDecode.
+ *
+ * Compared case-insensitively against the full extracted token (the existing
+ * apr_pstrmemdup + strcasecmp pair already enforces an exact-length compare,
+ * so prefix-collisions like "&ltest;" do not occur in this v2 implementation).
+ *
+ * The set is limited to entities that map into the ASCII range -- those are
+ * what attackers use to evade rules expecting ASCII payload bytes. The
+ * original implementation only knew quot/amp/lt/gt/nbsp, which let inputs
+ * such as "javascript&colon;execute_my_code();" survive htmlEntityDecode and
+ * bypass rules matching "javascript:". See GHSA-cxqf-vgrr-xxrv.
+ */
+static const struct {
+    const char *name;
+    unsigned char ch;
+} msc_html_named_entities[] = {
+    { "amp",    '&'  },
+    { "apos",   '\'' },
+    { "ast",    '*'  },
+    { "bsol",   '\\' },
+    { "caret",  '^'  },
+    { "colon",  ':'  },
+    { "comma",  ','  },
+    { "commat", '@'  },
+    { "dollar", '$'  },
+    { "equals", '='  },
+    { "grave",  '`'  },
+    { "gt",     '>'  },
+    { "hyphen", '-'  },
+    { "lbrace", '{'  },
+    { "lbrack", '['  },
+    { "lowbar", '_'  },
+    { "lpar",   '('  },
+    { "lt",     '<'  },
+    { "nbsp",   NBSP },
+    { "num",    '#'  },
+    { "percnt", '%'  },
+    { "period", '.'  },
+    { "plus",   '+'  },
+    { "quest",  '?'  },
+    { "quot",   '"'  },
+    { "rbrace", '}'  },
+    { "rbrack", ']'  },
+    { "rpar",   ')'  },
+    { "semi",   ';'  },
+    { "sol",    '/'  },
+    { "tilde",  '~'  },
+    { "verbar", '|'  },
+};
+
+static int msc_html_named_entity_lookup(const char *name, unsigned char *out) {
+    size_t n = sizeof(msc_html_named_entities) / sizeof(msc_html_named_entities[0]);
+    size_t i;
+    for (i = 0; i < n; i++) {
+        if (strcasecmp(name, msc_html_named_entities[i].name) == 0) {
+            *out = msc_html_named_entities[i].ch;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /**
  *
  * IMP1 Assumes NUL-terminated
@@ -1763,26 +1825,16 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
 
                 k = j;
                 while((j < input_len)&&(isalnum(input[j]))) j++;
-                if (j > k) { /* Do we have at least one digit? */
+                if (j > k) { /* Do we have at least one character? */
                     char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
+                    unsigned char decoded = 0;
 
-                    /* Decode the entity. */
-                    /* ENH What about others? */
-                    if (strcasecmp(x, "quot") == 0) *d++ = '"';
-                    else
-                        if (strcasecmp(x, "amp") == 0) *d++ = '&';
-                        else
-                            if (strcasecmp(x, "lt") == 0) *d++ = '<';
-                            else
-                                if (strcasecmp(x, "gt") == 0) *d++ = '>';
-                                else
-                                    if (strcasecmp(x, "nbsp") == 0) *d++ = NBSP;
-                                    else {
-                                        /* We do no want to convert this entity, copy the raw data over. */
-                                        copy = j - k + 1;
-                                        goto HTML_ENT_OUT;
-                                    }
-
+                    if (!msc_html_named_entity_lookup(x, &decoded)) {
+                        /* Unknown entity: copy the raw data over. */
+                        copy = j - k + 1;
+                        goto HTML_ENT_OUT;
+                    }
+                    *d++ = decoded;
                     count++;
 
                     /* Skip over the semicolon if it's there. */
