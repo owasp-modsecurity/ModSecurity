@@ -154,7 +154,7 @@
     "enabled": 1,
     "version_min": 300000,
     "type": "config",
-    "title": "SecRequestBodyLimitAction Reject (XML, >Limit, <=NoFilesLimit) SHOULD BE 413",
+    "title": "SecRequestBodyLimitAction Reject (XML, >Limit, <=NoFilesLimit)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -189,7 +189,7 @@
     },
     "expected": {
       "debug_log": "Request body is bigger than the maximum expected.",
-      "http_code": 403
+      "http_code": 413
     },
     "rules": [
       "SecRuleEngine On",
@@ -205,7 +205,7 @@
     "enabled": 1,
     "version_min": 300000,
     "type": "config",
-    "title": "SecRequestBodyLimitAction Reject (XML, >Limit, >NoFilesLimit) SHOULD BE 413",
+    "title": "SecRequestBodyLimitAction Reject (XML, >Limit, >NoFilesLimit)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -240,7 +240,7 @@
     },
     "expected": {
       "debug_log": "Request body is bigger than the maximum expected.",
-      "http_code": 403
+      "http_code": 413
     },
     "rules": [
       "SecRuleEngine On",
