@@ -661,10 +661,16 @@ int Transaction::addRequestHeader(const unsigned char *key, size_t key_n,
 size_t Transaction::requestBodyLengthToProcess() const {
     bool is_process_partial = (m_rules->m_requestBodyLimitAction
         == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
+    size_t len = m_requestBody.str().size();
     if (is_process_partial && (m_requestBodyNoFilesLimitExceeded || m_requestBodyLimitExceeded)) {
-        return std::min(m_rules->m_requestBodyNoFilesLimit.m_value, m_rules->m_requestBodyLimit.m_value);
+        if (m_rules->m_requestBodyNoFilesLimit.m_set && m_rules->m_requestBodyNoFilesLimit.m_value < len) {
+            len = m_rules->m_requestBodyNoFilesLimit.m_value;
+        }
+        if (m_rules->m_requestBodyLimit.m_set && m_rules->m_requestBodyLimit.m_value < len) {
+            len = m_rules->m_requestBodyLimit.m_value;
+        }
     }
-    return m_requestBody.str().size();
+    return len;
 }
 
 
