@@ -141,7 +141,7 @@
       ]
     },
     "expected": {
-      "http_code": 403
+      "http_code": 413
     },
     "rules": [
       "SecRuleEngine On",
