@@ -34,7 +34,7 @@ m4_define([msc_version_info],
 
 
 # Project Information
-AC_INIT([modsecurity], [3.0], [security@modsecurity.org])
+AC_INIT([modsecurity], [4.0], [security@modsecurity.org])
 
 
 # General definitions

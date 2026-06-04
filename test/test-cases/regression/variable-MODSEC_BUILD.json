@@ -37,7 +37,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Target value: \"03([0-9]+)\" \\(Variable: MODSEC_BUILD\\)",
+      "debug_log": "Target value: \"04([0-9]+)\" \\(Variable: MODSEC_BUILD\\)",
       "http_code": 200
     },
     "rules": [
