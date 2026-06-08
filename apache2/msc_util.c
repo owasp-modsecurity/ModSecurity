@@ -1691,59 +1691,67 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
 
 /* Named-entity table for t:htmlEntityDecode.
  *
- * Compared case-insensitively against the full extracted token (the existing
- * apr_pstrmemdup + strcasecmp pair already enforces an exact-length compare,
- * so prefix-collisions like "&ltest;" do not occur in this v2 implementation).
+ * Compared case-insensitively against the full extracted token; the length
+ * must match exactly. The set is limited to entities that map into the ASCII
+ * range -- those are what attackers use to evade rules expecting ASCII payload
+ * bytes. The original implementation only knew quot/amp/lt/gt/nbsp, which let
+ * inputs such as "javascript&colon;execute_my_code();" survive htmlEntityDecode
+ * and bypass rules matching "javascript:". See GHSA-cxqf-vgrr-xxrv.
  *
- * The set is limited to entities that map into the ASCII range -- those are
- * what attackers use to evade rules expecting ASCII payload bytes. The
- * original implementation only knew quot/amp/lt/gt/nbsp, which let inputs
- * such as "javascript&colon;execute_my_code();" survive htmlEntityDecode and
- * bypass rules matching "javascript:". See GHSA-cxqf-vgrr-xxrv.
+ * NAMED_ENTITY derives the name length from the string literal at compile
+ * time so the name and len fields cannot drift out of sync.
  */
+#define NAMED_ENTITY(name_lit, character) \
+    { (name_lit), sizeof(name_lit) - 1, (unsigned char)(character) }
+
 static const struct {
     const char *name;
+    size_t len;
     unsigned char ch;
 } msc_html_named_entities[] = {
-    { "amp",    '&'  },
-    { "apos",   '\'' },
-    { "ast",    '*'  },
-    { "bsol",   '\\' },
-    { "caret",  '^'  },
-    { "colon",  ':'  },
-    { "comma",  ','  },
-    { "commat", '@'  },
-    { "dollar", '$'  },
-    { "equals", '='  },
-    { "grave",  '`'  },
-    { "gt",     '>'  },
-    { "hyphen", '-'  },
-    { "lbrace", '{'  },
-    { "lbrack", '['  },
-    { "lowbar", '_'  },
-    { "lpar",   '('  },
-    { "lt",     '<'  },
-    { "nbsp",   NBSP },
-    { "num",    '#'  },
-    { "percnt", '%'  },
-    { "period", '.'  },
-    { "plus",   '+'  },
-    { "quest",  '?'  },
-    { "quot",   '"'  },
-    { "rbrace", '}'  },
-    { "rbrack", ']'  },
-    { "rpar",   ')'  },
-    { "semi",   ';'  },
-    { "sol",    '/'  },
-    { "tilde",  '~'  },
-    { "verbar", '|'  },
+    NAMED_ENTITY("amp",    '&'),
+    NAMED_ENTITY("apos",   '\''),
+    NAMED_ENTITY("ast",    '*'),
+    NAMED_ENTITY("bsol",   '\\'),
+    NAMED_ENTITY("caret",  '^'),
+    NAMED_ENTITY("colon",  ':'),
+    NAMED_ENTITY("comma",  ','),
+    NAMED_ENTITY("commat", '@'),
+    NAMED_ENTITY("dollar", '$'),
+    NAMED_ENTITY("equals", '='),
+    NAMED_ENTITY("grave",  '`'),
+    NAMED_ENTITY("gt",     '>'),
+    NAMED_ENTITY("hyphen", '-'),
+    NAMED_ENTITY("lbrace", '{'),
+    NAMED_ENTITY("lbrack", '['),
+    NAMED_ENTITY("lowbar", '_'),
+    NAMED_ENTITY("lpar",   '('),
+    NAMED_ENTITY("lt",     '<'),
+    NAMED_ENTITY("nbsp",   NBSP),
+    NAMED_ENTITY("num",    '#'),
+    NAMED_ENTITY("percnt", '%'),
+    NAMED_ENTITY("period", '.'),
+    NAMED_ENTITY("plus",   '+'),
+    NAMED_ENTITY("quest",  '?'),
+    NAMED_ENTITY("quot",   '"'),
+    NAMED_ENTITY("rbrace", '}'),
+    NAMED_ENTITY("rbrack", ']'),
+    NAMED_ENTITY("rpar",   ')'),
+    NAMED_ENTITY("semi",   ';'),
+    NAMED_ENTITY("sol",    '/'),
+    NAMED_ENTITY("tilde",  '~'),
+    NAMED_ENTITY("verbar", '|'),
 };
 
-static int msc_html_named_entity_lookup(const char *name, unsigned char *out) {
+#undef NAMED_ENTITY
+
+static int msc_html_named_entity_lookup(const char *name, size_t name_len,
+                                        unsigned char *out) {
     size_t n = sizeof(msc_html_named_entities) / sizeof(msc_html_named_entities[0]);
     size_t i;
     for (i = 0; i < n; i++) {
-        if (strcasecmp(name, msc_html_named_entities[i].name) == 0) {
+        if (name_len == msc_html_named_entities[i].len &&
+            strncasecmp(name, msc_html_named_entities[i].name, name_len) == 0) {
             *out = msc_html_named_entities[i].ch;
             return 1;
         }
@@ -1826,10 +1834,10 @@ int html_entities_decode_inplace(apr_pool_t *mp, unsigned char *input, int input
                 k = j;
                 while((j < input_len)&&(isalnum(input[j]))) j++;
                 if (j > k) { /* Do we have at least one character? */
-                    char *x = apr_pstrmemdup(mp, (const char *)&input[k], j - k);
                     unsigned char decoded = 0;
 
-                    if (!msc_html_named_entity_lookup(x, &decoded)) {
+                    if (!msc_html_named_entity_lookup((const char *)&input[k],
+                                                      j - k, &decoded)) {
                         /* Unknown entity: copy the raw data over. */
                         copy = j - k + 1;
                         goto HTML_ENT_OUT;
