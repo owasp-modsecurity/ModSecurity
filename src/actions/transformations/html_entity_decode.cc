@@ -45,41 +45,49 @@ struct NamedEntity {
  *
  * The set is limited to entities that map into the ASCII range, since those
  * are what attackers use to evade rules expecting ASCII payload bytes.
+ *
+ * NAMED_ENTITY derives the name length from the string literal at compile
+ * time so the two cannot drift out of sync.
  */
+#define NAMED_ENTITY(name_lit, character) \
+    { (name_lit), sizeof(name_lit) - 1, static_cast<unsigned char>(character) }
+
 constexpr NamedEntity named_entities[] = {
-    {"amp",    3, '&'},
-    {"apos",   4, '\''},
-    {"ast",    3, '*'},
-    {"bsol",   4, '\\'},
-    {"caret",  5, '^'},
-    {"colon",  5, ':'},
-    {"comma",  5, ','},
-    {"commat", 6, '@'},
-    {"dollar", 6, '$'},
-    {"equals", 6, '='},
-    {"grave",  5, '`'},
-    {"gt",     2, '>'},
-    {"hyphen", 6, '-'},
-    {"lbrace", 6, '{'},
-    {"lbrack", 6, '['},
-    {"lowbar", 6, '_'},
-    {"lpar",   4, '('},
-    {"lt",     2, '<'},
-    {"nbsp",   4, NBSP},
-    {"num",    3, '#'},
-    {"percnt", 6, '%'},
-    {"period", 6, '.'},
-    {"plus",   4, '+'},
-    {"quest",  5, '?'},
-    {"quot",   4, '"'},
-    {"rbrace", 6, '}'},
-    {"rbrack", 6, ']'},
-    {"rpar",   4, ')'},
-    {"semi",   4, ';'},
-    {"sol",    3, '/'},
-    {"tilde",  5, '~'},
-    {"verbar", 6, '|'},
+    NAMED_ENTITY("amp",    '&'),
+    NAMED_ENTITY("apos",   '\''),
+    NAMED_ENTITY("ast",    '*'),
+    NAMED_ENTITY("bsol",   '\\'),
+    NAMED_ENTITY("caret",  '^'),
+    NAMED_ENTITY("colon",  ':'),
+    NAMED_ENTITY("comma",  ','),
+    NAMED_ENTITY("commat", '@'),
+    NAMED_ENTITY("dollar", '$'),
+    NAMED_ENTITY("equals", '='),
+    NAMED_ENTITY("grave",  '`'),
+    NAMED_ENTITY("gt",     '>'),
+    NAMED_ENTITY("hyphen", '-'),
+    NAMED_ENTITY("lbrace", '{'),
+    NAMED_ENTITY("lbrack", '['),
+    NAMED_ENTITY("lowbar", '_'),
+    NAMED_ENTITY("lpar",   '('),
+    NAMED_ENTITY("lt",     '<'),
+    NAMED_ENTITY("nbsp",   NBSP),
+    NAMED_ENTITY("num",    '#'),
+    NAMED_ENTITY("percnt", '%'),
+    NAMED_ENTITY("period", '.'),
+    NAMED_ENTITY("plus",   '+'),
+    NAMED_ENTITY("quest",  '?'),
+    NAMED_ENTITY("quot",   '"'),
+    NAMED_ENTITY("rbrace", '}'),
+    NAMED_ENTITY("rbrack", ']'),
+    NAMED_ENTITY("rpar",   ')'),
+    NAMED_ENTITY("semi",   ';'),
+    NAMED_ENTITY("sol",    '/'),
+    NAMED_ENTITY("tilde",  '~'),
+    NAMED_ENTITY("verbar", '|'),
 };
+
+#undef NAMED_ENTITY
 
 bool lookup_named_entity(const unsigned char *name, std::size_t name_len,
                          unsigned char *out) {
