@@ -37,6 +37,9 @@ typedef struct Variable_t Variables;
 
 #ifdef __cplusplus
 namespace modsecurity {
+namespace Utils {
+class Regex;
+}
 namespace variables {
 class KeyExclusions;
 }
@@ -68,6 +71,17 @@ class Collection {
     virtual void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) = 0;
+
+    /*
+     * Resolve using a regular expression that was already compiled (e.g. the
+     * one held by a VariableRegex). This avoids recompiling - and JIT'ing - the
+     * same pattern on every transaction. The default implementation delegates
+     * to the string overload using the pattern text, so backends that do not
+     * override it keep their previous behaviour.
+     */
+    virtual void resolveRegularExpression(Utils::Regex *r,
+        std::vector<const VariableValue *> *l,
+        variables::KeyExclusions &ke);
 
 
     /* storeOrUpdateFirst */

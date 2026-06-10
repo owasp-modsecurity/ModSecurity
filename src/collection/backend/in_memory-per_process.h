@@ -99,6 +99,9 @@ class InMemoryPerProcess :
     void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) override;
+    void resolveRegularExpression(Utils::Regex *r,
+        std::vector<const VariableValue *> *l,
+        variables::KeyExclusions &ke) override;
 
     /* store */
     virtual void store(const std::string &key, std::string &compartment,

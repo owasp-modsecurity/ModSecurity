@@ -66,17 +66,14 @@ class Tx_NoDictElement : public Variable {
 class Tx_DictElementRegexp : public VariableRegex {
  public:
     explicit Tx_DictElementRegexp(const std::string &dictElement)
-        : VariableRegex("TX", dictElement),
-        m_dictElement(dictElement) { }
+        : VariableRegex("TX", dictElement) { }
 
     void evaluate(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
         t->m_collections.m_tx_collection->resolveRegularExpression(
-            m_dictElement, l, m_keyExclusion);
+            &m_r, l, m_keyExclusion);
     }
-
-    std::string m_dictElement;
 };
 
 

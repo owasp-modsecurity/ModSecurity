@@ -240,6 +240,7 @@ UTILS = \
 
 
 COLLECTION = \
+	collection/collection.cc \
 	collection/collections.cc \
 	collection/backend/collection_data.cc \
 	collection/backend/in_memory-per_process.cc \
