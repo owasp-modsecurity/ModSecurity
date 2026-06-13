@@ -17,7 +17,7 @@ jobs:
       PIC_CC_OPT: "-fPIC"
       MODSECURITY_CC_OPT: "-Wall -Wextra -Wformat -Wformat-security"
       MODSECURITY_CXX_OPT: "-Wall -Wextra -Wformat -Wformat-security"
-      MODSECURITY_LD_OPT: "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,--as-needed -Wl,--gc-sections"
+      MODSECURITY_LD_OPT: ""
     steps:
       - uses: actions/checkout@v6
         with:
@@ -31,7 +31,11 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y -qq
           CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
-          [ -n "$CANDIDATES" ]
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
           BEST_PKG="$(
             printf '%s\n' "$CANDIDATES" \
             | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
@@ -39,12 +43,16 @@ jobs:
             | tail -n1 \
             | awk '{print $2}'
           )"
-          [ -n "$BEST_PKG" ]
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua package"
+            exit 1
+          fi
+
           echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
 
       - name: Install dependencies
         run: |
-          sudo apt-get update -y -qq
           sudo apt-get install -y \
             autoconf automake libtool pkg-config bison flex \
             libyajl-dev libcurl4-openssl-dev liblmdb-dev \
@@ -70,7 +78,7 @@ jobs:
           echo "CFLAGS=${COMMON_CC_OPT} ${PIC_CC_OPT} ${C_WARNINGS}" >> "$GITHUB_ENV"
           echo "CXXFLAGS=${COMMON_CC_OPT} ${PIC_CC_OPT} ${CXX_WARNINGS}" >> "$GITHUB_ENV"
           echo "CPPFLAGS=-D_FORTIFY_SOURCE=2" >> "$GITHUB_ENV"
-          echo "LDFLAGS=${COMMON_LD_OPT} ${MODSECURITY_LD_OPT}" >> "$GITHUB_ENV"
+          echo "LDFLAGS=${COMMON_LD_OPT}${MODSECURITY_LD_OPT:+ ${MODSECURITY_LD_OPT}}" >> "$GITHUB_ENV"
 
       - name: Print toolchain and build configuration
         shell: bash
@@ -80,7 +88,7 @@ jobs:
           ${CC} --version
           echo
           echo "linker version:"
-          ${CC} -Wl,--version | head -n1 || ld --version | head -n1
+          ${CC} -Wl,--version 2>&1 | sed -n '1p' || ld --version 2>&1 | sed -n '1p'
           echo
           echo "CFLAGS=${CFLAGS}"
           echo "CXXFLAGS=${CXXFLAGS}"
