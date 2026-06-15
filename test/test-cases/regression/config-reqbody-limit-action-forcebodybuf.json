@@ -52,7 +52,7 @@
     "enabled": 1,
     "version_min": 300000,
     "type": "config",
-    "title": "SecRequestBodyLimitAction Reject (forcebodybuf, >NoFilesLimit) SHOULD BE 413",
+    "title": "SecRequestBodyLimitAction Reject (forcebodybuf, >NoFilesLimit)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -86,7 +86,7 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 413
     },
     "rules": [
       "SecRuleEngine On",

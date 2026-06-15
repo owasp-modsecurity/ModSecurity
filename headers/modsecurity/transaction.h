@@ -640,6 +640,8 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         void *logCbData, const time_t timestamp);
 
+    int rejectLongRequestIfActionIsReject();
+
     /**
      * Pointer to the callback function that will be called to fill
      * the web server (connector) log.
