@@ -106,6 +106,10 @@ void MultipartPartTmpFile::Close() {
 
 Multipart::Multipart(const std::string &header, Transaction *transaction)
     : m_reqbody_no_files_length(0),
+    m_reqbody_no_files_limit(m_transaction->m_rules->m_requestBodyNoFilesLimit.m_set
+            ? m_transaction->m_rules->m_requestBodyNoFilesLimit.m_value
+            : Transaction::DEFAULT_REQUEST_BODY_NO_FILES_LIMIT),
+    m_reqbody_limit_action(m_transaction->m_rules->m_requestBodyLimitAction),
     m_nfiles(0),
     m_boundary_count(0),
     m_buf{0},
@@ -136,6 +140,7 @@ Multipart::Multipart(const std::string &header, Transaction *transaction)
     m_flag_invalid_part(0),
     m_flag_invalid_header_folding(0),
     m_flag_file_limit_exceeded(0),
+    m_flag_reqbody_no_files_limit_exceeded(0),
     m_header(header),
     m_transaction(transaction) { }
 
@@ -657,9 +662,16 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
     } else if (m_mpp->m_type == MULTIPART_FORMDATA) {
         std::string d;
 
+        int len = MULTIPART_BUF_SIZE - m_bufleft + m_reserve[0];
+        if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
+            m_flag_reqbody_no_files_limit_exceeded = 1;
+            if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
+                len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
+            }
+        }
+
         /* The buffer contains data so increase the data length counter. */
-        m_reqbody_no_files_length += (MULTIPART_BUF_SIZE - m_bufleft) \
-            + m_reserve[0];
+        m_reqbody_no_files_length += len;
 
         /* add this part to the list of parts */
 
@@ -670,11 +682,11 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
         if (m_reserve[0] != 0) {
             d.assign(&(m_reserve[1]), m_reserve[0]);
-            d.assign(m_buf, MULTIPART_BUF_SIZE - m_bufleft);
+            d.assign(m_buf, len - m_reserve[0]);
 
             m_mpp->m_length += d.size();
         } else {
-            d.assign(m_buf, MULTIPART_BUF_SIZE - m_bufleft);
+            d.assign(m_buf, len);
             m_mpp->m_length += d.size();
         }
 
@@ -726,8 +738,15 @@ int Multipart::process_part_header(std::string *error, int offset) {
     }
 
     i = 0;
+
+    if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
+        m_flag_reqbody_no_files_limit_exceeded = 1;
+        if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
+            len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
+        }
+    }
     /* The buffer is data so increase the data length counter. */
-    m_reqbody_no_files_length += (MULTIPART_BUF_SIZE - m_bufleft);
+    m_reqbody_no_files_length += len;
 
     if (len > 1) {
         if (m_buf[len - 2] == '\r') {

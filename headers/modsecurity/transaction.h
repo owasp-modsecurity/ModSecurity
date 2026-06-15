@@ -635,11 +635,15 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 
     std::vector<std::shared_ptr<RequestBodyProcessor::MultipartPartTmpFile>> m_multipartPartTmpFiles;
 
+    static const size_t DEFAULT_REQUEST_BODY_LIMIT = 134217728;
+    static const size_t DEFAULT_REQUEST_BODY_NO_FILES_LIMIT = 1048576;
+
  private:
 
     Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         void *logCbData, const time_t timestamp);
 
+    void setRequestBodyNoFilesLimitExceeded();
     int rejectLongRequestIfActionIsReject();
 
     /**

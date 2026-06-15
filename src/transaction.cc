@@ -719,14 +719,9 @@ int Transaction::processRequestBody() {
         (m_requestBodyProcessor == XMLRequestBody)) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
             && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
-            m_variableReqbodyError.set("1", 0);
-            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
-            m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
-                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
-            m_requestBodyNoFilesLimitExceeded = true;
+            setRequestBodyNoFilesLimitExceeded();
             if (rejectLongRequestIfActionIsReject()) {
-                return false;
+                return true;
             }
 	    }
     }
@@ -807,7 +802,7 @@ int Transaction::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
 #endif
         std::string error;
-        int reqbodyNoFilesLength = 0;
+        bool reqbody_no_files_limit_exceeded = false;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
@@ -817,7 +812,7 @@ int Transaction::processRequestBody() {
                 }
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
-            reqbodyNoFilesLength = m.m_reqbody_no_files_length;
+            reqbody_no_files_limit_exceeded = m.m_flag_reqbody_no_files_limit_exceeded;
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
@@ -827,13 +822,11 @@ int Transaction::processRequestBody() {
                 m_variableOffset);
             m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
                 "error: " + error, m_variableOffset);
-        } else if (((m_rules->m_requestBodyNoFilesLimit.m_set)
-                   && (reqbodyNoFilesLength > m_rules->m_requestBodyNoFilesLimit.m_value))) {
-            m_variableReqbodyError.set("1", 0);
-            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
-            m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
-                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+        } else if (reqbody_no_files_limit_exceeded) {
+            setRequestBodyNoFilesLimitExceeded();
+            if (rejectLongRequestIfActionIsReject()) {
+                return false;
+            }
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
@@ -914,6 +907,48 @@ int Transaction::processRequestBody() {
     return true;
 }
 
+void Transaction::setRequestBodyNoFilesLimitExceeded() {
+    if (m_requestBodyNoFilesLimitExceeded) {
+        return;
+    }
+
+    m_variableReqbodyError.set("1", 0);
+    m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+    m_variableInboundDataError.set("1", m_variableOffset);
+    ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
+        + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+    m_requestBodyNoFilesLimitExceeded = true;
+}
+
+/**
+ * @name    rejectLongRequestIfActionIsReject
+ * @brief   Reject request if it exceeds m_requestBodyLimitExceeded or SecRequestBodyNoFilesLimit
+ *          and requestBodyLimitAction is Reject.
+ *
+ * @returns If the request is rejected or not.
+ * @retval true Request was rejected..
+ * @retval false Request was not rejected..
+ *
+ */
+int Transaction::rejectLongRequestIfActionIsReject() {
+    if ((m_requestBodyNoFilesLimitExceeded || m_requestBodyLimitExceeded)
+        && (this->m_rules->m_requestBodyLimitAction == RulesSet::BodyLimitAction::RejectBodyLimitAction)) {
+        ms_dbg(5, "Request body limit is marked to reject the " \
+            "request");
+        if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
+            intervention::free(&m_it);
+            m_it.log = strdup("Request body limit is marked to " \
+                    "reject the request");
+            m_it.status = 413;
+            m_it.disruptive = true;
+            return true;
+        } else {
+            ms_dbg(5, "Not rejecting the request as the engine is " \
+                "not Enabled");
+        }
+    }
+    return false;
+}
 
 /**
  * @name    appendRequestBody
@@ -969,28 +1004,15 @@ int Transaction::requestBodyFromFile(const char *path) {
     return appendRequestBody(reinterpret_cast<const unsigned char*>(buf), len);
 }
 
-int Transaction::rejectLongRequestIfActionIsReject() {
-    if (this->m_rules->m_requestBodyLimitAction ==
-        RulesSet::BodyLimitAction::RejectBodyLimitAction) {
-        ms_dbg(5, "Request body limit is marked to reject the " \
-            "request");
-        if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-            intervention::free(&m_it);
-            m_it.log = strdup("Request body limit is marked to " \
-                    "reject the request");
-            m_it.status = 413;
-            m_it.disruptive = true;
-            return true;
-        } else {
-            ms_dbg(5, "Not rejecting the request as the engine is " \
-                "not Enabled");
-        }
-    }
-    return false;
-}
-
 int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_requestBody.tellp();
+
+    if (m_requestBodyLimitExceeded) {
+        ms_dbg(9, "Skip appending request body already exceeded limit: " + std::to_string(len) + " bytes. " \
+            "Limit set to: "
+            + std::to_string(this->m_rules->m_requestBodyLimit.m_value));
+        return false;
+    }
 
     ms_dbg(9, "Appending request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: "
