@@ -610,7 +610,7 @@ static int var_sdbm_delete_error_generate(modsec_rec *msr, msre_var *var, msre_r
 
 /* REQBODY_ERROR */
 
-static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+static int var_reqbody_error_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
@@ -632,7 +632,7 @@ static int var_reqbody_processor_error_generate(modsec_rec *msr, msre_var *var, 
 
 /* REQBODY_ERROR_MSG */
 
-static int var_reqbody_processor_error_msg_generate(modsec_rec *msr, msre_var *var,
+static int var_reqbody_error_msg_generate(modsec_rec *msr, msre_var *var,
     msre_rule *rule, apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
@@ -3950,35 +3950,13 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         PHASE_REQUEST_BODY
     );
 
-    /* REQBODY_PROCESSOR_ERROR - Deprecated */
-    msre_engine_variable_register(engine,
-        "REQBODY_PROCESSOR_ERROR",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_reqbody_processor_error_generate,
-        VAR_DONT_CACHE, /* dynamic */
-        PHASE_REQUEST_BODY
-    );
-
-    /* REQBODY_PROCESSOR_ERROR_MSG - Deprecated */
-    msre_engine_variable_register(engine,
-        "REQBODY_PROCESSOR_ERROR_MSG",
-        VAR_SIMPLE,
-        0, 0,
-        NULL,
-        var_reqbody_processor_error_msg_generate,
-        VAR_DONT_CACHE, /* dynamic */
-        PHASE_REQUEST_BODY
-    );
-
     /* REQBODY_ERROR */
     msre_engine_variable_register(engine,
         "REQBODY_ERROR",
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_reqbody_processor_error_generate,
+        var_reqbody_error_generate,
         VAR_DONT_CACHE, /* dynamic */
         PHASE_REQUEST_BODY
     );
@@ -3989,7 +3967,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         VAR_SIMPLE,
         0, 0,
         NULL,
-        var_reqbody_processor_error_msg_generate,
+        var_reqbody_error_msg_generate,
         VAR_DONT_CACHE, /* dynamic */
         PHASE_REQUEST_BODY
     );
