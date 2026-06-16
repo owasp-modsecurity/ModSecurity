@@ -106,10 +106,10 @@ void MultipartPartTmpFile::Close() {
 
 Multipart::Multipart(const std::string &header, Transaction *transaction)
     : m_reqbody_no_files_length(0),
-    m_reqbody_no_files_limit(m_transaction->m_rules->m_requestBodyNoFilesLimit.m_set
-            ? m_transaction->m_rules->m_requestBodyNoFilesLimit.m_value
+    m_reqbody_no_files_limit(transaction->m_rules->m_requestBodyNoFilesLimit.m_set
+            ? transaction->m_rules->m_requestBodyNoFilesLimit.m_value
             : Transaction::DEFAULT_REQUEST_BODY_NO_FILES_LIMIT),
-    m_reqbody_limit_action(m_transaction->m_rules->m_requestBodyLimitAction),
+    m_reqbody_limit_action(transaction->m_rules->m_requestBodyLimitAction),
     m_nfiles(0),
     m_boundary_count(0),
     m_buf{0},
