@@ -117,6 +117,7 @@ TESTS+=test/test-cases/regression/variable-ARGS.json
 TESTS+=test/test-cases/regression/variable-ARGS_NAMES.json
 TESTS+=test/test-cases/regression/variable-ARGS_POST.json
 TESTS+=test/test-cases/regression/variable-ARGS_POST_NAMES.json
+TESTS+=test/test-cases/regression/variable-ARGS_RAW.json
 TESTS+=test/test-cases/regression/variable-AUTH_TYPE.json
 TESTS+=test/test-cases/regression/variable-DURATION.json
 TESTS+=test/test-cases/regression/variable-ENV.json
