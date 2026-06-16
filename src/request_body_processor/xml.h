@@ -60,7 +60,7 @@ class XMLNodes {
         // need to stop parsing if the number of arguments reached the limit
         xmlParserCtxtPtr  parsing_ctx_arg;
 
-        explicit XMLNodes (Transaction *transaction);
+        explicit XMLNodes(Transaction *transaction);
         ~XMLNodes();
 };
 
