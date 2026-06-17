@@ -59,7 +59,7 @@
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -117,7 +117,7 @@
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -175,7 +175,7 @@
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -233,7 +233,7 @@
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -291,7 +291,7 @@
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500056\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -348,7 +348,7 @@
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500055\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500057\""
     ]
   },
   {
@@ -687,7 +687,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,status:403,id:500074\"",
       "SecRule MULTIPART_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500075\"",
       "SecRule MULTIPART_INVALID_HEADER_FOLDING \"!@eq 0\" \"phase:2,deny,status:403,id:500076\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -747,7 +747,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,status:403,id:500074\"",
       "SecRule MULTIPART_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500075\"",
       "SecRule MULTIPART_INVALID_HEADER_FOLDING \"!@eq 0\" \"phase:2,deny,status:403,id:500076\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -806,7 +806,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,status:403,id:500074\"",
       "SecRule MULTIPART_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500075\"",
       "SecRule MULTIPART_INVALID_HEADER_FOLDING \"!@eq 0\" \"phase:2,deny,status:403,id:500076\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -865,7 +865,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,status:403,id:500074\"",
       "SecRule MULTIPART_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500075\"",
       "SecRule MULTIPART_INVALID_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500076\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -924,7 +924,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,status:403,id:500074\"",
       "SecRule MULTIPART_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500075\"",
       "SecRule MULTIPART_INVALID_HEADER_FOLDING \"!@eq 1\" \"phase:2,deny,status:403,id:500076\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -1037,7 +1037,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_INVALID_QUOTING \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1099,7 +1099,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1160,7 +1160,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1222,7 +1222,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1284,7 +1284,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1346,7 +1346,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1408,7 +1408,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1469,7 +1469,7 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500095\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"!@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1530,9 +1530,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1592,9 +1592,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1655,9 +1655,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1718,9 +1718,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1781,9 +1781,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1844,9 +1844,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1907,9 +1907,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -1970,9 +1970,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2033,9 +2033,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2096,9 +2096,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2159,9 +2159,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2222,9 +2222,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2285,9 +2285,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2358,9 +2358,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2430,9 +2430,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:PE %{REQBODY_PROCESSOR_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
+      "SecRule MULTIPART_STRICT_ERROR \"@eq 1\" \"phase:2,deny,id:500095,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'\"",
       "SecRule MULTIPART_UNMATCHED_BOUNDARY \"@eq 1\" \"phase:2,deny,id:500096\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"chain,phase:2,deny,id:500097\""
     ]
   },
   {
@@ -2511,7 +2511,7 @@
       "SecUploadFileLimit 2",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 1\" \"phase:2,deny,id:500161\"",
       "SecRule MULTIPART_FILE_LIMIT_EXCEEDED \"!@eq 1\" \"phase:2,deny,id:500162\"",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,id:500163\"",
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,id:500163\"",
       "SecRule &FILES \"!@eq 3\" \"phase:2,deny,id:500164\"",
       "SecRule &FILES_NAMES \"!@eq 3\" \"phase:2,deny,id:500165\"",
       "SecRule &FILES_SIZES \"!@eq 3\" \"phase:2,deny,id:500166\"",
@@ -3415,7 +3415,7 @@
     },
     "rules": [
       "SecruleEngine On",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   },
   {
@@ -3466,7 +3466,7 @@
     },
     "rules": [
       "SecruleEngine On",
-      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+      "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
   }
 ]

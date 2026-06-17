@@ -213,8 +213,6 @@ class Driver;
 #include "src/variables/remote_user.h"
 #include "src/variables/reqbody_error.h"
 #include "src/variables/reqbody_error_msg.h"
-#include "src/variables/reqbody_processor_error.h"
-#include "src/variables/reqbody_processor_error_msg.h"
 #include "src/variables/reqbody_processor.h"
 #include "src/variables/request_base_name.h"
 #include "src/variables/request_body.h"
@@ -397,8 +395,6 @@ using namespace modsecurity::operators;
   VARIABLE_REMOTE_PORT          "REMOTE_PORT"
   VARIABLE_REQBODY_ERROR_MSG    "REQBODY_ERROR_MSG"
   VARIABLE_REQBODY_ERROR        "REQBODY_ERROR"
-  VARIABLE_REQBODY_PROCESSOR_ERROR_MSG    "REQBODY_PROCESSOR_ERROR_MSG"
-  VARIABLE_REQBODY_PROCESSOR_ERROR        "REQBODY_PROCESSOR_ERROR"
   VARIABLE_REQBODY_PROCESSOR    "REQBODY_PROCESSOR"
   VARIABLE_REQUEST_BASENAME     "REQUEST_BASENAME"
   VARIABLE_REQUEST_BODY_LENGTH  "REQUEST_BODY_LENGTH"
@@ -2484,14 +2480,6 @@ var:
     | VARIABLE_REQBODY_PROCESSOR
       {
         VARIABLE_CONTAINER($$, new variables::ReqbodyProcessor());
-      }
-    | VARIABLE_REQBODY_PROCESSOR_ERROR
-      {
-        VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorError());
-      }
-    | VARIABLE_REQBODY_PROCESSOR_ERROR_MSG
-      {
-        VARIABLE_CONTAINER($$, new variables::ReqbodyProcessorErrorMsg());
       }
     | VARIABLE_REQUEST_BASENAME
       {

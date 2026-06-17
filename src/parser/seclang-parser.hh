@@ -252,8 +252,6 @@ class Driver;
 #include "src/variables/remote_user.h"
 #include "src/variables/reqbody_error.h"
 #include "src/variables/reqbody_error_msg.h"
-#include "src/variables/reqbody_processor_error.h"
-#include "src/variables/reqbody_processor_error_msg.h"
 #include "src/variables/reqbody_processor.h"
 #include "src/variables/request_base_name.h"
 #include "src/variables/request_body.h"
