@@ -4561,22 +4561,6 @@ namespace yy {
 #line 4562 "seclang-parser.cc"
     break;
 
-  case 305: // var: "REQBODY_PROCESSOR_ERROR"
-#line 2489 "seclang-parser.yy"
-      {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorError());
-      }
-#line 4570 "seclang-parser.cc"
-    break;
-
-  case 306: // var: "REQBODY_PROCESSOR_ERROR_MSG"
-#line 2493 "seclang-parser.yy"
-      {
-        VARIABLE_CONTAINER(yylhs.value.as < std::unique_ptr<Variable> > (), new variables::ReqbodyProcessorErrorMsg());
-      }
-#line 4578 "seclang-parser.cc"
-    break;
-
   case 307: // var: "REQUEST_BASENAME"
 #line 2497 "seclang-parser.yy"
       {

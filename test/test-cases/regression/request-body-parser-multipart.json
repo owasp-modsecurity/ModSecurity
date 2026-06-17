@@ -1525,7 +1525,7 @@
     },
     "expected": {
       "debug_log": "boundary whitespace in C-T header",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 1,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 1,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1587,7 +1587,7 @@
       ]
     },
     "expected": {
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1650,7 +1650,7 @@
     },
     "expected": {
       "debug_log": "No boundaries found in payload",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 1,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 1,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1713,7 +1713,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(characters\\)",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1776,7 +1776,7 @@
     },
     "expected": {
       "debug_log": "boundary was quoted",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1839,7 +1839,7 @@
     },
     "expected": {
       "debug_log": "boundary was quoted.*No boundaries found in payload",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1902,7 +1902,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(characters\\).*boundary was quoted.",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -1965,7 +1965,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(characters\\).*boundary was quoted.",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2028,7 +2028,7 @@
     },
     "expected": {
       "debug_log": "boundary was quoted",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2091,7 +2091,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(characters\\)",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2154,7 +2154,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(characters\\)",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 1,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2217,7 +2217,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(quote\\)",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2280,7 +2280,7 @@
     },
     "expected": {
       "debug_log": "Invalid boundary in C-T \\(quote\\)",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 0,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2353,7 +2353,7 @@
     },
     "expected": {
       "debug_log": "Invalid Content-Disposition header",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
@@ -2425,7 +2425,7 @@
     },
     "expected": {
       "debug_log": "Part missing Content-Disposition header",
-      "error_log": "msg \"Multipart request body failed strict validation:PE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1,IH 0,FL \"",
+      "error_log": "msg \"Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1,IH 0,FL \"",
       "http_code": 403
     },
     "rules": [
