@@ -8,7 +8,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * If any of the files related to licensing are missing or if you have any
- * other questions related to licensing please contact OWASP.
+ * other questions related to licensing please contact OWASP
  * directly using the email address modsecurity@owasp.org.
  *
  */
@@ -26,7 +26,7 @@ namespace modsecurity {
 namespace collection {
 
 
-void Collection::resolveRegularExpression(Utils::Regex *r,
+void Collection::resolveRegularExpression(const Utils::Regex *r,
     std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
     // Default behaviour: fall back to the string-based resolution using the
     // pattern carried by the compiled regex. Backends that can take advantage

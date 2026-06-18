@@ -99,7 +99,7 @@ class InMemoryPerProcess :
     void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) override;
-    void resolveRegularExpression(Utils::Regex *r,
+    void resolveRegularExpression(const Utils::Regex *r,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) override;
 

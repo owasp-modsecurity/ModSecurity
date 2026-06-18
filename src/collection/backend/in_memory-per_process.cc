@@ -201,7 +201,7 @@ void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
 }
 
 
-void InMemoryPerProcess::resolveRegularExpression(Utils::Regex *r,
+void InMemoryPerProcess::resolveRegularExpression(const Utils::Regex *r,
     std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
     std::list<std::string> expiredVars;
 

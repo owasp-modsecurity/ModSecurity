@@ -79,7 +79,7 @@ class Collection {
      * to the string overload using the pattern text, so backends that do not
      * override it keep their previous behaviour.
      */
-    virtual void resolveRegularExpression(Utils::Regex *r,
+    virtual void resolveRegularExpression(const Utils::Regex *r,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke);
 
