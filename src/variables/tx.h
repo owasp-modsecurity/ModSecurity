@@ -25,6 +25,7 @@
 
 #include "src/variables/variable.h"
 #include "src/run_time_string.h"
+#include "src/collection/backend/in_memory-per_process.h"
 
 namespace modsecurity {
 
@@ -71,8 +72,20 @@ class Tx_DictElementRegexp : public VariableRegex {
     void evaluate(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
-        t->m_collections.m_tx_collection->resolveRegularExpression(
-            &m_r, l, m_keyExclusion);
+        // TX is always backed by InMemoryPerProcess. Reuse the regex compiled
+        // once in VariableRegex::m_r via the backend's concrete fast path,
+        // instead of recompiling the pattern on every transaction. This is kept
+        // off the Collection base class to avoid an ABI-breaking vtable change;
+        // any other backend falls back to the string-based resolution.
+        auto *collection = t->m_collections.m_tx_collection;
+        if (auto *inMemory =
+                dynamic_cast<collection::backend::InMemoryPerProcess *>(
+                    collection)) {
+            inMemory->resolveRegularExpression(&m_r, l, m_keyExclusion);
+        } else {
+            collection->resolveRegularExpression(m_r.pattern, l,
+                m_keyExclusion);
+        }
     }
 };
 
