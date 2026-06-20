@@ -13,6 +13,7 @@
  *
  */
 
+#include <bits/types/FILE.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -205,8 +206,8 @@ bool createDir(const std::string& dir, int mode, std::string *error) {
 
 bool isFile(const std::string& f) {
     struct stat fileInfo;
-    FILE *fp = fopen(f.c_str(), "r");
-    if (fp == NULL) {
+    FILE *fp;
+    if (!fopen_modsec(&fp, f.c_str(), "r")) {
         return false;
     }
     fstat(fileno(fp), &fileInfo);
@@ -219,6 +220,15 @@ bool isFile(const std::string& f) {
     return true;
 }
 
-
+bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
+    if (v_fp == NULL || filename == NULL || mode == NULL) {
+        return false;
+    }
+    *v_fp = fopen(filename, mode);
+    if (*v_fp == NULL) {
+        return false;
+    }
+    return true;
+}
 }  // namespace utils
 }  // namespace modsecurity
