@@ -1,4 +1,3 @@
-
 #line 3 "seclang-scanner.cc"
 
 #define  YY_INT_ALIGNED short int
@@ -4953,6 +4952,7 @@ char *yytext;
 #include "src/parser/seclang-parser.hh"
 #include "src/utils/https_client.h"
 #include "src/utils/string.h"
+#include "src/utils/system.h"
 
 using modsecurity::Parser::Driver;
 using modsecurity::Utils::HttpsClient;
@@ -8400,8 +8400,7 @@ YY_RULE_SETUP
         driver.loc.push_back(new yy::location());
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
-        yyin = fopen(f.c_str(), "r" );
-        if (!yyin) {
+        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r") != 0) {
             BEGIN(INITIAL);
             driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
@@ -8433,8 +8432,7 @@ YY_RULE_SETUP
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
 
-        yyin = fopen(f.c_str(), "r" );
-        if (!yyin) {
+        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r") != 0) {
             BEGIN(INITIAL);
             driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
