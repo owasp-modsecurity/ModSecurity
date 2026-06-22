@@ -220,15 +220,22 @@ bool isFile(const std::string& f) {
     return true;
 }
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
-    if (v_fp == NULL || filename == NULL || mode == NULL) {
+    if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
         return false;
     }
     *v_fp = fopen(filename, mode);
-    if (*v_fp == NULL) {
+    if (*v_fp == nullptr) {
         return false;
     }
     return true;
 }
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 }  // namespace utils
 }  // namespace modsecurity
