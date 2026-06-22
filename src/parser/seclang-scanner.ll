@@ -1,4 +1,4 @@
-/* -*- C++ -*- */
+%{ /* -*- C++ -*- */
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
