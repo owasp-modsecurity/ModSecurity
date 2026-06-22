@@ -240,6 +240,39 @@ class UnicodeMapHolder {
     int m_data[65536];
 };
 
+class ConfigFileMode : public ConfigUnsignedInt {
+ public:
+    bool parse(const std::string& a, std::string* errmsg = nullptr) {
+        std::uint64_t val;
+
+        try {
+            val = static_cast<std::uint64_t>(std::stoull(a, nullptr, 8));
+        }
+        catch (const std::invalid_argument&) {
+            if(errmsg) {
+                *errmsg = "Invalid number format (not numeric)";
+            }
+            return false;
+        }
+        catch (const std::out_of_range&) {
+            if(errmsg) {
+                *errmsg = "Number out of range";
+            }
+            return false;
+        }
+        catch (...) { // NOSONAR
+            if(errmsg) {
+                *errmsg = "An unknown error occurred while parsing number.";
+            }
+            return false;
+        }
+
+        m_value = static_cast<uint32_t>(val);
+        m_set = true;
+        return true;
+    }
+};
+
 
 class RulesSetProperties;
 class ConfigUnicodeMap {
@@ -607,7 +640,7 @@ class RulesSetProperties {
     ConfigUnsignedLong m_responseBodyLimit;
     ConfigUnsignedInt m_pcreMatchLimit;
     ConfigUnsignedInt m_uploadFileLimit;
-    ConfigUnsignedInt m_uploadFileMode;
+    ConfigFileMode m_uploadFileMode;
     DebugLog *m_debugLog;
     OnFailedRemoteRulesAction m_remoteRulesActionOnFailed;
     RuleEngine m_secRuleEngine;
