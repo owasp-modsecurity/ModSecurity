@@ -663,8 +663,15 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
         std::string d;
 
         int len = MULTIPART_BUF_SIZE - m_bufleft + m_reserve[0];
+        ms_dbg_a(m_transaction, 9,
+            "[myDebug] Multipart: add_form_data no_files_len=" + std::to_string(m_reqbody_no_files_length) + ", len=" + std::to_string(len)
+            + ", m_rserve[0]=" + std::to_string(m_reserve[0])
+            + ", " + std::string(m_buf, len - m_reserve[0]));
         if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
             m_flag_reqbody_no_files_limit_exceeded = 1;
+            ms_dbg_a(m_transaction, 9,
+                "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#2, no_files_len+len-" +
+                std::to_string(m_reqbody_no_files_length + len) + ", limit=" + std::to_string(m_reqbody_no_files_limit));
             if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
                 len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
             }
@@ -739,8 +746,14 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
     i = 0;
 
+    ms_dbg_a(m_transaction, 9,
+        "[myDebug] Multipart: add_part_header no_files_len=" + std::to_string(m_reqbody_no_files_length)
+        + ", len=" + std::to_string(len) + ", buf=" + std::string(m_buf, len));
     if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
         m_flag_reqbody_no_files_limit_exceeded = 1;
+        ms_dbg_a(m_transaction, 9,
+            "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#1, no_files_len+len-" +
+            std::to_string(m_reqbody_no_files_length + len) + ", limit=" + std::to_string(m_reqbody_no_files_limit));
         if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
         }

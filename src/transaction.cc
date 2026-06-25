@@ -878,6 +878,9 @@ int Transaction::processRequestBody() {
         }
     }
 
+    ms_dbg(4, "Request body no files length: " \
+        + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+
     /**
      * FIXME: This variable should be calculated on demand, it is
      * computationally intensive.
