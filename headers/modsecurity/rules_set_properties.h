@@ -267,6 +267,13 @@ class ConfigFileMode : public ConfigUnsignedInt {
             return false;
         }
 
+        if(val > std::numeric_limits<uint32_t>::max()) {
+            if(errmsg) {
+                *errmsg = "Value is too big.";
+            }
+            return false;
+        }
+
         m_value = static_cast<uint32_t>(val);
         m_set = true;
         return true;
