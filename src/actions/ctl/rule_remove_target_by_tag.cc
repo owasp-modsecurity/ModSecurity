@@ -1,7 +1,7 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
- *               2021 - 2026 OWASP (https://owasp.org)
+ *               2024 - 2026 OWASP (https://owasp.org)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
