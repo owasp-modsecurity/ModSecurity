@@ -276,7 +276,7 @@
         "Host": "localhost",
         "Accept": "*/*"
       },
-      "uri": "/index.html?foo=bar=attack",
+      "uri": "/index.html?foo%3Dbar=attack",
       "method": "GET"
     },
     "expected": {
