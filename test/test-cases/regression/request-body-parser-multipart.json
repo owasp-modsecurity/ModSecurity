@@ -3417,5 +3417,56 @@
       "SecruleEngine On",
       "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (invalid part header - missing trailing quote)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "145",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename=\"1.jsp\r\n",
+        "\r\n",
+        "Some content\r\n",
+        "--a--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-15\\): form-data; name=\"file\"; filename=\"1.jsp",
+      "http_code": 403
+    },
+    "rules": [
+      "SecruleEngine On",
+      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
+    ]
   }
 ]

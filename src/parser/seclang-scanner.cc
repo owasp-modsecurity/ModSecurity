@@ -1,5 +1,5 @@
 
-#line 2 "seclang-scanner.cc"
+#line 3 "seclang-scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -70,7 +70,6 @@ typedef int16_t flex_int16_t;
 typedef uint16_t flex_uint16_t;
 typedef int32_t flex_int32_t;
 typedef uint32_t flex_uint32_t;
-typedef uint64_t flex_uint64_t;
 #else
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
@@ -195,7 +194,7 @@ typedef size_t yy_size_t;
 #endif
 
 /* %if-not-reentrant */
-extern yy_size_t yyleng;
+extern int yyleng;
 /* %endif */
 
 /* %if-c-only */
@@ -248,7 +247,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -329,8 +328,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = NULL; /**< Stack as an array. */
 /* %not-for-header */
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t yyleng;
+static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+int yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = NULL;
@@ -360,7 +359,7 @@ static void yy_init_buffer ( YY_BUFFER_STATE b, FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer ( char *base, yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string ( const char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes ( const char *bytes, yy_size_t len  );
+YY_BUFFER_STATE yy_scan_bytes ( const char *bytes, int len  );
 
 /* %endif */
 
@@ -428,7 +427,7 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
 /* %% [2.0] code to fiddle yytext and yyleng for yymore() goes here \ */\
-	yyleng = (yy_size_t) (yy_cp - yy_bp); \
+	yyleng = (int) (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 /* %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \ */\
@@ -4873,66 +4872,66 @@ int yy_flex_debug = 1;
 
 static const flex_int16_t yy_rule_linenum[549] =
     {   0,
-      511,  512,  513,  514,  515,  516,  517,  518,  519,  520,
-      521,  522,  523,  524,  525,  526,  527,  528,  529,  530,
-      531,  532,  534,  535,  536,  537,  538,  539,  540,  541,
-      542,  543,  544,  545,  546,  547,  548,  549,  550,  551,
-      552,  553,  554,  555,  556,  557,  558,  559,  560,  561,
-      562,  563,  564,  565,  567,  568,  571,  572,  573,  574,
-      575,  576,  577,  579,  580,  581,  582,  583,  584,  585,
-      586,  587,  588,  589,  590,  591,  592,  593,  594,  595,
-      596,  597,  598,  599,  600,  601,  602,  603,  604,  605,
-      606,  607,  608,  609,  610,  611,  612,  613,  614,  615,
+      516,  517,  518,  519,  520,  521,  522,  523,  524,  525,
+      526,  527,  528,  529,  530,  531,  532,  533,  534,  535,
+      536,  537,  539,  540,  541,  542,  543,  544,  545,  546,
+      547,  548,  549,  550,  551,  552,  553,  554,  555,  556,
+      557,  558,  559,  560,  561,  562,  563,  564,  565,  566,
+      567,  568,  569,  570,  572,  573,  576,  577,  578,  579,
+      580,  581,  582,  584,  585,  586,  587,  588,  589,  590,
+      591,  592,  593,  594,  595,  596,  597,  598,  599,  600,
+      601,  602,  603,  604,  605,  606,  607,  608,  609,  610,
+      611,  612,  613,  614,  615,  616,  617,  618,  619,  620,
 
-      617,  618,  619,  620,  621,  622,  623,  627,  632,  633,
-      638,  639,  640,  645,  646,  647,  652,  657,  658,  659,
-      664,  665,  669,  670,  671,  675,  676,  680,  681,  685,
-      686,  687,  691,  692,  696,  697,  702,  703,  704,  708,
-      712,  713,  721,  726,  727,  732,  733,  734,  743,  746,
-      747,  748,  749,  750,  751,  752,  753,  754,  755,  756,
-      757,  758,  759,  760,  761,  762,  763,  764,  765,  766,
-      767,  768,  769,  770,  771,  774,  775,  776,  777,  778,
-      779,  780,  781,  782,  784,  785,  786,  787,  788,  789,
-      790,  791,  792,  793,  794,  795,  796,  797,  798,  799,
+      622,  623,  624,  625,  626,  627,  628,  632,  637,  638,
+      643,  644,  645,  650,  651,  652,  657,  662,  663,  664,
+      669,  670,  674,  675,  676,  680,  681,  685,  686,  690,
+      691,  692,  696,  697,  701,  702,  707,  708,  709,  713,
+      717,  718,  726,  731,  732,  737,  738,  739,  748,  751,
+      752,  753,  754,  755,  756,  757,  758,  759,  760,  761,
+      762,  763,  764,  765,  766,  767,  768,  769,  770,  771,
+      772,  773,  774,  775,  776,  779,  780,  781,  782,  783,
+      784,  785,  786,  787,  789,  790,  791,  792,  793,  794,
+      795,  796,  797,  798,  799,  800,  801,  802,  803,  804,
 
-      800,  801,  802,  803,  804,  805,  806,  807,  808,  809,
-      810,  811,  812,  813,  814,  815,  816,  817,  818,  819,
-      820,  821,  822,  823,  824,  825,  826,  827,  828,  829,
-      830,  831,  832,  833,  834,  835,  836,  837,  838,  839,
-      840,  841,  842,  843,  844,  845,  846,  847,  848,  849,
-      850,  851,  852,  853,  854,  855,  856,  857,  858,  859,
-      860,  861,  863,  864,  865,  867,  868,  869,  870,  871,
-      872,  873,  874,  875,  876,  879,  883,  884,  885,  886,
-      887,  891,  892,  893,  894,  895,  896,  900,  901,  902,
-      903,  908,  909,  910,  911,  912,  913,  914,  915,  916,
+      805,  806,  807,  808,  809,  810,  811,  812,  813,  814,
+      815,  816,  817,  818,  819,  820,  821,  822,  823,  824,
+      825,  826,  827,  828,  829,  830,  831,  832,  833,  834,
+      835,  836,  837,  838,  839,  840,  841,  842,  843,  844,
+      845,  846,  847,  848,  849,  850,  851,  852,  853,  854,
+      855,  856,  857,  858,  859,  860,  861,  862,  863,  864,
+      865,  866,  868,  869,  870,  872,  873,  874,  875,  876,
+      877,  878,  879,  880,  881,  884,  888,  889,  890,  891,
+      892,  896,  897,  898,  899,  900,  901,  905,  906,  907,
+      908,  913,  914,  915,  916,  917,  918,  919,  920,  921,
 
-      917,  918,  919,  920,  921,  922,  923,  924,  925,  926,
-      927,  928,  929,  930,  931,  932,  933,  934,  935,  936,
-      937,  938,  939,  940,  941,  942,  943,  944,  945,  946,
-      947,  948,  949,  950,  951,  952,  953,  954,  955,  956,
-      957,  958,  959,  960,  961,  962,  963,  964,  965,  966,
-      967,  968,  969,  970,  971,  972,  973,  974,  975,  976,
-      977,  978,  979,  980,  981,  982,  983,  984,  985,  986,
-      987,  988,  989,  990,  991,  992,  993,  994,  995,  996,
-      997,  998,  999, 1000, 1001, 1002, 1003, 1004, 1005, 1006,
-     1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016,
+      922,  923,  924,  925,  926,  927,  928,  929,  930,  931,
+      932,  933,  934,  935,  936,  937,  938,  939,  940,  941,
+      942,  943,  944,  945,  946,  947,  948,  949,  950,  951,
+      952,  953,  954,  955,  956,  957,  958,  959,  960,  961,
+      962,  963,  964,  965,  966,  967,  968,  969,  970,  971,
+      972,  973,  974,  975,  976,  977,  978,  979,  980,  981,
+      982,  983,  984,  985,  986,  987,  988,  989,  990,  991,
+      992,  993,  994,  995,  996,  997,  998,  999, 1000, 1001,
+     1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011,
+     1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021,
 
-     1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026,
-     1027, 1028, 1029, 1030, 1031, 1032, 1035, 1036, 1037, 1038,
-     1039, 1040, 1041, 1042, 1043, 1047, 1048, 1049, 1050, 1051,
-     1052, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065,
-     1067, 1068, 1069, 1070, 1071, 1076, 1077, 1078, 1079, 1080,
-     1081, 1083, 1084, 1086, 1087, 1093, 1094, 1095, 1096, 1097,
-     1098, 1101, 1102, 1103, 1104, 1105, 1106, 1110, 1111, 1112,
-     1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122,
-     1123, 1124, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132,
-     1133, 1134, 1135, 1136, 1137, 1138, 1139, 1140, 1142, 1143,
+     1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031,
+     1032, 1033, 1034, 1035, 1036, 1037, 1040, 1041, 1042, 1043,
+     1044, 1045, 1046, 1047, 1048, 1052, 1053, 1054, 1055, 1056,
+     1057, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070,
+     1072, 1073, 1074, 1075, 1076, 1081, 1082, 1083, 1084, 1085,
+     1086, 1088, 1089, 1091, 1092, 1098, 1099, 1100, 1101, 1102,
+     1103, 1106, 1107, 1108, 1109, 1110, 1111, 1115, 1116, 1117,
+     1118, 1119, 1120, 1121, 1122, 1123, 1124, 1125, 1126, 1127,
+     1128, 1129, 1130, 1131, 1132, 1133, 1134, 1135, 1136, 1137,
+     1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1147, 1148,
 
-     1148, 1152, 1156, 1157, 1161, 1162, 1165, 1166, 1170, 1171,
-     1175, 1176, 1180, 1181, 1186, 1188, 1189, 1190, 1191, 1193,
-     1194, 1195, 1196, 1198, 1199, 1200, 1201, 1203, 1205, 1206,
-     1208, 1209, 1210, 1211, 1213, 1218, 1219, 1220, 1224, 1225,
-     1226, 1231, 1233, 1234, 1235, 1254, 1283, 1313
+     1153, 1157, 1161, 1162, 1166, 1167, 1170, 1171, 1175, 1176,
+     1180, 1181, 1185, 1186, 1191, 1193, 1194, 1195, 1196, 1198,
+     1199, 1200, 1201, 1203, 1204, 1205, 1206, 1208, 1210, 1211,
+     1213, 1214, 1215, 1216, 1218, 1223, 1224, 1225, 1229, 1230,
+     1231, 1236, 1238, 1239, 1240, 1259, 1288, 1318
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -4962,6 +4961,11 @@ using modsecurity::utils::string::parserSanitizer;
 typedef yy::seclang_parser p;
 static int state_variable_from = 0;
 static std::stack<int> YY_PREVIOUS_STATE;
+
+static const char* find_separator(const char *s) {
+    while (*s && *s != ' ' && *s != '\t') s++;
+    return (*s) ? s + 1 : s;
+}
 
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
@@ -5018,16 +5022,16 @@ static std::stack<int> YY_PREVIOUS_STATE;
 #define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
-#line 5021 "seclang-scanner.cc"
+#line 5026 "seclang-scanner.cc"
 #define YY_NO_INPUT 1
 #define YY_NO_UNISTD_H 1
 
-#line 498 "seclang-scanner.ll"
+#line 503 "seclang-scanner.ll"
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
 
-#line 5029 "seclang-scanner.cc"
-#line 5030 "seclang-scanner.cc"
+#line 5034 "seclang-scanner.cc"
+#line 5035 "seclang-scanner.cc"
 
 #define INITIAL 0
 #define EXPECTING_ACTION_PREDICATE_VARIABLE 1
@@ -5115,7 +5119,7 @@ FILE *yyget_out ( void );
 
 void yyset_out  ( FILE * _out_str  );
 
-			yy_size_t yyget_leng ( void );
+			int yyget_leng ( void );
 
 char *yyget_text ( void );
 
@@ -5202,7 +5206,7 @@ static int input ( void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		yy_size_t n; \
+		int n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -5341,15 +5345,15 @@ YY_DECL
 
 	{
 /* %% [7.0] user's declarations go here */
-#line 503 "seclang-scanner.ll"
+#line 508 "seclang-scanner.ll"
 
 
 
-#line 507 "seclang-scanner.ll"
+#line 512 "seclang-scanner.ll"
   // Code run each time yylex is called.
   driver.loc.back()->step();
 
-#line 5352 "seclang-scanner.cc"
+#line 5357 "seclang-scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -5427,555 +5431,555 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 511 "seclang-scanner.ll"
+#line 516 "seclang-scanner.ll"
 { return p::make_ACTION_APPEND(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 512 "seclang-scanner.ll"
+#line 517 "seclang-scanner.ll"
 { return p::make_ACTION_BLOCK(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 513 "seclang-scanner.ll"
+#line 518 "seclang-scanner.ll"
 { return p::make_ACTION_CAPTURE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 514 "seclang-scanner.ll"
+#line 519 "seclang-scanner.ll"
 { return p::make_ACTION_CHAIN(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 515 "seclang-scanner.ll"
+#line 520 "seclang-scanner.ll"
 { return p::make_ACTION_DENY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 516 "seclang-scanner.ll"
+#line 521 "seclang-scanner.ll"
 { return p::make_ACTION_DEPRECATE_VAR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 517 "seclang-scanner.ll"
+#line 522 "seclang-scanner.ll"
 { return p::make_ACTION_DROP(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 518 "seclang-scanner.ll"
+#line 523 "seclang-scanner.ll"
 { return p::make_ACTION_ID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 519 "seclang-scanner.ll"
+#line 524 "seclang-scanner.ll"
 { return p::make_ACTION_LOG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 520 "seclang-scanner.ll"
+#line 525 "seclang-scanner.ll"
 { return p::make_ACTION_MULTI_MATCH(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 521 "seclang-scanner.ll"
+#line 526 "seclang-scanner.ll"
 { return p::make_ACTION_NO_AUDIT_LOG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 522 "seclang-scanner.ll"
+#line 527 "seclang-scanner.ll"
 { return p::make_ACTION_NO_LOG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 523 "seclang-scanner.ll"
+#line 528 "seclang-scanner.ll"
 { return p::make_ACTION_PASS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 524 "seclang-scanner.ll"
+#line 529 "seclang-scanner.ll"
 { return p::make_ACTION_PAUSE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 525 "seclang-scanner.ll"
+#line 530 "seclang-scanner.ll"
 { return p::make_ACTION_PREPEND(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 526 "seclang-scanner.ll"
+#line 531 "seclang-scanner.ll"
 { return p::make_ACTION_PROXY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 527 "seclang-scanner.ll"
+#line 532 "seclang-scanner.ll"
 { return p::make_ACTION_SANITISE_ARG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 528 "seclang-scanner.ll"
+#line 533 "seclang-scanner.ll"
 { return p::make_ACTION_SANITISE_MATCHED(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 529 "seclang-scanner.ll"
+#line 534 "seclang-scanner.ll"
 { return p::make_ACTION_SANITISE_MATCHED_BYTES(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 530 "seclang-scanner.ll"
+#line 535 "seclang-scanner.ll"
 { return p::make_ACTION_SANITISE_REQUEST_HEADER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 531 "seclang-scanner.ll"
+#line 536 "seclang-scanner.ll"
 { return p::make_ACTION_SANITISE_RESPONSE_HEADER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 532 "seclang-scanner.ll"
+#line 537 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETRSC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 534 "seclang-scanner.ll"
+#line 539 "seclang-scanner.ll"
 { return p::make_ACTION_STATUS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 535 "seclang-scanner.ll"
+#line 540 "seclang-scanner.ll"
 { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 536 "seclang-scanner.ll"
+#line 541 "seclang-scanner.ll"
 { return p::make_ACTION_ACCURACY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 537 "seclang-scanner.ll"
+#line 542 "seclang-scanner.ll"
 { return p::make_ACTION_ALLOW(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 538 "seclang-scanner.ll"
+#line 543 "seclang-scanner.ll"
 { return p::make_ACTION_AUDIT_LOG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 539 "seclang-scanner.ll"
+#line 544 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_AUDIT_ENGINE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 540 "seclang-scanner.ll"
+#line 545 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_AUDIT_LOG_PARTS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 541 "seclang-scanner.ll"
+#line 546 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_BDY_JSON(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 542 "seclang-scanner.ll"
+#line 547 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_BDY_XML(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 543 "seclang-scanner.ll"
+#line 548 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_BDY_URLENCODED(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 544 "seclang-scanner.ll"
+#line 549 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_FORCE_REQ_BODY_VAR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 545 "seclang-scanner.ll"
+#line 550 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_PARSE_XML_INTO_ARGS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 546 "seclang-scanner.ll"
+#line 551 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_REQUEST_BODY_ACCESS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 547 "seclang-scanner.ll"
+#line 552 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_RULE_ENGINE(*driver.loc.back()); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 548 "seclang-scanner.ll"
+#line 553 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_RULE_REMOVE_BY_ID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 549 "seclang-scanner.ll"
+#line 554 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_RULE_REMOVE_BY_TAG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 550 "seclang-scanner.ll"
+#line 555 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 551 "seclang-scanner.ll"
+#line 556 "seclang-scanner.ll"
 { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 552 "seclang-scanner.ll"
+#line 557 "seclang-scanner.ll"
 { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 553 "seclang-scanner.ll"
+#line 558 "seclang-scanner.ll"
 { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 554 "seclang-scanner.ll"
+#line 559 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 555 "seclang-scanner.ll"
+#line 560 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_INITCOL(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 556 "seclang-scanner.ll"
+#line 561 "seclang-scanner.ll"
 { return p::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 46:
 /* rule 46 can match eol */
 YY_RULE_SETUP
-#line 557 "seclang-scanner.ll"
+#line 562 "seclang-scanner.ll"
 { return p::make_ACTION_MATURITY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 558 "seclang-scanner.ll"
+#line 563 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_MSG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 559 "seclang-scanner.ll"
+#line 564 "seclang-scanner.ll"
 { return p::make_ACTION_PHASE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 560 "seclang-scanner.ll"
+#line 565 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_REDIRECT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 561 "seclang-scanner.ll"
+#line 566 "seclang-scanner.ll"
 { return p::make_ACTION_REV(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 562 "seclang-scanner.ll"
+#line 567 "seclang-scanner.ll"
 { return p::make_ACTION_REV(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 563 "seclang-scanner.ll"
+#line 568 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETENV(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 564 "seclang-scanner.ll"
+#line 569 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETSID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 565 "seclang-scanner.ll"
+#line 570 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_SETUID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 567 "seclang-scanner.ll"
+#line 572 "seclang-scanner.ll"
 { BEGIN(SETVAR_ACTION_QUOTED); return p::make_ACTION_SETVAR(*driver.loc.back()); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 568 "seclang-scanner.ll"
+#line 573 "seclang-scanner.ll"
 { BEGIN(SETVAR_ACTION_NONQUOTED); return p::make_ACTION_SETVAR(*driver.loc.back()); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 571 "seclang-scanner.ll"
+#line 576 "seclang-scanner.ll"
 { return p::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 572 "seclang-scanner.ll"
+#line 577 "seclang-scanner.ll"
 { return p::make_ACTION_SEVERITY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 573 "seclang-scanner.ll"
+#line 578 "seclang-scanner.ll"
 { return p::make_ACTION_SKIP_AFTER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 574 "seclang-scanner.ll"
+#line 579 "seclang-scanner.ll"
 { return p::make_ACTION_SKIP(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 575 "seclang-scanner.ll"
+#line 580 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_TAG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 62:
 /* rule 62 can match eol */
 YY_RULE_SETUP
-#line 576 "seclang-scanner.ll"
+#line 581 "seclang-scanner.ll"
 { return p::make_ACTION_VER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 577 "seclang-scanner.ll"
+#line 582 "seclang-scanner.ll"
 { return p::make_ACTION_XMLNS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 579 "seclang-scanner.ll"
+#line 584 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_PARITY_ZERO_7_BIT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 580 "seclang-scanner.ll"
+#line 585 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_PARITY_ODD_7_BIT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 581 "seclang-scanner.ll"
+#line 586 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_PARITY_EVEN_7_BIT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 582 "seclang-scanner.ll"
+#line 587 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_SQL_HEX_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 583 "seclang-scanner.ll"
+#line 588 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_BASE_64_ENCODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 584 "seclang-scanner.ll"
+#line 589 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_BASE_64_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 585 "seclang-scanner.ll"
+#line 590 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_BASE_64_DECODE_EXT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 586 "seclang-scanner.ll"
+#line 591 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_CMD_LINE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 587 "seclang-scanner.ll"
+#line 592 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_SHA1(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 588 "seclang-scanner.ll"
+#line 593 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_MD5(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 589 "seclang-scanner.ll"
+#line 594 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 590 "seclang-scanner.ll"
+#line 595 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_HEX_ENCODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 591 "seclang-scanner.ll"
+#line 596 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_HEX_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 592 "seclang-scanner.ll"
+#line 597 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_LOWERCASE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 593 "seclang-scanner.ll"
+#line 598 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_UPPERCASE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 594 "seclang-scanner.ll"
+#line 599 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_URL_ENCODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 595 "seclang-scanner.ll"
+#line 600 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_URL_DECODE_UNI(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 596 "seclang-scanner.ll"
+#line 601 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_URL_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 597 "seclang-scanner.ll"
+#line 602 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_NONE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 598 "seclang-scanner.ll"
+#line 603 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_COMPRESS_WHITESPACE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 599 "seclang-scanner.ll"
+#line 604 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REMOVE_WHITESPACE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 600 "seclang-scanner.ll"
+#line 605 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REPLACE_NULLS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 601 "seclang-scanner.ll"
+#line 606 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REMOVE_NULLS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 602 "seclang-scanner.ll"
+#line 607 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_HTML_ENTITY_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 603 "seclang-scanner.ll"
+#line 608 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_JS_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 604 "seclang-scanner.ll"
+#line 609 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_CSS_DECODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 605 "seclang-scanner.ll"
+#line 610 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_TRIM(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 606 "seclang-scanner.ll"
+#line 611 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_TRIM_LEFT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 607 "seclang-scanner.ll"
+#line 612 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_TRIM_RIGHT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 608 "seclang-scanner.ll"
+#line 613 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_NORMALISE_PATH_WIN(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 609 "seclang-scanner.ll"
+#line 614 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_NORMALISE_PATH(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 610 "seclang-scanner.ll"
+#line 615 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_LENGTH(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 611 "seclang-scanner.ll"
+#line 616 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_UTF8_TO_UNICODE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 612 "seclang-scanner.ll"
+#line 617 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS_CHAR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 613 "seclang-scanner.ll"
+#line 618 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REMOVE_COMMENTS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 614 "seclang-scanner.ll"
+#line 619 "seclang-scanner.ll"
 { return p::make_ACTION_TRANSFORMATION_REPLACE_COMMENTS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 615 "seclang-scanner.ll"
+#line 620 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_LOG_DATA(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 617 "seclang-scanner.ll"
+#line 622 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_DETC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 618 "seclang-scanner.ll"
+#line 623 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_ONLYARGS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 619 "seclang-scanner.ll"
+#line 624 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_OFF(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 620 "seclang-scanner.ll"
+#line 625 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_ON(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 621 "seclang-scanner.ll"
+#line 626 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 106:
 /* rule 106 can match eol */
 YY_RULE_SETUP
-#line 622 "seclang-scanner.ll"
+#line 627 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 107:
 /* rule 107 can match eol */
 YY_RULE_SETUP
-#line 623 "seclang-scanner.ll"
+#line 628 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 
 case 108:
 YY_RULE_SETUP
-#line 627 "seclang-scanner.ll"
+#line 632 "seclang-scanner.ll"
 { return p::make_COMMA(*driver.loc.back()); }
 	YY_BREAK
 
@@ -5983,75 +5987,75 @@ YY_RULE_SETUP
 case 109:
 /* rule 109 can match eol */
 YY_RULE_SETUP
-#line 632 "seclang-scanner.ll"
+#line 637 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(yyleng); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 110:
 /* rule 110 can match eol */
 YY_RULE_SETUP
-#line 633 "seclang-scanner.ll"
+#line 638 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(yyleng); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 
 case 111:
 YY_RULE_SETUP
-#line 638 "seclang-scanner.ll"
+#line 643 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(yyleng); }
 	YY_BREAK
 case 112:
 /* rule 112 can match eol */
 YY_RULE_SETUP
-#line 639 "seclang-scanner.ll"
+#line 644 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(1); }
 	YY_BREAK
 case 113:
 /* rule 113 can match eol */
 YY_RULE_SETUP
-#line 640 "seclang-scanner.ll"
+#line 645 "seclang-scanner.ll"
 { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 
 case 114:
 YY_RULE_SETUP
-#line 645 "seclang-scanner.ll"
+#line 650 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(yyleng); p::make_NEW_LINE(*driver.loc.back()); }
 	YY_BREAK
 case 115:
 /* rule 115 can match eol */
 YY_RULE_SETUP
-#line 646 "seclang-scanner.ll"
+#line 651 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(1); }
 	YY_BREAK
 case 116:
 /* rule 116 can match eol */
 YY_RULE_SETUP
-#line 647 "seclang-scanner.ll"
+#line 652 "seclang-scanner.ll"
 { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 
 case 117:
 YY_RULE_SETUP
-#line 652 "seclang-scanner.ll"
+#line 657 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 	YY_BREAK
 
 
 case 118:
 YY_RULE_SETUP
-#line 657 "seclang-scanner.ll"
+#line 662 "seclang-scanner.ll"
 { BEGIN(ACTION_PREDICATE_ENDS_WITH_QUOTE); }
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 658 "seclang-scanner.ll"
+#line 663 "seclang-scanner.ll"
 { BEGIN(ACTION_PREDICATE_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 659 "seclang-scanner.ll"
+#line 664 "seclang-scanner.ll"
 { BEGIN(ACTION_PREDICATE_ENDS_WITH_COMMA_OR_DOUBLE_QUOTE); yyless(0); }
 	YY_BREAK
 
@@ -6059,116 +6063,116 @@ YY_RULE_SETUP
 case 121:
 /* rule 121 can match eol */
 YY_RULE_SETUP
-#line 664 "seclang-scanner.ll"
+#line 669 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 122:
 /* rule 122 can match eol */
 YY_RULE_SETUP
-#line 665 "seclang-scanner.ll"
+#line 670 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 
 case 123:
 YY_RULE_SETUP
-#line 669 "seclang-scanner.ll"
+#line 674 "seclang-scanner.ll"
 { yyless(1); BEGIN_PREVIOUS(); }
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 670 "seclang-scanner.ll"
+#line 675 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); }
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 671 "seclang-scanner.ll"
+#line 676 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); }
 	YY_BREAK
 
 
 case 126:
 YY_RULE_SETUP
-#line 675 "seclang-scanner.ll"
+#line 680 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(yyleng); }
 	YY_BREAK
 case 127:
 /* rule 127 can match eol */
-YY_RULE_SETUP
-#line 676 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-	YY_BREAK
-
-
-case 128:
-YY_RULE_SETUP
-#line 680 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(yyleng); }
-	YY_BREAK
-case 129:
-/* rule 129 can match eol */
 YY_RULE_SETUP
 #line 681 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 130:
+case 128:
 YY_RULE_SETUP
 #line 685 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(yyleng); }
+	YY_BREAK
+case 129:
+/* rule 129 can match eol */
+YY_RULE_SETUP
+#line 686 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
+case 130:
+YY_RULE_SETUP
+#line 690 "seclang-scanner.ll"
 { yyless(0); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 686 "seclang-scanner.ll"
+#line 691 "seclang-scanner.ll"
 { yyless(0); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE);}
 	YY_BREAK
 case 132:
 /* rule 132 can match eol */
 YY_RULE_SETUP
-#line 687 "seclang-scanner.ll"
+#line 692 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
 case 133:
 YY_RULE_SETUP
-#line 691 "seclang-scanner.ll"
+#line 696 "seclang-scanner.ll"
 { BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 692 "seclang-scanner.ll"
+#line 697 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 	YY_BREAK
 
 
 case 135:
 YY_RULE_SETUP
-#line 696 "seclang-scanner.ll"
+#line 701 "seclang-scanner.ll"
 { return p::make_NOT(*driver.loc.back()); }
 	YY_BREAK
 case 136:
 /* rule 136 can match eol */
 YY_RULE_SETUP
-#line 697 "seclang-scanner.ll"
+#line 702 "seclang-scanner.ll"
 { BEGIN_ACTION_OPERATION(); yyless(0); }
 	YY_BREAK
 
 
 case 137:
 YY_RULE_SETUP
-#line 702 "seclang-scanner.ll"
+#line 707 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PLUS(*driver.loc.back()); }
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 703 "seclang-scanner.ll"
+#line 708 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_MINUS(*driver.loc.back()); }
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 704 "seclang-scanner.ll"
+#line 709 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS(*driver.loc.back()); }
 	YY_BREAK
 
@@ -6176,27 +6180,27 @@ YY_RULE_SETUP
 case 140:
 /* rule 140 can match eol */
 YY_RULE_SETUP
-#line 708 "seclang-scanner.ll"
+#line 713 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(0);}
 	YY_BREAK
 
 
 case 141:
 YY_RULE_SETUP
-#line 712 "seclang-scanner.ll"
+#line 717 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 142:
 /* rule 142 can match eol */
 YY_RULE_SETUP
-#line 713 "seclang-scanner.ll"
+#line 718 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_ACTION); yyless(0); }
 	YY_BREAK
 
 
 case 143:
 YY_RULE_SETUP
-#line 721 "seclang-scanner.ll"
+#line 726 "seclang-scanner.ll"
 { BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
 	YY_BREAK
 
@@ -6204,1557 +6208,1557 @@ YY_RULE_SETUP
 case 144:
 /* rule 144 can match eol */
 YY_RULE_SETUP
-#line 726 "seclang-scanner.ll"
+#line 731 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 145:
 /* rule 145 can match eol */
 YY_RULE_SETUP
-#line 727 "seclang-scanner.ll"
+#line 732 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(0); }
 	YY_BREAK
 
 
 case 146:
 YY_RULE_SETUP
-#line 732 "seclang-scanner.ll"
+#line 737 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 147:
 /* rule 147 can match eol */
 YY_RULE_SETUP
-#line 733 "seclang-scanner.ll"
+#line 738 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 148:
 /* rule 148 can match eol */
 YY_RULE_SETUP
-#line 734 "seclang-scanner.ll"
+#line 739 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); yyless(0); }
 	YY_BREAK
 
 
 case YY_STATE_EOF(FINISH_ACTIONS):
-#line 742 "seclang-scanner.ll"
+#line 747 "seclang-scanner.ll"
 { BEGIN(INITIAL); yyless(0); p::make_NEW_LINE(*driver.loc.back()); }
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 743 "seclang-scanner.ll"
+#line 748 "seclang-scanner.ll"
 { BEGIN(INITIAL); }
 	YY_BREAK
 
 case 150:
 /* rule 150 can match eol */
 YY_RULE_SETUP
-#line 746 "seclang-scanner.ll"
+#line 751 "seclang-scanner.ll"
 { return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 	YY_BREAK
 case 151:
 /* rule 151 can match eol */
 YY_RULE_SETUP
-#line 747 "seclang-scanner.ll"
+#line 752 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_SERVER_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
 	YY_BREAK
 case 152:
 /* rule 152 can match eol */
 YY_RULE_SETUP
-#line 748 "seclang-scanner.ll"
+#line 753 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 2), *driver.loc.back()); }
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 749 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 754 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 750 "seclang-scanner.ll"
+#line 755 "seclang-scanner.ll"
 { return p::make_CONFIG_CONTENT_INJECTION(*driver.loc.back()); }
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 751 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 756 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 752 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 757 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_DIR_MOD(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 753 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 758 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 754 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 759 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 755 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 760 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 756 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 761 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_ARGUMENT_SEPARATOR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 757 "seclang-scanner.ll"
+#line 762 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_AUDIT_ENG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 758 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_FLE_MOD(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 763 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_FLE_MOD(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 759 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_LOG2(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 764 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_LOG2(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 760 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 765 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 761 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 766 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_LOG_P(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 762 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 767 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_LOG(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 763 "seclang-scanner.ll"
+#line 768 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_AUDIT_LOG_FMT(*driver.loc.back()); }
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 764 "seclang-scanner.ll"
+#line 769 "seclang-scanner.ll"
 { return p::make_JSON(*driver.loc.back()); }
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 765 "seclang-scanner.ll"
+#line 770 "seclang-scanner.ll"
 { return p::make_NATIVE(*driver.loc.back()); }
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 766 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 771 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_LOG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 767 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 772 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 768 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 773 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_STS(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 769 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_PREFIX(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 774 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_PREFIX(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 770 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_AUDIT_PREFIX(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 775 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_AUDIT_PREFIX(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 771 "seclang-scanner.ll"
+#line 776 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_AUDIT_TPE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 774 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_DEBUG_LOG(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 779 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_DEBUG_LOG(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 775 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_DEBUG_LOG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 780 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_DEBUG_LOG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 776 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_DEBUG_LVL(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 781 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_DEBUG_LVL(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 777 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_GEO_DB(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 782 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_GEO_DB(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 778 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 783 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT_RECURSION(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 779 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 784 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_PCRE_MATCH_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 780 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_ARGS_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 785 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_ARGS_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 781 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 786 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 782 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 787 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_REQ_BODY_IN_MEMORY_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 784 "seclang-scanner.ll"
+#line 789 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_REQ_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 785 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_REQ_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 790 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_REQ_BODY_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 786 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 791 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_REQ_BODY_NO_FILES_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 787 "seclang-scanner.ll"
+#line 792 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_REQ_BODY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 788 "seclang-scanner.ll"
+#line 793 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_RES_BODY_LIMIT_ACTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 789 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_RES_BODY_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 794 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_RES_BODY_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 790 "seclang-scanner.ll"
+#line 795 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_RES_BODY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 791 "seclang-scanner.ll"
+#line 796 "seclang-scanner.ll"
 { return p::make_CONFIG_DIR_RULE_ENG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 792 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 797 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_SEC_MARKER(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 793 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_SEC_MARKER(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 798 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_SEC_MARKER(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 794 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_UNICODE_MAP_FILE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 799 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_UNICODE_MAP_FILE(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 795 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 800 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 796 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 801 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 797 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 802 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_MSG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 798 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 803 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 799 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 804 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_REMOVE_BY_TAG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 201:
 YY_RULE_SETUP
-#line 800 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 805 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 801 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 806 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_TAG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 802 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 807 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 803 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 808 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_MSG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 205:
 YY_RULE_SETUP
-#line 804 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 809 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 206:
 YY_RULE_SETUP
-#line 805 "seclang-scanner.ll"
-{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 810 "seclang-scanner.ll"
+{ state_variable_from = 1; BEGIN(TRANSACTION_TO_VARIABLE); return p::make_CONFIG_SEC_RULE_UPDATE_TARGET_BY_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 207:
 YY_RULE_SETUP
-#line 806 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 811 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 208:
 YY_RULE_SETUP
-#line 807 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 812 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_CONFIG_SEC_RULE_UPDATE_ACTION_BY_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 209:
 YY_RULE_SETUP
-#line 808 "seclang-scanner.ll"
+#line 813 "seclang-scanner.ll"
 { return p::make_CONFIG_UPDLOAD_KEEP_FILES(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 210:
 YY_RULE_SETUP
-#line 809 "seclang-scanner.ll"
+#line 814 "seclang-scanner.ll"
 { return p::make_CONFIG_UPDLOAD_SAVE_TMP_FILES(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 211:
 YY_RULE_SETUP
-#line 810 "seclang-scanner.ll"
-{ return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 815 "seclang-scanner.ll"
+{ return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 212:
 YY_RULE_SETUP
-#line 811 "seclang-scanner.ll"
-{ return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 816 "seclang-scanner.ll"
+{ return p::make_CONFIG_UPLOAD_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 213:
 YY_RULE_SETUP
-#line 812 "seclang-scanner.ll"
-{ return p::make_CONFIG_UPLOAD_FILE_LIMIT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 817 "seclang-scanner.ll"
+{ return p::make_CONFIG_UPLOAD_FILE_LIMIT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 214:
 YY_RULE_SETUP
-#line 813 "seclang-scanner.ll"
-{ return p::make_CONFIG_UPLOAD_FILE_MODE(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 818 "seclang-scanner.ll"
+{ return p::make_CONFIG_UPLOAD_FILE_MODE(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 215:
 YY_RULE_SETUP
-#line 814 "seclang-scanner.ll"
+#line 819 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_ABORT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 216:
 YY_RULE_SETUP
-#line 815 "seclang-scanner.ll"
+#line 820 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_DETC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 217:
 YY_RULE_SETUP
-#line 816 "seclang-scanner.ll"
+#line 821 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_HTTPS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 218:
 YY_RULE_SETUP
-#line 817 "seclang-scanner.ll"
+#line 822 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_ONLYARGS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 219:
 YY_RULE_SETUP
-#line 818 "seclang-scanner.ll"
+#line 823 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_OFF(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 220:
 YY_RULE_SETUP
-#line 819 "seclang-scanner.ll"
+#line 824 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_ON(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 221:
 YY_RULE_SETUP
-#line 820 "seclang-scanner.ll"
+#line 825 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_PARALLEL(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 222:
 YY_RULE_SETUP
-#line 821 "seclang-scanner.ll"
+#line 826 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_PROCESS_PARTIAL(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 223:
 YY_RULE_SETUP
-#line 822 "seclang-scanner.ll"
+#line 827 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_REJECT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 224:
 YY_RULE_SETUP
-#line 823 "seclang-scanner.ll"
+#line 828 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_RELEVANT_ONLY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 225:
 YY_RULE_SETUP
-#line 824 "seclang-scanner.ll"
+#line 829 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_SERIAL(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 226:
 YY_RULE_SETUP
-#line 825 "seclang-scanner.ll"
+#line 830 "seclang-scanner.ll"
 { return p::make_CONFIG_VALUE_WARN(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 227:
 YY_RULE_SETUP
-#line 826 "seclang-scanner.ll"
+#line 831 "seclang-scanner.ll"
 { return p::make_CONFIG_XML_EXTERNAL_ENTITY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 228:
 YY_RULE_SETUP
-#line 827 "seclang-scanner.ll"
+#line 832 "seclang-scanner.ll"
 { return p::make_CONFIG_XML_PARSE_XML_INTO_ARGS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 229:
 YY_RULE_SETUP
-#line 828 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_RESPONSE_BODY_MP(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 833 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_RESPONSE_BODY_MP(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 230:
 YY_RULE_SETUP
-#line 829 "seclang-scanner.ll"
+#line 834 "seclang-scanner.ll"
 { return p::make_CONGIG_DIR_RESPONSE_BODY_MP_CLEAR(*driver.loc.back()); }
 	YY_BREAK
 case 231:
 YY_RULE_SETUP
-#line 830 "seclang-scanner.ll"
+#line 835 "seclang-scanner.ll"
 { return p::make_CONGIG_DIR_SEC_ARG_SEP(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 232:
 YY_RULE_SETUP
-#line 831 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 836 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_SEC_COOKIE_FORMAT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 233:
 YY_RULE_SETUP
-#line 832 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 837 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 234:
 YY_RULE_SETUP
-#line 833 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 838 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_COOKIEV0_SEPARATOR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 235:
 YY_RULE_SETUP
-#line 834 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 839 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 236:
 YY_RULE_SETUP
-#line 835 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 840 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_SEC_DATA_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 237:
 YY_RULE_SETUP
-#line 836 "seclang-scanner.ll"
+#line 841 "seclang-scanner.ll"
 { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 238:
 YY_RULE_SETUP
-#line 837 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 842 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 239:
 YY_RULE_SETUP
-#line 838 "seclang-scanner.ll"
-{ return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 843 "seclang-scanner.ll"
+{ return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 240:
 YY_RULE_SETUP
-#line 839 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 844 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 241:
 YY_RULE_SETUP
-#line 840 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 845 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 242:
 YY_RULE_SETUP
-#line 841 "seclang-scanner.ll"
+#line 846 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_CACHE_TRANSFORMATIONS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 243:
 YY_RULE_SETUP
-#line 842 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 847 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 244:
 YY_RULE_SETUP
-#line 843 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 848 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 245:
 YY_RULE_SETUP
-#line 844 "seclang-scanner.ll"
+#line 849 "seclang-scanner.ll"
 { return p::make_CONFIG_CONN_ENGINE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 246:
 YY_RULE_SETUP
-#line 845 "seclang-scanner.ll"
+#line 850 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_HASH_ENGINE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 247:
 YY_RULE_SETUP
-#line 846 "seclang-scanner.ll"
+#line 851 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_HASH_KEY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 248:
 YY_RULE_SETUP
-#line 847 "seclang-scanner.ll"
+#line 852 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_HASH_PARAM(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 249:
 YY_RULE_SETUP
-#line 848 "seclang-scanner.ll"
+#line 853 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_HASH_METHOD_RX(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 250:
 YY_RULE_SETUP
-#line 849 "seclang-scanner.ll"
+#line 854 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_HASH_METHOD_PM(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 251:
 YY_RULE_SETUP
-#line 850 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 855 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 252:
 YY_RULE_SETUP
-#line 851 "seclang-scanner.ll"
-{ return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(strchr(yytext, ' ') + 1), *driver.loc.back()); }
+#line 856 "seclang-scanner.ll"
+{ return p::make_CONFIG_DIR_GSB_DB(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 253:
 YY_RULE_SETUP
-#line 852 "seclang-scanner.ll"
+#line 857 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_GUARDIAN_LOG(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 254:
 YY_RULE_SETUP
-#line 853 "seclang-scanner.ll"
+#line 858 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_INTERCEPT_ON_ERROR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 255:
 YY_RULE_SETUP
-#line 854 "seclang-scanner.ll"
+#line 859 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_CONN_R_STATE_LIMIT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 256:
 YY_RULE_SETUP
-#line 855 "seclang-scanner.ll"
+#line 860 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_CONN_W_STATE_LIMIT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 257:
 YY_RULE_SETUP
-#line 856 "seclang-scanner.ll"
+#line 861 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_SENSOR_ID(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 258:
 YY_RULE_SETUP
-#line 857 "seclang-scanner.ll"
+#line 862 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_RULE_INHERITANCE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 259:
 YY_RULE_SETUP
-#line 858 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_RULE_PERF_TIME(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 863 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_RULE_PERF_TIME(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 260:
 YY_RULE_SETUP
-#line 859 "seclang-scanner.ll"
+#line 864 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_STREAM_IN_BODY_INSPECTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 261:
 YY_RULE_SETUP
-#line 860 "seclang-scanner.ll"
+#line 865 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_STREAM_OUT_BODY_INSPECTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 262:
 YY_RULE_SETUP
-#line 861 "seclang-scanner.ll"
+#line 866 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_DISABLE_BACKEND_COMPRESS(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 263:
 YY_RULE_SETUP
-#line 863 "seclang-scanner.ll"
+#line 868 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_TO_VARIABLE); return p::make_DIRECTIVE(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 264:
 YY_RULE_SETUP
-#line 864 "seclang-scanner.ll"
+#line 869 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_CONFIG_DIR_SEC_DEFAULT_ACTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 265:
 YY_RULE_SETUP
-#line 865 "seclang-scanner.ll"
+#line 870 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_CONFIG_DIR_SEC_ACTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 266:
 YY_RULE_SETUP
-#line 867 "seclang-scanner.ll"
+#line 872 "seclang-scanner.ll"
 { return p::make_CONFIG_SEC_REMOTE_RULES_FAIL_ACTION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 267:
 YY_RULE_SETUP
-#line 868 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_COLLECTION_TIMEOUT(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 873 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_COLLECTION_TIMEOUT(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 268:
 YY_RULE_SETUP
-#line 869 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_HTTP_BLKEY(strchr(yytext, ' ') + 1, *driver.loc.back()); }
+#line 874 "seclang-scanner.ll"
+{ return p::make_CONFIG_SEC_HTTP_BLKEY(find_separator(yytext), *driver.loc.back()); }
 	YY_BREAK
 case 269:
 /* rule 269 can match eol */
 YY_RULE_SETUP
-#line 870 "seclang-scanner.ll"
+#line 875 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 270:
 /* rule 270 can match eol */
 YY_RULE_SETUP
-#line 871 "seclang-scanner.ll"
+#line 876 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT); }
 	YY_BREAK
 case 271:
 /* rule 271 can match eol */
 YY_RULE_SETUP
-#line 872 "seclang-scanner.ll"
+#line 877 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(COMMENT);  }
 	YY_BREAK
 case 272:
 YY_RULE_SETUP
-#line 873 "seclang-scanner.ll"
+#line 878 "seclang-scanner.ll"
 { driver.loc.back()->step(); /* comment, just ignore. */ }
 	YY_BREAK
 case 273:
 YY_RULE_SETUP
-#line 874 "seclang-scanner.ll"
+#line 879 "seclang-scanner.ll"
 { driver.loc.back()->step(); /* carriage return, just ignore. */}
 	YY_BREAK
 case 274:
 YY_RULE_SETUP
-#line 875 "seclang-scanner.ll"
+#line 880 "seclang-scanner.ll"
 { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 275:
 YY_RULE_SETUP
-#line 876 "seclang-scanner.ll"
+#line 881 "seclang-scanner.ll"
 { return p::make_COMMA(*driver.loc.back()); }
 	YY_BREAK
 
 case 276:
 YY_RULE_SETUP
-#line 879 "seclang-scanner.ll"
+#line 884 "seclang-scanner.ll"
 { BEGIN(EXPECTING_VARIABLE); }
 	YY_BREAK
 
 
 case 277:
 YY_RULE_SETUP
-#line 883 "seclang-scanner.ll"
+#line 888 "seclang-scanner.ll"
 { return p::make_PIPE(*driver.loc.back()); }
 	YY_BREAK
 case 278:
 YY_RULE_SETUP
-#line 884 "seclang-scanner.ll"
+#line 889 "seclang-scanner.ll"
 { return p::make_PIPE(*driver.loc.back()); }
 	YY_BREAK
 case 279:
 YY_RULE_SETUP
-#line 885 "seclang-scanner.ll"
+#line 890 "seclang-scanner.ll"
 { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 280:
 YY_RULE_SETUP
-#line 886 "seclang-scanner.ll"
+#line 891 "seclang-scanner.ll"
 { return p::make_VAR_EXCLUSION(*driver.loc.back()); }
 	YY_BREAK
 case 281:
 YY_RULE_SETUP
-#line 887 "seclang-scanner.ll"
+#line 892 "seclang-scanner.ll"
 { return p::make_VAR_COUNT(*driver.loc.back()); }
 	YY_BREAK
 
 
 case 282:
 YY_RULE_SETUP
-#line 891 "seclang-scanner.ll"
+#line 896 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_SPACE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 case 283:
 YY_RULE_SETUP
-#line 892 "seclang-scanner.ll"
+#line 897 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_QUOTE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 case 284:
 /* rule 284 can match eol */
 YY_RULE_SETUP
-#line 893 "seclang-scanner.ll"
+#line 898 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_SPACE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 case 285:
 /* rule 285 can match eol */
 YY_RULE_SETUP
-#line 894 "seclang-scanner.ll"
+#line 899 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_QUOTE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 case 286:
 /* rule 286 can match eol */
 YY_RULE_SETUP
-#line 895 "seclang-scanner.ll"
+#line 900 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_SPACE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 case 287:
 /* rule 287 can match eol */
 YY_RULE_SETUP
-#line 896 "seclang-scanner.ll"
+#line 901 "seclang-scanner.ll"
 { if (state_variable_from == 0) { BEGIN(EXPECTING_OPERATOR_ENDS_WITH_QUOTE); } else { state_variable_from = 0; BEGIN(INITIAL);} }
 	YY_BREAK
 
 
 case 288:
 YY_RULE_SETUP
-#line 900 "seclang-scanner.ll"
+#line 905 "seclang-scanner.ll"
 {  }
 	YY_BREAK
 case 289:
 YY_RULE_SETUP
-#line 901 "seclang-scanner.ll"
+#line 906 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 290:
 /* rule 290 can match eol */
 YY_RULE_SETUP
-#line 902 "seclang-scanner.ll"
+#line 907 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 291:
 /* rule 291 can match eol */
 YY_RULE_SETUP
-#line 903 "seclang-scanner.ll"
+#line 908 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 
 
 case 292:
 YY_RULE_SETUP
-#line 908 "seclang-scanner.ll"
+#line 913 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 	YY_BREAK
 case 293:
 YY_RULE_SETUP
-#line 909 "seclang-scanner.ll"
+#line 914 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_COMBINED_SIZE(*driver.loc.back()); }
 	YY_BREAK
 case 294:
 YY_RULE_SETUP
-#line 910 "seclang-scanner.ll"
+#line 915 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_GET_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 295:
 YY_RULE_SETUP
-#line 911 "seclang-scanner.ll"
+#line 916 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 296:
 YY_RULE_SETUP
-#line 912 "seclang-scanner.ll"
+#line 917 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 297:
 YY_RULE_SETUP
-#line 913 "seclang-scanner.ll"
+#line 918 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 298:
 YY_RULE_SETUP
-#line 914 "seclang-scanner.ll"
+#line 919 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_POST_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 299:
 YY_RULE_SETUP
-#line 915 "seclang-scanner.ll"
+#line 920 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 300:
 YY_RULE_SETUP
-#line 916 "seclang-scanner.ll"
+#line 921 "seclang-scanner.ll"
 { return p::make_VARIABLE_AUTH_TYPE(*driver.loc.back()); }
 	YY_BREAK
 case 301:
 YY_RULE_SETUP
-#line 917 "seclang-scanner.ll"
+#line 922 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES_COMBINED_SIZE(*driver.loc.back()); }
 	YY_BREAK
 case 302:
 YY_RULE_SETUP
-#line 918 "seclang-scanner.ll"
+#line 923 "seclang-scanner.ll"
 { return p::make_VARIABLE_FULL_REQUEST_LENGTH(*driver.loc.back()); }
 	YY_BREAK
 case 303:
 YY_RULE_SETUP
-#line 919 "seclang-scanner.ll"
+#line 924 "seclang-scanner.ll"
 { return p::make_VARIABLE_FULL_REQUEST(*driver.loc.back()); }
 	YY_BREAK
 case 304:
 YY_RULE_SETUP
-#line 920 "seclang-scanner.ll"
+#line 925 "seclang-scanner.ll"
 { return p::make_VARIABLE_INBOUND_DATA_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 305:
 YY_RULE_SETUP
-#line 921 "seclang-scanner.ll"
+#line 926 "seclang-scanner.ll"
 { return p::make_VARIABLE_MATCHED_VAR_NAME(*driver.loc.back()); }
 	YY_BREAK
 case 306:
 YY_RULE_SETUP
-#line 922 "seclang-scanner.ll"
+#line 927 "seclang-scanner.ll"
 { return p::make_VARIABLE_MATCHED_VAR(*driver.loc.back()); }
 	YY_BREAK
 case 307:
 YY_RULE_SETUP
-#line 923 "seclang-scanner.ll"
+#line 928 "seclang-scanner.ll"
 { return p::make_VARIABLE_MSC_PCRE_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 308:
 YY_RULE_SETUP
-#line 924 "seclang-scanner.ll"
+#line 929 "seclang-scanner.ll"
 { return p::make_VARIABLE_MSC_PCRE_LIMITS_EXCEEDED(*driver.loc.back()); }
 	YY_BREAK
 case 309:
 YY_RULE_SETUP
-#line 925 "seclang-scanner.ll"
+#line 930 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_BOUNDARY_QUOTED(*driver.loc.back()); }
 	YY_BREAK
 case 310:
 YY_RULE_SETUP
-#line 926 "seclang-scanner.ll"
+#line 931 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_BOUNDARY_WHITESPACE(*driver.loc.back()); }
 	YY_BREAK
 case 311:
 YY_RULE_SETUP
-#line 927 "seclang-scanner.ll"
+#line 932 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_CRLF_LF_LINES(*driver.loc.back()); }
 	YY_BREAK
 case 312:
 YY_RULE_SETUP
-#line 928 "seclang-scanner.ll"
+#line 933 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_DATA_AFTER(*driver.loc.back()); }
 	YY_BREAK
 case 313:
 YY_RULE_SETUP
-#line 929 "seclang-scanner.ll"
+#line 934 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_DATA_BEFORE(*driver.loc.back()); }
 	YY_BREAK
 case 314:
 YY_RULE_SETUP
-#line 930 "seclang-scanner.ll"
+#line 935 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_FILE_LIMIT_EXCEEDED(*driver.loc.back()); }
 	YY_BREAK
 case 315:
 YY_RULE_SETUP
-#line 931 "seclang-scanner.ll"
+#line 936 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
 	YY_BREAK
 case 316:
 YY_RULE_SETUP
-#line 932 "seclang-scanner.ll"
+#line 937 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
 	YY_BREAK
 case 317:
 YY_RULE_SETUP
-#line 933 "seclang-scanner.ll"
+#line 938 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 	YY_BREAK
 case 318:
 YY_RULE_SETUP
-#line 934 "seclang-scanner.ll"
+#line 939 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 	YY_BREAK
 case 319:
 YY_RULE_SETUP
-#line 935 "seclang-scanner.ll"
+#line 940 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING(*driver.loc.back()); }
 	YY_BREAK
 case 320:
 YY_RULE_SETUP
-#line 936 "seclang-scanner.ll"
+#line 941 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_INVALID_PART(*driver.loc.back()); }
 	YY_BREAK
 case 321:
 YY_RULE_SETUP
-#line 937 "seclang-scanner.ll"
+#line 942 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_INVALID_QUOTING(*driver.loc.back()); }
 	YY_BREAK
 case 322:
 YY_RULE_SETUP
-#line 938 "seclang-scanner.ll"
+#line 943 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_LF_LINE(*driver.loc.back()); }
 	YY_BREAK
 case 323:
 YY_RULE_SETUP
-#line 939 "seclang-scanner.ll"
+#line 944 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_MISSING_SEMICOLON(*driver.loc.back()); }
 	YY_BREAK
 case 324:
 YY_RULE_SETUP
-#line 940 "seclang-scanner.ll"
+#line 945 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_SEMICOLON_MISSING(*driver.loc.back()); }
 	YY_BREAK
 case 325:
 YY_RULE_SETUP
-#line 941 "seclang-scanner.ll"
+#line 946 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
 	YY_BREAK
 case 326:
 YY_RULE_SETUP
-#line 942 "seclang-scanner.ll"
+#line 947 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_NAME(*driver.loc.back()); }
 	YY_BREAK
 case 327:
 YY_RULE_SETUP
-#line 943 "seclang-scanner.ll"
+#line 948 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_STRICT_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 328:
 YY_RULE_SETUP
-#line 944 "seclang-scanner.ll"
+#line 949 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_UNMATCHED_BOUNDARY(*driver.loc.back()); }
 	YY_BREAK
 case 329:
 YY_RULE_SETUP
-#line 945 "seclang-scanner.ll"
+#line 950 "seclang-scanner.ll"
 { return p::make_VARIABLE_OUTBOUND_DATA_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 330:
 YY_RULE_SETUP
-#line 946 "seclang-scanner.ll"
+#line 951 "seclang-scanner.ll"
 { return p::make_VARIABLE_PATH_INFO(*driver.loc.back()); }
 	YY_BREAK
 case 331:
 YY_RULE_SETUP
-#line 947 "seclang-scanner.ll"
+#line 952 "seclang-scanner.ll"
 { return p::make_VARIABLE_QUERY_STRING(*driver.loc.back()); }
 	YY_BREAK
 case 332:
 YY_RULE_SETUP
-#line 948 "seclang-scanner.ll"
+#line 953 "seclang-scanner.ll"
 { return p::make_VARIABLE_REMOTE_ADDR(*driver.loc.back()); }
 	YY_BREAK
 case 333:
 YY_RULE_SETUP
-#line 949 "seclang-scanner.ll"
+#line 954 "seclang-scanner.ll"
 { return p::make_VARIABLE_REMOTE_HOST(*driver.loc.back()); }
 	YY_BREAK
 case 334:
 YY_RULE_SETUP
-#line 950 "seclang-scanner.ll"
+#line 955 "seclang-scanner.ll"
 { return p::make_VARIABLE_REMOTE_PORT(*driver.loc.back()); }
 	YY_BREAK
 case 335:
 YY_RULE_SETUP
-#line 951 "seclang-scanner.ll"
+#line 956 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQBODY_ERROR_MSG(*driver.loc.back()); }
 	YY_BREAK
 case 336:
 YY_RULE_SETUP
-#line 952 "seclang-scanner.ll"
+#line 957 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQBODY_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 337:
 YY_RULE_SETUP
-#line 953 "seclang-scanner.ll"
+#line 958 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG(*driver.loc.back()); }
 	YY_BREAK
 case 338:
 YY_RULE_SETUP
-#line 954 "seclang-scanner.ll"
+#line 959 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQBODY_PROCESSOR_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 339:
 YY_RULE_SETUP
-#line 955 "seclang-scanner.ll"
+#line 960 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQBODY_PROCESSOR(*driver.loc.back()); }
 	YY_BREAK
 case 340:
 YY_RULE_SETUP
-#line 956 "seclang-scanner.ll"
+#line 961 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_BASENAME(*driver.loc.back()); }
 	YY_BREAK
 case 341:
 YY_RULE_SETUP
-#line 957 "seclang-scanner.ll"
+#line 962 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_BODY_LENGTH(*driver.loc.back()); }
 	YY_BREAK
 case 342:
 YY_RULE_SETUP
-#line 958 "seclang-scanner.ll"
+#line 963 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_BODY(*driver.loc.back()); }
 	YY_BREAK
 case 343:
 YY_RULE_SETUP
-#line 959 "seclang-scanner.ll"
+#line 964 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_FILE_NAME(*driver.loc.back()); }
 	YY_BREAK
 case 344:
 YY_RULE_SETUP
-#line 960 "seclang-scanner.ll"
+#line 965 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_HEADERS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 345:
 YY_RULE_SETUP
-#line 961 "seclang-scanner.ll"
+#line 966 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_HEADERS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 346:
 YY_RULE_SETUP
-#line 962 "seclang-scanner.ll"
+#line 967 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_LINE(*driver.loc.back()); }
 	YY_BREAK
 case 347:
 YY_RULE_SETUP
-#line 963 "seclang-scanner.ll"
+#line 968 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_METHOD(*driver.loc.back()); }
 	YY_BREAK
 case 348:
 YY_RULE_SETUP
-#line 964 "seclang-scanner.ll"
+#line 969 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_PROTOCOL(*driver.loc.back()); }
 	YY_BREAK
 case 349:
 YY_RULE_SETUP
-#line 965 "seclang-scanner.ll"
+#line 970 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_URI_RAW(*driver.loc.back()); }
 	YY_BREAK
 case 350:
 YY_RULE_SETUP
-#line 966 "seclang-scanner.ll"
+#line 971 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_URI(*driver.loc.back()); }
 	YY_BREAK
 case 351:
 YY_RULE_SETUP
-#line 967 "seclang-scanner.ll"
+#line 972 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_BODY(*driver.loc.back()); }
 	YY_BREAK
 case 352:
 YY_RULE_SETUP
-#line 968 "seclang-scanner.ll"
+#line 973 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_CONTENT_LENGTH(*driver.loc.back()); }
 	YY_BREAK
 case 353:
 YY_RULE_SETUP
-#line 969 "seclang-scanner.ll"
+#line 974 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_CONTENT_TYPE(*driver.loc.back()); }
 	YY_BREAK
 case 354:
 YY_RULE_SETUP
-#line 970 "seclang-scanner.ll"
+#line 975 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_HEADERS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 355:
 YY_RULE_SETUP
-#line 971 "seclang-scanner.ll"
+#line 976 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESPONSE_HEADERS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 356:
 YY_RULE_SETUP
-#line 972 "seclang-scanner.ll"
+#line 977 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_PROTOCOL(*driver.loc.back()); }
 	YY_BREAK
 case 357:
 YY_RULE_SETUP
-#line 973 "seclang-scanner.ll"
+#line 978 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_STATUS(*driver.loc.back()); }
 	YY_BREAK
 case 358:
 YY_RULE_SETUP
-#line 974 "seclang-scanner.ll"
+#line 979 "seclang-scanner.ll"
 { return p::make_VARIABLE_SERVER_ADDR(*driver.loc.back()); }
 	YY_BREAK
 case 359:
 YY_RULE_SETUP
-#line 975 "seclang-scanner.ll"
+#line 980 "seclang-scanner.ll"
 { return p::make_VARIABLE_SERVER_NAME(*driver.loc.back()); }
 	YY_BREAK
 case 360:
 YY_RULE_SETUP
-#line 976 "seclang-scanner.ll"
+#line 981 "seclang-scanner.ll"
 { return p::make_VARIABLE_SERVER_PORT(*driver.loc.back()); }
 	YY_BREAK
 case 361:
 YY_RULE_SETUP
-#line 977 "seclang-scanner.ll"
+#line 982 "seclang-scanner.ll"
 { return p::make_VARIABLE_SESSION_ID(*driver.loc.back()); }
 	YY_BREAK
 case 362:
 YY_RULE_SETUP
-#line 978 "seclang-scanner.ll"
+#line 983 "seclang-scanner.ll"
 { return p::make_VARIABLE_UNIQUE_ID(*driver.loc.back()); }
 	YY_BREAK
 case 363:
 YY_RULE_SETUP
-#line 979 "seclang-scanner.ll"
+#line 984 "seclang-scanner.ll"
 { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 	YY_BREAK
 case 364:
 YY_RULE_SETUP
-#line 980 "seclang-scanner.ll"
+#line 985 "seclang-scanner.ll"
 { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
 	YY_BREAK
 case 365:
 YY_RULE_SETUP
-#line 981 "seclang-scanner.ll"
+#line 986 "seclang-scanner.ll"
 { return p::make_VARIABLE_WEB_APP_ID(*driver.loc.back()); }
 	YY_BREAK
 case 366:
 YY_RULE_SETUP
-#line 982 "seclang-scanner.ll"
+#line 987 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 	YY_BREAK
 case 367:
 YY_RULE_SETUP
-#line 983 "seclang-scanner.ll"
+#line 988 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 	YY_BREAK
 case 368:
 YY_RULE_SETUP
-#line 984 "seclang-scanner.ll"
+#line 989 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
 	YY_BREAK
 case 369:
 YY_RULE_SETUP
-#line 985 "seclang-scanner.ll"
+#line 990 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
 	YY_BREAK
 case 370:
 YY_RULE_SETUP
-#line 986 "seclang-scanner.ll"
+#line 991 "seclang-scanner.ll"
 { return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
 	YY_BREAK
 case 371:
 YY_RULE_SETUP
-#line 987 "seclang-scanner.ll"
+#line 992 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
 	YY_BREAK
 case 372:
 YY_RULE_SETUP
-#line 988 "seclang-scanner.ll"
+#line 993 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES_SIZES(*driver.loc.back()); }
 	YY_BREAK
 case 373:
 YY_RULE_SETUP
-#line 989 "seclang-scanner.ll"
+#line 994 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_SIZES(*driver.loc.back()); }
 	YY_BREAK
 case 374:
 YY_RULE_SETUP
-#line 990 "seclang-scanner.ll"
+#line 995 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 375:
 YY_RULE_SETUP
-#line 991 "seclang-scanner.ll"
+#line 996 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 376:
 YY_RULE_SETUP
-#line 992 "seclang-scanner.ll"
+#line 997 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
 	YY_BREAK
 case 377:
 YY_RULE_SETUP
-#line 993 "seclang-scanner.ll"
+#line 998 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_TMP_CONTENT(*driver.loc.back()); }
 	YY_BREAK
 case 378:
 YY_RULE_SETUP
-#line 994 "seclang-scanner.ll"
+#line 999 "seclang-scanner.ll"
 { return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 379:
 YY_RULE_SETUP
-#line 995 "seclang-scanner.ll"
+#line 1000 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MATCHED_VARS_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 380:
 YY_RULE_SETUP
-#line 996 "seclang-scanner.ll"
+#line 1001 "seclang-scanner.ll"
 { return p::make_VARIABLE_MATCHED_VARS(*driver.loc.back()); }
 	YY_BREAK
 case 381:
 YY_RULE_SETUP
-#line 997 "seclang-scanner.ll"
+#line 1002 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MATCHED_VARS(*driver.loc.back()); }
 	YY_BREAK
 case 382:
 YY_RULE_SETUP
-#line 998 "seclang-scanner.ll"
+#line 1003 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES(*driver.loc.back()); }
 	YY_BREAK
 case 383:
 YY_RULE_SETUP
-#line 999 "seclang-scanner.ll"
+#line 1004 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES(*driver.loc.back()); }
 	YY_BREAK
 case 384:
 YY_RULE_SETUP
-#line 1000 "seclang-scanner.ll"
+#line 1005 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_COOKIES(*driver.loc.back()); }
 	YY_BREAK
 case 385:
 YY_RULE_SETUP
-#line 1001 "seclang-scanner.ll"
+#line 1006 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_COOKIES(*driver.loc.back()); }
 	YY_BREAK
 case 386:
 YY_RULE_SETUP
-#line 1002 "seclang-scanner.ll"
+#line 1007 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 387:
 YY_RULE_SETUP
-#line 1003 "seclang-scanner.ll"
+#line 1008 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 388:
 YY_RULE_SETUP
-#line 1004 "seclang-scanner.ll"
+#line 1009 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESPONSE_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 389:
 YY_RULE_SETUP
-#line 1005 "seclang-scanner.ll"
+#line 1010 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RESPONSE_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 390:
 YY_RULE_SETUP
-#line 1006 "seclang-scanner.ll"
+#line 1011 "seclang-scanner.ll"
 { return p::make_VARIABLE_GEO(*driver.loc.back()); }
 	YY_BREAK
 case 391:
 YY_RULE_SETUP
-#line 1007 "seclang-scanner.ll"
+#line 1012 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_GEO(*driver.loc.back()); }
 	YY_BREAK
 case 392:
 YY_RULE_SETUP
-#line 1008 "seclang-scanner.ll"
+#line 1013 "seclang-scanner.ll"
 { return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 393:
 YY_RULE_SETUP
-#line 1009 "seclang-scanner.ll"
+#line 1014 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_REQUEST_COOKIES_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 394:
 YY_RULE_SETUP
-#line 1010 "seclang-scanner.ll"
+#line 1015 "seclang-scanner.ll"
 { return p::make_VARIABLE_MULTIPART_PART_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 395:
 YY_RULE_SETUP
-#line 1011 "seclang-scanner.ll"
+#line 1016 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_PART_HEADERS(*driver.loc.back()); }
 	YY_BREAK
 case 396:
 YY_RULE_SETUP
-#line 1012 "seclang-scanner.ll"
+#line 1017 "seclang-scanner.ll"
 { return p::make_VARIABLE_RULE(*driver.loc.back()); }
 	YY_BREAK
 case 397:
 YY_RULE_SETUP
-#line 1013 "seclang-scanner.ll"
+#line 1018 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_RULE(*driver.loc.back()); }
 	YY_BREAK
 case 398:
 YY_RULE_SETUP
-#line 1014 "seclang-scanner.ll"
+#line 1019 "seclang-scanner.ll"
 { return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 399:
 YY_RULE_SETUP
-#line 1015 "seclang-scanner.ll"
+#line 1020 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_FILES_TMP_NAMES(*driver.loc.back()); }
 	YY_BREAK
 case 400:
 YY_RULE_SETUP
-#line 1016 "seclang-scanner.ll"
+#line 1021 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_XML(*driver.loc.back()); }
 	YY_BREAK
 case 401:
 YY_RULE_SETUP
-#line 1017 "seclang-scanner.ll"
+#line 1022 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_RUN_TIME_VAR_XML(*driver.loc.back()); }
 	YY_BREAK
 case 402:
 YY_RULE_SETUP
-#line 1018 "seclang-scanner.ll"
+#line 1023 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_ENV(*driver.loc.back()); }
 	YY_BREAK
 case 403:
 YY_RULE_SETUP
-#line 1019 "seclang-scanner.ll"
+#line 1024 "seclang-scanner.ll"
 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_RUN_TIME_VAR_ENV(*driver.loc.back()); }
 	YY_BREAK
 case 404:
 YY_RULE_SETUP
-#line 1020 "seclang-scanner.ll"
+#line 1025 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_BLD(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 405:
 YY_RULE_SETUP
-#line 1021 "seclang-scanner.ll"
+#line 1026 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_DUR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 406:
 YY_RULE_SETUP
-#line 1022 "seclang-scanner.ll"
+#line 1027 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_HSV(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 407:
 YY_RULE_SETUP
-#line 1023 "seclang-scanner.ll"
+#line 1028 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_REMOTE_USER(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 408:
 YY_RULE_SETUP
-#line 1024 "seclang-scanner.ll"
+#line 1029 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_DAY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 409:
 YY_RULE_SETUP
-#line 1025 "seclang-scanner.ll"
+#line 1030 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_EPOCH(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 410:
 YY_RULE_SETUP
-#line 1026 "seclang-scanner.ll"
+#line 1031 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_HOUR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 411:
 YY_RULE_SETUP
-#line 1027 "seclang-scanner.ll"
+#line 1032 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_MIN(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 412:
 YY_RULE_SETUP
-#line 1028 "seclang-scanner.ll"
+#line 1033 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_MON(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 413:
 YY_RULE_SETUP
-#line 1029 "seclang-scanner.ll"
+#line 1034 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_SEC(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 414:
 YY_RULE_SETUP
-#line 1030 "seclang-scanner.ll"
+#line 1035 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_YEAR(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 415:
 YY_RULE_SETUP
-#line 1031 "seclang-scanner.ll"
+#line 1036 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 416:
 YY_RULE_SETUP
-#line 1032 "seclang-scanner.ll"
+#line 1037 "seclang-scanner.ll"
 { return p::make_RUN_TIME_VAR_TIME_WDAY(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 417:
 YY_RULE_SETUP
-#line 1035 "seclang-scanner.ll"
+#line 1040 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Variable VARIABLE_WEBSERVER_ERROR_LOG is not supported by libModSecurity", ""); throw p::syntax_error(*driver.loc.back(), "");}
 	YY_BREAK
 case 418:
 YY_RULE_SETUP
-#line 1036 "seclang-scanner.ll"
+#line 1041 "seclang-scanner.ll"
 { return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
 	YY_BREAK
 case 419:
 YY_RULE_SETUP
-#line 1037 "seclang-scanner.ll"
+#line 1042 "seclang-scanner.ll"
 { return p::make_VARIABLE_IP(*driver.loc.back()); }
 	YY_BREAK
 case 420:
 YY_RULE_SETUP
-#line 1038 "seclang-scanner.ll"
+#line 1043 "seclang-scanner.ll"
 { return p::make_VARIABLE_RESOURCE(*driver.loc.back()); }
 	YY_BREAK
 case 421:
 YY_RULE_SETUP
-#line 1039 "seclang-scanner.ll"
+#line 1044 "seclang-scanner.ll"
 { return p::make_VARIABLE_SESSION(*driver.loc.back()); }
 	YY_BREAK
 case 422:
 YY_RULE_SETUP
-#line 1040 "seclang-scanner.ll"
+#line 1045 "seclang-scanner.ll"
 { return p::make_VARIABLE_STATUS(*driver.loc.back()); }
 	YY_BREAK
 case 423:
 YY_RULE_SETUP
-#line 1041 "seclang-scanner.ll"
+#line 1046 "seclang-scanner.ll"
 { return p::make_VARIABLE_STATUS_LINE(*driver.loc.back()); }
 	YY_BREAK
 case 424:
 YY_RULE_SETUP
-#line 1042 "seclang-scanner.ll"
+#line 1047 "seclang-scanner.ll"
 { return p::make_VARIABLE_TX(*driver.loc.back()); }
 	YY_BREAK
 case 425:
 YY_RULE_SETUP
-#line 1043 "seclang-scanner.ll"
+#line 1048 "seclang-scanner.ll"
 { return p::make_VARIABLE_USER(*driver.loc.back()); }
 	YY_BREAK
 
 
 case 426:
 YY_RULE_SETUP
-#line 1047 "seclang-scanner.ll"
+#line 1052 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_GLOBAL(*driver.loc.back()); }
 	YY_BREAK
 case 427:
 YY_RULE_SETUP
-#line 1048 "seclang-scanner.ll"
+#line 1053 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_IP(*driver.loc.back()); }
 	YY_BREAK
 case 428:
 YY_RULE_SETUP
-#line 1049 "seclang-scanner.ll"
+#line 1054 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_RESOURCE(*driver.loc.back()); }
 	YY_BREAK
 case 429:
 YY_RULE_SETUP
-#line 1050 "seclang-scanner.ll"
+#line 1055 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_SESSION(*driver.loc.back()); }
 	YY_BREAK
 case 430:
 YY_RULE_SETUP
-#line 1051 "seclang-scanner.ll"
+#line 1056 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_TX(*driver.loc.back()); }
 	YY_BREAK
 case 431:
 YY_RULE_SETUP
-#line 1052 "seclang-scanner.ll"
+#line 1057 "seclang-scanner.ll"
 { BEGINX_(); return p::make_VARIABLE_USER(*driver.loc.back()); }
 	YY_BREAK
 
 
 case 432:
 YY_RULE_SETUP
-#line 1057 "seclang-scanner.ll"
+#line 1062 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_PLUS(*driver.loc.back()); }
 	YY_BREAK
 case 433:
 YY_RULE_SETUP
-#line 1058 "seclang-scanner.ll"
+#line 1063 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS_MINUS(*driver.loc.back()); }
 	YY_BREAK
 case 434:
 YY_RULE_SETUP
-#line 1059 "seclang-scanner.ll"
+#line 1064 "seclang-scanner.ll"
 { BEGIN_ACTION_WAITING_CONTENT(); return p::make_SETVAR_OPERATION_EQUALS(*driver.loc.back()); }
 	YY_BREAK
 case 435:
 /* rule 435 can match eol */
 YY_RULE_SETUP
-#line 1060 "seclang-scanner.ll"
+#line 1065 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 436:
 /* rule 436 can match eol */
 YY_RULE_SETUP
-#line 1061 "seclang-scanner.ll"
+#line 1066 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 437:
 /* rule 437 can match eol */
 YY_RULE_SETUP
-#line 1062 "seclang-scanner.ll"
+#line 1067 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 0); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 438:
 /* rule 438 can match eol */
 YY_RULE_SETUP
-#line 1063 "seclang-scanner.ll"
+#line 1068 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 439:
 /* rule 439 can match eol */
 YY_RULE_SETUP
-#line 1064 "seclang-scanner.ll"
+#line 1069 "seclang-scanner.ll"
 { yyless(yyleng - 1); BEGIN_PREVIOUS(); return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 440:
 /* rule 440 can match eol */
 YY_RULE_SETUP
-#line 1065 "seclang-scanner.ll"
+#line 1070 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 441:
 /* rule 441 can match eol */
 YY_RULE_SETUP
-#line 1067 "seclang-scanner.ll"
+#line 1072 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 442:
 /* rule 442 can match eol */
 YY_RULE_SETUP
-#line 1068 "seclang-scanner.ll"
+#line 1073 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 443:
 YY_RULE_SETUP
-#line 1069 "seclang-scanner.ll"
+#line 1074 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(0); }
 	YY_BREAK
 case 444:
 YY_RULE_SETUP
-#line 1070 "seclang-scanner.ll"
+#line 1075 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(0); }
 	YY_BREAK
 case 445:
 YY_RULE_SETUP
-#line 1071 "seclang-scanner.ll"
+#line 1076 "seclang-scanner.ll"
 { BEGINX(LEXING_ERROR_ACTION); yyless(0); }
 	YY_BREAK
 
@@ -7762,524 +7766,524 @@ YY_RULE_SETUP
 case 446:
 /* rule 446 can match eol */
 YY_RULE_SETUP
-#line 1076 "seclang-scanner.ll"
+#line 1081 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 447:
 /* rule 447 can match eol */
 YY_RULE_SETUP
-#line 1077 "seclang-scanner.ll"
+#line 1082 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 448:
 /* rule 448 can match eol */
 YY_RULE_SETUP
-#line 1078 "seclang-scanner.ll"
+#line 1083 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 449:
 /* rule 449 can match eol */
 YY_RULE_SETUP
-#line 1079 "seclang-scanner.ll"
+#line 1084 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 0); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 450:
 /* rule 450 can match eol */
 YY_RULE_SETUP
-#line 1080 "seclang-scanner.ll"
+#line 1085 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 451:
 /* rule 451 can match eol */
 YY_RULE_SETUP
-#line 1081 "seclang-scanner.ll"
+#line 1086 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); return p::make_DICT_ELEMENT(yytext, *driver.loc.back()); }
 	YY_BREAK
 case 452:
 /* rule 452 can match eol */
 YY_RULE_SETUP
-#line 1083 "seclang-scanner.ll"
+#line 1088 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 1, yyleng-2), *driver.loc.back()); }
 	YY_BREAK
 case 453:
 /* rule 453 can match eol */
 YY_RULE_SETUP
-#line 1084 "seclang-scanner.ll"
+#line 1089 "seclang-scanner.ll"
 { BEGIN_PREVIOUS(); yyless(yyleng - 1); return p::make_DICT_ELEMENT_REGEXP(std::string(yytext, 2, yyleng-4), *driver.loc.back()); }
 	YY_BREAK
 case 454:
 YY_RULE_SETUP
-#line 1086 "seclang-scanner.ll"
+#line 1091 "seclang-scanner.ll"
 { BEGINX(LEXING_ERROR_ACTION); yyless(0); }
 	YY_BREAK
 case 455:
 YY_RULE_SETUP
-#line 1087 "seclang-scanner.ll"
+#line 1092 "seclang-scanner.ll"
 { return p::make_QUOTATION_MARK(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
 case 456:
 YY_RULE_SETUP
-#line 1093 "seclang-scanner.ll"
+#line 1098 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 457:
 YY_RULE_SETUP
-#line 1094 "seclang-scanner.ll"
+#line 1099 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 458:
 YY_RULE_SETUP
-#line 1095 "seclang-scanner.ll"
+#line 1100 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
 	YY_BREAK
 case 459:
 YY_RULE_SETUP
-#line 1096 "seclang-scanner.ll"
+#line 1101 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
 	YY_BREAK
 case 460:
 YY_RULE_SETUP
-#line 1097 "seclang-scanner.ll"
+#line 1102 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 case 461:
 YY_RULE_SETUP
-#line 1098 "seclang-scanner.ll"
+#line 1103 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 
 
 case 462:
 YY_RULE_SETUP
-#line 1101 "seclang-scanner.ll"
+#line 1106 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_GEOLOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 463:
 YY_RULE_SETUP
-#line 1102 "seclang-scanner.ll"
+#line 1107 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_UNCONDITIONAL_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 464:
 YY_RULE_SETUP
-#line 1103 "seclang-scanner.ll"
+#line 1108 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_SQLI(*driver.loc.back()); }
 	YY_BREAK
 case 465:
 YY_RULE_SETUP
-#line 1104 "seclang-scanner.ll"
+#line 1109 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_DETECT_XSS(*driver.loc.back()); }
 	YY_BREAK
 case 466:
 YY_RULE_SETUP
-#line 1105 "seclang-scanner.ll"
+#line 1110 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_URL_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 case 467:
 YY_RULE_SETUP
-#line 1106 "seclang-scanner.ll"
+#line 1111 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_TO_ACTIONS); return p::make_OPERATOR_VALIDATE_UTF8_ENCODING(*driver.loc.back()); }
 	YY_BREAK
 
 
 case 468:
 YY_RULE_SETUP
-#line 1110 "seclang-scanner.ll"
+#line 1115 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_WITHIN(*driver.loc.back()); }
 	YY_BREAK
 case 469:
 YY_RULE_SETUP
-#line 1111 "seclang-scanner.ll"
+#line 1116 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS_WORD(*driver.loc.back()); }
 	YY_BREAK
 case 470:
 YY_RULE_SETUP
-#line 1112 "seclang-scanner.ll"
+#line 1117 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_CONTAINS(*driver.loc.back()); }
 	YY_BREAK
 case 471:
 YY_RULE_SETUP
-#line 1113 "seclang-scanner.ll"
+#line 1118 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_ENDS_WITH(*driver.loc.back()); }
 	YY_BREAK
 case 472:
 YY_RULE_SETUP
-#line 1114 "seclang-scanner.ll"
+#line 1119 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_EQ(*driver.loc.back()); }
 	YY_BREAK
 case 473:
 YY_RULE_SETUP
-#line 1115 "seclang-scanner.ll"
+#line 1120 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_GE(*driver.loc.back()); }
 	YY_BREAK
 case 474:
 YY_RULE_SETUP
-#line 1116 "seclang-scanner.ll"
+#line 1121 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_GT(*driver.loc.back()); }
 	YY_BREAK
 case 475:
 YY_RULE_SETUP
-#line 1117 "seclang-scanner.ll"
+#line 1122 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH_FROM_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 476:
 YY_RULE_SETUP
-#line 1118 "seclang-scanner.ll"
+#line 1123 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_IP_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 477:
 YY_RULE_SETUP
-#line 1119 "seclang-scanner.ll"
+#line 1124 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_LE(*driver.loc.back()); }
 	YY_BREAK
 case 478:
 YY_RULE_SETUP
-#line 1120 "seclang-scanner.ll"
+#line 1125 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_LT(*driver.loc.back()); }
 	YY_BREAK
 case 479:
 YY_RULE_SETUP
-#line 1121 "seclang-scanner.ll"
+#line 1126 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_PM_FROM_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 480:
 YY_RULE_SETUP
-#line 1122 "seclang-scanner.ll"
+#line 1127 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_PM(*driver.loc.back()); }
 	YY_BREAK
 case 481:
 YY_RULE_SETUP
-#line 1123 "seclang-scanner.ll"
+#line 1128 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_RBL( *driver.loc.back()); }
 	YY_BREAK
 case 482:
 YY_RULE_SETUP
-#line 1124 "seclang-scanner.ll"
+#line 1129 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_RX(*driver.loc.back()); }
 	YY_BREAK
 case 483:
 YY_RULE_SETUP
-#line 1125 "seclang-scanner.ll"
+#line 1130 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_RX_GLOBAL(*driver.loc.back()); }
 	YY_BREAK
 case 484:
 YY_RULE_SETUP
-#line 1126 "seclang-scanner.ll"
+#line 1131 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_EQ(*driver.loc.back()); }
 	YY_BREAK
 case 485:
 YY_RULE_SETUP
-#line 1127 "seclang-scanner.ll"
+#line 1132 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_STR_MATCH(*driver.loc.back()); }
 	YY_BREAK
 case 486:
 YY_RULE_SETUP
-#line 1128 "seclang-scanner.ll"
+#line 1133 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_BEGINS_WITH(*driver.loc.back()); }
 	YY_BREAK
 case 487:
 YY_RULE_SETUP
-#line 1129 "seclang-scanner.ll"
+#line 1134 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_INSPECT_FILE(*driver.loc.back()); }
 	YY_BREAK
 case 488:
 YY_RULE_SETUP
-#line 1130 "seclang-scanner.ll"
+#line 1135 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_FUZZY_HASH(*driver.loc.back()); }
 	YY_BREAK
 case 489:
 YY_RULE_SETUP
-#line 1131 "seclang-scanner.ll"
+#line 1136 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_BYTE_RANGE(*driver.loc.back()); }
 	YY_BREAK
 case 490:
 YY_RULE_SETUP
-#line 1132 "seclang-scanner.ll"
+#line 1137 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_DTD(*driver.loc.back()); }
 	YY_BREAK
 case 491:
 YY_RULE_SETUP
-#line 1133 "seclang-scanner.ll"
+#line 1138 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_HASH(*driver.loc.back()); }
 	YY_BREAK
 case 492:
 YY_RULE_SETUP
-#line 1134 "seclang-scanner.ll"
+#line 1139 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VALIDATE_SCHEMA(*driver.loc.back()); }
 	YY_BREAK
 case 493:
 YY_RULE_SETUP
-#line 1135 "seclang-scanner.ll"
+#line 1140 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CC(*driver.loc.back()); }
 	YY_BREAK
 case 494:
 YY_RULE_SETUP
-#line 1136 "seclang-scanner.ll"
+#line 1141 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_CPF(*driver.loc.back()); }
 	YY_BREAK
 case 495:
 YY_RULE_SETUP
-#line 1137 "seclang-scanner.ll"
+#line 1142 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SSN(*driver.loc.back()); }
 	YY_BREAK
 case 496:
 YY_RULE_SETUP
-#line 1138 "seclang-scanner.ll"
+#line 1143 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_VERIFY_SVNR(*driver.loc.back()); }
 	YY_BREAK
 case 497:
 YY_RULE_SETUP
-#line 1139 "seclang-scanner.ll"
+#line 1144 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_GSB_LOOKUP(*driver.loc.back()); }
 	YY_BREAK
 case 498:
 YY_RULE_SETUP
-#line 1140 "seclang-scanner.ll"
+#line 1145 "seclang-scanner.ll"
 { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
 	YY_BREAK
 case 499:
 YY_RULE_SETUP
-#line 1142 "seclang-scanner.ll"
+#line 1147 "seclang-scanner.ll"
 { return p::make_NOT(*driver.loc.back()); }
 	YY_BREAK
 case 500:
 YY_RULE_SETUP
-#line 1143 "seclang-scanner.ll"
+#line 1148 "seclang-scanner.ll"
 { BEGIN_NO_OP_INFORMED(); yyless(0); }
 	YY_BREAK
 
 
 case 501:
 YY_RULE_SETUP
-#line 1148 "seclang-scanner.ll"
+#line 1153 "seclang-scanner.ll"
 { BEGIN(EXPECTING_PARAMETER_ENDS_WITH_SPACE); }
 	YY_BREAK
 
 
 case 502:
 YY_RULE_SETUP
-#line 1152 "seclang-scanner.ll"
+#line 1157 "seclang-scanner.ll"
 { BEGIN(EXPECTING_PARAMETER_ENDS_WITH_QUOTE); }
 	YY_BREAK
 
 
 case 503:
 YY_RULE_SETUP
-#line 1156 "seclang-scanner.ll"
+#line 1161 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
 case 504:
 /* rule 504 can match eol */
-YY_RULE_SETUP
-#line 1157 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-	YY_BREAK
-
-
-case 505:
-YY_RULE_SETUP
-#line 1161 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
-case 506:
-/* rule 506 can match eol */
 YY_RULE_SETUP
 #line 1162 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
+case 505:
+YY_RULE_SETUP
+#line 1166 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
+	YY_BREAK
+case 506:
+/* rule 506 can match eol */
+YY_RULE_SETUP
+#line 1167 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
 case 507:
 YY_RULE_SETUP
-#line 1165 "seclang-scanner.ll"
+#line 1170 "seclang-scanner.ll"
 { BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
 	YY_BREAK
 case 508:
 YY_RULE_SETUP
-#line 1166 "seclang-scanner.ll"
+#line 1171 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 
 
 case 509:
 YY_RULE_SETUP
-#line 1170 "seclang-scanner.ll"
+#line 1175 "seclang-scanner.ll"
 { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
 case 510:
 /* rule 510 can match eol */
-YY_RULE_SETUP
-#line 1171 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-	YY_BREAK
-
-
-case 511:
-YY_RULE_SETUP
-#line 1175 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
-case 512:
-/* rule 512 can match eol */
 YY_RULE_SETUP
 #line 1176 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 513:
+case 511:
 YY_RULE_SETUP
 #line 1180 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
+	YY_BREAK
+case 512:
+/* rule 512 can match eol */
+YY_RULE_SETUP
+#line 1181 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
+case 513:
+YY_RULE_SETUP
+#line 1185 "seclang-scanner.ll"
 { BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
 	YY_BREAK
 case 514:
 YY_RULE_SETUP
-#line 1181 "seclang-scanner.ll"
+#line 1186 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 	YY_BREAK
 
 
 case 515:
 YY_RULE_SETUP
-#line 1186 "seclang-scanner.ll"
+#line 1191 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 516:
 /* rule 516 can match eol */
 YY_RULE_SETUP
-#line 1188 "seclang-scanner.ll"
+#line 1193 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 517:
 /* rule 517 can match eol */
 YY_RULE_SETUP
-#line 1189 "seclang-scanner.ll"
+#line 1194 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 518:
 /* rule 518 can match eol */
 YY_RULE_SETUP
-#line 1190 "seclang-scanner.ll"
+#line 1195 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 519:
 /* rule 519 can match eol */
 YY_RULE_SETUP
-#line 1191 "seclang-scanner.ll"
+#line 1196 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 520:
 /* rule 520 can match eol */
 YY_RULE_SETUP
-#line 1193 "seclang-scanner.ll"
+#line 1198 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 521:
 /* rule 521 can match eol */
 YY_RULE_SETUP
-#line 1194 "seclang-scanner.ll"
+#line 1199 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 522:
 /* rule 522 can match eol */
 YY_RULE_SETUP
-#line 1195 "seclang-scanner.ll"
+#line 1200 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 523:
 /* rule 523 can match eol */
 YY_RULE_SETUP
-#line 1196 "seclang-scanner.ll"
+#line 1201 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 524:
 /* rule 524 can match eol */
 YY_RULE_SETUP
-#line 1198 "seclang-scanner.ll"
+#line 1203 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 525:
 /* rule 525 can match eol */
 YY_RULE_SETUP
-#line 1199 "seclang-scanner.ll"
+#line 1204 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 526:
 /* rule 526 can match eol */
 YY_RULE_SETUP
-#line 1200 "seclang-scanner.ll"
+#line 1205 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 527:
 /* rule 527 can match eol */
 YY_RULE_SETUP
-#line 1201 "seclang-scanner.ll"
+#line 1206 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 528:
 YY_RULE_SETUP
-#line 1203 "seclang-scanner.ll"
+#line 1208 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 529:
 /* rule 529 can match eol */
 YY_RULE_SETUP
-#line 1205 "seclang-scanner.ll"
+#line 1210 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 530:
 /* rule 530 can match eol */
 YY_RULE_SETUP
-#line 1206 "seclang-scanner.ll"
+#line 1211 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 531:
 /* rule 531 can match eol */
 YY_RULE_SETUP
-#line 1208 "seclang-scanner.ll"
+#line 1213 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 532:
 /* rule 532 can match eol */
 YY_RULE_SETUP
-#line 1209 "seclang-scanner.ll"
+#line 1214 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 533:
 /* rule 533 can match eol */
 YY_RULE_SETUP
-#line 1210 "seclang-scanner.ll"
+#line 1215 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 534:
 /* rule 534 can match eol */
 YY_RULE_SETUP
-#line 1211 "seclang-scanner.ll"
+#line 1216 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 535:
 YY_RULE_SETUP
-#line 1213 "seclang-scanner.ll"
+#line 1218 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 
 
 case 536:
 YY_RULE_SETUP
-#line 1218 "seclang-scanner.ll"
+#line 1223 "seclang-scanner.ll"
 {  }
 	YY_BREAK
 case 537:
 /* rule 537 can match eol */
 YY_RULE_SETUP
-#line 1219 "seclang-scanner.ll"
+#line 1224 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 538:
 /* rule 538 can match eol */
 YY_RULE_SETUP
-#line 1220 "seclang-scanner.ll"
+#line 1225 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
@@ -8287,40 +8291,40 @@ YY_RULE_SETUP
 case 539:
 /* rule 539 can match eol */
 YY_RULE_SETUP
-#line 1224 "seclang-scanner.ll"
+#line 1229 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 540:
 /* rule 540 can match eol */
 YY_RULE_SETUP
-#line 1225 "seclang-scanner.ll"
+#line 1230 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 case 541:
 /* rule 541 can match eol */
 YY_RULE_SETUP
-#line 1226 "seclang-scanner.ll"
+#line 1231 "seclang-scanner.ll"
 { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
 case 542:
 YY_RULE_SETUP
-#line 1231 "seclang-scanner.ll"
+#line 1236 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 case 543:
 YY_RULE_SETUP
-#line 1233 "seclang-scanner.ll"
+#line 1238 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case 544:
 YY_RULE_SETUP
-#line 1234 "seclang-scanner.ll"
+#line 1239 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Expecting an action, got: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case 545:
 YY_RULE_SETUP
-#line 1235 "seclang-scanner.ll"
+#line 1240 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Expecting a variable, got:  : ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -8359,7 +8363,7 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_COLLECTION_ELEM):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_OPERATION):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
-#line 1238 "seclang-scanner.ll"
+#line 1243 "seclang-scanner.ll"
 {
     if (yyin) {
         fclose(yyin);
@@ -8377,7 +8381,7 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
 	YY_BREAK
 case 546:
 YY_RULE_SETUP
-#line 1254 "seclang-scanner.ll"
+#line 1259 "seclang-scanner.ll"
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
@@ -8409,7 +8413,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 547:
 YY_RULE_SETUP
-#line 1283 "seclang-scanner.ll"
+#line 1288 "seclang-scanner.ll"
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
@@ -8443,7 +8447,7 @@ YY_RULE_SETUP
 case 548:
 /* rule 548 can match eol */
 YY_RULE_SETUP
-#line 1313 "seclang-scanner.ll"
+#line 1318 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -8482,10 +8486,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 549:
 YY_RULE_SETUP
-#line 1350 "seclang-scanner.ll"
+#line 1355 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8488 "seclang-scanner.cc"
+#line 8493 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -8687,7 +8691,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -8701,7 +8705,7 @@ static int yy_get_next_buffer (void)
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -8759,7 +8763,7 @@ static int yy_get_next_buffer (void)
 
 	if (((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc(
 			(void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t) new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
@@ -8880,7 +8884,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (int) ((yy_c_buf_p) - (yytext_ptr));
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -9323,12 +9327,12 @@ YY_BUFFER_STATE yy_scan_string (const char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	yy_size_t i;
+	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = (yy_size_t) (_yybytes_len + 2);
@@ -9375,7 +9379,7 @@ static void yynoreturn yy_fatal_error (const char* msg )
 	do \
 		{ \
 		/* Undo effects of setting up yytext. */ \
-        yy_size_t yyless_macro_arg = (n); \
+        int yyless_macro_arg = (n); \
         YY_LESS_LINENO(yyless_macro_arg);\
 		yytext[yyleng] = (yy_hold_char); \
 		(yy_c_buf_p) = yytext + yyless_macro_arg; \
@@ -9419,7 +9423,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-yy_size_t yyget_leng  (void)
+int yyget_leng  (void)
 {
         return yyleng;
 }
@@ -9590,7 +9594,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1350 "seclang-scanner.ll"
+#line 1355 "seclang-scanner.ll"
 
 
 namespace modsecurity {

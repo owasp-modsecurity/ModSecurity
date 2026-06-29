@@ -1441,6 +1441,7 @@ int Transaction::processLogging() {
 bool Transaction::intervention(ModSecurityIntervention *it) {
     const auto disruptive = m_it.disruptive;
     if (m_it.disruptive) {
+        m_isInterrupted = true;
         if (m_it.url) {
             it->url = strdup(m_it.url);
         } else {
@@ -1669,6 +1670,10 @@ std::string Transaction::toJSON(int parts) {
     LOGFY_ADD("host_ip", m_serverIpAddress);
     LOGFY_ADD_NUM("host_port", m_serverPort);
     LOGFY_ADD("unique_id", m_id);
+
+    yajl_gen_string(g, reinterpret_cast<const unsigned char*>("is_interrupted"),
+        strlen("is_interrupted"));
+    yajl_gen_bool(g, m_isInterrupted);
 
     /* request */
     yajl_gen_string(g, reinterpret_cast<const unsigned char*>("request"),
@@ -2397,6 +2402,61 @@ int Transaction::setRequestHostName(const std::string& hostname) {
 extern "C" int msc_set_request_hostname(Transaction *transaction,
     const unsigned char *hostname) {
     return transaction->setRequestHostName(reinterpret_cast<const char *>(hostname));
+}
+
+
+/**
+ * @name    msc_get_rules_messages_size
+ * @brief   Retrieve the number of RuleMessage records on a transaction.
+ *
+ * Returns the size of Transaction::m_rulesMessages: the number of
+ * RuleMessage records that were selected to be logged on the
+ * transaction. This is not necessarily the total number of rules that
+ * matched!
+ *
+ * @param transaction ModSecurity transaction.
+ *
+ * @returns The number of RuleMessage records on the transaction.
+ *
+ */
+extern "C" size_t msc_get_rules_messages_size(const Transaction *transaction) {
+    return transaction->m_rulesMessages.size();
+}
+
+
+/**
+ * @name    msc_get_rules_messages_rule_ids
+ * @brief   Copy the rule ids from Transaction::m_rulesMessages into a buffer.
+ *
+ * Copies the rule id of each RuleMessage into the caller-provided buffer.
+ * Only rule messages that were selected to be logged are included.
+ *
+ * The caller is expected to size the buffer using
+ * msc_get_rules_messages_size. If @p ids_len is smaller than the number
+ * of available records, only the first @p ids_len ids are written and
+ * the remaining records are skipped.
+ *
+ * @param transaction ModSecurity transaction.
+ * @param ids         Caller-provided buffer to receive the rule ids.
+ *                    May be NULL only if @p ids_len is 0.
+ * @param ids_len     Capacity of @p ids, in number of int64_t slots.
+ *
+ * @returns The number of rule ids written into @p ids.
+ *
+ */
+extern "C" size_t msc_get_rules_messages_rule_ids(const Transaction *transaction,
+    int64_t *ids, size_t ids_len) {
+    if (ids == nullptr || ids_len == 0) {
+        return 0;
+    }
+    size_t written = 0;
+    for (const auto &msg : transaction->m_rulesMessages) {
+        if (written >= ids_len) {
+            break;
+        }
+        ids[written++] = msg.m_rule.m_ruleId;
+    }
+    return written;
 }
 
 

@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifndef __cplusplus
 typedef struct ModSecurity_t ModSecurity;
@@ -404,7 +405,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     size_t getRequestBodyLength();
 
 #ifndef NO_LOGS
-    void debug(int, const std::string &) const;
+    void debug(int level, const std::string& message) const;
 #endif
     void serverLog(const RuleMessage &rm);
 
@@ -594,6 +595,14 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     ModSecurityIntervention m_it;
 
     /**
+     * Sticky flag: set to true the first time the connector consumes a
+     * disruptive intervention via Transaction::intervention(). Unlike
+     * m_it.disruptive, this is NOT cleared by intervention::reset(), so
+     * it remains a reliable signal at audit-log time.
+     */
+    bool m_isInterrupted = false;
+
+    /**
      * Holds the creation time stamp, using std::time.
      *
      * TODO: m_timeStamp and m_creationTimeStamp may be merged into a single
@@ -756,6 +765,13 @@ int msc_update_status_code(Transaction *transaction, int status);
 
 /** @ingroup ModSecurity_C_API */
 int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
+
+/** @ingroup ModSecurity_C_API */
+size_t msc_get_rules_messages_size(const Transaction *transaction);
+
+/** @ingroup ModSecurity_C_API */
+size_t msc_get_rules_messages_rule_ids(const Transaction *transaction,
+    int64_t *ids, size_t ids_len);
 
 #ifdef __cplusplus
 }
