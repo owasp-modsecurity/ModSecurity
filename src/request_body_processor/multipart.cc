@@ -670,7 +670,7 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
         if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
             m_flag_reqbody_no_files_limit_exceeded = 1;
             ms_dbg_a(m_transaction, 9,
-                "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#2, no_files_len+len-" +
+                "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#2, no_files_len+len=" +
                 std::to_string(m_reqbody_no_files_length + len) + ", limit=" + std::to_string(m_reqbody_no_files_limit));
             if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
                 len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
