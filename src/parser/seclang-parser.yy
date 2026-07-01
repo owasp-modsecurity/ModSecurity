@@ -2588,7 +2588,6 @@ var:
     | RUN_TIME_VAR_DUR
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new Duration(name));
         $$ = std::move(c);
       }
@@ -2596,84 +2595,72 @@ var:
     | RUN_TIME_VAR_BLD
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new ModsecBuild(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_HSV
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new HighestSeverity(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_REMOTE_USER
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new RemoteUser(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new Time(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_DAY
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeDay(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_EPOCH
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeEpoch(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_HOUR
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeHour(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_MIN
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMin(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_MON
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeMon(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_SEC
       {
         std::string name($1);
-        char z = name.at(0);
             std::unique_ptr<Variable> c(new TimeSec(name));
             $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_WDAY
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeWDay(name));
         $$ = std::move(c);
       }
     | RUN_TIME_VAR_TIME_YEAR
       {
         std::string name($1);
-        char z = name.at(0);
         std::unique_ptr<Variable> c(new TimeYear(name));
         $$ = std::move(c);
       }

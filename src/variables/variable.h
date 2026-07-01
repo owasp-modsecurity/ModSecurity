@@ -634,7 +634,7 @@ class Variable : public VariableMonkeyResolution {
 class VariableDictElement : public Variable {
  public:
     VariableDictElement(const std::string &name, const std::string &dict_element)
-        :  m_dictElement(dict_element), Variable(name + ":" + dict_element) { }
+        : Variable(name + ":" + dict_element), m_dictElement(dict_element) { }
 
     std::string m_dictElement;
 };
@@ -643,9 +643,9 @@ class VariableDictElement : public Variable {
 class VariableRegex : public Variable {
  public:
     VariableRegex(const std::string &name, const std::string &regex)
-        :  m_r(regex, true),
-        m_regex(regex),
-        Variable(name + ":" + "regex(" + regex + ")") { }
+        : Variable(name + ":" + "regex(" + regex + ")"),
+        m_r(regex, true),
+        m_regex(regex) { }
 
     Utils::Regex m_r;
     // FIXME: no need for that.
