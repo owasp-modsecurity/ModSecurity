@@ -280,6 +280,8 @@ struct modsec_rec {
 
     apr_size_t           reqbody_length;
     unsigned int         reqbody_partial_processing_enabled;
+    unsigned int         reqbody_length_limit_exceeded;
+    unsigned int         reqbody_no_files_length_limit_exceeded;
 
     apr_bucket_brigade  *of_brigade;
     unsigned int         of_status;
@@ -736,8 +738,6 @@ apr_status_t DSOLOCAL modsecurity_request_body_start(modsec_rec *msr, char **err
 
 apr_status_t DSOLOCAL modsecurity_request_body_store(modsec_rec *msr,
     const char *data, apr_size_t length, char **error_msg);
-
-void DSOLOCAL modsecurity_request_body_enable_partial_processing(modsec_rec *msr);
 
 apr_status_t DSOLOCAL modsecurity_request_body_end(modsec_rec *msr, char **error_msg);
 

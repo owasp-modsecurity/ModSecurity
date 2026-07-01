@@ -19,10 +19,11 @@
 #include "msc_multipart.h"
 #include "msc_util.h"
 #include "msc_parsers.h"
-#include "dbg_print_bytes.h"
+#include "msc_reqbody.h"
 
 #define CONTENT_TYPE_MAX_LENGTH 1024
 
+#include "dbg_print_bytes.h"
 #define DEBUG_BYTES_BUF_LEN 256
 #define DEBUG_BYTES_OMIT_MARKER "...(snip)..."
 
@@ -257,23 +258,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     return 1;
 }
 
-/* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-static void modsecurity_request_body_enable_partial_processing_for_no_files_length(modsec_rec *msr,
-    int *length)
-{
-    /* Enable partial processing if no_files_len exceeds limit and action is ProcessPartial */
-    if (   (msr->msc_reqbody_no_files_length > (unsigned long)msr->txcfg->reqbody_no_files_limit)
-        && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL))
-    {
-        *length -= msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit;
-        if (msr->txcfg->debuglog_level >= 9) {
-            msr_log(msr, 9, "MULTIPART: length shortened by %" APR_SIZE_T_FMT " bytes because of no_files_len limit.",
-                    msr->msc_reqbody_no_files_length - (unsigned long)msr->txcfg->reqbody_no_files_limit);
-        }
-        modsecurity_request_body_enable_partial_processing(msr);
-    }
-}
-
 /**
  *
  */
@@ -295,12 +279,11 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     }
 
     /* The buffer is data so increase the data length counter. */
-    dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf,
-        MULTIPART_BUF_SIZE - msr->mpd->bufleft, DEBUG_BYTES_OMIT_MARKER);
+    len = modsecurity_request_body_may_enable_partial_processing_for_no_files_length(msr, len, "MULTIPART");
+    msr->msc_reqbody_no_files_length += len;
+    dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf, len, DEBUG_BYTES_OMIT_MARKER);
     msr_log(msr, 9, "[myDebug] Multipart: adding part_header, no_files_len=%lu, add_len=%d, buf=%s",
-        msr->msc_reqbody_no_files_length, (MULTIPART_BUF_SIZE - msr->mpd->bufleft), debug_buf);
-    msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
-    modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &msr->mpd->bufleft);
+        msr->msc_reqbody_no_files_length, len, debug_buf);
 
     if (len > 1) {
         if (msr->mpd->buf[len - 2] == '\r') {
@@ -498,7 +481,7 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
     assert(error_msg != NULL);
     char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
     char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
-    int bytes_reserved = 0;
+    int bytes_reserved = 0, len;
     char debug_buf[DEBUG_BYTES_BUF_LEN];
 
     *error_msg = NULL;
@@ -615,13 +598,12 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         value_part_t *value_part = apr_pcalloc(msr->mp, sizeof(value_part_t));
 
         /* The buffer contains data so increase the data length counter. */
-        dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf,
-            (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0], DEBUG_BYTES_OMIT_MARKER);
+        len = modsecurity_request_body_may_enable_partial_processing_for_no_files_length(msr,
+            (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0], "MULTIPART");
+        dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf, len, DEBUG_BYTES_OMIT_MARKER);
         msr_log(msr, 9, "[myDebug] Multipart: adding part_form_data, no_files_len=%lu, add_len=%d, buf=%s",
-            msr->msc_reqbody_no_files_length, (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0], debug_buf);
-        int len = (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
-        msr->msc_reqbody_no_files_length += (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0];
-        modsecurity_request_body_enable_partial_processing_for_no_files_length(msr, &msr->mpd->bufleft);
+            msr->msc_reqbody_no_files_length, len, debug_buf);
+        msr->msc_reqbody_no_files_length += len;
 
         /* add this part to the list of parts */
 
@@ -648,6 +630,8 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         if (msr->txcfg->debuglog_level >= 9) {
             msr_log(msr, 9, "Multipart: Added data to variable: %s",
                 log_escape_nq_ex(msr->mp, value_part->data, value_part->length));
+            dbg_print_bytes(debug_buf, sizeof(debug_buf), value_part->data, value_part->length, DEBUG_BYTES_OMIT_MARKER);
+            msr_log(msr, 9, "[myDebug] Multipart: Added data to variable: %s", debug_buf);
         }
     }
     else {

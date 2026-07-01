@@ -6,6 +6,7 @@ standalone_la_SOURCES = ../apache2/acmp.c \
     ../apache2/apache2_config.c \
     ../apache2/apache2_io.c \
     ../apache2/apache2_util.c \
+    ../apache2/dbg_print_bytes.c \
     ../apache2/others/libinjection/src/libinjection_html5.c \
     ../apache2/others/libinjection/src/libinjection_sqli.c \
     ../apache2/others/libinjection/src/libinjection_xss.c \
