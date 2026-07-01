@@ -190,13 +190,21 @@ def http_client(test_environment):
 
 @pytest.fixture(scope="function")
 def modsec_test(apache_server, log_matcher, response_matcher, http_client):
-    """Complete ModSecurity test environment"""
+    """Complete ModSecurity test environment (regression tests, needs Apache)"""
     return ModSecurityTestCase(
         apache_server=apache_server,
         log_matcher=log_matcher,
         response_matcher=response_matcher,
         http_client=http_client
     )
+
+
+@pytest.fixture(scope="function")
+def unit_test():
+    """Lightweight test environment for op/tfn unit tests. No Apache server
+    is started - only the msc_test binary is used, so this fixture is cheap
+    and has no dependency on apache_server/test_environment."""
+    return ModSecurityTestCase()
 
 
 def pytest_configure(config):
