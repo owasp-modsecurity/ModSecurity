@@ -17,199 +17,160 @@ class TestResult:
     message: str = ""
     response: Optional[requests.Response] = None
     log_matches: Dict[str, List[str]] = None
-    
+    skipped: bool = False
+
     def __post_init__(self):
         if self.log_matches is None:
             self.log_matches = {}
 
 
+def _split_negation(key: str) -> "tuple[bool, str]":
+    """Mirrors run-regression-tests.pl's `($neg,$name) = ($key =~ m/^(-?)(.*)$/)`."""
+    if key.startswith("-"):
+        return True, key[1:]
+    return False, key
+
+
+def _split_match_value(value) -> "tuple[Pattern[bytes], float]":
+    """match_response values are a bare compiled pattern; match_log/match_file
+    values are `[pattern, timeout]` (match_file's timeout is unused by the
+    Perl harness itself but harmless to honor the same way)."""
+    if isinstance(value, list):
+        pattern = value[0]
+        timeout = value[1] if len(value) > 1 else 0
+        return pattern, timeout
+    return value, 0
+
+
+def _force_multiline(pattern: Pattern[bytes]) -> Pattern[bytes]:
+    """match_log()/match_file() in Perl always match with an extra `/m` on
+    top of whatever flags the qr// itself carries."""
+    if pattern.flags & re.MULTILINE:
+        return pattern
+    return re.compile(pattern.pattern, pattern.flags | re.MULTILINE)
+
+
+POOL_DEBUG_RE = re.compile(rb"POOL DEBUG:[^\n]+PALLOC[^\n]+\n")
+BUFSIZ = 32768
+
+
+class _PersistentLog:
+    """Ports match_log()/httpd_reset_fd() from run-regression-tests.pl: an
+    accumulating buffer read from a fixed position in a growing log file
+    (Apache appends to it while running), reset once per test."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        self._position = 0
+        self.buf = b""
+
+    def reset(self):
+        self.path.touch(exist_ok=True)
+        self._position = self.path.stat().st_size
+        self.buf = b""
+
+    def wait_for(self, pattern: Pattern[bytes], timeout: float = 0) -> Optional[bytes]:
+        """Poll for `pattern` in the accumulated buffer for up to `timeout`
+        seconds, growing the buffer from the file as new data appears.
+        Always tries at least once, matching the Perl do{}while loop."""
+        deadline = time.monotonic() + timeout
+        while True:
+            try:
+                with open(self.path, "rb") as f:
+                    f.seek(self._position)
+                    chunk = f.read(BUFSIZ)
+            except FileNotFoundError:
+                # match_file targets (e.g. an uploaded file) may not exist
+                # yet; keep polling until the deadline like any other miss.
+                chunk = b""
+            if chunk:
+                self._position += len(chunk)
+                self.buf += chunk
+                self.buf = POOL_DEBUG_RE.sub(b"", self.buf)
+
+            match = pattern.search(self.buf)
+            if match:
+                return match.group(0)
+
+            if time.monotonic() >= deadline:
+                return None
+            if len(chunk) < BUFSIZ:
+                time.sleep(0.1)
+
+
 class LogMatcher:
-    """Handles matching patterns in log files"""
-    
+    """Handles matching patterns in log files. Mirrors match_log()'s real
+    semantics: a persistent accumulating buffer per log, and a *timeout in
+    seconds* to wait for a pattern (not an occurrence count)."""
+
     def __init__(self, error_log: Path, debug_log: Path, audit_log: Path):
         self.log_files = {
             'error': error_log,
-            'debug': debug_log, 
-            'audit': audit_log
+            'debug': debug_log,
+            'audit': audit_log,
         }
-        self._last_positions = {name: 0 for name in self.log_files.keys()}
+        self._logs: Dict[str, _PersistentLog] = {
+            name: _PersistentLog(path) for name, path in self.log_files.items()
+        }
     
     def reset_positions(self):
-        """Reset file read positions to current end"""
-        for log_name, log_file in self.log_files.items():
-            if log_file.exists():
-                try:
-                    with open(log_file, 'r') as f:
-                        f.seek(0, 2)  # Seek to end
-                        self._last_positions[log_name] = f.tell()
-                except Exception:
-                    self._last_positions[log_name] = 0
-            else:
-                self._last_positions[log_name] = 0
-    
-    def wait_for_pattern(self, log_name: str, pattern: Union[str, Pattern], 
-                        timeout: int = 10) -> Optional[str]:
-        """Wait for a pattern to appear in the specified log file"""
-        if isinstance(pattern, str):
-            regex = re.compile(pattern)
-        else:
-            regex = pattern
-        
-        log_file = self.log_files.get(log_name)
-        if not log_file:
-            return None
-        
-        start_time = time.time()
-        last_position = self._last_positions.get(log_name, 0)
-        
-        while time.time() - start_time < timeout:
-            if log_file.exists():
-                try:
-                    with open(log_file, 'r') as f:
-                        f.seek(last_position)
-                        new_content = f.read()
-                        last_position = f.tell()
-                        self._last_positions[log_name] = last_position
-                        
-                        for line in new_content.split('\n'):
-                            match = regex.search(line)
-                            if match:
-                                return match.group()
-                except Exception:
-                    pass
-            
-            time.sleep(0.1)
-        
-        return None
-    
-    def check_patterns(self, patterns: Dict[str, List]) -> Dict[str, List[str]]:
-        """Check multiple patterns across different log files
-        
-        Args:
-            patterns: Dict with log names as keys and list of [pattern, count] as values
-            
-        Returns:
-            Dict with log names as keys and list of matches as values
-        """
-        results = {}
-        
-        for log_name, pattern_list in patterns.items():
-            results[log_name] = []
-            
-            for pattern_info in pattern_list:
-                if isinstance(pattern_info, list) and len(pattern_info) >= 1:
-                    pattern = pattern_info[0]
-                    expected_count = pattern_info[1] if len(pattern_info) > 1 else 1
-                else:
-                    pattern = pattern_info
-                    expected_count = 1
-                
-                matches = []
-                for _ in range(expected_count):
-                    match = self.wait_for_pattern(log_name, pattern)
-                    if match:
-                        matches.append(match)
-                    else:
-                        break
-                
-                results[log_name].extend(matches)
-        
-        return results
-    
-    def get_log_content(self, log_name: str, from_position: bool = True) -> str:
-        """Get content from log file"""
-        log_file = self.log_files.get(log_name)
-        if not log_file or not log_file.exists():
-            return ""
-        
-        try:
-            with open(log_file, 'r') as f:
-                if from_position:
-                    f.seek(self._last_positions.get(log_name, 0))
-                return f.read()
-        except Exception:
-            return ""
+        """Reset every log's read position to its current end - called once
+        per test, right before starting Apache (matches httpd_reset_fd())."""
+        for log in self._logs.values():
+            log.reset()
+
+    def get_reader(self, log_name: str, from_start: bool = False) -> "_PersistentLog":
+        """Returns the persistent reader for a well-known log (error/debug/
+        audit; positioned at end-of-file by reset_positions()), or lazily
+        creates one for an arbitrary file (match_file; read from the start,
+        like match_file()'s own O_RDONLY-from-position-0 open in Perl)."""
+        if log_name in self._logs:
+            return self._logs[log_name]
+        reader = _PersistentLog(Path(log_name))
+        if not from_start:
+            reader.reset()
+        self._logs[log_name] = reader
+        return reader
+
+    def wait_for_pattern(self, log_name: str, pattern: Pattern[bytes],
+                        timeout: float = 0, from_start: bool = False) -> Optional[bytes]:
+        """Wait up to `timeout` seconds for `pattern` (already compiled with
+        the right flags, including MULTILINE where the Perl harness forces
+        it - see _force_multiline()) to appear in the named log/file."""
+        reader = self.get_reader(log_name, from_start=from_start)
+        return reader.wait_for(pattern, timeout=timeout)
 
 
 class ResponseMatcher:
-    """Handles matching patterns in HTTP responses"""
-    
-    @staticmethod
-    def match_status(response: requests.Response, pattern: Union[str, Pattern]) -> bool:
-        """Match response status code against pattern"""
-        if isinstance(pattern, str):
-            regex = re.compile(pattern)
-        else:
-            regex = pattern
-        
-        return bool(regex.search(str(response.status_code)))
-    
-    @staticmethod
-    def match_content(response: requests.Response, pattern: Union[str, Pattern]) -> bool:
-        """Match response content against pattern"""
-        if isinstance(pattern, str):
-            regex = re.compile(pattern, re.MULTILINE)
-        else:
-            regex = pattern
-        
-        return bool(regex.search(response.text))
-    
-    @staticmethod 
-    def match_headers(response: requests.Response, header_name: str, 
-                     pattern: Union[str, Pattern]) -> bool:
-        """Match response header against pattern"""
-        if isinstance(pattern, str):
-            regex = re.compile(pattern)
-        else:
-            regex = pattern
-        
-        header_value = response.headers.get(header_name, "")
-        return bool(regex.search(header_value))
-    
-    @staticmethod
-    def match_raw(response: requests.Response, pattern: Union[str, Pattern]) -> bool:
-        """Match full response (headers + content) against pattern"""
-        if isinstance(pattern, str):
-            regex = re.compile(pattern, re.MULTILINE)
-        else:
-            regex = pattern
-        
-        # Reconstruct raw response
-        raw_response = f"HTTP/{response.raw.version // 10}.{response.raw.version % 10} {response.status_code} {response.reason}\n"
-        for name, value in response.headers.items():
-            raw_response += f"{name}: {value}\n"
-        raw_response += f"\n{response.text}"
-        
-        return bool(regex.search(raw_response))
-    
-    def check_response(self, response: requests.Response, 
-                      match_criteria: Dict[str, Any]) -> Dict[str, bool]:
-        """Check response against multiple criteria
-        
-        Args:
-            response: HTTP response object
-            match_criteria: Dict with criteria types as keys and patterns as values
-            
-        Returns:
-            Dict with criteria types as keys and match results as values
-        """
-        results = {}
-        
-        for criteria_type, pattern in match_criteria.items():
-            if criteria_type == "status":
-                results[criteria_type] = self.match_status(response, pattern)
-            elif criteria_type == "content":
-                results[criteria_type] = self.match_content(response, pattern)
-            elif criteria_type == "raw":
-                results[criteria_type] = self.match_raw(response, pattern)
-            elif criteria_type.startswith("header_"):
-                header_name = criteria_type[7:]  # Remove "header_" prefix
-                results[criteria_type] = self.match_headers(response, header_name, pattern)
-            else:
-                results[criteria_type] = False
-        
-        return results
+    """Handles matching patterns in HTTP responses. Mirrors match_response()
+    in run-regression-tests.pl: only status/content/raw are real match
+    types - anything else (some upstream .t files reference match_response
+    keys the real harness doesn't recognize, relying on them always
+    "failing to match") always returns None, same as Perl's fallthrough."""
 
+    @staticmethod
+    def match(mtype: str, response: requests.Response, pattern: Pattern[bytes]) -> Optional[bytes]:
+        if mtype == "status":
+            m = pattern.search(str(response.status_code).encode())
+        elif mtype == "content":
+            m = pattern.search(response.content)
+        elif mtype == "raw":
+            m = pattern.search(ResponseMatcher._raw_response(response))
+        else:
+            return None
+        return m.group(0) if m else None
+
+    @staticmethod
+    def _raw_response(response: requests.Response) -> bytes:
+        """Matches HTTP::Response->as_string (LWP), which `match_response`'s
+        "raw" case uses in the real Perl harness: LF-only line endings, no
+        CRLF, unlike the actual wire format."""
+        raw = response.raw
+        version = getattr(raw, "version", 11)
+        lines = [f"HTTP/{version // 10}.{version % 10} {response.status_code} {response.reason}"]
+        lines += [f"{name}: {value}" for name, value in response.headers.items()]
+        header_text = "\n".join(lines).encode() + b"\n\n"
+        return header_text + response.content
 
 def _to_bytes(data: Union[str, bytes]) -> bytes:
     """Normalize test data to bytes. Hand-written tests pass plain `str` (real
@@ -320,94 +281,84 @@ class ModSecurityTestCase:
         self.http_client = http_client
         self.unit_runner = UnitTestRunner()
     
-    def run_regression_test(self, test_config: Dict[str, Any]) -> TestResult:
-        """Run a complete regression test"""
-        # Extract test configuration
-        test_type = test_config.get("type", "unknown")
-        comment = test_config.get("comment", "")
-        conf = test_config.get("conf", "")
-        request = test_config.get("request")
-        match_response = test_config.get("match_response", {})
-        match_log = test_config.get("match_log", {})
-        prerun = test_config.get("prerun")
-        
+    def run_regression_test(self, entry: Dict[str, Any]) -> TestResult:
+        """Run one regression-test entry (as produced by
+        regression_fixtures.load_fixture_file). Mirrors runfile() in
+        run-regression-tests.pl: start Apache with the per-test conf, make
+        the request, check match_response/match_log/match_file (each
+        respecting a leading "-" for negation), stop Apache."""
+        comment = entry.get("comment", "")
+
+        if entry.get("unsupported"):
+            return TestResult(
+                success=False,
+                skipped=True,
+                message=(
+                    f"'{entry['unsupported']}' is a Perl coderef this migration doesn't "
+                    "execute - needs manual follow-up (see dump_regression_fixtures.pl)"
+                ),
+            )
+
+        conf = entry.get("conf", "")
+        request = entry.get("request")
+
         try:
-            # Reset log positions
-            self.log_matcher.reset_positions()
-            
-            # Start Apache with test configuration
             if not self.apache_server.start(conf):
-                return TestResult(
-                    success=False,
-                    message="Failed to start Apache server"
-                )
-            
-            # Run prerun setup if provided
-            if prerun and callable(prerun):
-                prerun_result = prerun()
-                if prerun_result != 0:
-                    return TestResult(
-                        success=False,
-                        message=f"Prerun failed with code {prerun_result}"
-                    )
-            
-            # Make HTTP request if provided
+                return TestResult(success=False, message=f"Failed to start Apache for '{comment}'")
+
             response = None
             if request:
                 response = self._make_request(request)
-                if not response:
+                if response is None:
+                    return TestResult(success=False, message="Failed to make HTTP request")
+
+            for key, value in (entry.get("match_response") or {}).items():
+                negate, mtype = _split_negation(key)
+                pattern, _ = _split_match_value(value)
+                match = self.response_matcher.match(mtype, response, pattern) if response is not None else None
+                fail = (negate and match is not None) or (not negate and match is None)
+                if fail:
+                    verb = "matched (expected no match)" if negate else "failed to match"
                     return TestResult(
                         success=False,
-                        message="Failed to make HTTP request"
+                        message=f"response {mtype} {verb}: {pattern.pattern!r}",
+                        response=response,
                     )
-            
-            # Check response criteria
-            response_results = {}
-            if match_response and response:
-                response_results = self.response_matcher.check_response(
-                    response, match_response
-                )
-                
-                for criteria, result in response_results.items():
-                    if not result:
+
+            for key, value in (entry.get("match_log") or {}).items():
+                negate, log_name = _split_negation(key)
+                pattern, timeout = _split_match_value(value)
+                match = self.log_matcher.wait_for_pattern(log_name, _force_multiline(pattern), timeout=timeout)
+                fail = (negate and match is not None) or (not negate and match is None)
+                if fail:
+                    verb = "matched (expected no match)" if negate else "failed to match"
+                    return TestResult(
+                        success=False,
+                        message=f"{log_name} log {verb}: {pattern.pattern!r}",
+                        response=response,
+                    )
+
+            match_file = entry.get("match_file") or {}
+            if match_file:
+                time.sleep(1)  # matches runfile()'s own "make sure the file exists" delay
+                for key, value in match_file.items():
+                    negate, file_name = _split_negation(key)
+                    pattern, timeout = _split_match_value(value)
+                    match = self.log_matcher.wait_for_pattern(
+                        file_name, _force_multiline(pattern), timeout=timeout, from_start=True
+                    )
+                    fail = (negate and match is not None) or (not negate and match is None)
+                    if fail:
+                        verb = "matched (expected no match)" if negate else "failed to match"
                         return TestResult(
                             success=False,
-                            message=f"Response {criteria} match failed",
-                            response=response
-                        )
-            
-            # Check log criteria  
-            log_results = {}
-            if match_log:
-                log_results = self.log_matcher.check_patterns(match_log)
-                
-                for log_name, patterns in match_log.items():
-                    expected_matches = len(patterns)
-                    actual_matches = len(log_results.get(log_name, []))
-                    
-                    if actual_matches < expected_matches:
-                        return TestResult(
-                            success=False,
-                            message=f"Log {log_name} match failed: expected {expected_matches}, got {actual_matches}",
+                            message=f"file {file_name} {verb}: {pattern.pattern!r}",
                             response=response,
-                            log_matches=log_results
                         )
-            
-            return TestResult(
-                success=True,
-                message=f"Test '{comment}' passed",
-                response=response,
-                log_matches=log_results
-            )
-            
-        except Exception as e:
-            return TestResult(
-                success=False,
-                message=f"Test failed with exception: {e}"
-            )
-        
+
+            return TestResult(success=True, message=f"Test '{comment}' passed", response=response)
+
         finally:
-            # Always stop the server
             self.apache_server.stop()
     
     def run_unit_test(self, test_config: Dict[str, Any]) -> TestResult:
@@ -442,84 +393,83 @@ class ModSecurityTestCase:
                 message=f"Unknown test type: {test_type}"
             )
     
-    def _make_request(self, request_config) -> Optional[requests.Response]:
-        """Make HTTP request based on configuration"""
-        if isinstance(request_config, requests.Request):
-            # Direct Request object
-            return self.http_client.send(request_config)
-        elif callable(request_config):
-            # Function that returns request configuration
+    def _make_request(self, request: Dict[str, Any]) -> Optional[requests.Response]:
+        """Make an HTTP request from a fixture request dict (see
+        regression_fixtures._decode_request): either a fully-formed
+        HTTP::Request (method/uri/headers/content) or a raw byte string
+        (do_raw_request() in Perl - deliberately malformed/chunked requests
+        that must go over a raw socket instead of a conforming HTTP client)."""
+        if request["__type__"] == "http_request":
+            headers = {name: value for name, value in request["headers"]}
             try:
-                request_config = request_config()
-            except Exception:
+                return self.http_client.request(
+                    request["method"], request["uri"], headers=headers, data=request["content"],
+                )
+            except requests.exceptions.ConnectionError:
+                # The `drop` action closes the connection with no HTTP
+                # response at all. LWP::UserAgent (used by the real Perl
+                # harness) synthesizes a response with a 5xx status for this
+                # rather than raising, and .t files' match_response checks
+                # rely on that - do the same instead of losing the response
+                # entirely.
+                return self._synthetic_response(500)
+            except requests.RequestException:
                 return None
-        
-        # Handle dictionary configuration
-        if isinstance(request_config, dict):
-            method = request_config.get("method", "GET")
-            path = request_config.get("path", "/")
-            return self.http_client.make_request(method, path, **request_config)
-        
-        # Handle raw request string
-        if isinstance(request_config, str):
-            return self._make_raw_request(request_config)
-        
-        return None
-    
-    def _make_raw_request(self, raw_request: str) -> Optional[requests.Response]:
-        """Make raw HTTP request"""
-        try:
-            import socket
-            
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((self.apache_server.server_name, self.apache_server.port))
-            sock.send(raw_request.encode())
-            sock.shutdown(socket.SHUT_WR)
-            
-            response_data = b""
-            while True:
-                data = sock.recv(4096)
-                if not data:
-                    break
-                response_data += data
-            
-            sock.close()
-            
-            # Parse response
-            response_text = response_data.decode('utf-8', errors='ignore')
-            return self._parse_raw_response(response_text)
-            
-        except Exception:
-            return None
-    
-    def _parse_raw_response(self, response_text: str) -> requests.Response:
-        """Parse raw HTTP response into requests.Response object"""
-        # This is a simplified parser - in practice you might want to use
-        # a more robust HTTP parser
-        lines = response_text.split('\n')
-        
-        # Parse status line
-        status_line = lines[0]
-        status_code = int(status_line.split()[1])
-        
-        # Parse headers
-        headers = {}
-        content_start = 0
-        for i, line in enumerate(lines[1:], 1):
-            if line.strip() == "":
-                content_start = i + 1
-                break
-            if ":" in line:
-                name, value = line.split(":", 1)
-                headers[name.strip()] = value.strip()
-        
-        # Get content
-        content = '\n'.join(lines[content_start:])
-        
-        # Create mock response
+        elif request["__type__"] == "raw":
+            return self._make_raw_request(request["data"])
+        else:
+            raise ValueError(f"Unknown request type: {request['__type__']}")
+
+    @staticmethod
+    def _synthetic_response(status_code: int) -> requests.Response:
         response = requests.Response()
         response.status_code = status_code
-        response.headers.update(headers)
-        response._content = content.encode()
-        
+        response._content = b""
+        return response
+
+    def _make_raw_request(self, raw_request: bytes) -> Optional[requests.Response]:
+        """do_raw_request() in run-regression-tests.pl: write raw bytes
+        straight to the socket and parse whatever comes back, bypassing
+        `requests` entirely (it would "fix up" a malformed request)."""
+        import socket
+
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.connect((self.apache_server.server_name, self.apache_server.port))
+                sock.sendall(raw_request)
+                sock.shutdown(socket.SHUT_WR)
+
+                response_data = b""
+                while True:
+                    data = sock.recv(4096)
+                    if not data:
+                        break
+                    response_data += data
+        except OSError:
+            return None
+
+        return self._parse_raw_response(response_data)
+
+    def _parse_raw_response(self, response_data: bytes) -> Optional[requests.Response]:
+        """Parse a raw byte response into a requests.Response."""
+        if b"\r\n\r\n" in response_data:
+            head, _, body = response_data.partition(b"\r\n\r\n")
+        else:
+            head, body = response_data, b""
+
+        lines = head.split(b"\r\n")
+        if not lines or not lines[0]:
+            return None
+        status_parts = lines[0].split()
+        if len(status_parts) < 2:
+            return None
+        status_code = int(status_parts[1])
+
+        response = requests.Response()
+        response.status_code = status_code
+        for line in lines[1:]:
+            if b":" in line:
+                name, _, value = line.partition(b":")
+                response.headers[name.strip().decode()] = value.strip().decode()
+        response._content = body
         return response 
