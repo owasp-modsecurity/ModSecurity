@@ -57,9 +57,9 @@ DECLARE_HOOK(int,process_connection,(conn_rec *c)) // cppcheck-suppress funcArgN
 DECLARE_HOOK(int,post_read_request,(request_rec *r)) // cppcheck-suppress funcArgNamesDifferentUnnamed
 DECLARE_HOOK(int,fixups,(request_rec *r)) // cppcheck-suppress funcArgNamesDifferentUnnamed
 DECLARE_HOOK(void, error_log, (const char *file, int line, int level, // cppcheck-suppress funcArgNamesDifferentUnnamed
-                       apr_status_t status, const server_rec *s, // cppcheck-suppress funcArgNamesDifferentUnnamed
-                       const request_rec *r, apr_pool_t *pool, // cppcheck-suppress funcArgNamesDifferentUnnamed
-                       const char *errstr)) // cppcheck-suppress funcArgNamesDifferentUnnamed
+                       apr_status_t status, const server_rec *s,
+                       const request_rec *r, apr_pool_t *pool,
+                       const char *errstr))
 DECLARE_HOOK(int,log_transaction,(request_rec *r)) // cppcheck-suppress funcArgNamesDifferentUnnamed
 DECLARE_HOOK(void,insert_filter,(request_rec *r)) // cppcheck-suppress funcArgNamesDifferentUnnamed
 DECLARE_HOOK(void,insert_error_filter,(request_rec *r)) // cppcheck-suppress funcArgNamesDifferentUnnamed
