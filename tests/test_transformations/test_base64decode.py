@@ -1,5 +1,4 @@
 import pytest
-from ..modsec_test import TestResult
 
 
 @pytest.mark.unit

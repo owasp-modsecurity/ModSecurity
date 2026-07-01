@@ -1,15 +1,19 @@
 # ModSecurity Pytest Testing Framework
 
-Python/pytest front end for ModSecurity v2's test data. There are two independent suites:
+Python/pytest front end for ModSecurity v2's tests. There are two independent suites:
 
 - **Unit tests** (`test_operators/`, `test_transformations/`): exercise individual `@operator`s and
-  `t:transformation`s directly through the `msc_test` C binary. No Apache required.
+  `t:transformation`s directly through the `msc_test` C binary. No Apache required. These files are
+  plain, hand-maintained pytest parametrize tables - add or edit cases directly.
 - **Regression tests** (`test_regression/`): exercise full `SecRule`/config behavior against a real
-  Apache + `mod_security2.so`, driven by `conftest.py`'s `apache_server`/`modsec_test` fixtures.
+  Apache + `mod_security2.so`, driven by `conftest.py`'s `apache_server`/`modsec_test` fixtures. This
+  suite is still generated from Perl `.t` data (`tests/regression/*/*.t`) rather than hand-ported -
+  see "How the regression test data flows" below for why and how.
 
-Both suites are generated from the same Perl `.t` data files this project has always used
-(`tests/op/*.t`, `tests/tfn/*.t`, `tests/regression/*/*.t`) rather than being hand-ported line by
-line - see "How the test data flows" below for why and how.
+Unit tests were originally migrated the same way (`tests/op/*.t`/`tests/tfn/*.t` fed through a Perl
+dumper into generated `.py` files), but that data is flat literal strings with no ongoing need for
+a Perl round-trip, so the `.t` files, the dumper, and the converter script were retired once the
+`.py` files existed - the generated files are now the source of truth and are edited directly.
 
 ## Prerequisites
 
@@ -28,8 +32,8 @@ line - see "How the test data flows" below for why and how.
    cd tests
    pip install -r requirements.txt
    ```
-3. Regression tests also need Perl with `LWP::UserAgent` (`libwww-perl` on Debian/Ubuntu) - not at
-   test-run time, but to regenerate fixtures after editing a `.t` file (see below).
+3. Regenerating regression fixtures after editing a `regression/*/*.t` file also needs Perl with
+   `LWP::UserAgent` (`libwww-perl` on Debian/Ubuntu) - not needed just to run the tests.
 
 ## Directory structure
 
@@ -40,13 +44,13 @@ tests/
 ├── modsec_test.py                   # LogMatcher/ResponseMatcher/ModSecurityTestCase/UnitTestRunner
 ├── regression_fixtures.py           # Loads tests/regression/fixtures/*.json into Python objects
 │
-├── op/*.t, tfn/*.t                  # Source of truth for unit tests (Perl data, unchanged format)
-├── dump_unit_fixtures.pl            # Evals an op/tfn .t file, emits JSON (param/input/output base64)
-├── convert_perl_tests.py            # convert_perl_tests.py --unit-only regenerates the .py files below
-├── test_operators/                  # One file per op/*.t (mostly generated; test_beginswith.py is
-│   └── ...                          #   hand-written and excluded from regeneration - see below)
-├── test_transformations/            # One file per tfn/*.t (same deal; test_base64decode.py is hand-written)
+├── test_operators/                  # Hand-maintained pytest files, one per operator
 │   └── ...
+├── test_transformations/            # Hand-maintained pytest files, one per transformation
+│   └── ...
+├── op/pmFromFile-01.dat             # Runtime data file @pmFromFile's test reads - not test *code*,
+│                                     #   kept even though the op/*.t definitions that once lived
+│                                     #   alongside it are gone (see git history if you need them)
 │
 ├── regression/*/*.t                 # Source of truth for regression tests (Perl data, unchanged format)
 ├── dump_regression_fixtures.pl      # Evals a regression .t file the way run-regression-tests.pl does
@@ -84,37 +88,28 @@ pytest -n auto
 Markers: `unit`, `regression`, `apache` (needs Apache), `slow`. `pytest -m unit` / `pytest -m regression`
 work the same as passing the directory.
 
-## How the test data flows
+## Adding a unit test
 
-Both suites are generated from Perl, not hand-ported, because the `.t` files use real Perl syntax
-(`qr//` regexes with flags, `HTTP::Request->new(...)`, `$ENV{...}` interpolation, `\xHH` string
-escapes, occasional `conf => sub {...}` coderefs) that a text/regex-based Python parser cannot
-reliably reproduce - the first attempt at this (`convert_perl_tests.py`'s original Perl-parsing
-path, still present for reference) silently mis-escaped binary data and dropped every regression
-assertion. Instead, a small Perl script lets Perl itself evaluate the `.t` file (the same
-`@C = (...)` trick `run-unit-tests.pl`/`run-regression-tests.pl` use) and serializes the result to
-JSON, which Python then consumes as data - no Perl semantics need to be reimplemented in Python.
+`test_operators/`/`test_transformations/` are plain pytest files - add a new parametrize tuple (or
+a whole new `test_<name>.py`, following an existing file's pattern) directly. `param`/`input_data`/
+`expected_output` accept either a `str` (for real Unicode text) or a `bytes` literal (for exact
+byte sequences, including invalid UTF-8 or embedded NULs - see `test_transformations/test_base64decode.py`
+for an example of both). `unit_test.unit_runner.run_operator_test()`/`run_transformation_test()`
+drive the `msc_test` binary directly; see `modsec_test.py`'s `UnitTestRunner` for the exact contract
+(`msc_test.c`'s own `-t op|tfn -n <name> -p <param> -r <expected_ret>`, stdin = input).
 
-**Unit tests** (`dump_unit_fixtures.pl` + `convert_perl_tests.py --unit-only`): base64-decodes
-`param`/`input`/`output` into real Python `bytes` and emits one `test_<name>.py` per `.t` file with
-a `repr()`-generated parametrize table - readable, diffable, and correct for arbitrary/invalid byte
-sequences. Re-run after editing an `op/*.t` or `tfn/*.t` file:
+## How the regression test data flows
 
-```bash
-cd tests && python3 convert_perl_tests.py --unit-only
-```
-
-`test_operators/test_beginswith.py` and `test_transformations/test_base64decode.py` have hand-added
-edge-case coverage beyond their mechanical parametrize table and are skipped by `--unit-only`
-(there's a `hand_written` set in `convert_perl_tests.py` if you need to add another) - update those
-by hand instead of regenerating them.
-
-**Regression tests** (`dump_regression_fixtures.pl`): sets up the same `%ENV` as
-`run-regression-tests.pl`, evals the `.t` file, and serializes `qr//` → `{pattern, flags}`,
-`HTTP::Request` → `{method, uri, headers, content}`, `conf => sub {...}` coderefs (executed and
-captured), etc. `test_regression/test_fixtures.py` then discovers every `tests/regression/fixtures/*/*.json`
-file and parametrizes one pytest case per entry - there is no per-`.t`-file Python code to keep in
-sync. Re-run after editing a `regression/*/*.t` file:
+`tests/regression/*/*.t` files use real Perl syntax (`qr//` regexes with flags,
+`HTTP::Request->new(...)`, `$ENV{...}` interpolation, `\xHH` string escapes, occasional
+`conf => sub {...}` coderefs) that a text/regex-based Python parser cannot reliably reproduce.
+Instead, `dump_regression_fixtures.pl` sets up the same `%ENV` as `run-regression-tests.pl`, lets
+Perl itself evaluate the `.t` file (the same `@C = (...)` trick `run-regression-tests.pl` uses), and
+serializes the result to JSON: `qr//` → `{pattern, flags}`, `HTTP::Request` → `{method, uri, headers,
+content}`, `conf => sub {...}` coderefs (executed and captured), etc. - no Perl semantics need to be
+reimplemented in Python. `test_regression/test_fixtures.py` then discovers every
+`tests/regression/fixtures/*/*.json` file and parametrizes one pytest case per entry - there is no
+per-`.t`-file Python code to keep in sync. Re-run after editing a `regression/*/*.t` file:
 
 ```bash
 tests/regenerate_regression_fixtures.sh
