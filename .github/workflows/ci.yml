@@ -100,7 +100,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data python3 python3-venv
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -114,8 +114,14 @@ jobs:
         run: make -j `nproc`
       - name: install module
         run: sudo make install
-      - name: run tests
-        run: make test
+      - name: build msc_test
+        run: make -C tests msc_test
+      - name: install Python test dependencies
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -r tests/requirements.txt
+      - name: run op/tfn unit tests
+        run: .venv/bin/pytest tests/test_operators tests/test_transformations
 
   test-regression-linux:
     runs-on: ${{ matrix.os }}
@@ -130,7 +136,7 @@ jobs:
       - name: Setup Dependencies
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2
+          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2 python3 python3-venv
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -144,54 +150,13 @@ jobs:
         run: make -j `nproc`
       - name: install module
         run: sudo make install
-      - name: run regression tests
-        run: make test-regression
-
-  test-python-unit:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Setup Dependencies
-        run: |
-          sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev python3 python3-venv
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-      - name: autogen.sh
-        run: ./autogen.sh
-      - name: configure
-        run: ./configure --enable-assertions 'CFLAGS=-Werror=format-security'
-      - name: build msc_test
-        run: make -C tests msc_test
       - name: install Python test dependencies
         run: |
           python3 -m venv .venv
           .venv/bin/pip install -r tests/requirements.txt
-      - name: run op/tfn unit tests
-        run: .venv/bin/pytest tests/test_operators tests/test_transformations
-
-  test-python-regression:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Setup Dependencies
-        run: |
-          sudo apt-get update -y -qq
-          sudo apt-get install -y --no-install-recommends apache2-dev libxml2-dev liblua5.1-0-dev libcurl4-gnutls-dev libpcre2-dev libpcre3-dev libpcre3 pkg-config libyajl-dev apache2 apache2-bin apache2-data perl libwww-perl ssdeep libfuzzy-dev libfuzzy2 python3 python3-venv
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-      - name: autogen.sh
-        run: ./autogen.sh
-      - name: configure
-        run: ./configure --enable-assertions 'CFLAGS=-Werror=format-security'
-      - name: make
-        run: make -j `nproc`
-      - name: install Python test dependencies
-        run: |
-          python3 -m venv .venv
-          .venv/bin/pip install -r tests/requirements.txt
+      # dump_regression_fixtures.pl needs libwww-perl (installed above) to
+      # eval the .t files' HTTP::Request objects - fails loudly if the .t
+      # sources and the checked-in tests/regression/fixtures/*.json drift.
       - name: check regression fixtures are up to date
         run: |
           bash tests/regenerate_regression_fixtures.sh /tmp/fixtures-check
