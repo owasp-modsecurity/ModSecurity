@@ -27,6 +27,42 @@ constexpr int UNICODE_ERROR_INVALID_ENCODING     = -2;
 namespace modsecurity::actions::transformations {
 
 
+static inline bool writeUnicodeEscape(char *&data, char *unicode,
+    size_t unicode_size, unsigned int d) {
+    *data++ = '%';
+    *data++ = 'u';
+    const int written = std::snprintf(unicode, unicode_size, "%x", d);
+    if (written < 0 || static_cast<size_t>(written) >= unicode_size) {
+        return false;
+    }
+
+    const auto length = static_cast<size_t>(written);
+    switch (length) {
+        case 1:
+            *data++ = '0';
+            *data++ = '0';
+            *data++ = '0';
+            break;
+        case 2:
+            *data++ = '0';
+            *data++ = '0';
+            break;
+        case 3:
+            *data++ = '0';
+            break;
+        case 4:
+        case 5:
+            break;
+    }
+
+    for (size_t j = 0; j < length; j++) {
+        *data++ = unicode[j];
+    }
+
+    return true;
+}
+
+
 static inline bool encode(std::string &value) {
     auto input = reinterpret_cast<unsigned char*>(value.data());
     const auto input_len = value.length();
@@ -78,39 +114,11 @@ static inline bool encode(std::string &value) {
                 unicode_len = 2;
                 count += 6;
                 if (count <= len) {
-                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x1F) << 6) | (*(utf + 1) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    const int written = std::snprintf(unicode, sizeof(unicode),
-                        "%x", d);
-                    if (written < 0
-                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                    if (writeUnicodeEscape(data, unicode,
+                        sizeof(unicode), d) == false) {
                         return changed;
-                    }
-                    length = static_cast<size_t>(written);
-
-                    switch (length) {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (size_t j = 0; j < length; j++) {
-                        *data++ = unicode[j];
                     }
 
                     changed = true;
@@ -131,41 +139,13 @@ static inline bool encode(std::string &value) {
                 unicode_len = 3;
                 count+=6;
                 if (count <= len) {
-                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x0F) << 12)
                         | ((*(utf + 1) & 0x3F) << 6)
                         | (*(utf + 2) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    const int written = std::snprintf(unicode, sizeof(unicode),
-                        "%x", d);
-                    if (written < 0
-                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                    if (writeUnicodeEscape(data, unicode,
+                        sizeof(unicode), d) == false) {
                         return changed;
-                    }
-                    length = static_cast<size_t>(written);
-
-                    switch (length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (size_t j = 0; j < length; j++) {
-                        *data++ = unicode[j];
                     }
 
                     changed = true;
@@ -195,42 +175,14 @@ static inline bool encode(std::string &value) {
                 unicode_len = 4;
                 count+=7;
                 if (count <= len) {
-                    size_t length = 0;
                     /* compute character number */
                     d = ((c & 0x07) << 18)
                         | ((*(utf + 1) & 0x3F) << 12)
                         | ((*(utf + 2) & 0x3F) << 6)
                         | (*(utf + 3) & 0x3F);
-                    *data++ = '%';
-                    *data++ = 'u';
-                    const int written = std::snprintf(unicode, sizeof(unicode),
-                        "%x", d);
-                    if (written < 0
-                        || static_cast<size_t>(written) >= sizeof(unicode)) {
+                    if (writeUnicodeEscape(data, unicode,
+                        sizeof(unicode), d) == false) {
                         return changed;
-                    }
-                    length = static_cast<size_t>(written);
-
-                    switch (length)  {
-                        case 1:
-                            *data++ = '0';
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 2:
-                            *data++ = '0';
-                            *data++ = '0';
-                            break;
-                        case 3:
-                            *data++ = '0';
-                            break;
-                        case 4:
-                        case 5:
-                            break;
-                    }
-
-                    for (size_t j = 0; j < length; j++) {
-                        *data++ = unicode[j];
                     }
 
                     changed = true;
