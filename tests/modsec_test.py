@@ -16,7 +16,7 @@ class TestResult:
     success: bool
     message: str = ""
     response: Optional[requests.Response] = None
-    log_matches: Dict[str, List[str]] = None
+    log_matches: Optional[Dict[str, List[str]]] = None
     skipped: bool = False
 
     def __post_init__(self):
@@ -50,7 +50,26 @@ def _force_multiline(pattern: Pattern[bytes]) -> Pattern[bytes]:
     return re.compile(pattern.pattern, pattern.flags | re.MULTILINE)
 
 
-POOL_DEBUG_RE = re.compile(rb"POOL DEBUG:[^\n]+PALLOC[^\n]+\n")
+def _check_match_spec(spec, get_match, describe) -> Optional[str]:
+    """Shared logic for match_response/match_log/match_file: walk a
+    {key: pattern_or_[pattern,timeout]} spec, respecting a leading "-" on the
+    key for negation, and return a failure message for the first mismatch (or
+    None if everything matched as expected).
+
+    get_match(name, pattern, timeout) -> matched bytes or None.
+    describe(name) -> message prefix, e.g. "response status" or "file <path>".
+    """
+    for key, value in (spec or {}).items():
+        negate, name = _split_negation(key)
+        pattern, timeout = _split_match_value(value)
+        match = get_match(name, pattern, timeout)
+        if (negate and match is not None) or (not negate and match is None):
+            verb = "matched (expected no match)" if negate else "failed to match"
+            return f"{describe(name)} {verb}: {pattern.pattern!r}"
+    return None
+
+
+POOL_DEBUG_RE = re.compile(rb"POOL DEBUG:(?=[^\n]+PALLOC)[^\n]+\n")
 BUFSIZ = 32768
 
 
@@ -312,49 +331,34 @@ class ModSecurityTestCase:
                 if response is None:
                     return TestResult(success=False, message="Failed to make HTTP request")
 
-            for key, value in (entry.get("match_response") or {}).items():
-                negate, mtype = _split_negation(key)
-                pattern, _ = _split_match_value(value)
-                match = self.response_matcher.match(mtype, response, pattern) if response is not None else None
-                fail = (negate and match is not None) or (not negate and match is None)
-                if fail:
-                    verb = "matched (expected no match)" if negate else "failed to match"
-                    return TestResult(
-                        success=False,
-                        message=f"response {mtype} {verb}: {pattern.pattern!r}",
-                        response=response,
-                    )
+            def get_response_match(mtype, pattern, _timeout):
+                return self.response_matcher.match(mtype, response, pattern) if response is not None else None
 
-            for key, value in (entry.get("match_log") or {}).items():
-                negate, log_name = _split_negation(key)
-                pattern, timeout = _split_match_value(value)
-                match = self.log_matcher.wait_for_pattern(log_name, _force_multiline(pattern), timeout=timeout)
-                fail = (negate and match is not None) or (not negate and match is None)
-                if fail:
-                    verb = "matched (expected no match)" if negate else "failed to match"
-                    return TestResult(
-                        success=False,
-                        message=f"{log_name} log {verb}: {pattern.pattern!r}",
-                        response=response,
-                    )
+            failure = _check_match_spec(
+                entry.get("match_response"), get_response_match, lambda mtype: f"response {mtype}"
+            )
+            if failure:
+                return TestResult(success=False, message=failure, response=response)
+
+            def get_log_match(log_name, pattern, timeout):
+                return self.log_matcher.wait_for_pattern(log_name, _force_multiline(pattern), timeout=timeout)
+
+            failure = _check_match_spec(entry.get("match_log"), get_log_match, lambda log_name: f"{log_name} log")
+            if failure:
+                return TestResult(success=False, message=failure, response=response)
 
             match_file = entry.get("match_file") or {}
             if match_file:
                 time.sleep(1)  # matches runfile()'s own "make sure the file exists" delay
-                for key, value in match_file.items():
-                    negate, file_name = _split_negation(key)
-                    pattern, timeout = _split_match_value(value)
-                    match = self.log_matcher.wait_for_pattern(
+
+                def get_file_match(file_name, pattern, timeout):
+                    return self.log_matcher.wait_for_pattern(
                         file_name, _force_multiline(pattern), timeout=timeout, from_start=True
                     )
-                    fail = (negate and match is not None) or (not negate and match is None)
-                    if fail:
-                        verb = "matched (expected no match)" if negate else "failed to match"
-                        return TestResult(
-                            success=False,
-                            message=f"file {file_name} {verb}: {pattern.pattern!r}",
-                            response=response,
-                        )
+
+                failure = _check_match_spec(match_file, get_file_match, lambda file_name: f"file {file_name}")
+                if failure:
+                    return TestResult(success=False, message=failure, response=response)
 
             return TestResult(success=True, message=f"Test '{comment}' passed", response=response)
 
@@ -400,7 +404,7 @@ class ModSecurityTestCase:
         (do_raw_request() in Perl - deliberately malformed/chunked requests
         that must go over a raw socket instead of a conforming HTTP client)."""
         if request["__type__"] == "http_request":
-            headers = {name: value for name, value in request["headers"]}
+            headers = dict(request["headers"])
             try:
                 return self.http_client.request(
                     request["method"], request["uri"], headers=headers, data=request["content"],
