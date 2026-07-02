@@ -103,29 +103,29 @@ class TestBase64DecodeTransformation:
     def test_invalid_input(self, unit_test):
         """Test handling of invalid base64 input"""
         test_cases = [
-            # Invalid characters (should be ignored or cause graceful failure)
-            {"input": "Invalid!@#$", "output": "", "ret": 0, "desc": "Completely invalid"},
-            
+            # base64Decode is lenient: it decodes whatever valid base64
+            # characters it finds and does not fail outright on invalid
+            # ones. Verified directly against msc_test - not ""/ret=0.
+            {"input": "Invalid!@#$", "output": b'"{\xda\x96\'', "ret": 1, "desc": "Completely invalid"},
+
             # Partial valid base64
             {"input": "VGVzdA!@#", "output": "Test", "ret": 1, "desc": "Partially valid"},
-            
+
             # Wrong length
             {"input": "VGVz", "output": "Tes", "ret": 1, "desc": "Short input"},
         ]
-        
+
         for case in test_cases:
             test_config = {
-                "type": "tfn", 
+                "type": "tfn",
                 "name": "base64Decode",
                 "input": case["input"],
                 "output": case["output"],
                 "ret": case["ret"]
             }
-            
+
             result = unit_test.run_unit_test(test_config)
-            # Note: Some invalid cases might behave differently than expected
-            # This is testing the actual behavior rather than ideal behavior
-            assert result.success or case["ret"] == 0, f"Invalid input test failed: {case['desc']}"
+            assert result.success, f"Invalid input test failed: {case['desc']} - {result.message}"
     
     def test_binary_data(self, unit_test):
         """Test base64 decoding of binary data"""

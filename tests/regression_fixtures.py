@@ -6,11 +6,63 @@ re.Pattern objects; base64-encoded request bodies become bytes.
 """
 
 import base64
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List
 
+from .apache_server import _resolve_httpd_and_modules_dir, _resolve_server_root
+
 FIXTURES_DIR = Path(__file__).resolve().parent / "regression" / "fixtures"
+
+# Mirrors dump_regression_fixtures.pl's @path_keys: fixtures are dumped with
+# this-machine paths replaced by "##KEY##" placeholders (JSON forbids raw
+# control-byte delimiters in strings, and plain text needs no escaping when
+# substituted directly into the serialized JSON), so the checked-in fixtures
+# don't hard-code whatever machine happened to generate them. Substituted
+# back to real local paths here, before any test uses them.
+_PATH_KEYS = (
+    "DEBUG_LOG", "AUDIT_LOG", "ERROR_LOG", "HTTPD_CONF",
+    "DATA_DIR", "TEMP_DIR", "UPLOAD_DIR", "CONF_DIR", "LOGS_DIR", "HTDOCS",
+    "TEST_SERVER_ROOT", "REGRESSION_DIR", "SCRIPT_DIR", "DIST_ROOT",
+    "SERVER_ROOT", "MODULES_DIR", "RUNASUSER",
+)
+
+
+def _resolve_local_env() -> Dict[str, str]:
+    """Mirrors the %ENV block dump_regression_fixtures.pl used when it
+    generated the fixtures, resolved for *this* machine instead."""
+    script_dir = Path(__file__).resolve().parent
+    reg_dir = script_dir / "regression"
+    sroot_dir = reg_dir / "server_root"
+    logs_dir = sroot_dir / "logs"
+    httpd_path, modules_dir = _resolve_httpd_and_modules_dir(script_dir)
+
+    return {
+        "SERVER_ROOT": _resolve_server_root(httpd_path),
+        "TEST_SERVER_ROOT": str(sroot_dir),
+        "DATA_DIR": str(sroot_dir / "data"),
+        "TEMP_DIR": str(sroot_dir / "tmp"),
+        "UPLOAD_DIR": str(sroot_dir / "upload"),
+        "CONF_DIR": str(sroot_dir / "conf"),
+        "MODULES_DIR": modules_dir,
+        "LOGS_DIR": str(logs_dir),
+        "SCRIPT_DIR": str(script_dir),
+        "REGRESSION_DIR": str(reg_dir),
+        "DIST_ROOT": str(script_dir.parent),
+        "AUDIT_LOG": str(logs_dir / "modsec_audit.log"),
+        "DEBUG_LOG": str(logs_dir / "modsec_debug.log"),
+        "ERROR_LOG": str(logs_dir / "error.log"),
+        "HTTPD_CONF": str(sroot_dir / "conf" / "httpd.conf"),
+        "HTDOCS": str(sroot_dir / "htdocs"),
+        "RUNASUSER": os.environ.get("USER") or os.environ.get("LOGNAME") or os.environ.get("USERNAME") or "unknown",
+    }
+
+
+def _substitute_placeholders(json_text: str, env: Dict[str, str]) -> str:
+    for key in _PATH_KEYS:
+        json_text = json_text.replace(f"##{key}##", env[key])
+    return json_text
 
 # Perl regex modifier letters -> Python re flags. 'x'/'p'/'a'/'d'/'l'/'u' are
 # not used by any pattern in the current test corpus and are intentionally
@@ -60,7 +112,8 @@ def _decode_request(req: Dict[str, Any]) -> Dict[str, Any]:
 def load_fixture_file(path: Path) -> List[Dict[str, Any]]:
     import json
 
-    entries = json.loads(path.read_text())
+    json_text = _substitute_placeholders(path.read_text(), _resolve_local_env())
+    entries = json.loads(json_text)
     decoded = []
     for entry in entries:
         out = dict(entry)

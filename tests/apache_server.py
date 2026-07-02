@@ -73,9 +73,10 @@ class ApacheServer:
         self._per_test_conf: Optional[Path] = None
 
     def _run_control(self, extra_conf: Optional[str], action: str) -> subprocess.CompletedProcess:
-        cmd = [
-            self.httpd_path,
-            "-d", self.apache_server_root,
+        cmd = [self.httpd_path]
+        if self.apache_server_root:
+            cmd += ["-d", self.apache_server_root]
+        cmd += [
             "-f", str(self.base_conf),
             "-c", f"Listen {self.server_name}:{self.port}",
         ]

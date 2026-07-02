@@ -51,6 +51,13 @@ my $httpd_root = `$HTTPD -V 2>/dev/null`;
 
 # Same %ENV keys as run-regression-tests.pl, so conf/request strings that
 # interpolate $ENV{...} evaluate identically here and at real test-run time.
+# These are real, absolute, this-machine paths - needed as-is so that
+# conf=>sub{} coderefs (e.g. config/00-load-modsec.t opens a real file via
+# $ENV{DIST_ROOT}) work correctly during eval. Every one of them gets
+# replaced by a portable placeholder token in the final JSON output (see
+# %PLACEHOLDER_FOR below) so the checked-in fixtures don't hard-code this
+# machine's paths - the Python harness substitutes its own local paths back
+# in before starting Apache.
 %ENV = (
     %ENV,
     SERVER_ROOT => $server_root,
@@ -239,4 +246,27 @@ for my $t (@C) {
     push @out, \%entry;
 }
 
-print JSON::PP->new->canonical->utf8->encode(\@out);
+my $json = JSON::PP->new->canonical->utf8->encode(\@out);
+
+# Swap this machine's real absolute paths for portable placeholder tokens
+# (regression_fixtures.py substitutes its own local paths back in before
+# starting Apache). Longest values first, so a shorter path that's a prefix
+# of a longer one (e.g. SCRIPT_DIR is a prefix of DEBUG_LOG) doesn't get
+# substituted first and break the longer match.
+my @path_keys = qw(
+    DEBUG_LOG AUDIT_LOG ERROR_LOG HTTPD_CONF
+    DATA_DIR TEMP_DIR UPLOAD_DIR CONF_DIR LOGS_DIR HTDOCS
+    TEST_SERVER_ROOT REGRESSION_DIR SCRIPT_DIR DIST_ROOT
+    SERVER_ROOT MODULES_DIR RUNASUSER
+);
+for my $key (sort { length($ENV{$b}) <=> length($ENV{$a}) } @path_keys) {
+    my $value = $ENV{$key};
+    next unless defined $value and length $value;
+    # Plain printable text, not a control character: JSON forbids raw control
+    # bytes inside string literals, and this way the substitution can operate
+    # on the already-serialized JSON text without worrying about escaping.
+    my $placeholder = "##${key}##";
+    $json =~ s/\Q$value\E/$placeholder/g;
+}
+
+print $json;
