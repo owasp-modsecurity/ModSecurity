@@ -92,7 +92,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
              * find a parameter to compare against.
              */
             if (var->param != NULL) {
-                myvalue = apr_pstrdup(msr->mp, var->param);
+                myvalue = var->param;
             }
         }
 
