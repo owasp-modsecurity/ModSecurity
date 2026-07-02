@@ -428,3 +428,77 @@
 		),
 	),
 },
+
+### ctl:ruleRemoveTargetByTag with an XPath target (XML://@*)
+# Baseline: without any target removal, the XML://@* target lets the rule
+# match "attack" found in an XML attribute value.
+{
+	type => "rule",
+	comment => "ruleRemoveTargetByTag baseline: XML://\@* matches attribute value",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500040, \\
+		        phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/*|XML://\@* "\@rx attack" "id:500041, \\
+		        phase:2,deny,status:403,log,tag:'xml-attr-remove-test',msg:'XML attribute matched'"
+	),
+	match_log => {
+		error => [ qr/Pattern match "attack" at XML\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(
+				<?xml version="1.0"?><root><a probe="attack"></a></root>
+			),
+		),
+	),
+},
+# Regression for issue #3591: ctl:ruleRemoveTargetByTag must strip the
+# XML://@* target from the tagged rule, so it stops inspecting attribute
+# values. Previously this had no effect because target-exception matching
+# only ever compared the variable's embedded ":param" suffix in its name,
+# which XML targets never populate (they keep the XPath expression in a
+# separate field instead).
+{
+	type => "rule",
+	comment => "ruleRemoveTargetByTag removes an XML://\@* target from a tagged rule",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500042, \\
+		        phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/*|XML://\@* "\@rx attack" "id:500043, \\
+		        phase:2,deny,status:403,log,tag:'xml-attr-remove-test-2',msg:'XML attribute matched'"
+		SecAction "id:500044,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=xml-attr-remove-test-2;XML://\@*"
+	),
+	match_log => {
+		debug => [ qr/fetch_target_exception: Target XML:\/\/\@\* will not be processed\./, 1 ],
+		-error => [ qr/Pattern match "attack" at XML\./, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "application/xml",
+		],
+		normalize_raw_request_data(
+			q(
+				<?xml version="1.0"?><root><a probe="attack"></a></root>
+			),
+		),
+	),
+},
