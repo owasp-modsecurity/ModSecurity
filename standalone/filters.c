@@ -63,10 +63,11 @@ void init_filter_tables()
 	}
 }
 
+
 AP_DECLARE(ap_filter_rec_t *) ap_register_input_filter(const char *name,
                                           ap_in_filter_func filter_func,
-                                          ap_init_filter_func filter_init,
-                                          ap_filter_type ftype)
+                                          ap_init_filter_func filter_init, // cppcheck-suppress funcArgNamesDifferentUnnamed
+                                          ap_filter_type ftype) // cppcheck-suppress funcArgNamesDifferentUnnamed
 {
 	ap_filter_rec_t *f;
 
@@ -86,8 +87,8 @@ AP_DECLARE(ap_filter_rec_t *) ap_register_input_filter(const char *name,
 
 AP_DECLARE(ap_filter_rec_t *) ap_register_output_filter(const char *name,
                                             ap_out_filter_func filter_func,
-                                            ap_init_filter_func filter_init,
-                                            ap_filter_type ftype)
+                                            ap_init_filter_func filter_init, // cppcheck-suppress funcArgNamesDifferentUnnamed
+                                            ap_filter_type ftype) // cppcheck-suppress funcArgNamesDifferentUnnamed
 {
 	ap_filter_rec_t *f;
 	
