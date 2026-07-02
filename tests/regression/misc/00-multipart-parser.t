@@ -706,7 +706,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,id:500095"
         SecRule MULTIPART_INVALID_QUOTING "!\@eq 1" "phase:2,deny,id:500096"
-        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500097"
+        SecRule REQBODY_ERROR "!\@eq 1" "phase:2,deny,id:500097"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*Duplicate Content-Disposition name/s, 1 ],
