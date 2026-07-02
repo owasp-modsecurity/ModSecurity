@@ -63,8 +63,13 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         blob_offset += 2;
         /* Need name_len bytes for the name body plus 2 more for the value_len header.
          * name_len == 0 is already handled by the early break above, so no zero-check
-         * is required at this point. */
-        if (blob_offset + var->name_len + 2 > blob_size) return NULL;
+         * is required at this point. blob_offset <= blob_size holds here (the loop
+         * guard blob_offset + 1 < blob_size held before the 2-byte read above), so
+         * blob_size - blob_offset cannot underflow; comparing against the remaining
+         * byte count avoids the unsigned wraparound that blob_offset + name_len + 2
+         * could hit on a hostile blob_size. name_len is capped at 65536 above, so
+         * name_len + 2 cannot overflow. */
+        if (var->name_len + 2 > blob_size - blob_offset) return NULL;
         var->name = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->name_len - 1);
         blob_offset += var->name_len;
         var->name_len--;
@@ -72,7 +77,11 @@ static apr_table_t *collection_unpack(modsec_rec *msr, const unsigned char *blob
         var->value_len = (blob[blob_offset] << 8) + blob[blob_offset + 1];
         blob_offset += 2;
 
-        if (var->value_len < 1 || blob_offset + var->value_len > blob_size) return NULL;
+        /* Same overflow-safe remaining-bytes comparison as the name check above.
+         * blob_offset <= blob_size holds here because that check reserved these
+         * 2 value_len-header bytes. value_len < 1 rejects the malformed zero-length
+         * value whose (value_len - 1) would otherwise underflow apr_pstrmemdup. */
+        if (var->value_len < 1 || var->value_len > blob_size - blob_offset) return NULL;
         var->value = apr_pstrmemdup(msr->mp, (const char *)blob + blob_offset, var->value_len - 1);
         blob_offset += var->value_len;
         var->value_len--;
