@@ -13,7 +13,7 @@
 			SecRule REQBODY_PROCESSOR "^MULTIPART\$" \\
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Multipart flags: \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
+				RE %{REQBODY_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -31,7 +31,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Multipart flags: PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
+		error => [ qr/Multipart flags: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -79,7 +79,7 @@
 			SecRule REQBODY_PROCESSOR "^MULTIPART\$" \\
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Multipart flags: \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
+				RE %{REQBODY_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -97,7 +97,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Multipart flags: PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
+		error => [ qr/Multipart flags: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -145,7 +145,7 @@
 			SecRule REQBODY_PROCESSOR "^MULTIPART\$" \\
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Multipart flags: \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
+				RE %{REQBODY_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -163,7 +163,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Multipart flags: PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
+		error => [ qr/Multipart flags: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0./, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -211,7 +211,7 @@
 			SecRule REQBODY_PROCESSOR "^MULTIPART\$" \\
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Multipart flags: \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
+				RE %{REQBODY_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -277,7 +277,7 @@
 			SecRule REQBODY_PROCESSOR "^MULTIPART\$" \\
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Multipart flags: \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
+				RE %{REQBODY_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -344,7 +344,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -363,7 +362,7 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -412,7 +411,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -431,7 +429,7 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -480,7 +478,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -499,7 +496,7 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
@@ -548,7 +545,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -567,7 +563,7 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Request body no files data length is larger than the configured limit \(16384\)\./, 1],
 	},
 	match_response => {
@@ -616,7 +612,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -635,7 +630,7 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Request body no files data length is larger than the configured limit \(16384\)\./, 1],
 	},
 	match_response => {
@@ -684,7 +679,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -703,8 +697,8 @@
 		4096
 	),
 	match_log => {
-		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
-		debug => [ qr/Request body no files length: 16384/, 1],
+		error => [ qr/heck values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		debug => [ qr/Request body no files data length is larger than the configured limit \(16384\)\./, 1],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -752,7 +746,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -770,7 +763,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Input filter: Completed receiving request body \(length 32768\)\./, 1],
 	},
 	match_response => {
@@ -819,7 +812,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -837,7 +829,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Input filter: Completed receiving request body \(length 32768\)\./, 1],
 	},
 	match_response => {
@@ -886,7 +878,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -904,7 +895,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Input filter: Completed receiving request body \(length 32768\)\./, 1],
 	},
 	match_response => {
@@ -953,7 +944,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -971,7 +961,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Multipart: Allow partial processing of request body/, 1],
 	},
 	match_response => {
@@ -1020,7 +1010,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -1038,7 +1027,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Multipart: Allow partial processing of request body/, 1],
 	},
 	match_response => {
@@ -1086,7 +1075,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -1104,7 +1092,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Multipart: Allow partial processing of request body/, 1],
 	},
 	match_response => {
@@ -1152,7 +1140,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -1170,7 +1157,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Multipart: Allow partial processing of request body/, 1],
 	},
 	match_response => {
@@ -1196,7 +1183,7 @@
 				-----------------------------69343412719991675451336310646
 				Content-Disposition: form-data; name="b"
 
-				) . "b" x 16273 . q(ad_value
+				) . "b" x 16270 . q(ad_valueb
 				-----------------------------69343412719991675451336310646--)
 		),
 		4096
@@ -1218,7 +1205,6 @@
 				"id:'200000',phase:2,t:none,log, \\
 				msg:'Check values for test: \\
 				RE %{REQBODY_ERROR}, \\
-				PE %{REQBODY_PROCESSOR_ERROR}, \\
 				BQ %{MULTIPART_BOUNDARY_QUOTED}, \\
 				BW %{MULTIPART_BOUNDARY_WHITESPACE}, \\
 				DB %{MULTIPART_DATA_BEFORE}, \\
@@ -1236,7 +1222,7 @@
 		)
 	),
 	match_log => {
-		error => [ qr/Check values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
+		error => [ qr/Check values for test: RE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
 		debug => [ qr/Multipart: Allow partial processing of request body/, 1],
 	},
 	match_response => {
