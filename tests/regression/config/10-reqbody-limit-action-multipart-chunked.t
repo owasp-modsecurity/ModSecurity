@@ -704,7 +704,7 @@
 	),
 	match_log => {
 		error => [ qr/heck values for test: RE 0, PE 0, BQ 0, BW 0, DB 0, DA 0, HF 0, LF 0, SM 0, IQ 0, IP 0, IH 0, FL 0, UB 0/, 1],
-		debug => [ qr/Request body no files data length is larger than the configured limit \(16384\)\./, 1],
+		debug => [ qr/Request body no files length: 16384/, 1],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -729,7 +729,7 @@
 				-----------------------------69343412719991675451336310646
 				Content-Disposition: form-data; name="b"
 
-				) . 'b' x 16270 . q(bad_value
+				) . 'b' x 16269 . q(bad_valueb
 				-----------------------------69343412719991675451336310646--
 			)
 		),
