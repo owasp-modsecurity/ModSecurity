@@ -85,6 +85,15 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             myname = apr_strtok(myvar,":",&myvalue);
         } else {
             myname = myvar;
+
+            /* Some variables (e.g., XML) keep their parameter (an XPath
+             * expression) in var->param instead of embedding it in
+             * var->name. Fall back to it so exception matching can still
+             * find a parameter to compare against.
+             */
+            if (var->param != NULL) {
+                myvalue = var->param;
+            }
         }
 
         match = 0;

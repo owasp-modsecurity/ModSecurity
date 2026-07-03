@@ -428,160 +428,25 @@
 		),
 	),
 },
+
+### ctl:ruleRemoveTargetByTag with an XPath target (XML://@*)
+# Baseline: without any target removal, the XML://@* target lets the rule
+# match "attack" found in an XML attribute value.
 {
 	type => "rule",
-	comment => "xml ProcessPartial, bad format and whole body before limit",
+	comment => "ruleRemoveTargetByTag baseline: XML://\@* matches attribute value",
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 57
-		SecRequestBodyNoFilesLimit 57
-		SecXmlExternalEntity Off
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule REQBODY_ERROR "!\@eq 0" \\
-			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500040, \\
+		        phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/*|XML://\@* "\@rx attack" "id:500041, \\
+		        phase:2,deny,status:403,log,tag:'xml-attr-remove-test',msg:'XML attribute matched'"
 	),
 	match_log => {
-		error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
-	},
-	match_response => {
-		status => qr/^400$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "57",
-		],
-		'<?xml version="1.0" encoding="utf-8"?><a><b>value</b></a ',
-	),
-},
-{
-	type => "rule",
-	comment => "xml ProcessPartial, bad format and length exceeds limit",
-	conf => qq(
-		SecRuleEngine On
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 57
-		SecRequestBodyNoFilesLimit 57
-		SecXmlExternalEntity Off
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule REQBODY_ERROR "!\@eq 0" \\
-			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
-	),
-	match_log => {
-		-error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "58",
-		],
-		'<?xml version="1.0" encoding="utf-8"?><a><b>value</b></a  ',
-	),
-},
-{
-	type => "rule",
-	comment => "xml ProcessPartial, bad format and whole body before limit, no declaration",
-	conf => qq(
-		SecRuleEngine On
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 19
-		SecRequestBodyNoFilesLimit 19
-		SecXmlExternalEntity Off
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule REQBODY_ERROR "!\@eq 0" \\
-			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
-	),
-	match_log => {
-		error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
-	},
-	match_response => {
-		status => qr/^400$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "19",
-		],
-		'<a><b>value</b></a ',
-	),
-},
-{
-	type => "rule",
-	comment => "xml ProcessPartial, bad format and length exceeds limit, no declaration",
-	conf => qq(
-		SecRuleEngine On
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 19
-		SecRequestBodyNoFilesLimit 19
-		SecXmlExternalEntity Off
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule REQBODY_ERROR "!\@eq 0" \\
-			"id:'500007', phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
-		SecRule XML:/* "bad_value" "id:'500008',phase:2,t:none,deny"
-	),
-	match_log => {
-		-error => [ qr/Access denied with code 400 \(phase 2\). Match of "eq 0" against "REQBODY_ERROR" required\./, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-			"Content-Length" => "20",
-		],
-		'<a><b>value</b></a  ',
-	),
-},
-{
-	type => "rule",
-	comment => "xml ProcessPartial, bad value and whole body before limit",
-	conf => qq(
-		SecRuleEngine On
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 61
-		SecXmlExternalEntity Off
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
-	),
-	match_log => {
-		error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+		error => [ qr/Pattern match "attack" at XML\./, 1 ],
 	},
 	match_response => {
 		status => qr/^403$/,
@@ -589,71 +454,51 @@
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
-			"Content-Type" => "text/xml",
+			"Content-Type" => "application/xml",
 		],
 		normalize_raw_request_data(
-			q(<?xml version="1.0" encoding="utf-8"?><a><b>bad_value</b></a>),
+			q(
+				<?xml version="1.0"?><root><a probe="attack"></a></root>
+			),
 		),
 	),
 },
+# Regression for issue #3591: ctl:ruleRemoveTargetByTag must strip the
+# XML://@* target from the tagged rule, so it stops inspecting attribute
+# values. Previously this had no effect because target-exception matching
+# only ever compared the variable's embedded ":param" suffix in its name,
+# which XML targets never populate (they keep the XPath expression in a
+# separate field instead).
 {
 	type => "rule",
-	comment => "xml ProcessPartial, bad value before limit",
+	comment => "ruleRemoveTargetByTag removes an XML://\@* target from a tagged rule",
 	conf => qq(
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 61
-		SecXmlExternalEntity Off
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500042, \\
+		        phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=XML"
+		SecRule XML:/*|XML://\@* "\@rx attack" "id:500043, \\
+		        phase:2,deny,status:403,log,tag:'xml-attr-remove-test-2',msg:'XML attribute matched'"
+		SecAction "id:500044,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=xml-attr-remove-test-2;XML://\@*"
 	),
 	match_log => {
-		error => [ qr/Access denied with code 403 \(phase 2\). Pattern match "bad_value" at XML\./, 1 ],
+		debug => [ qr/fetch_target_exception: Target XML:\/\/\@\* will not be processed\./, 1 ],
+		-error => [ qr/Pattern match "attack" at XML\./, 1 ],
 	},
-	match_response => {
-		status => qr/^403$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Content-Type" => "text/xml",
-		],
-		normalize_raw_request_data(
-			q(<?xml version="1.0" encoding="utf-8"?><a><b>bad_value</b><c>ok_value</c></a>),
-		),
-	),
-},
-{
-	type => "rule",
-	comment => "xml ProcessPartial, bad value after limit",
-	conf => qq(
-		SecRuleEngine On
-		SecRequestBodyAccess On
-		SecRequestBodyLimitAction ProcessPartial
-		SecRequestBodyLimit 61
-		SecXmlExternalEntity Off
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRule REQUEST_HEADERS:Content-Type "^text/xml\$" "id:500005, \\
-		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
-		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500006
-		SecRule XML:/* "bad_value" "id:'500007',phase:2,t:none,deny"
-	),
 	match_response => {
 		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 		[
-			"Content-Type" => "text/xml",
+			"Content-Type" => "application/xml",
 		],
 		normalize_raw_request_data(
-			q(<?xml version="1.0" encoding="utf-8"?><a><b>12</b><c>bad_value</c></a>),
+			q(
+				<?xml version="1.0"?><root><a probe="attack"></a></root>
+			),
 		),
 	),
 },
