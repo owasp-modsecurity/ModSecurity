@@ -1,0 +1,4 @@
+pytest>=7.0.0
+pytest-xdist>=2.5.0
+requests>=2.25.0
+psutil>=5.8.0 

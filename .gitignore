@@ -113,7 +113,10 @@ Makefile
 # tests
 tests/regression/server_root/**
 tests/*.pl
+!tests/dump_unit_fixtures.pl
+!tests/dump_regression_fixtures.pl
 tests/*.trs
 tests/*.log
+tests/msc_test
 
 
