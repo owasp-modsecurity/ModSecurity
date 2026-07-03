@@ -267,7 +267,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
         if (msr->xml->parsing_ctx != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
             xmlParseChunk(msr->xml->parsing_ctx, buf, size, 0);
-            if (msr->xml->parsing_ctx->wellFormed != 1) {
+            if (!msr->xml->allow_ill_formed && msr->xml->parsing_ctx->wellFormed != 1) {
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }
@@ -304,10 +304,12 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
 
     /* Only if we have a context, meaning we've done some work. */
     if (msr->xml->parsing_ctx != NULL || msr->xml->parsing_ctx_arg != NULL) {
+        int terminate = !msr->reqbody_partial_processing_enabled;
+
         if (msr->xml->parsing_ctx != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
             /* This is how we signal the end of parsing to libxml. */
-            xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, 1);
+            xmlParseChunk(msr->xml->parsing_ctx, NULL, 0, terminate);
 
             /* Preserve the results for our reference. */
             msr->xml->well_formed = msr->xml->parsing_ctx->wellFormed;
@@ -318,7 +320,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
             msr->xml->parsing_ctx = NULL;
             msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
-            if (msr->xml->well_formed != 1) {
+            if (!msr->xml->allow_ill_formed && msr->xml->well_formed != 1) {
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }
@@ -326,7 +328,7 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
 
         if (msr->xml->parsing_ctx_arg != NULL &&
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
-            if (xmlParseChunk(msr->xml->parsing_ctx_arg, NULL, 0, 1) != 0) {
+            if (xmlParseChunk(msr->xml->parsing_ctx_arg, NULL, 0, terminate) != 0) {
                 if (msr->xml->xml_error) {
                     *error_msg = msr->xml->xml_error;
                 }
