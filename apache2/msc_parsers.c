@@ -15,10 +15,6 @@
 #include "msc_parsers.h"
 #include <ctype.h>
 
-#include "dbg_print_bytes.h"
-#define DEBUG_BYTES_BUF_LEN 256
-#define DEBUG_BYTES_OMIT_MARKER "...(snip)..."
-
 /**
  *
  */
@@ -359,11 +355,6 @@ void add_argument(modsec_rec *msr, apr_table_t *arguments, msc_arg *arg)
         msr_log(msr, 5, "Adding request argument (%s): name \"%s\", value \"%s\"",
                 arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
                 log_escape_ex(msr->mp, arg->value, arg->value_len));
-        char debug_buf[DEBUG_BYTES_BUF_LEN];
-        dbg_print_bytes(debug_buf, sizeof(debug_buf), arg->value, arg->value_len, DEBUG_BYTES_OMIT_MARKER);
-        msr_log(msr, 5, "[myDebug] Adding request argument (%s): name \"%s\", value \"%s\"",
-                arg->origin, log_escape_ex(msr->mp, arg->name, arg->name_len),
-                debug_buf);
     }
 
     if (apr_table_elts(arguments)->nelts >= msr->txcfg->arguments_limit) {

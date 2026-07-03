@@ -23,10 +23,6 @@
 
 #define CONTENT_TYPE_MAX_LENGTH 1024
 
-#include "dbg_print_bytes.h"
-#define DEBUG_BYTES_BUF_LEN 256
-#define DEBUG_BYTES_OMIT_MARKER "...(snip)..."
-
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
     int i, len;
@@ -265,7 +261,6 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
     assert(error_msg != NULL);
     int i, len, rc;
-    char debug_buf[DEBUG_BYTES_BUF_LEN];
 
     *error_msg = NULL;
 
@@ -280,11 +275,6 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
     /* The buffer is data so increase the data length counter. */
     len = modsecurity_request_body_may_enable_partial_processing_for_no_files_length(msr, len, "MULTIPART");
-    if (msr->txcfg->debuglog_level >= 9) {
-        dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf, len, DEBUG_BYTES_OMIT_MARKER);
-        msr_log(msr, 9, "[myDebug] Multipart: adding part_header, no_files_len=%lu, add_len=%d, buf=%s",
-            msr->msc_reqbody_no_files_length, len, debug_buf);
-    }
     msr->msc_reqbody_no_files_length += len;
 
     if (len > 1) {
@@ -484,7 +474,6 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
     char *p = msr->mpd->buf + (MULTIPART_BUF_SIZE - msr->mpd->bufleft);
     char localreserve[2] = { '\0', '\0' }; /* initialized to quiet warning */
     int bytes_reserved = 0, len;
-    char debug_buf[DEBUG_BYTES_BUF_LEN];
 
     *error_msg = NULL;
 
@@ -602,11 +591,6 @@ static int multipart_process_part_data(modsec_rec *msr, char **error_msg) {
         /* The buffer contains data so increase the data length counter. */
         len = modsecurity_request_body_may_enable_partial_processing_for_no_files_length(msr,
             (MULTIPART_BUF_SIZE - msr->mpd->bufleft) + msr->mpd->reserve[0], "MULTIPART");
-        if (msr->txcfg->debuglog_level >= 9) {
-            dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->mpd->buf, len, DEBUG_BYTES_OMIT_MARKER);
-            msr_log(msr, 9, "[myDebug] Multipart: adding part_form_data, no_files_len=%lu, add_len=%d, buf=%s",
-                msr->msc_reqbody_no_files_length, len, debug_buf);
-        }
         msr->msc_reqbody_no_files_length += len;
 
         /* add this part to the list of parts */

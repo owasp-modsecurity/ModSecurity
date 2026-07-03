@@ -18,10 +18,6 @@
 
 #define CHUNK_CAPACITY 8192
 
-#include "dbg_print_bytes.h"
-#define DEBUG_BYTES_BUF_LEN 256
-#define DEBUG_BYTES_OMIT_MARKER "...(snip)..."
-
 /**
  *
  */
@@ -681,7 +677,6 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
     assert(msr != NULL);
     assert(error_msg != NULL);
     int invalid_count = 0;
-    char debug_buf[DEBUG_BYTES_BUF_LEN];
 
     *error_msg = NULL;
 
@@ -694,9 +689,6 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
 
     unsigned int length = msr->msc_reqbody_length > msr->msc_reqbody_no_files_length
                         ? msr->msc_reqbody_no_files_length : msr->msc_reqbody_length;
-    dbg_print_bytes(debug_buf, sizeof(debug_buf), msr->msc_reqbody_buffer, length, DEBUG_BYTES_OMIT_MARKER);
-    msr_log(msr, 9, "[myDebug] modsecurity_request_body_end_urlencoded, length=%d, req_len=%d, no_files_len=%ld, buf=%s",
-        length, msr->msc_reqbody_length, msr->msc_reqbody_no_files_length, debug_buf);    
     if (parse_arguments(msr, msr->msc_reqbody_buffer, length,
         msr->txcfg->argument_separator, "BODY", msr->arguments, &invalid_count) < 0)
     {
