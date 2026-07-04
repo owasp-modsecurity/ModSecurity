@@ -219,8 +219,6 @@ VARIABLE_REMOTE_HOST                      (?i:REMOTE_HOST)
 VARIABLE_REMOTE_PORT                      (?i:REMOTE_PORT)
 VARIABLE_REQBODY_ERROR                    (?i:REQBODY_ERROR)
 VARIABLE_REQBODY_ERROR_MSG                (?i:REQBODY_ERROR_MSG)
-VARIABLE_REQBODY_PROCESSOR_ERROR          (?i:REQBODY_PROCESSOR_ERROR)
-VARIABLE_REQBODY_PROCESSOR_ERROR_MSG      (?i:REQBODY_PROCESSOR_ERROR_MSG)
 VARIABLE_REQBODY_PROCESSOR                (?i:REQBODY_PROCESSOR)
 VARIABLE_REQUEST_BASENAME                 (?i:REQUEST_BASENAME)
 VARIABLE_REQUEST_BODY                     (?i:REQUEST_BODY)
@@ -935,7 +933,6 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_MULTIPART_FILENAME}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
 {VARIABLE_MULTIPART_FILENAME}               { return p::make_VARIABLE_MULTIPART_FILENAME(*driver.loc.back()); }
 {VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
-{VARIABLE_MULTIPART_HEADER_FOLDING}         { return p::make_VARIABLE_MULTIPART_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_HEADER_FOLDING} { return p::make_VARIABLE_MULTIPART_INVALID_HEADER_FOLDING(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_PART}           { return p::make_VARIABLE_MULTIPART_INVALID_PART(*driver.loc.back()); }
 {VARIABLE_MULTIPART_INVALID_QUOTING}        { return p::make_VARIABLE_MULTIPART_INVALID_QUOTING(*driver.loc.back()); }
@@ -954,8 +951,6 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_REMOTE_PORT}                      { return p::make_VARIABLE_REMOTE_PORT(*driver.loc.back()); }
 {VARIABLE_REQBODY_ERROR_MSG}                { return p::make_VARIABLE_REQBODY_ERROR_MSG(*driver.loc.back()); }
 {VARIABLE_REQBODY_ERROR}                    { return p::make_VARIABLE_REQBODY_ERROR(*driver.loc.back()); }
-{VARIABLE_REQBODY_PROCESSOR_ERROR_MSG}      { return p::make_VARIABLE_REQBODY_PROCESSOR_ERROR_MSG(*driver.loc.back()); }
-{VARIABLE_REQBODY_PROCESSOR_ERROR}          { return p::make_VARIABLE_REQBODY_PROCESSOR_ERROR(*driver.loc.back()); }
 {VARIABLE_REQBODY_PROCESSOR}                { return p::make_VARIABLE_REQBODY_PROCESSOR(*driver.loc.back()); }
 {VARIABLE_REQUEST_BASENAME}                 { return p::make_VARIABLE_REQUEST_BASENAME(*driver.loc.back()); }
 {VARIABLE_REQUEST_BODY_LENGTH}              { return p::make_VARIABLE_REQUEST_BODY_LENGTH(*driver.loc.back()); }

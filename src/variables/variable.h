@@ -328,10 +328,6 @@ class VariableMonkeyResolution {
             t->m_variableReqbodyError.evaluate(l);
         } else if (comp(variable, "REQBODY_ERROR_MSG")) {
             t->m_variableReqbodyErrorMsg.evaluate(l);
-        } else if (comp(variable, "REQBODY_PROCESSOR_ERROR_MSG")) {
-            t->m_variableReqbodyProcessorErrorMsg.evaluate(l);
-        } else if (comp(variable, "REQBODY_PROCESSOR_ERROR")) {
-            t->m_variableReqbodyProcessorError.evaluate(l);
         } else if (comp(variable, "REQBODY_PROCESSOR")) {
             t->m_variableReqbodyProcessor.evaluate(l);
         } else if (comp(variable, "REQUEST_BASENAME")) {
@@ -443,10 +439,6 @@ class VariableMonkeyResolution {
                 vv = t->m_variableReqbodyError.resolveFirst();
             } else if (comp(variable, "REQBODY_ERROR_MSG")) {
                 vv = t->m_variableReqbodyErrorMsg.resolveFirst();
-            } else if (comp(variable, "REQBODY_PROCESSOR_ERROR_MSG")) {
-                vv = t->m_variableReqbodyProcessorErrorMsg.resolveFirst();
-            } else if (comp(variable, "REQBODY_PROCESSOR_ERROR")) {
-                vv = t->m_variableReqbodyProcessorError.resolveFirst();
             } else if (comp(variable, "REQBODY_PROCESSOR")) {
                 vv = t->m_variableReqbodyProcessor.resolveFirst();
             } else if (comp(variable, "REQUEST_BASENAME")) {
