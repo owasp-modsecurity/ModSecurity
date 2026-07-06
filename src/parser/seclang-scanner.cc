@@ -6240,19 +6240,19 @@ case 150:
 /* rule 150 can match eol */
 YY_RULE_SETUP
 #line 751 "seclang-scanner.ll"
-{ return p::make_CONFIG_COMPONENT_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
+{ return p::make_CONFIG_COMPONENT_SIG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 151:
 /* rule 151 can match eol */
 YY_RULE_SETUP
 #line 752 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_SERVER_SIG(strchr(yytext, ' ') + 2, *driver.loc.back()); }
+{ return p::make_CONFIG_SEC_SERVER_SIG(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 152:
 /* rule 152 can match eol */
 YY_RULE_SETUP
 #line 753 "seclang-scanner.ll"
-{ return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(strchr(yytext, ' ') + 2), *driver.loc.back()); }
+{ return p::make_CONFIG_SEC_WEB_APP_ID(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
