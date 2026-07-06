@@ -716,9 +716,17 @@ int Transaction::processRequestBody() {
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
 
-    if ((m_requestBodyType == WWWFormUrlEncoded) ||
-        (m_requestBodyProcessor == JSONRequestBody) ||
-        (m_requestBodyProcessor == XMLRequestBody)) {
+    /*
+     * Check whether request body length exceeds SecRequestBodyNoFilesLimit
+     * when the rquest body processor is not Multipart.
+     *
+     * Note: ctl:forceRequestBodyVariable is not implemented in v3.
+     *
+     * 4. forceRequestBodyVariable - Not implemented in ModSecurity v3 (REQUEST_BODY is always populated in v3)
+     * https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-%28v3.x%29#ctl
+     */
+    ms_dbg(9, "[myDebug] m_requestBodyProcessor=" + std::to_string(m_requestBodyProcessor));
+    if (m_requestBodyProcessor != MultiPartRequestBody) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
             && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
             setRequestBodyNoFilesLimitExceeded();
@@ -938,8 +946,7 @@ void Transaction::setRequestBodyNoFilesLimitExceeded() {
 int Transaction::rejectLongRequestIfActionIsReject() {
     if ((m_requestBodyNoFilesLimitExceeded || m_requestBodyLimitExceeded)
         && (this->m_rules->m_requestBodyLimitAction == RulesSet::BodyLimitAction::RejectBodyLimitAction)) {
-        ms_dbg(5, "Request body limit is marked to reject the " \
-            "request");
+        ms_dbg(5, "Request body limit is marked to reject the request");
         if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
             intervention::free(&m_it);
             m_it.log = strdup("Request body limit is marked to " \
