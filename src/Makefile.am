@@ -228,6 +228,7 @@ OPERATORS = \
 UTILS = \
 	utils/acmp.cc \
 	utils/base64.cc \
+	utils/dbg_print_bytes.cc \
 	utils/decode.cc \
 	utils/geo_lookup.cc \
 	utils/https_client.cc \
