@@ -584,11 +584,13 @@ int Transaction::addRequestHeader(const std::string& key,
         std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
+            this->m_requestBodyProcessor = MultiPartRequestBody;
             m_variableReqbodyProcessor.set("MULTIPART", m_variableOffset);
         }
 
         if (l.compare(0, urlencoded.length(), urlencoded) == 0) {
             this->m_requestBodyType = WWWFormUrlEncoded;
+            this->m_requestBodyProcessor = WWWFormUrlEncoded;
             m_variableReqbodyProcessor.set("URLENCODED", m_variableOffset);
         }
     }
