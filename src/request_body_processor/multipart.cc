@@ -36,10 +36,6 @@
 #include "modsecurity/collection/collections.h"
 #include "src/utils/string.h"
 
-#include "src/utils/dbg_print_bytes.h"
-#define DEBUG_BYTES_BUF_LEN 256
-#define DEBUG_BYTES_OMIT_MARKER "...(snip)..."
-
 namespace modsecurity {
 namespace RequestBodyProcessor {
 
@@ -669,7 +665,6 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
         }
     } else if (m_mpp->m_type == MULTIPART_FORMDATA) {
         std::string d;
-        char debug_buf[DEBUG_BYTES_BUF_LEN];
 
         int len = MULTIPART_BUF_SIZE - m_bufleft + m_reserve[0];
         if (m_reqbody_no_files_length + len > m_reqbody_no_files_limit) {
@@ -677,19 +672,7 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
             if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
                 len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
             }
-            dbg_print_bytes(debug_buf, sizeof(debug_buf), reinterpret_cast<unsigned char *>(&(m_reserve[1])), m_reserve[0], DEBUG_BYTES_OMIT_MARKER);
-            ms_dbg_a(m_transaction, 9,
-                "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#2, no_files_len=" + std::to_string(m_reqbody_no_files_length) +
-                ", adjusted_len=" + std::to_string(len) +
-                ", m_reserve[0]=" + std::to_string(m_reserve[0]) +
-                ", m_reserve[1:]=" + std::string(debug_buf) +
-                ", limit=" + std::to_string(m_reqbody_no_files_limit));
         }
-        dbg_print_bytes(debug_buf, sizeof(debug_buf), reinterpret_cast<unsigned char *>(m_buf), len, DEBUG_BYTES_OMIT_MARKER);
-        ms_dbg_a(m_transaction, 9,
-            "[myDebug] Multipart: add_form_data no_files_len=" + std::to_string(m_reqbody_no_files_length) + ", len=" + std::to_string(len)
-            + ", m_rserve[0]=" + std::to_string(m_reserve[0])
-            + ", buf=" + std::string(debug_buf));
 
         /* The buffer contains data so increase the data length counter. */
         m_reqbody_no_files_length += len;
@@ -744,7 +727,6 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
 int Multipart::process_part_header(std::string *error, int offset) {
     int i, len;
-    char debug_buf[DEBUG_BYTES_BUF_LEN];
 
     /* Check for nul bytes. */
     len = MULTIPART_BUF_SIZE - m_bufleft;
@@ -766,15 +748,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
         if (m_reqbody_limit_action == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             len = m_reqbody_no_files_limit - m_reqbody_no_files_length;
         }
-        ms_dbg_a(m_transaction, 9,
-            "[myDebug] Multipart: set m_flag_reqbody_no_files_limit_exceeded#1, no_files_len=" + std::to_string(m_reqbody_no_files_length) +
-            ", adjusted_len=" + std::to_string(len) +
-            ", limit=" + std::to_string(m_reqbody_no_files_limit));
     }
-    dbg_print_bytes(debug_buf, sizeof(debug_buf), reinterpret_cast<unsigned char *>(m_buf), len, DEBUG_BYTES_OMIT_MARKER);
-    ms_dbg_a(m_transaction, 9,
-        "[myDebug] Multipart: add_part_header no_files_len=" + std::to_string(m_reqbody_no_files_length)
-        + ", len=" + std::to_string(len) + ", buf=" + std::string(debug_buf));
     /* The buffer is data so increase the data length counter. */
     m_reqbody_no_files_length += len;
 

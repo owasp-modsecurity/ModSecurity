@@ -725,7 +725,6 @@ int Transaction::processRequestBody() {
      * 4. forceRequestBodyVariable - Not implemented in ModSecurity v3 (REQUEST_BODY is always populated in v3)
      * https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-%28v3.x%29#ctl
      */
-    ms_dbg(9, "[myDebug] m_requestBodyProcessor=" + std::to_string(m_requestBodyProcessor));
     if (m_requestBodyProcessor != MultiPartRequestBody) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
             && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
@@ -739,9 +738,6 @@ int Transaction::processRequestBody() {
     bool is_full_body_in_limit = !m_requestBodyNoFilesLimitExceeded && !m_requestBodyLimitExceeded;
     bool is_process_partial = (m_rules->m_requestBodyLimitAction
         == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
-    ms_dbg(5, "[myDebug] m_requestBodyNoFilesLimitExceeded=" + std::to_string(m_requestBodyNoFilesLimitExceeded) \
-        + ", m_requestBodyLimitExceeded=" + std::to_string(m_requestBodyLimitExceeded) \
-        + ", is_process_partial=" + std::to_string(is_process_partial));
 
 #ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
