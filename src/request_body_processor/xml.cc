@@ -150,7 +150,7 @@ extern "C" {
 }
 
 XML::XML(Transaction *transaction)
-    : m_transaction(transaction) {
+    : m_transaction(transaction), m_require_well_formed(false) {
     m_data.doc = NULL;
     m_data.parsing_ctx = NULL;
     m_data.sax_handler = NULL;
@@ -171,7 +171,8 @@ XML::~XML() {
     }
 }
 
-bool XML::init() {
+bool XML::init(bool require_well_formed) {
+    m_require_well_formed = require_well_formed;
     //xmlParserInputBufferCreateFilenameFunc entity;
     if (m_transaction->m_rules->m_secXMLExternalEntity
         == RulesSetProperties::TrueConfigBoolean) {
@@ -280,7 +281,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
         != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
         xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
         m_data.xml_parser_state->parsing_ctx_arg = m_data.parsing_ctx_arg;
-        if (m_data.parsing_ctx->wellFormed != 1) {
+        if (m_require_well_formed && m_data.parsing_ctx->wellFormed != 1) {
             error->assign("XML: Failed to parse document.");
             ms_dbg_a(m_transaction, 4, "XML: Failed to parse document.");
             return false;
@@ -296,7 +297,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
               == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs)
         ) {
         xmlParseChunk(m_data.parsing_ctx_arg, buf, size, 0);
-        if (m_data.parsing_ctx_arg->wellFormed != 1) {
+        if (m_require_well_formed && m_data.parsing_ctx_arg->wellFormed != 1) {
             error->assign("XML: Failed to parse document for ARGS.");
             ms_dbg_a(m_transaction, 4, "XML: Failed to parse document for ARGS.");
             return false;
@@ -326,7 +327,7 @@ bool XML::complete(std::string *error) {
             ms_dbg_a(m_transaction, 4, "XML: Parsing complete (well_formed " \
                 + std::to_string(m_data.well_formed) + ").");
 
-            if (m_data.well_formed != 1) {
+            if (m_require_well_formed && m_data.well_formed != 1) {
                 error->assign("XML: Failed to parse document.");
                 ms_dbg_a(m_transaction, 4, "XML: Failed to parse document.");
                 return false;

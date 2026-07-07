@@ -23,10 +23,10 @@
       "uri": "/?key=value&key=other_value",
       "method": "POST",
       "body": [
-        "{",
-        "       \"foo\":\"bar\",",
-        "       \"mod\":\"sec\"",
-        "}"
+        "{\n",
+        "       \"foo\":\"bar\",\n",
+        "       \"mod\":\"sec\"\n",
+        "}\n"
       ]
     },
     "response": {
@@ -72,13 +72,13 @@
       "uri": "/?key=value&key=other_value",
       "method": "POST",
       "body": [
-        "{",
-        "\"first_level\":",
-        "{",
-        "       \"first_key\":\"bar\",",
-        "       \"second_key\":\"sec\"",
-        "}",
-        "}"
+        "{\n",
+        "\"first_level\":\n",
+        "{\n",
+        "       \"first_key\":\"bar\",\n",
+        "       \"second_key\":\"sec\"\n",
+        "}\n",
+        "}\n"
       ]
     },
     "response": {
@@ -170,7 +170,7 @@
       "uri": "/?key=value&key=other_value",
       "method": "POST",
       "body": [
-        "a"
+        "a\n"
       ]
     },
     "response": {
@@ -214,17 +214,17 @@
       "uri": "/?foo=bar",
       "method": "POST",
       "body": [
-        "{",
-        "   \"key1\":",
-        "{",
-        "   \"key2\":",
-        "{",
-        "   \"key3\":",
-        "{",
-        "   \"key4\":",
-        "{",
-        "   \"key5\":\"thevalue\"",
-        "}}}}}"
+        "{\n",
+        "   \"key1\":\n",
+        "{\n",
+        "   \"key2\":\n",
+        "{\n",
+        "   \"key3\":\n",
+        "{\n",
+        "   \"key4\":\n",
+        "{\n",
+        "   \"key5\":\"thevalue\"\n",
+        "}}}}}\n"
       ]
     },
     "response": {
@@ -268,17 +268,17 @@
       "uri": "/?foo=bar",
       "method": "POST",
       "body": [
-        "{",
-        "   \"key1\":",
-        "{",
-        "   \"key2\":",
-        "{",
-        "   \"key3\":",
-        "{",
-        "   \"key4\":",
-        "{",
-        "   \"key5\":\"thevalue\"",
-        "}}}}}"
+        "{\n",
+        "   \"key1\":\n",
+        "{\n",
+        "   \"key2\":\n",
+        "{\n",
+        "   \"key3\":\n",
+        "{\n",
+        "   \"key4\":\n",
+        "{\n",
+        "   \"key5\":\"thevalue\"\n",
+        "}}}}}\n"
       ]
     },
     "response": {

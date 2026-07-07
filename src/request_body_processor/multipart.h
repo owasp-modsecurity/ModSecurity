@@ -23,6 +23,7 @@
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rules_set.h"
 
 namespace modsecurity {
 namespace RequestBodyProcessor {
@@ -172,6 +173,9 @@ class Multipart {
     void validate_quotes(const char *data, char quote);
 
     size_t m_reqbody_no_files_length;
+    size_t m_reqbody_no_files_limit;
+    RulesSet::BodyLimitAction m_reqbody_limit_action;
+
     std::list<MultipartPart *> m_parts;
 
     /* Number of parts that are files */
@@ -232,6 +236,7 @@ class Multipart {
 
     int m_seen_data;
     int m_is_complete;
+    bool m_allow_partial;
 
     int m_flag_error;
     int m_flag_data_before;
@@ -247,6 +252,7 @@ class Multipart {
     int m_flag_invalid_part;
     int m_flag_invalid_header_folding;
     int m_flag_file_limit_exceeded;
+    int m_flag_reqbody_no_files_limit_exceeded;
 
  private:
     std::string m_header;

@@ -150,6 +150,8 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_secXMLParseXmlIntoArgs(rules->m_secXMLParseXmlIntoArgs),
     m_logCbData(logCbData),
+    m_requestBodyNoFilesLimitExceeded(false),
+    m_requestBodyLimitExceeded(false),
     TransactionAnchoredVariables(this) {
     m_variableUrlEncodedError.set("0", 0);
     m_variableMscPcreError.set("0", 0);
@@ -252,12 +254,15 @@ int Transaction::processConnection(const char *client, int cPort,
 
 
 bool Transaction::extractArguments(const std::string &orig,
-    const std::string& buf, size_t offset) {
+    const std::string& buf, size_t offset, bool partial_processing_enabled) {
     char sep1 = '&';
     if (m_rules->m_secArgumentSeparator.m_set) {
         sep1 = m_rules->m_secArgumentSeparator.m_value.at(0);
     }
-    const auto key_value_sets = utils::string::ssplit(buf, sep1);
+    auto key_value_sets = utils::string::ssplit(buf, sep1);
+    if (partial_processing_enabled && (buf.empty() || buf.back() != sep1)) {
+        key_value_sets.pop_back();
+    }
 
     for (const auto &t : key_value_sets) {
         const auto sep2 = '=';
@@ -579,11 +584,13 @@ int Transaction::addRequestHeader(const std::string& key,
         std::string l = utils::string::tolower(value);
         if (l.compare(0, multipart.length(), multipart) == 0) {
             this->m_requestBodyType = MultiPartRequestBody;
+            this->m_requestBodyProcessor = MultiPartRequestBody;
             m_variableReqbodyProcessor.set("MULTIPART", m_variableOffset);
         }
 
         if (l.compare(0, urlencoded.length(), urlencoded) == 0) {
             this->m_requestBodyType = WWWFormUrlEncoded;
+            this->m_requestBodyProcessor = WWWFormUrlEncoded;
             m_variableReqbodyProcessor.set("URLENCODED", m_variableOffset);
         }
     }
@@ -653,6 +660,21 @@ int Transaction::addRequestHeader(const unsigned char *key, size_t key_n,
     return this->addRequestHeader(keys, values);
 }
 
+size_t Transaction::requestBodyLengthToProcess() const {
+    bool is_process_partial = (m_rules->m_requestBodyLimitAction
+        == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
+    size_t len = m_requestBody.str().size();
+    if (is_process_partial && (m_requestBodyNoFilesLimitExceeded || m_requestBodyLimitExceeded)) {
+        if (m_rules->m_requestBodyNoFilesLimit.m_set && m_rules->m_requestBodyNoFilesLimit.m_value < len) {
+            len = m_rules->m_requestBodyNoFilesLimit.m_value;
+        }
+        if (m_rules->m_requestBodyLimit.m_set && m_rules->m_requestBodyLimit.m_value < len) {
+            len = m_rules->m_requestBodyLimit.m_value;
+        }
+    }
+    return len;
+}
+
 
 /**
  * @name    processRequestBody
@@ -694,29 +716,41 @@ int Transaction::processRequestBody() {
     std::unique_ptr<std::string> a = m_variableRequestHeaders.resolveFirst(
         "Content-Type");
 
-    bool requestBodyNoFilesLimitExceeded = false;
-    if ((m_requestBodyType == WWWFormUrlEncoded) ||
-        (m_requestBodyProcessor == JSONRequestBody) ||
-        (m_requestBodyProcessor == XMLRequestBody)) {
+    /*
+     * Check whether request body length exceeds SecRequestBodyNoFilesLimit
+     * when the rquest body processor is not Multipart.
+     *
+     * Note: ctl:forceRequestBodyVariable is not implemented in v3.
+     *
+     * 4. forceRequestBodyVariable - Not implemented in ModSecurity v3 (REQUEST_BODY is always populated in v3)
+     * https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-%28v3.x%29#ctl
+     */
+    if (m_requestBodyProcessor != MultiPartRequestBody) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
             && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
-            m_variableReqbodyError.set("1", 0);
-            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
-            m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
-                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
-            requestBodyNoFilesLimitExceeded = true;
-	}
+            setRequestBodyNoFilesLimitExceeded();
+            if (rejectLongRequestIfActionIsReject()) {
+                return true;
+            }
+	    }
     }
+
+    bool is_full_body_in_limit = !m_requestBodyNoFilesLimitExceeded && !m_requestBodyLimitExceeded;
+    bool is_process_partial = (m_rules->m_requestBodyLimitAction
+        == RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction);
 
 #ifdef WITH_LIBXML2
     if (m_requestBodyProcessor == XMLRequestBody) {
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!requestBodyNoFilesLimitExceeded) {
+        if (is_full_body_in_limit || is_process_partial) {
             std::string error;
-            if (m_xml->init() == true) {
+            bool require_well_formed = !(is_process_partial && m_requestBodyLimitExceeded);
+            if (!require_well_formed) {
+                ms_dbg(4, "XML: Allow partial processing of request body");
+            }
+            if (m_xml->init(require_well_formed) == true) {
                 m_xml->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                    requestBodyLengthToProcess(),
                     &error);
                 m_xml->complete(&error);
             }
@@ -740,14 +774,18 @@ int Transaction::processRequestBody() {
     if (m_requestBodyProcessor == JSONRequestBody) {
 #endif
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!requestBodyNoFilesLimitExceeded) {
+        if (is_full_body_in_limit || is_process_partial) {
             std::string error;
             if (m_rules->m_requestBodyJsonDepthLimit.m_set) {
                 m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
             }
-            if (m_json->init() == true) {
+            unsigned int allow_partial_values = is_process_partial && m_requestBodyLimitExceeded;
+            if (allow_partial_values) {
+                ms_dbg(4, "JSON: Allow partial processing of request body");
+            }
+            if (m_json->init(allow_partial_values) == true) {
                 m_json->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                    requestBodyLengthToProcess(),
                     &error);
                 m_json->complete(&error);
             }
@@ -770,13 +808,17 @@ int Transaction::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
 #endif
         std::string error;
-        int reqbodyNoFilesLength = 0;
+        bool reqbody_no_files_limit_exceeded = false;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
+                m.m_allow_partial = is_process_partial && m_requestBodyLimitExceeded;
+                if (m.m_allow_partial) {
+                    ms_dbg(4, "Multipart: Allow partial processing of request body");
+                }
                 m.process(m_requestBody.str(), &error, m_variableOffset);
             }
-            reqbodyNoFilesLength = m.m_reqbody_no_files_length;
+            reqbody_no_files_limit_exceeded = m.m_flag_reqbody_no_files_limit_exceeded;
             m.multipart_complete(&error);
         }
         if (error.empty() == false) {
@@ -786,13 +828,11 @@ int Transaction::processRequestBody() {
                 m_variableOffset);
             m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
                 "error: " + error, m_variableOffset);
-        } else if (((m_rules->m_requestBodyNoFilesLimit.m_set)
-                   && (reqbodyNoFilesLength > m_rules->m_requestBodyNoFilesLimit.m_value))) {
-            m_variableReqbodyError.set("1", 0);
-            m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
-            m_variableInboundDataError.set("1", m_variableOffset);
-            ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
-                + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+        } else if (reqbody_no_files_limit_exceeded) {
+            setRequestBodyNoFilesLimitExceeded();
+            if (rejectLongRequestIfActionIsReject()) {
+                return false;
+            }
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
             m_variableReqbodyProcessorError.set("0", m_variableOffset);
@@ -800,9 +840,11 @@ int Transaction::processRequestBody() {
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
-        if (!requestBodyNoFilesLimitExceeded) {
-            extractArguments("POST", m_requestBody.str(), m_variableOffset);
-	}
+        if (is_full_body_in_limit || is_process_partial) {
+            bool partial_processing_enabled = is_process_partial && m_requestBodyLimitExceeded;
+            extractArguments("POST", m_requestBody.str().substr(0, requestBodyLengthToProcess()),
+                m_variableOffset, partial_processing_enabled);
+	    }
     } else if (m_requestBodyType != UnknownFormat) {
         /**
          * FIXME: double check to see if that is a valid scenario...
@@ -842,6 +884,9 @@ int Transaction::processRequestBody() {
         }
     }
 
+    ms_dbg(4, "Request body no files length: " \
+        + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+
     /**
      * FIXME: This variable should be calculated on demand, it is
      * computationally intensive.
@@ -871,6 +916,47 @@ int Transaction::processRequestBody() {
     return true;
 }
 
+void Transaction::setRequestBodyNoFilesLimitExceeded() {
+    if (m_requestBodyNoFilesLimitExceeded) {
+        return;
+    }
+
+    m_variableReqbodyError.set("1", 0);
+    m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
+    m_variableInboundDataError.set("1", m_variableOffset);
+    ms_dbg(5, "Request body excluding files is bigger than the maximum expected. Limit: " \
+        + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
+    m_requestBodyNoFilesLimitExceeded = true;
+}
+
+/**
+ * @name    rejectLongRequestIfActionIsReject
+ * @brief   Reject request if it exceeds m_requestBodyLimitExceeded or SecRequestBodyNoFilesLimit
+ *          and requestBodyLimitAction is Reject.
+ *
+ * @returns If the request is rejected or not.
+ * @retval true Request was rejected..
+ * @retval false Request was not rejected..
+ *
+ */
+int Transaction::rejectLongRequestIfActionIsReject() {
+    if ((m_requestBodyNoFilesLimitExceeded || m_requestBodyLimitExceeded)
+        && (this->m_rules->m_requestBodyLimitAction == RulesSet::BodyLimitAction::RejectBodyLimitAction)) {
+        ms_dbg(5, "Request body limit is marked to reject the request");
+        if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
+            intervention::free(&m_it);
+            m_it.log = strdup("Request body limit is marked to " \
+                    "reject the request");
+            m_it.status = 413;
+            m_it.disruptive = true;
+            return true;
+        } else {
+            ms_dbg(5, "Not rejecting the request as the engine is " \
+                "not Enabled");
+        }
+    }
+    return false;
+}
 
 /**
  * @name    appendRequestBody
@@ -929,12 +1015,20 @@ int Transaction::requestBodyFromFile(const char *path) {
 int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_requestBody.tellp();
 
+    if (m_requestBodyLimitExceeded) {
+        ms_dbg(9, "Skip appending request body already exceeded limit: " + std::to_string(len) + " bytes. " \
+            "Limit set to: "
+            + std::to_string(this->m_rules->m_requestBodyLimit.m_value));
+        return false;
+    }
+
     ms_dbg(9, "Appending request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: "
         + std::to_string(this->m_rules->m_requestBodyLimit.m_value));
 
     if (this->m_rules->m_requestBodyLimit.m_value > 0
         && this->m_rules->m_requestBodyLimit.m_value < len + current_size) {
+        m_requestBodyLimitExceeded = true;
         m_variableInboundDataError.set("1", m_variableOffset);
         ms_dbg(5, "Request body is bigger than the maximum expected.");
 
@@ -947,21 +1041,7 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
             ms_dbg(5, "Request body limit is marked to process partial");
             return false;
         } else {
-            if (this->m_rules->m_requestBodyLimitAction ==
-                RulesSet::BodyLimitAction::RejectBodyLimitAction) {
-                ms_dbg(5, "Request body limit is marked to reject the " \
-                    "request");
-                if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
-                    intervention::free(&m_it);
-                    m_it.log = strdup("Request body limit is marked to " \
-                            "reject the request");
-                    m_it.status = 403;
-                    m_it.disruptive = true;
-                } else {
-                    ms_dbg(5, "Not rejecting the request as the engine is " \
-                        "not Enabled");
-                }
-            }
+            rejectLongRequestIfActionIsReject();
             return true;
         }
     }
