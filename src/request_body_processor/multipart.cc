@@ -1195,7 +1195,7 @@ int Multipart::multipart_complete(std::string *error) {
                  *                   close-delimiter transport-padding
                  *                   [CRLF epilogue]
                  */
-                unsigned int buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - m_bufleft);
+                auto buf_data_len = (unsigned int)(MULTIPART_BUF_SIZE - m_bufleft);
                 if ((buf_data_len >= 2 + m_boundary.size())
                     && (*(m_buf) == '-')
                     && (*(m_buf + 1) == '-')
