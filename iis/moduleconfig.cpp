@@ -80,7 +80,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     if ( pPropertyException != NULL )
     {
 
-        ppException = ( IAppHostConfigException** ) &pPropertyException;
+        ppException = reinterpret_cast<IAppHostConfigException**>(&pPropertyException);
         goto Failure;
     }
 
@@ -107,7 +107,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     if ( pPropertyException != NULL )
     {
 
-        ppException = ( IAppHostConfigException** ) &pPropertyException;
+        ppException = reinterpret_cast<IAppHostConfigException**>(&pPropertyException);
         goto Failure;
     }
 

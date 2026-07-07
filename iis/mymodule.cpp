@@ -36,15 +36,13 @@
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 {
  public:
-    REQUEST_STORED_CONTEXT()
+    REQUEST_STORED_CONTEXT() : m_pResponseLength(0), m_pResponsePosition(0)
 	{
 		m_pConnRec = NULL;
 		m_pRequestRec = NULL;
 		m_pHttpContext = NULL;
 		m_pProvider = NULL;
 		m_pResponseBuffer = NULL;
-		m_pResponseLength = 0;
-		m_pResponsePosition = 0;
 	}
 
     ~REQUEST_STORED_CONTEXT()
@@ -76,11 +74,11 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 		}
 	}
 
-	conn_rec			*m_pConnRec;
-	request_rec			*m_pRequestRec;
-	IHttpContext		*m_pHttpContext;
-	IHttpEventProvider	*m_pProvider;
-	char				*m_pResponseBuffer;
+	conn_rec			*m_pConnRec = NULL;
+	request_rec			*m_pRequestRec = NULL;
+	IHttpContext		*m_pHttpContext = NULL;
+	IHttpEventProvider	*m_pProvider = NULL;
+	char				*m_pResponseBuffer = NULL;
 	ULONGLONG			m_pResponseLength;
 	ULONGLONG			m_pResponsePosition;
 };
@@ -129,7 +127,7 @@ apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 	addr->family = pAddr->sa_family;
 
 	if (pAddr->sa_family == AF_INET) {
-		auto sin = (SOCKADDR_IN *)pAddr;
+		auto sin = (const SOCKADDR_IN *)pAddr;
 		addr->addr_str_len = INET_ADDRSTRLEN;
 		addr->ipaddr_len = sizeof(struct in_addr);
 		addr->ipaddr_ptr = &addr->sa.sin.sin_addr;
@@ -140,7 +138,7 @@ apr_sockaddr_t *CopySockAddr(apr_pool_t *pool, PSOCKADDR pAddr)
 		addr->salen = sizeof(addr->sa);
 		addr->port = ntohs(sin->sin_port);
 	} else if (pAddr->sa_family == AF_INET6) {
-		auto sin6 = (SOCKADDR_IN6 *)pAddr;
+		auto sin6 = (const SOCKADDR_IN6 *)pAddr;
 		addr->addr_str_len = INET6_ADDRSTRLEN;
 		addr->ipaddr_len = sizeof(struct in6_addr);
 		addr->ipaddr_ptr = &addr->sa.sin6.sin6_addr;
@@ -253,7 +251,7 @@ void Log(void *obj, int level, char *str)
 
 void StoreIISContext(request_rec *r, REQUEST_STORED_CONTEXT *rsc)
 {
-    apr_table_setn(r->notes, NOTE_IIS, (const char *)rsc);
+	apr_table_setn(r->notes, NOTE_IIS, reinterpret_cast<const char*>(rsc));
 }
 
 REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
@@ -460,7 +458,7 @@ CMyHttpModule::OnSendResponse(
 	// here we must transfer response headers
 	//
 	USHORT ctcch = 0;
-	char *ct = (char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
+	const char *ct = (char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
 	char *ctz = ZeroTerminate(ct, ctcch, r->pool);
 
 	// assume HTML if content type not set
@@ -852,7 +850,6 @@ CMyHttpModule::OnBeginRequest(
 
 	if(r->hostname != NULL)
 	{
-		int k = 0;
 		char *ptr = (char *)r->hostname;
 
 		while(*ptr != 0 && *ptr != ':')
@@ -1106,7 +1103,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         return APR_SUCCESS;
     }
 
-    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, (DWORD *)readcnt, NULL);
+    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, reinterpret_cast<DWORD *>(readcnt), NULL);
 
     if (FAILED(hr))
     {
@@ -1123,7 +1120,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
     return APR_SUCCESS;
 }
 
-apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
+apr_status_t WriteBodyCallback(request_rec *r, const char *buf, unsigned int length)
 {
 	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
 
@@ -1197,7 +1194,7 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 	return APR_SUCCESS;
 }
 
-apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int length)
+apr_status_t WriteResponseCallback(request_rec *r, const char *buf, unsigned int length)
 {
 	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
 
@@ -1252,10 +1249,10 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 }
 
 
-CMyHttpModule::CMyHttpModule()
+CMyHttpModule::CMyHttpModule():m_hEventLog(RegisterEventSource( NULL, "ModSecurity" ))
 {
     // Open a handle to the Event Viewer.
-    m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
+    //m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
 
     SYSTEM_INFO         sysInfo;
 
