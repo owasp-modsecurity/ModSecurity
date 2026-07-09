@@ -11,7 +11,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500055"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500056"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500057"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500057"
     ),
     match_log => {
         debug => [ qr/Added file part [0-9a-h]+ to the list: name "image" file name "image.jpg" \(offset 258, length 10\).*Adding request argument \(BODY\): name "name", value "Brian Rectanus".*Adding request argument \(BODY\): name "email", value "brian.rectanus\@breach.com"/s, 1 ],
@@ -57,7 +57,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500058"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500059"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500060"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500060"
     ),
     match_log => {
         debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Adding request argument \(BODY\): name "b", value "2"/s, 1 ],
@@ -99,7 +99,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500061"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500062"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500063"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500063"
     ),
     match_log => {
         debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Adding request argument \(BODY\): name "b", value "2"/s, 1 ],
@@ -140,7 +140,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500064"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500065"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500066"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500066"
     ),
     match_log => {
         debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Adding request argument \(BODY\): name "b", value "2"/s, 1 ],
@@ -183,7 +183,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500067"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500068"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500069"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500069"
     ),
     match_log => {
         debug => [ qr/Adding request argument \(BODY\): name "a", value "1".*Adding request argument \(BODY\): name "b", value "2"/s, 1 ],
@@ -224,7 +224,7 @@
         SecDebugLogLevel 9
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500070"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500071"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500071"
     ),
     match_log => {
         debug => [ qr/Adding request argument \(BODY\): name "a", value "--test".*Adding request argument \(BODY\): name "b", value "--"/s, 1 ],
@@ -419,7 +419,7 @@
         SecDebugLogLevel 9
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,id:500072"
-        SecRule REQBODY_PROCESSOR_ERROR "!\@eq 1" "phase:2,deny,id:500073"
+        SecRule REQBODY_ERROR "!\@eq 1" "phase:2,deny,id:500073"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*Invalid part header \(header name missing\)/s, 1 ],
@@ -463,7 +463,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,status:403,id:500074"
         SecRule MULTIPART_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500075"
         SecRule MULTIPART_INVALID_HEADER_FOLDING "!\@eq 0" "phase:2,deny,status:403,id:500076"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403,id:500077"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:403,id:500077"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*name: b.*variable: 2/s, 1 ],
@@ -504,7 +504,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,status:403,id:500078"
         SecRule MULTIPART_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500079"
         SecRule MULTIPART_INVALID_HEADER_FOLDING "!\@eq 0" "phase:2,deny,status:403,id:500080"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403,id:500081"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:403,id:500081"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*name: b.*variable: 2/s, 1 ],
@@ -545,7 +545,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,status:403,id:500082"
         SecRule MULTIPART_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500083"
         SecRule MULTIPART_INVALID_HEADER_FOLDING "!\@eq 0" "phase:2,deny,status:403,id:500084"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403,id:500085"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:403,id:500085"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*name: b.*variable: 2/s, 1 ],
@@ -585,7 +585,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,status:403,id:500086"
         SecRule MULTIPART_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500087"
         SecRule MULTIPART_INVALID_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500088"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403,id:500089"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:403,id:500089"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*name: b.*variable: 2/s, 1 ],
@@ -625,7 +625,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,status:403,id:500090"
         SecRule MULTIPART_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500091"
         SecRule MULTIPART_INVALID_HEADER_FOLDING "!\@eq 1" "phase:2,deny,status:403,id:500092"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:403,id:500093"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:403,id:500093"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*name: b.*variable: 2/s, 1 ],
@@ -706,7 +706,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "!\@eq 1" "phase:2,deny,id:500095"
         SecRule MULTIPART_INVALID_QUOTING "!\@eq 1" "phase:2,deny,id:500096"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "chain,phase:2,deny,id:500097"
+        SecRule REQBODY_ERROR "!\@eq 1" "phase:2,deny,id:500097"
     ),
     match_log => {
         debug => [ qr/name: a.*variable: 1.*Duplicate Content-Disposition name/s, 1 ],
@@ -787,7 +787,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500098"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500099"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500100"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500100"
     ),
     match_log => {
         error => [ qr/Invalid boundary in C-T \(malformed\)/, 1 ],
@@ -834,7 +834,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500101"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500102"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500103"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500103"
     ),
     match_log => {
     },
@@ -881,7 +881,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500104"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500105"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500106"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500106"
     ),
     match_log => {
         error => [ qr/Invalid boundary in C-T \(case sensitivity\)/, 1 ],
@@ -928,7 +928,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500107"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500108"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500109"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500109"
     ),
     match_log => {
         error => [ qr/Invalid boundary in C-T \(parameter name\)/, 1 ],
@@ -977,7 +977,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500110"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500111"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500112"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500112"
     ),
     match_log => {
         debug => [ qr/Multiple boundary parameters in C-T/, 1 ],
@@ -1024,7 +1024,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500113"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500114"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500115"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500115"
     ),
     match_log => {
         debug => [ qr/Multiple boundary parameters in C-T/, 1 ],
@@ -1071,7 +1071,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500116"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500117"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500118"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500118"
     ),
     match_log => {
     },
@@ -1117,7 +1117,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500119"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500120"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500121"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500121"
     ),
     match_log => {
         debug => [ qr/Multipart: Warning: boundary whitespace in C-T header./, 1 ],
@@ -1164,7 +1164,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500122"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500123"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500124"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500124"
     ),
     match_log => {
         debug => [ qr/Added file part [0-9a-h]+ to the list: name "image" file name "image.jpg" \(offset 258, length 10\).*Adding request argument \(BODY\): name "name", value "Brian Rectanus".*Adding request argument \(BODY\): name "email", value "brian.rectanus\@breach.com"/s, 1 ],
@@ -1213,7 +1213,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500125"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500126"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500127"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500127"
     ),
     match_log => {
         debug => [ qr/Multipart parsing error: Multipart: No boundaries found in payload./, 1 ],
@@ -1259,7 +1259,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500128"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500129"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500130"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500130"
     ),
     match_log => {
         debug => [ qr/Multipart parsing error: Multipart: No boundaries found in payload./, 1 ],
@@ -1308,7 +1308,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500131"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500132"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500133"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500133"
     ),
     match_log => {
         debug => [ qr/boundary was quoted/, 1 ],
@@ -1354,7 +1354,7 @@
         SecDebugLogLevel 9
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:400,id:500134"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:400,id:500136"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:400,id:500136"
     ),
     match_log => {
         debug => [ qr/Multipart: Warning: boundary was quoted./s, 1 ],
@@ -1401,7 +1401,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500137"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500138"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500139"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500139"
     ),
     match_log => {
         error => [ qr/Multipart parsing error \(init\): Multipart: Invalid boundary in C-T \(characters\)./s, 1 ],
@@ -1447,7 +1447,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500140"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500141"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500142"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500142"
     ),
     match_log => {
         debug => [ qr/boundary was quoted/s, 1 ],
@@ -1494,7 +1494,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500143"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500144"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500145"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500145"
     ),
     match_log => {
         debug => [ qr/Invalid boundary in C-T \(characters\)/, 1 ],
@@ -1540,7 +1540,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500146"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500147"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500148"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500148"
     ),
     match_log => {
         debug => [ qr/Invalid boundary in C-T \(characters\)/, 1 ],
@@ -1586,7 +1586,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500149"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500150"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500151"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500151"
     ),
     match_log => {
         debug => [ qr/Invalid boundary in C-T \(quote\)/, 1 ],
@@ -1632,7 +1632,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500152"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500153"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500154"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500154"
     ),
     match_log => {
         debug => [ qr/Invalid boundary in C-T \(quote\)/, 1 ],
@@ -1677,7 +1677,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500155"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500156"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500157"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500157"
     ),
     match_log => {
         debug => [ qr/Invalid Content-Disposition header/, 1 ],
@@ -1730,7 +1730,7 @@
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500158"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500159"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500160"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500160"
     ),
     match_log => {
         debug => [ qr/Part missing Content-Disposition header/, 1 ],
@@ -1792,7 +1792,7 @@
         SecRule MULTIPART_FILE_LIMIT_EXCEEDED "!\@eq 1" "phase:2,deny,id:500162"
 
         # This should not be set
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,id:500163"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500163"
 
         # Theses should still be accurate
         SecRule &FILES "!\@eq 3" "phase:2,deny,id:500164"
@@ -1859,7 +1859,7 @@
         SecDebugLogLevel 9
         SecRequestBodyAccess On
         SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,status:400,id:500168"
-        SecRule REQBODY_PROCESSOR_ERROR "\@eq 1" "phase:2,deny,status:400,id:500169"
+        SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,status:400,id:500169"
         SecRule MULTIPART_PART_HEADERS:image "\@rx content-type:.*jpeg" "phase:2,deny,status:403,id:500170,t:lowercase"
     ),
     match_log => {
