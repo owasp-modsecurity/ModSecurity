@@ -2303,6 +2303,12 @@ char *construct_single_var(modsec_rec *msr, char *name) {
     msre_var *vx = NULL;
     char *my_error_msg = NULL;
 
+    if (msr->msc_rule_mptmp == NULL) {
+        if (apr_pool_create(&msr->msc_rule_mptmp, msr->mp) != APR_SUCCESS) {
+            return NULL;
+        }
+    }
+    
     /* Extract variable name and its parameter from the script. */
     varname = apr_pstrdup(msr->mp, name);
     if (varname == NULL) return NULL;

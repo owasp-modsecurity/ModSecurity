@@ -1662,9 +1662,13 @@ static void register_hooks(apr_pool_t *mp) {
     /* Add the MODSEC_2.x compatibility defines */
     *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_2.5");
 
-    /* Add the MODSEC_a.b define */
+    /* Add version, feature, and compile-mode ModSecurity defines. */
     *(char **)apr_array_push(ap_server_config_defines) = apr_psprintf(mp, "MODSEC_%s.%s", MODSEC_VERSION_MAJOR, MODSEC_VERSION_MINOR);
-
+    *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_AnalyseMultipartHeaders");
+    *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_ARGS_COMBINED_SIZE_NONAME");
+#ifndef WITH_PCRE
+    *(char **)apr_array_push(ap_server_config_defines) = apr_pstrdup(mp, "MODSEC_PCRE2");
+#endif
 #if (!defined(NO_MODSEC_API))
     /* Export optional functions. */
     APR_REGISTER_OPTIONAL_FN(modsec_register_tfn);
