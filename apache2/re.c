@@ -102,7 +102,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
 
         if (targets != NULL) {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, id_log(rule));
+                msr_log(msr, 9, "fetch_target_exception: Found exception target list [%s] for rule id %s", targets, id_log(rule, msr->mp));
             }
             target = apr_strtok((char *)targets, ",", &savedptr);
 
@@ -147,7 +147,7 @@ static int fetch_target_exception(msre_rule *rule, modsec_rec *msr, msre_var *va
             }
         } else  {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", id_log(rule));
+                msr_log(msr, 9, "fetch_target_exception: No exception target found for rule id %s.", id_log(rule, msr->mp));
 
             }
         }
@@ -1534,7 +1534,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                         saw_starter = 0;
 
                         if (msr->txcfg->debuglog_level >= 9) {
-                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]", id_log(rule),last_rule->actionset->is_chained,skip_after,saw_starter);
+                            msr_log(msr, 9, "Current rule is id=\"%s\" [chained %d] is trying to find the SecMarker=\"%s\" [stater %d]", id_log(rule, msr->mp),last_rule->actionset->is_chained,skip_after,saw_starter);
                         }
 
                     }
@@ -1691,7 +1691,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
                     msr_log(msr, 5, "Not processing %srule id=\"%s\": "
                             "removed by ctl action",
                             rule->actionset->is_chained ? "chained " : "",
-                            id_log(rule));
+                            id_log(rule, msr->mp));
                 }
 
                 /* Skip the whole chain, if this is a chained rule */
@@ -1865,7 +1865,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             if (rule->actionset->msg) {
                 msg = rule->actionset->msg;
             }
-            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", id_log(rule), msg);
+            msr_log(msr, 1, "Rule processing failed (id=%s, msg=%s).", id_log(rule, msr->mp), msg);
 
             if (msr->txcfg->reqintercept_oe == 1)   {
                 apr_table_clear(msr->matched_vars);
@@ -1899,7 +1899,7 @@ static apr_status_t msre_ruleset_process_phase_(msre_ruleset *ruleset, modsec_re
             if (rule->actionset->msg) {
                 msg = rule->actionset->msg;
             }
-            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, id_log(rule), msg);
+            msr_log(msr, 1, "Rule processing failed with unknown return code: %d (id=%s, msg=%s).", rc, id_log(rule, msr->mp), msg);
             apr_table_clear(msr->matched_vars);
             return -1;
         }
