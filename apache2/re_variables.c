@@ -542,17 +542,19 @@ static int var_request_uri_generate(modsec_rec *msr, msre_var *var, msre_rule *r
 {
     assert(msr != NULL);
     assert(msr->r != NULL);
-    char *value = NULL;
-
-    if (msr->r->parsed_uri.query == NULL) value = msr->r->parsed_uri.path;
-    else {
-        value = apr_pstrcat(mptmp, msr->r->parsed_uri.path, "?", msr->r->parsed_uri.query, NULL);
-        if (!value) {
-            msr_log(msr, 1, "REQUEST_URI: Memory allocation error");
-            return -1;
-        }
+    char* value = apr_pstrdup(mptmp, msr->r->parsed_uri.path);
+    int invalid_count;
+    int changed;
+#ifdef REQUEST_EARLY
+    // Before (real) phase 2, URI value is raw, httpd decodes it in before phase 2
+    if (msr->phase == 1) urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
+#endif
+    // Query is never decoded, so always decode it
+    if (msr->r->parsed_uri.query != NULL) {
+        char* query = apr_pstrdup(mptmp, msr->r->parsed_uri.query);
+        urldecode_nonstrict_inplace_ex(query, strlen(query), &invalid_count, &changed);
+        value = apr_pstrcat(mptmp, value, "?", query, NULL);
     }
-
     return var_simple_generate(var, vartab, mptmp, value);
 }
 
@@ -2457,7 +2459,15 @@ static int var_query_string_generate(modsec_rec *msr, msre_var *var, msre_rule *
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    return var_simple_generate(var, vartab, mptmp, msr->query_string);
+    int invalid_count;
+    int changed;
+    char* value = "";
+    // Query is never decoded, so always decode it
+    if (msr->query_string) {
+        value = apr_pstrdup(mptmp, msr->query_string);
+        urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
+    }
+    return var_simple_generate(var, vartab, mptmp, value);
 }
 
 /* REQUEST_BASENAME */
@@ -2952,7 +2962,16 @@ static int var_request_filename_generate(modsec_rec *msr, msre_var *var, msre_ru
 {
     assert(msr != NULL);
     assert(msr->r != NULL);
-    return var_simple_generate(var, vartab, mptmp, msr->r->parsed_uri.path);
+    char* value = apr_pstrdup(mptmp, msr->r->parsed_uri.path);
+#ifdef REQUEST_EARLY
+    // Before (real) phase 2, URI value is raw, httpd decodes it in before phase 2
+    if (msr->phase == 1) {
+        int invalid_count;
+        int changed;
+        urldecode_nonstrict_inplace_ex(value, strlen(value), &invalid_count, &changed);
+    }
+#endif
+    return var_simple_generate(var, vartab, mptmp, value);
 }
 
 /* REQUEST_LINE */
