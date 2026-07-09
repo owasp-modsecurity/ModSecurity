@@ -22,7 +22,8 @@
 
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
-    int i, len;
+    size_t i;
+    size_t len;
 
     if(msr->mpd == NULL)
         return;
@@ -42,7 +43,7 @@ void validate_quotes(modsec_rec *msr, char *data, char quote)  {
 
         if(data[i] == '\'') {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %d bytes",
+                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %zu bytes",
                         log_escape_nq(msr->mp, data), len);
             }
             msr->mpd->flag_invalid_quoting = 1;
@@ -846,7 +847,7 @@ int multipart_init(modsec_rec *msr, char **error_msg) {
         char *p = NULL;
         char *b = NULL;
         int seen_semicolon = 0;
-        int len = 0;
+        size_t len = 0;
 
         /* Check for extra characters before the boundary. */
         for (p = (char *)(msr->request_content_type + 19); p < msr->mpd->boundary; p++) {
@@ -1485,7 +1486,7 @@ int multipart_get_arguments(modsec_rec *msr, char *origin, apr_table_t *argument
 char *multipart_reconstruct_urlencoded_body_sanitize(modsec_rec *msr) {
     multipart_part **parts;
     char *body;
-    unsigned int body_len;
+    size_t body_len;
     int i;
 
     if (msr->mpd == NULL) return NULL;
