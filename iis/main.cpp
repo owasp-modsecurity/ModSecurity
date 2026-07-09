@@ -85,7 +85,7 @@ RegisterModule(
     }
 
 	hr = pModuleInfo->SetPriorityForRequestNotification(RQ_BEGIN_REQUEST, PRIORITY_ALIAS_FIRST);
-	//hr = pModuleInfo->SetPriorityForRequestNotification(RQ_SEND_RESPONSE, PRIORITY_ALIAS_LAST);	// reverted!
+	hr = pModuleInfo->SetPriorityForRequestNotification(RQ_SEND_RESPONSE, PRIORITY_ALIAS_LAST);	// reverted!
 	//hr = pModuleInfo2->SetPriorityForPostRequestNotification(RQ_END_REQUEST, PRIORITY_ALIAS_LAST);
 
     pFactory = NULL;

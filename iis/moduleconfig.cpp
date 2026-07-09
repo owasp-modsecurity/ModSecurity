@@ -79,8 +79,14 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     // If there is a config failure, we cannot continue execution:
     if ( pPropertyException != NULL )
     {
-
-        ppException = reinterpret_cast<IAppHostConfigException**>(&pPropertyException);
+        
+        // If there is a config failure, we cannot continue execution
+        // To avoid using reinterpret_cast, we will use static_cast to 
+        // convert the IAppHostPropertyException to IAppHostConfigException
+        // An additional variable was created to hold the static_cast result
+        // and then assigned to ppException therefore avoiding double referencing.
+        IAppHostConfigException* pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
+        ppException = &pConfigExc;
         goto Failure;
     }
 
@@ -107,7 +113,9 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     if ( pPropertyException != NULL )
     {
 
-        ppException = reinterpret_cast<IAppHostConfigException**>(&pPropertyException);
+        // See prevoius comment regarding static_cast and ppException assignment
+        IAppHostConfigException* pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
+        ppException = &pConfigExc;
         goto Failure;
     }
 

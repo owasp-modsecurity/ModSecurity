@@ -36,13 +36,15 @@
 class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 {
  public:
-    REQUEST_STORED_CONTEXT() : m_pResponseLength(0), m_pResponsePosition(0)
+    REQUEST_STORED_CONTEXT()
 	{
-		m_pConnRec = NULL;
-		m_pRequestRec = NULL;
-		m_pHttpContext = NULL;
-		m_pProvider = NULL;
-		m_pResponseBuffer = NULL;
+		m_pConnRec = nullptr;
+		m_pRequestRec = nullptr;
+		m_pHttpContext = nullptr;
+		m_pProvider = nullptr;
+		m_pResponseBuffer = nullptr;
+		m_pResponseLength = 0; // cppcheck-suppress useInitializationList
+		m_pResponsePosition = 0; // cppcheck-suppress useInitializationList
 	}
 
     ~REQUEST_STORED_CONTEXT()
@@ -62,23 +64,23 @@ class REQUEST_STORED_CONTEXT : public IHttpStoredContext
 
 	void FinishRequest()
 	{
-		if(m_pRequestRec != NULL)
+		if(m_pRequestRec != nullptr)
 		{
 			modsecFinishRequest(m_pRequestRec);
-			m_pRequestRec = NULL;
+			m_pRequestRec = nullptr;
 		}
-		if(m_pConnRec != NULL)
+		if(m_pConnRec != nullptr)
 		{
 			modsecFinishConnection(m_pConnRec);
-			m_pConnRec = NULL;
+			m_pConnRec = nullptr;
 		}
 	}
 
-	conn_rec			*m_pConnRec = NULL;
-	request_rec			*m_pRequestRec = NULL;
-	IHttpContext		*m_pHttpContext = NULL;
-	IHttpEventProvider	*m_pProvider = NULL;
-	char				*m_pResponseBuffer = NULL;
+	conn_rec			*m_pConnRec = nullptr;
+	request_rec			*m_pRequestRec = nullptr;
+	IHttpContext		*m_pHttpContext = nullptr;
+	IHttpEventProvider	*m_pProvider = nullptr;
+	char				*m_pResponseBuffer = nullptr;
 	ULONGLONG			m_pResponseLength;
 	ULONGLONG			m_pResponsePosition;
 };
@@ -173,9 +175,9 @@ char *ZeroTerminate(const char *str, size_t len, apr_pool_t *pool)
 char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_pool_t *pool )
 {
     //
-    // Special case of NULL or empty input string
+    // Special case of nullptr or empty input string
     //
-    if ( (pszTextUTF16 == NULL) || (*pszTextUTF16 == L'\0') || cchUTF16 == 0 )
+    if ( (pszTextUTF16 == nullptr) || (*pszTextUTF16 == L'\0') || cchUTF16 == 0 )
     {
         // Return empty string
         return "";
@@ -189,9 +191,9 @@ char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_
         0,      // specify conversion behavior
         pszTextUTF16,           // source UTF-16 string
         static_cast<int>( cchUTF16 ),   // total source string length, in WCHAR's, 
-        NULL,                   // unused - no conversion required in this step
+        nullptr,                   // unused - no conversion required in this step
         0,                      // request buffer size
-        NULL, NULL              // unused
+        nullptr, nullptr              // unused
         );
 
     if ( cbUTF8 == 0 )
@@ -218,7 +220,7 @@ char *ConvertUTF16ToUTF8( __in const WCHAR * pszTextUTF16, size_t cchUTF16, apr_
                                         // including end-of-string \0
         pszUTF8,                // destination buffer
         cbUTF8,                 // destination buffer size, in bytes
-        NULL, NULL              // unused
+        nullptr, nullptr              // unused
         );  
 
     if ( result == 0 )
@@ -241,7 +243,7 @@ void Log(void *obj, int level, char *str)
 	if(level <= APLOG_ERR)
 		logcat = EVENTLOG_ERROR_TYPE;
 
-	if(level == APLOG_WARNING || strstr(str, "Warning.") != NULL)
+	if(level == APLOG_WARNING || strstr(str, "Warning.") != nullptr)
 		logcat = EVENTLOG_WARNING_TYPE;
 
 	mod->WriteEventViewerLog(str, logcat);
@@ -251,25 +253,25 @@ void Log(void *obj, int level, char *str)
 
 void StoreIISContext(request_rec *r, REQUEST_STORED_CONTEXT *rsc)
 {
-	apr_table_setn(r->notes, NOTE_IIS, reinterpret_cast<const char*>(rsc));
+	apr_table_setn(r->notes, NOTE_IIS, (const char*)rsc); // cppcheck-suppress dangerousTypeCast
 }
 
 REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
 {
-    REQUEST_STORED_CONTEXT *msr = NULL;
-    request_rec *rx = NULL;
+    REQUEST_STORED_CONTEXT *msr = nullptr;
+    request_rec *rx = nullptr;
 
     /* Look in the current request first. */
     msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->notes, NOTE_IIS);
-    if (msr != NULL) {
+    if (msr != nullptr) {
         //msr->r = r;
         return msr;
     }
 
     /* If this is a subrequest then look in the main request. */
-    if (r->main != NULL) {
+    if (r->main != nullptr) {
         msr = (REQUEST_STORED_CONTEXT *)apr_table_get(r->main->notes, NOTE_IIS);
-        if (msr != NULL) {
+        if (msr != nullptr) {
             //msr->r = r;
             return msr;
         }
@@ -277,16 +279,16 @@ REQUEST_STORED_CONTEXT *RetrieveIISContext(request_rec *r)
 
     /* If the request was redirected then look in the previous requests. */
     rx = r->prev;
-    while(rx != NULL) {
+    while(rx != nullptr) {
         msr = (REQUEST_STORED_CONTEXT *)apr_table_get(rx->notes, NOTE_IIS);
-        if (msr != NULL) {
+        if (msr != nullptr) {
             //msr->r = r;
             return msr;
         }
         rx = rx->prev;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -295,25 +297,25 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
     OVERLAPPED ovl;
     DWORD dwDataStartOffset;
     ULONGLONG bytesTotal = 0;
-	BYTE *	pIoBuffer = NULL;
+	BYTE *	pIoBuffer = nullptr;
 	HANDLE	hIoEvent = INVALID_HANDLE_VALUE;
 	HRESULT hr = S_OK;
 
-    pIoBuffer = (BYTE *)VirtualAlloc(NULL,
+    pIoBuffer = (BYTE *)VirtualAlloc(nullptr,
                                         1,
                                         MEM_COMMIT | MEM_RESERVE,
                                         PAGE_READWRITE);
-    if (pIoBuffer == NULL)
+    if (pIoBuffer == nullptr)
     {
         hr = HRESULT_FROM_WIN32(GetLastError());
 		goto Done;
     }
 
-    hIoEvent = CreateEvent(NULL,  // security attr
+    hIoEvent = CreateEvent(nullptr,  // security attr
                                 FALSE, // manual reset
                                 FALSE, // initial state
-                                NULL); // name
-    if (hIoEvent == NULL)
+                                nullptr); // name
+    if (hIoEvent == nullptr)
     {
         hr = HRESULT_FROM_WIN32(GetLastError());
 		goto Done;
@@ -402,7 +404,7 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 	}
 
 Done:
-	if(NULL != pIoBuffer)
+	if(nullptr != pIoBuffer)
 	{
 		VirtualFree(pIoBuffer, 0, MEM_RELEASE);
 	}
@@ -421,7 +423,7 @@ CMyHttpModule::OnSendResponse(
     IN ISendResponseProvider * pResponseProvider
 )
 {
-	REQUEST_STORED_CONTEXT *rsc = NULL;
+	REQUEST_STORED_CONTEXT *rsc = nullptr;
 
 	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
 
@@ -429,16 +431,16 @@ CMyHttpModule::OnSendResponse(
 
 	// here we must check if response body processing is enabled
 	//
-	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer != NULL || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
+	if(rsc == nullptr || rsc->m_pRequestRec == nullptr || rsc->m_pResponseBuffer != nullptr || !modsecIsResponseBodyAccessEnabled(rsc->m_pRequestRec))
 	{
 		goto Exit;
 	}
 
     HRESULT hr = S_OK;
-	IHttpResponse *pHttpResponse = NULL;
-    HTTP_RESPONSE *pRawHttpResponse = NULL;
-    HTTP_BYTE_RANGE *pFileByteRange = NULL;
-    HTTP_DATA_CHUNK *pSourceDataChunk = NULL;
+	IHttpResponse *pHttpResponse = nullptr;
+    HTTP_RESPONSE *pRawHttpResponse = nullptr;
+    HTTP_BYTE_RANGE *pFileByteRange = nullptr;
+    HTTP_DATA_CHUNK *pSourceDataChunk = nullptr;
     LARGE_INTEGER  lFileSize;
     REQUEST_NOTIFICATION_STATUS ret = RQ_NOTIFICATION_CONTINUE;
 	ULONGLONG ulTotalLength = 0;
@@ -458,7 +460,7 @@ CMyHttpModule::OnSendResponse(
 	// here we must transfer response headers
 	//
 	USHORT ctcch = 0;
-	const char *ct = (char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
+	const char *ct = (const char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
 	char *ctz = ZeroTerminate(ct, ctcch, r->pool);
 
 	// assume HTML if content type not set
@@ -469,7 +471,7 @@ CMyHttpModule::OnSendResponse(
 
 	r->content_type = ctz;
 
-#define _TRANSHEADER(id,str) if(pRawHttpResponse->Headers.KnownHeaders[id].pRawValue != NULL) \
+#define _TRANSHEADER(id,str) if(pRawHttpResponse->Headers.KnownHeaders[id].pRawValue != nullptr) \
 	{\
 		apr_table_setn(r->headers_out, str, \
 			ZeroTerminate(pRawHttpResponse->Headers.KnownHeaders[id].pRawValue, pRawHttpResponse->Headers.KnownHeaders[id].RawValueLength, r->pool)); \
@@ -520,7 +522,7 @@ CMyHttpModule::OnSendResponse(
 
 	const char *lng = apr_table_get(r->headers_out, "Content-Languages");
 
-	if(lng != NULL)
+	if(lng != nullptr)
 	{
 		r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
 
@@ -631,7 +633,7 @@ CMyHttpModule::OnSendResponse(
 
 	if (pResponseProvider->GetHeadersBeingSent() && 
          (dwFlags & HTTP_SEND_RESPONSE_FLAG_MORE_DATA) == 0 &&
-         pHttpContext->GetResponse()->GetHeader(HttpHeaderContentLength) == NULL)    
+         pHttpContext->GetResponse()->GetHeader(HttpHeaderContentLength) == nullptr)    
     {
         CHAR szLength[21]; //Max length for a 64 bit int is 20
 
@@ -680,7 +682,7 @@ Finished:
 Exit:
 	// temporary hack, in reality OnSendRequest theoretically could possibly come before OnEndRequest
 	//
-	if(rsc != NULL)
+	if(rsc != nullptr)
 		rsc->FinishRequest();
 
 	LeaveCriticalSection(&m_csLock);
@@ -694,13 +696,13 @@ CMyHttpModule::OnPostEndRequest(
     IN IHttpEventProvider * pProvider
 )
 {
-	REQUEST_STORED_CONTEXT *rsc = NULL;
+	REQUEST_STORED_CONTEXT *rsc = nullptr;
 
 	rsc = (REQUEST_STORED_CONTEXT *)pHttpContext->GetModuleContextContainer()->GetModuleContext(g_pModuleContext);
 
 	// only finish request if OnSendResponse have been called already
 	//
-	if(rsc != NULL && rsc->m_pResponseBuffer != NULL)
+	if(rsc != nullptr && rsc->m_pResponseBuffer != nullptr)
 	{
 		EnterCriticalSection(&m_csLock);
 
@@ -719,14 +721,14 @@ CMyHttpModule::OnBeginRequest(
 )
 {
     HRESULT                         hr                  = S_OK;
-    IHttpRequest*                   pRequest            = NULL;
-	MODSECURITY_STORED_CONTEXT*		pConfig = NULL;
+    IHttpRequest*                   pRequest            = nullptr;
+	MODSECURITY_STORED_CONTEXT*		pConfig = nullptr;
     
     UNREFERENCED_PARAMETER ( pProvider );
 
 	EnterCriticalSection(&m_csLock);
 
-    if ( pHttpContext == NULL ) 
+    if ( pHttpContext == nullptr ) 
     {
         hr = E_UNEXPECTED;
         goto Finished;
@@ -734,7 +736,7 @@ CMyHttpModule::OnBeginRequest(
 
     pRequest = pHttpContext->GetRequest();
 
-    if ( pRequest == NULL )
+    if ( pRequest == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Finished;
@@ -756,7 +758,7 @@ CMyHttpModule::OnBeginRequest(
         goto Finished;
 	}
 
-	if(pConfig->m_Config == NULL)
+	if(pConfig->m_Config == nullptr)
 	{
 		char *path;
 		USHORT pathlen;
@@ -788,7 +790,7 @@ CMyHttpModule::OnBeginRequest(
 		{
 			const char * err = modsecProcessConfig((directory_config *)pConfig->m_Config, path, apppath);
 
-			if(err != NULL)
+			if(err != nullptr)
 			{
 				WriteEventViewerLog(err, EVENTLOG_ERROR_TYPE);
 				delete apppath;
@@ -838,17 +840,17 @@ CMyHttpModule::OnBeginRequest(
 	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
 	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
 
-	if(r->hostname == NULL)
+	if(r->hostname == nullptr)
 	{
-		if(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue != NULL)
+		if(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue != nullptr)
 			r->hostname = ZeroTerminate(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue,
 										req->Headers.KnownHeaders[HttpHeaderHost].RawValueLength, r->pool);
 	}
 
 	int port = 0;
-	char *port_str = NULL;
+	char *port_str = nullptr;
 
-	if(r->hostname != NULL)
+	if(r->hostname != nullptr)
 	{
 		char *ptr = (char *)r->hostname;
 
@@ -863,10 +865,10 @@ CMyHttpModule::OnBeginRequest(
 		}
 	}
 
-	if(req->CookedUrl.pQueryString != NULL && req->CookedUrl.QueryStringLength > 0)
+	if(req->CookedUrl.pQueryString != nullptr && req->CookedUrl.QueryStringLength > 0)
 		r->args = ConvertUTF16ToUTF8(req->CookedUrl.pQueryString + 1, (req->CookedUrl.QueryStringLength / sizeof(WCHAR)) - 1, r->pool);
 
-#define _TRANSHEADER(id,str) if(req->Headers.KnownHeaders[id].pRawValue != NULL) \
+#define _TRANSHEADER(id,str) if(req->Headers.KnownHeaders[id].pRawValue != nullptr) \
 	{\
 		apr_table_setn(r->headers_in, str, \
 			ZeroTerminate(req->Headers.KnownHeaders[id].pRawValue, req->Headers.KnownHeaders[id].RawValueLength, r->pool)); \
@@ -928,7 +930,7 @@ CMyHttpModule::OnBeginRequest(
 
 	const char *lng = apr_table_get(r->headers_in, "Content-Languages");
 
-	if(lng != NULL)
+	if(lng != nullptr)
 	{
 		r->content_languages = apr_array_make(r->pool, 1, sizeof(const char *));
 
@@ -1023,9 +1025,9 @@ CMyHttpModule::OnBeginRequest(
 	r->parsed_uri.query = r->args;
 	r->parsed_uri.dns_looked_up = 0;
 	r->parsed_uri.dns_resolved = 0;
-	r->parsed_uri.password = NULL;
-	r->parsed_uri.user = NULL;
-	r->parsed_uri.fragment = NULL;
+	r->parsed_uri.password = nullptr;
+	r->parsed_uri.user = nullptr;
+	r->parsed_uri.fragment = nullptr;
 
 	r->unparsed_uri = ZeroTerminate(req->pRawUrl, req->RawUrlLength, r->pool);
 	r->uri = r->unparsed_uri;
@@ -1056,7 +1058,7 @@ CMyHttpModule::OnBeginRequest(
     c->client_addr = CopySockAddr(r->pool, pAddr);
 	c->client_ip = GetIpAddr(r->pool, pAddr);
 #endif
-	c->remote_host = NULL;
+	c->remote_host = nullptr;
 
     LeaveCriticalSection(&m_csLock);
 	int status = modsecProcessRequest(r);
@@ -1088,7 +1090,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 
     *readcnt = 0;
 
-    if (rsc == NULL)
+    if (rsc == nullptr)
     {
         *is_eos = 1;
         return APR_SUCCESS;
@@ -1103,7 +1105,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         return APR_SUCCESS;
     }
 
-    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, reinterpret_cast<DWORD *>(readcnt), NULL);
+    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, static_cast<DWORD *>(readcnt), nullptr);
 
     if (FAILED(hr))
     {
@@ -1124,7 +1126,7 @@ apr_status_t WriteBodyCallback(request_rec *r, const char *buf, unsigned int len
 {
 	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
 
-	if(rsc == NULL || rsc->m_pRequestRec == NULL)
+	if(rsc == nullptr || rsc->m_pRequestRec == nullptr)
 		return APR_SUCCESS;
 
 	IHttpContext *pHttpContext = rsc->m_pHttpContext;
@@ -1172,7 +1174,7 @@ apr_status_t ReadResponseCallback(request_rec *r, char *buf, unsigned int length
 
 	*readcnt = 0;
 
-	if(rsc == NULL || rsc->m_pResponseBuffer == NULL)
+	if(rsc == nullptr || rsc->m_pResponseBuffer == nullptr)
 	{
 		*is_eos = 1;
 		return APR_SUCCESS;
@@ -1198,7 +1200,7 @@ apr_status_t WriteResponseCallback(request_rec *r, const char *buf, unsigned int
 {
 	REQUEST_STORED_CONTEXT *rsc = RetrieveIISContext(r);
 
-	if(rsc == NULL || rsc->m_pRequestRec == NULL || rsc->m_pResponseBuffer == NULL)
+	if(rsc == nullptr || rsc->m_pRequestRec == nullptr || rsc->m_pResponseBuffer == nullptr)
 		return APR_SUCCESS;
 
 	IHttpContext *pHttpContext = rsc->m_pHttpContext;
@@ -1249,10 +1251,10 @@ apr_status_t WriteResponseCallback(request_rec *r, const char *buf, unsigned int
 }
 
 
-CMyHttpModule::CMyHttpModule():m_hEventLog(RegisterEventSource( NULL, "ModSecurity" ))
+CMyHttpModule::CMyHttpModule()
 {
     // Open a handle to the Event Viewer.
-    //m_hEventLog = RegisterEventSource( NULL, "ModSecurity" );
+    m_hEventLog = RegisterEventSource( nullptr, "ModSecurity" ); // cppcheck-suppress useInitializationList
 
     SYSTEM_INFO         sysInfo;
 
@@ -1295,11 +1297,11 @@ CMyHttpModule::~CMyHttpModule()
 	//WriteEventViewerLog("Module deleted.");
 
 	// Test whether the handle for the Event Viewer is open.
-    if (NULL != m_hEventLog)
+    if (nullptr != m_hEventLog)
     {
         // Close the handle to the Event Viewer.
         DeregisterEventSource( m_hEventLog );
-        m_hEventLog = NULL;
+        m_hEventLog = nullptr;
 
 		DeleteCriticalSection(&m_csLock);
     }
@@ -1312,13 +1314,13 @@ void CMyHttpModule::Dispose()
 BOOL CMyHttpModule::WriteEventViewerLog(LPCSTR szNotification, WORD category)
 {
     // Test whether the handle for the Event Viewer is open.
-    if (NULL != m_hEventLog)
+    if (nullptr != m_hEventLog)
     {
         // Write any strings to the Event Viewer and return.
         return ReportEvent(
             m_hEventLog,
             category, 0, 0x1,
-            NULL, 1, 0, &szNotification, NULL );
+            nullptr, 1, 0, &szNotification, nullptr );
     }
     return FALSE;
 }
