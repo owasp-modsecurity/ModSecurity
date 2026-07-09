@@ -696,7 +696,8 @@ static void transaction_checkpoint(void)
  */
 static void parse_configuration_line(const char *line, int line_count)
 {
-    const char *start = NULL, *command = NULL;
+    const char *start = NULL
+    const char *command = NULL;
     char *p = NULL;
 
     /* Remove the trailing newline character. */
@@ -1219,7 +1220,8 @@ static void logc_init(void)
     apr_status_t rc = 0;
     /* These variables are used by pcre_compile() and pcre2_compile() */
     const char *errptr = NULL; // cppcheck-suppress unreadVariable
-    int i, erroffset; // cppcheck-suppress unusedVariable
+    int i;
+    int erroffset; // cppcheck-suppress unusedVariable
     /* cURL major, minor and patch version */
     short cmaj, cmin, cpat = 0;
 #ifndef WITH_PCRE

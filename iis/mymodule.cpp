@@ -460,7 +460,7 @@ CMyHttpModule::OnSendResponse(
 	// here we must transfer response headers
 	//
 	USHORT ctcch = 0;
-	const char *ct = (const char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
+	auto ct = (const char *)pHttpResponse->GetHeader(HttpHeaderContentType, &ctcch);
 	char *ctz = ZeroTerminate(ct, ctcch, r->pool);
 
 	// assume HTML if content type not set
@@ -1110,7 +1110,7 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
 	if (readcnt != nullptr) {
 		*readcnt = static_cast<unsigned int>(dwReadcnt);
 	}	
-	
+
     if (FAILED(hr))
     {
         // End of data is okay.

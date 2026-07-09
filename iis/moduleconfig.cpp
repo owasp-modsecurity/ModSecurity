@@ -85,7 +85,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
         // convert the IAppHostPropertyException to IAppHostConfigException
         // An additional variable was created to hold the static_cast result
         // and then assigned to ppException therefore avoiding double referencing.
-        IAppHostConfigException* pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
+        auto pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
         ppException = &pConfigExc;
         goto Failure;
     }
@@ -114,7 +114,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     {
 
         // See prevoius comment regarding static_cast and ppException assignment
-        IAppHostConfigException* pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
+        auto pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
         ppException = &pConfigExc;
         goto Failure;
     }
