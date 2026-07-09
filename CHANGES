@@ -1,3 +1,15 @@
+02 Jul 2026 - 2.9.14
+--------------------
+
+ * chore: fix cppcheck issues with v2.21.0
+   [Issue #3593 - @airween]
+ * fix: ctl:ruleRemoveTargetByTag not removing XML attribute targets
+   [Issue #3592 - @fzipi]
+ * Remove deprecated REQBODY_PROCESSOR_ERROR and REQBODY_PROCESSOR_ERROR_MSG
+   [Issue #3578 - @hnakamur]
+ * Re-apply lost fix 4f33f5b: collection_unpack value_len underflow regression
+   [Issue #3560 - @g4mm4-VCF]
+
 28 Apr 2026 - 2.9.13
 --------------------
 
