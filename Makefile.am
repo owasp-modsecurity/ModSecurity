@@ -58,9 +58,7 @@ cppcheck:
 		standalone/ \
 		mlogc/ \
 		iis/ \
-		ext/ \
-		build/ \
-		doc/ 
+		ext/
 
 check-static: cppcheck
 

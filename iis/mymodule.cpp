@@ -1105,8 +1105,12 @@ apr_status_t ReadBodyCallback(request_rec *r, char *buf, unsigned int length, un
         return APR_SUCCESS;
     }
 
-    HRESULT hr = pRequest->ReadEntityBody(buf, length, false, static_cast<DWORD *>(readcnt), nullptr);
-
+	DWORD dwReadcnt = 0;
+	HRESULT hr = pRequest->ReadEntityBody(buf, length, false, &dwReadcnt, nullptr);
+	if (readcnt != nullptr) {
+		*readcnt = static_cast<unsigned int>(dwReadcnt);
+	}	
+	
     if (FAILED(hr))
     {
         // End of data is okay.
