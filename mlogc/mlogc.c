@@ -696,7 +696,7 @@ static void transaction_checkpoint(void)
  */
 static void parse_configuration_line(const char *line, int line_count)
 {
-    const char *start = NULL
+    const char *start = NULL;
     const char *command = NULL;
     char *p = NULL;
 
