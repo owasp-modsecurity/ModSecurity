@@ -113,7 +113,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     if ( pPropertyException != NULL )
     {
 
-        // See prevoius comment regarding static_cast and ppException assignment
+        // See previous comment regarding static_cast and ppException assignment
         auto pConfigExc = static_cast<IAppHostConfigException*>(pPropertyException);
         ppException = &pConfigExc;
         goto Failure;
