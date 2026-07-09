@@ -1406,9 +1406,9 @@ static void modsec_register_tfn(const char *name, void *fn) {
  * This function is exported for other Apache modules to
  * register new operators.
  */
-static void modsec_register_operator(const char *name, void *fn_init, void *fn_exec) {
+static void modsec_register_operator(const char* name, fn_op_param_init_t fn_init, fn_op_execute_t fn_exec) {
     if (modsecurity != NULL) {
-        msre_engine_op_register(modsecurity->msre, name, (fn_op_param_init_t)fn_init, (fn_op_execute_t)fn_exec);
+        msre_engine_op_register(modsecurity->msre, name, fn_init, fn_exec);
     }
 }
 

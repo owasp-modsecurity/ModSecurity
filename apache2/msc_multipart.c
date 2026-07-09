@@ -20,6 +20,9 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
+static const char* mime_charset_special = "!#$&+-^_`~%{}";
+static const char* attr_char_special =    "!#$&+-^_`~.";
+
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
     int i, len;
@@ -85,7 +88,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     assert(msr != NULL);
     assert(c_d_value != NULL);
     char *p = NULL, *t = NULL;
-
+    char* filenameStar = NULL;
+    
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
         return -1;
@@ -124,13 +128,46 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
         while((*p == '\t') || (*p == ' ')) p++;
         if (*p == '\0') return -6;
 
-        /* Accept both quotes as some backends will accept them, but
-         * technically "'" is invalid and so flag_invalid_quoting is
-         * set so the user can deal with it in the rules if they so wish.
-         */
-
         char quote = '\0';
-        if ((*p == '"') || (*p == '\'')) {
+        if (strcmp(name, "filename*") == 0) {
+            /* filename*=charset'[optional-language]'filename */
+            /* Read beyond the charset and the optional language*/
+            const char* start_of_charset = p;
+            while ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p) )) {
+                p++;
+            }
+            if ((*p != '\'') || (p == start_of_charset)) {
+                return -16; // Must be at least one legit char before ' for start of language
+            }
+            p++;
+            while (isalnum(*p) || *p == '-') p++;
+            if (*p != '\'') {
+                return -17; // Single quote for end-of-language not found
+            }
+            p++;
+
+            /* Now read what should be the actual filename */
+            const char* start_of_filename = p;
+            while ((*p != '\0') && (*p != ';')) {
+                if (*p == '%') {
+                    if ((!isxdigit(*(p + 1))) || (!isxdigit(*(p + 2)))) {
+                        return -18;
+                    }
+                    p += 3;
+                }
+                else if ((*p != '\0') && (isalnum(*p) || strchr(mime_charset_special, *p))) {
+                    p++;
+                }
+                else {
+                    return -19;
+                }
+            }
+            value = apr_pmemdup(msr->mp, start_of_filename, p - start_of_filename);
+        } else if ((*p == '"') || (*p == '\'')) {
+            /* Accept both quotes as some backends will accept them, but
+            * technically "'" is invalid and so flag_invalid_quoting is
+            * set so the user can deal with it in the rules if they so wish.
+            */
             /* quoted */
             quote = *p; // remember which quote character was used for the value
 
@@ -222,6 +259,18 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
                     log_escape_nq(msr->mp, value));
+            }
+            else if (strcmp(name, "filename*") == 0) {
+                if (filenameStar != NULL) {
+                    msr_log(msr, 4,
+                        "Multipart: Warning: Duplicate Content-Disposition filename*: %s.", log_escape_nq(msr->mp, value));
+                    return -20;
+                }
+                filenameStar = apr_pstrdup(msr->mp, value);
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Multipart: Content-Disposition filename*: %s.",
+                        log_escape_nq(msr->mp, value));
+                }
             }
         }
         else return -11;

@@ -27,8 +27,10 @@
 #if (!defined(NO_MODSEC_API))
 /* Optional functions. */
 
+typedef int (*fn_op_param_init_t)(msre_rule* rule, char** error_msg);
+typedef int (*fn_op_execute_t)(modsec_rec* msr, msre_rule* rule, msre_var* var, char** error_msg);
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_tfn, (const char *name, void *fn));
-APR_DECLARE_OPTIONAL_FN(void, modsec_register_operator, (const char *name, void *fn_init, void *fn_exec));
+APR_DECLARE_OPTIONAL_FN(void, modsec_register_operator, (const char *name, fn_op_param_init_t fn_init, fn_op_execute_t fn_exec));
 APR_DECLARE_OPTIONAL_FN(void, modsec_register_variable,
     (const char *name, unsigned int type,
      unsigned int argc_min, unsigned int argc_max,
