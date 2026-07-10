@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <memory>
 #include <cstdint>
+#include <cctype>
 #endif
 
 
@@ -46,6 +47,23 @@ class Collection {
  public:
     explicit Collection(const std::string &a) : m_name(a) { }
     virtual ~Collection() { }
+
+    /*
+     * Collection variable names are case-insensitive in SecLang (e.g.
+     * `setvar:ip.counter` and `IP:COUNTER` refer to the same key). Normalise
+     * the variable-name term of the composite LMDB key to lowercase so that
+     * writes and reads performed with different casing hit the same entry.
+     * The compartment values (collection key, web app id) are intentionally
+     * left untouched since they may be opaque, case-sensitive identifiers.
+     */
+    static std::string normKey(const std::string &k) {
+        std::string out;
+        out.reserve(k.size());
+        for (char c : k) {
+            out.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+        }
+        return out;
+    }
 
     virtual bool storeOrUpdateFirst(const std::string &key,
         const std::string &value) = 0;
@@ -73,7 +91,7 @@ class Collection {
     /* storeOrUpdateFirst */
     virtual bool storeOrUpdateFirst(const std::string &key,
         std::string compartment, const std::string &value) {
-        std::string nkey = compartment + "::" + key;
+        std::string nkey = compartment + "::" + normKey(key);
         return storeOrUpdateFirst(nkey, value);
     }
 
@@ -81,7 +99,7 @@ class Collection {
     virtual bool storeOrUpdateFirst(const std::string &key,
         std::string compartment, std::string compartment2,
         const std::string &value) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(key);
         return storeOrUpdateFirst(nkey, value);
     }
 
@@ -89,28 +107,28 @@ class Collection {
     /* updateFirst */
     virtual bool updateFirst(const std::string &key, std::string compartment,
         const std::string &value) {
-        std::string nkey = compartment + "::" + key;
+        std::string nkey = compartment + "::" + normKey(key);
         return updateFirst(nkey, value);
     }
 
 
     virtual bool updateFirst(const std::string &key, std::string compartment,
         std::string compartment2, const std::string &value) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(key);
         return updateFirst(nkey, value);
     }
 
 
     /* del */
     virtual void del(const std::string& key, std::string compartment) {
-        std::string nkey = compartment + "::" + key;
+        std::string nkey = compartment + "::" + normKey(key);
         del(nkey);
     }
 
 
     virtual void del(const std::string& key, std::string compartment,
         std::string compartment2) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(key);
         del(nkey);
     }
 
@@ -118,14 +136,14 @@ class Collection {
     /* setExpiry */
     virtual void setExpiry(const std::string& key, std::string compartment,
         int32_t expiry_seconds) {
-        std::string nkey = compartment + "::" + key;
+        std::string nkey = compartment + "::" + normKey(key);
         setExpiry(nkey, expiry_seconds);
     }
 
 
     virtual void setExpiry(const std::string& key, std::string compartment,
         std::string compartment2, int32_t expiry_seconds) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(key);
         setExpiry(nkey, expiry_seconds);
     }
 
@@ -133,14 +151,14 @@ class Collection {
     /* resolveFirst */
     virtual std::unique_ptr<std::string> resolveFirst(const std::string& var,
         std::string compartment) {
-        std::string nkey = compartment + "::" + var;
+        std::string nkey = compartment + "::" + normKey(var);
         return resolveFirst(nkey);
     }
 
 
     virtual std::unique_ptr<std::string> resolveFirst(const std::string& var,
         std::string compartment, std::string compartment2) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + var;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(var);
         return resolveFirst(nkey);
     }
 
@@ -148,7 +166,7 @@ class Collection {
     /* resolveSingleMatch */
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::vector<const VariableValue *> *l) {
-        std::string nkey = compartment + "::" + var;
+        std::string nkey = compartment + "::" + normKey(var);
         resolveSingleMatch(nkey, l);
     }
 
@@ -156,7 +174,7 @@ class Collection {
     virtual void resolveSingleMatch(const std::string& var,
         std::string compartment, std::string compartment2,
         std::vector<const VariableValue *> *l) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + var;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(var);
         resolveSingleMatch(nkey, l);
     }
 
@@ -165,7 +183,7 @@ class Collection {
     virtual void resolveMultiMatches(const std::string& var,
         std::string compartment, std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) {
-        std::string nkey = compartment + "::" + var;
+        std::string nkey = compartment + "::" + normKey(var);
         resolveMultiMatches(nkey, l, ke);
     }
 
@@ -174,7 +192,7 @@ class Collection {
         std::string compartment, std::string compartment2,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + var;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(var);
         resolveMultiMatches(nkey, l, ke);
     }
 
@@ -183,7 +201,7 @@ class Collection {
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment, std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) {
-        std::string nkey = compartment + "::" + var;
+        std::string nkey = compartment + "::" + normKey(var);
         resolveRegularExpression(nkey, l, ke);
     }
 
@@ -191,7 +209,7 @@ class Collection {
     virtual void resolveRegularExpression(const std::string& var,
         std::string compartment, std::string compartment2,
         std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
-        std::string nkey = compartment + "::" + compartment2 + "::" + var;
+        std::string nkey = compartment + "::" + compartment2 + "::" + normKey(var);
         resolveRegularExpression(nkey, l, ke);
     }
 

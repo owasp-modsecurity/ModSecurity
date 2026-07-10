@@ -641,16 +641,40 @@ end_txn:
 MDBEnvProvider::MDBEnvProvider() : m_env(NULL), valid(false) {
     int rc;
     MDB_txn *txn;
+
+    std::string datadir = m_s_dataDir;
+    int openFlags = MDB_WRITEMAP;
+    mdb_mode_t openMode = 0664;
+
+    if (datadir.empty()) {
+        // Legacy fallback: single file in the current working directory.
+        datadir = "./modsec-shared-collections";
+        openFlags |= MDB_NOSUBDIR;
+    }
+
     mdb_env_create(&m_env);
-    rc = mdb_env_open(m_env, "./modsec-shared-collections",
-        MDB_WRITEMAP | MDB_NOSUBDIR, 0664);
+    rc = mdb_env_open(m_env, datadir.c_str(), openFlags, openMode);
 
     if (rc == 0) {
         valid = true;
         mdb_txn_begin(m_env, NULL, 0, &txn);
         mdb_dbi_open(txn, NULL, MDB_CREATE | MDB_DUPSORT, &m_dbi);
         mdb_txn_commit(txn);
+    } else {
+        std::cerr << "ModSecurity: failed to open LMDB environment '"
+            << datadir << "': " << mdb_strerror(rc)
+            << " (collections will not be persisted)." << std::endl;
     }
+}
+
+std::string MDBEnvProvider::m_s_dataDir = "";
+
+void MDBEnvProvider::SetDataDir(const std::string &dir) {
+    m_s_dataDir = dir;
+}
+
+const std::string& MDBEnvProvider::GetDataDir() {
+    return m_s_dataDir;
 }
 
 MDB_env* MDBEnvProvider::GetEnv() {
