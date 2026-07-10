@@ -331,6 +331,17 @@ using namespace modsecurity::operators;
 %code
 {
 #include "src/parser/driver.h"
+#include <cerrno>
+#include <cstring>
+#include <sys/types.h>
+#include <sys/stat.h>
+#if !defined(S_ISDIR) && defined(S_IFMT) && defined(S_IFDIR)
+#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+#ifndef WIN32
+#include <unistd.h>
+#endif
+#include "src/collection/backend/lmdb.h"
 }
 %define api.token.prefix {TOK_}
 %token
@@ -1750,14 +1761,34 @@ expression:
 */
       }
     | CONGIG_DIR_SEC_DATA_DIR
-/* Parser error disabled to avoid breaking default installations with modsecurity.conf-recommended
-        std::stringstream ss;
-        ss << "SecDataDir is not currently supported.";
-        ss << " Collections are kept in memory (in_memory-per_process) for now.";
-        ss << " When using a backend such as LMDB, temp data path is currently defined by the backend.";
-        driver.error(@0, ss.str());
-        YYERROR;
-*/
+      {
+        driver.m_secDataDir.m_set = true;
+        driver.m_secDataDir.m_value = $1;
+#ifdef WITH_LMDB
+        struct stat dstat;
+        if (stat($1.c_str(), &dstat) != 0) {
+            std::stringstream ss;
+            ss << "SecDataDir '" << $1 << "' does not exist: " << strerror(errno);
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+        if (!S_ISDIR(dstat.st_mode)) {
+            std::stringstream ss;
+            ss << "SecDataDir '" << $1 << "' is not a directory.";
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+#ifndef WIN32
+        if (access($1.c_str(), W_OK | X_OK) != 0) {
+            std::stringstream ss;
+            ss << "SecDataDir '" << $1 << "' is not writable: " << strerror(errno);
+            driver.error(@0, ss.str());
+            YYERROR;
+        }
+#endif
+        collection::backend::MDBEnvProvider::SetDataDir($1);
+#endif
+      }
     | CONGIG_DIR_SEC_ARG_SEP
     | CONGIG_DIR_SEC_COOKIE_FORMAT
       {

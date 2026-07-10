@@ -1,5 +1,6 @@
+#line 2 "seclang-scanner.cc"
 
-#line 3 "seclang-scanner.cc"
+#line 4 "seclang-scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -5010,7 +5011,7 @@ static const char* find_separator(const char *s) {
 #define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
-#line 5014 "seclang-scanner.cc"
+#line 5015 "seclang-scanner.cc"
 #define YY_NO_INPUT 1
 #define YY_NO_UNISTD_H 1
 
@@ -5018,8 +5019,8 @@ static const char* find_separator(const char *s) {
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
 
-#line 5022 "seclang-scanner.cc"
 #line 5023 "seclang-scanner.cc"
+#line 5024 "seclang-scanner.cc"
 
 #define INITIAL 0
 #define EXPECTING_ACTION_PREDICATE_VARIABLE 1
@@ -5341,7 +5342,7 @@ YY_DECL
   // Code run each time yylex is called.
   driver.loc.back()->step();
 
-#line 5345 "seclang-scanner.cc"
+#line 5346 "seclang-scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -8477,7 +8478,7 @@ YY_RULE_SETUP
 #line 1355 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 8481 "seclang-scanner.cc"
+#line 8482 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{

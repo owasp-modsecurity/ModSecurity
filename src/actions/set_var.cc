@@ -86,7 +86,30 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
         } else if (user) {
             user->del(t, m_variableNameExpanded);
         } else {
-            // ?
+            const std::string &col = m_variable->m_collectionName;
+            if (col == "TX") {
+                t->m_collections.m_tx_collection->del(m_variableNameExpanded);
+            } else if (col == "IP") {
+                t->m_collections.m_ip_collection->del(m_variableNameExpanded,
+                    t->m_collections.m_ip_collection_key,
+                    t->m_rules->m_secWebAppId.m_value);
+            } else if (col == "SESSION") {
+                t->m_collections.m_session_collection->del(m_variableNameExpanded,
+                    t->m_collections.m_session_collection_key,
+                    t->m_collections.m_ip_collection_key);
+            } else if (col == "USER") {
+                t->m_collections.m_user_collection->del(m_variableNameExpanded,
+                    t->m_collections.m_user_collection_key,
+                    t->m_rules->m_secWebAppId.m_value);
+            } else if (col == "RESOURCE") {
+                t->m_collections.m_resource_collection->del(m_variableNameExpanded,
+                    t->m_collections.m_resource_collection_key,
+                    t->m_rules->m_secWebAppId.m_value);
+            } else if (col == "GLOBAL") {
+                t->m_collections.m_global_collection->del(m_variableNameExpanded,
+                    t->m_collections.m_global_collection_key,
+                    t->m_rules->m_secWebAppId.m_value);
+            }
         }
         goto end;
     } else {
@@ -138,7 +161,36 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
     } else if (user) {
         user->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);
     } else {
-        // ?
+        const std::string &col = m_variable->m_collectionName;
+        if (col == "TX") {
+            t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                m_variableNameExpanded, targetValue);
+        } else if (col == "IP") {
+            t->m_collections.m_ip_collection->storeOrUpdateFirst(
+                m_variableNameExpanded,
+                t->m_collections.m_ip_collection_key,
+                t->m_rules->m_secWebAppId.m_value, targetValue);
+        } else if (col == "SESSION") {
+            t->m_collections.m_session_collection->storeOrUpdateFirst(
+                m_variableNameExpanded,
+                t->m_collections.m_session_collection_key,
+                t->m_rules->m_secWebAppId.m_value, targetValue);
+        } else if (col == "USER") {
+            t->m_collections.m_user_collection->storeOrUpdateFirst(
+                m_variableNameExpanded,
+                t->m_collections.m_user_collection_key,
+                t->m_rules->m_secWebAppId.m_value, targetValue);
+        } else if (col == "RESOURCE") {
+            t->m_collections.m_resource_collection->storeOrUpdateFirst(
+                m_variableNameExpanded,
+                t->m_collections.m_resource_collection_key,
+                t->m_rules->m_secWebAppId.m_value, targetValue);
+        } else if (col == "GLOBAL") {
+            t->m_collections.m_global_collection->storeOrUpdateFirst(
+                m_variableNameExpanded,
+                t->m_collections.m_global_collection_key,
+                t->m_rules->m_secWebAppId.m_value, targetValue);
+        }
     }
 
     /*

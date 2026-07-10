@@ -522,6 +522,8 @@ class RulesSetProperties {
 
         to->m_secWebAppId.merge(&from->m_secWebAppId);
 
+        to->m_secDataDir.merge(&from->m_secDataDir);
+
         to->m_unicodeMapTable.merge(&from->m_unicodeMapTable);
 
         to->m_httpblKey.merge(&from->m_httpblKey);
@@ -620,6 +622,7 @@ class RulesSetProperties {
     ConfigString m_uploadTmpDirectory;
     ConfigString m_secArgumentSeparator;
     ConfigString m_secWebAppId;
+    ConfigString m_secDataDir;
     std::vector<std::shared_ptr<actions::Action> > \
         m_defaultActions[modsecurity::Phases::NUMBER_OF_PHASES];
     ConfigUnicodeMap m_unicodeMapTable;

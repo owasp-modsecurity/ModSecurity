@@ -83,6 +83,17 @@ class MDBEnvProvider {
     MDB_dbi* GetDBI();
     bool isValid() const;
 
+    /**
+     * Set the directory used to hold the LMDB environment. Must be called
+     * before the singleton is first instantiated (i.e. before the first
+     * collection transaction). When set, SecDataDir is used as the LMDB
+     * environment directory (data.mdb / lock.mdb are created inside it).
+     * When unset, the legacy behaviour is preserved: a single
+     * "./modsec-shared-collections" file in the current working directory.
+     */
+    static void SetDataDir(const std::string &dir);
+    static const std::string& GetDataDir();
+
     ~MDBEnvProvider();
  private:
     MDB_env *m_env;
@@ -90,6 +101,8 @@ class MDBEnvProvider {
     bool valid;
 
     MDBEnvProvider();
+
+    static std::string m_s_dataDir;
 };
 
 class LMDB :

@@ -32,7 +32,7 @@
 
 
 /**
- ** \file y.tab.h
+ ** \file seclang-parser.hh
  ** Define the yy::parser class.
  */
 
@@ -2139,67 +2139,67 @@ namespace yy {
         switch (yykind)
         {
       case symbol_kind::S_actions: // actions
-#line 724 "seclang-parser.yy"
+#line 735 "seclang-parser.yy"
                     { }
 #line 2145 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_actions_may_quoted: // actions_may_quoted
-#line 724 "seclang-parser.yy"
+#line 735 "seclang-parser.yy"
                     { }
 #line 2151 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_op: // op
-#line 725 "seclang-parser.yy"
+#line 736 "seclang-parser.yy"
                     { }
 #line 2157 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_op_before_init: // op_before_init
-#line 725 "seclang-parser.yy"
+#line 736 "seclang-parser.yy"
                     { }
 #line 2163 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_variables: // variables
-#line 727 "seclang-parser.yy"
+#line 738 "seclang-parser.yy"
                     { }
 #line 2169 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_variables_pre_process: // variables_pre_process
-#line 727 "seclang-parser.yy"
+#line 738 "seclang-parser.yy"
                     { }
 #line 2175 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_variables_may_be_quoted: // variables_may_be_quoted
-#line 727 "seclang-parser.yy"
+#line 738 "seclang-parser.yy"
                     { }
 #line 2181 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_var: // var
-#line 726 "seclang-parser.yy"
+#line 737 "seclang-parser.yy"
                     { }
 #line 2187 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_act: // act
-#line 722 "seclang-parser.yy"
+#line 733 "seclang-parser.yy"
                     { }
 #line 2193 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_setvar_action: // setvar_action
-#line 722 "seclang-parser.yy"
+#line 733 "seclang-parser.yy"
                     { }
 #line 2199 "seclang-parser.hh"
         break;
 
       case symbol_kind::S_run_time_string: // run_time_string
-#line 723 "seclang-parser.yy"
+#line 734 "seclang-parser.yy"
                     { }
 #line 2205 "seclang-parser.hh"
         break;
