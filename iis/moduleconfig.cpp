@@ -86,7 +86,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
         if( ppException != nullptr )
         {
             *ppException = static_cast<IAppHostConfigException*>(pPropertyException);
-            ppException -> AddRef();
+            (*ppException) -> AddRef();
         }
         goto Failure;
     }
@@ -116,7 +116,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
         if ( ppException != nullptr ){
             // See prevoius comment regarding static_cast and ppException assignment
             *ppException = static_cast<IAppHostConfigException*>(pPropertyException);
-            ppException -> AddRef();
+            (*ppException) -> AddRef();
         }
         goto Failure;
     }
@@ -487,7 +487,7 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
         CHAR**  ppszDestination,
         USHORT*  pdwLengthDestination )
 {
-    DWORD       dwResult    = nullptr;
+    DWORD       dwResult    = 0;
     DWORD       dwCount     = 0;
 
     if (  
