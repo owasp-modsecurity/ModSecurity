@@ -32,16 +32,16 @@ MODSECURITY_STORED_CONTEXT::Initialize(
 )
 {
     HRESULT                    hr                       = S_OK;
-    IAppHostAdminManager       *pAdminManager           = NULL;
-    IAppHostElement            *pSessionTrackingElement = NULL;
-    IAppHostPropertyException  *pPropertyException      = NULL;
+    IAppHostAdminManager       *pAdminManager           = nullptr;
+    IAppHostElement            *pSessionTrackingElement = nullptr;
+    IAppHostPropertyException  *pPropertyException      = nullptr;
 
     PCWSTR pszConfigPath = pW3Context->GetMetadata()->GetMetaPath();
     BSTR bstrUrlPath     = SysAllocString( pszConfigPath );
 
     pAdminManager = g_pHttpServer->GetAdminManager();
 
-    if ( ( FAILED( hr ) ) || ( pAdminManager == NULL ) )
+    if ( ( FAILED( hr ) ) || ( pAdminManager == nullptr ) )
     {
         hr = E_UNEXPECTED;
         goto Failure;   
@@ -58,7 +58,7 @@ MODSECURITY_STORED_CONTEXT::Initialize(
         goto Failure;
     }
 
-    if ( pSessionTrackingElement == NULL )
+    if ( pSessionTrackingElement == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Failure;
@@ -77,10 +77,17 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     }
 
     // If there is a config failure, we cannot continue execution:
-    if ( pPropertyException != NULL )
+    if ( pPropertyException != nullptr )
     {
-
-        ppException = ( IAppHostConfigException** ) &pPropertyException;
+        
+        // If there is a config failure, we cannot continue execution
+        // To avoid using reinterpret_cast, we will use static_cast to 
+        // convert the IAppHostPropertyException to IAppHostConfigException
+        if( ppException != nullptr )
+        {
+            *ppException = static_cast<IAppHostConfigException*>(pPropertyException);
+            (*ppException) -> AddRef();
+        }
         goto Failure;
     }
 
@@ -104,10 +111,13 @@ MODSECURITY_STORED_CONTEXT::Initialize(
     }
 
     // If there is a config failure, we cannot continue execution:
-    if ( pPropertyException != NULL )
+    if ( pPropertyException != nullptr )
     {
-
-        ppException = ( IAppHostConfigException** ) &pPropertyException;
+        if ( ppException != nullptr ){
+            // See prevoius comment regarding static_cast and ppException assignment
+            *ppException = static_cast<IAppHostConfigException*>(pPropertyException);
+            (*ppException) -> AddRef();
+        }
         goto Failure;
     }
 
@@ -124,14 +134,14 @@ MODSECURITY_STORED_CONTEXT::GetBooleanPropertyValue(
         BOOL*                       pBoolValue )
 {
     HRESULT                 hr              = S_OK;
-    IAppHostProperty        *pProperty      = NULL;    
+    IAppHostProperty        *pProperty      = nullptr;    
     VARIANT                 vPropertyValue;
 
     if ( 
-           ( pElement        == NULL ) || 
-           ( pszPropertyName == NULL ) ||
-           ( pException      == NULL ) ||
-           ( pBoolValue      == NULL )
+           ( pElement        == nullptr ) || 
+           ( pszPropertyName == nullptr ) ||
+           ( pException      == nullptr ) ||
+           ( pBoolValue      == nullptr )
        )
     {
         hr = E_INVALIDARG;
@@ -148,7 +158,7 @@ MODSECURITY_STORED_CONTEXT::GetBooleanPropertyValue(
         goto Failure;
     }
 
-    if ( pProperty == NULL )
+    if ( pProperty == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Failure;
@@ -166,7 +176,7 @@ MODSECURITY_STORED_CONTEXT::GetBooleanPropertyValue(
 
     // See it there is an exception that might be due to the actual value in the 
     // config not meeting validation criteria
-    *pException = NULL;
+    *pException = nullptr;
 
     hr = pProperty->get_Exception( pException );
 
@@ -176,7 +186,7 @@ MODSECURITY_STORED_CONTEXT::GetBooleanPropertyValue(
     }
 
     // No need to continue if we got an exception...
-    if ( ( *pException ) != NULL )
+    if ( ( *pException ) != nullptr )
     {
         goto Failure;
     }
@@ -188,10 +198,10 @@ MODSECURITY_STORED_CONTEXT::GetBooleanPropertyValue(
 Failure:
     VariantClear( &vPropertyValue );
 
-    if ( pProperty != NULL )
+    if ( pProperty != nullptr )
     {
         pProperty->Release();
-        pProperty = NULL;
+        pProperty = nullptr;
     }
 
     return hr;
@@ -205,14 +215,14 @@ MODSECURITY_STORED_CONTEXT::GetDWORDPropertyValue(
         DWORD*                      pnValue )
 {
     HRESULT                 hr              = S_OK;
-    IAppHostProperty        *pProperty      = NULL;    
+    IAppHostProperty        *pProperty      = nullptr;    
     VARIANT                 vPropertyValue;
 
     if ( 
-           ( pElement        == NULL ) || 
-           ( pszPropertyName == NULL ) ||
-           ( pException      == NULL ) ||
-           ( pnValue         == NULL )
+           ( pElement        == nullptr ) || 
+           ( pszPropertyName == nullptr ) ||
+           ( pException      == nullptr ) ||
+           ( pnValue         == nullptr )
        )
     {
         hr = E_INVALIDARG;
@@ -229,7 +239,7 @@ MODSECURITY_STORED_CONTEXT::GetDWORDPropertyValue(
         goto Failure;
     }
 
-    if ( pProperty == NULL )
+    if ( pProperty == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Failure;
@@ -247,7 +257,7 @@ MODSECURITY_STORED_CONTEXT::GetDWORDPropertyValue(
 
     // See it there is an exception that might be due to the actual value in the 
     // config not meeting validation criteria
-    *pException = NULL;
+    *pException = nullptr;
 
     hr = pProperty->get_Exception( pException );
 
@@ -257,7 +267,7 @@ MODSECURITY_STORED_CONTEXT::GetDWORDPropertyValue(
     }
 
     // No need to continue if we got an exception...
-    if ( ( *pException ) != NULL )
+    if ( ( *pException ) != nullptr )
     {
         goto Failure;
     }
@@ -268,10 +278,10 @@ MODSECURITY_STORED_CONTEXT::GetDWORDPropertyValue(
 Failure:
     VariantClear( &vPropertyValue );
 
-    if ( pProperty != NULL )
+    if ( pProperty != nullptr )
     {
         pProperty->Release();
-        pProperty = NULL;
+        pProperty = nullptr;
     }
 
     return hr;
@@ -285,14 +295,14 @@ MODSECURITY_STORED_CONTEXT::GetTimeSpanPropertyValue(
         ULONGLONG*                 pnValue )
 {
     HRESULT                 hr              = S_OK;
-    IAppHostProperty        *pProperty      = NULL;    
+    IAppHostProperty        *pProperty      = nullptr;    
     VARIANT                 vPropertyValue;
 
     if ( 
-           ( pElement        == NULL ) || 
-           ( pszPropertyName == NULL ) ||
-           ( pException      == NULL ) ||
-           ( pnValue         == NULL )
+           ( pElement        == nullptr ) || 
+           ( pszPropertyName == nullptr ) ||
+           ( pException      == nullptr ) ||
+           ( pnValue         == nullptr )
        )
     {
         hr = E_INVALIDARG;
@@ -309,7 +319,7 @@ MODSECURITY_STORED_CONTEXT::GetTimeSpanPropertyValue(
         goto Failure;
     }
 
-    if ( pProperty == NULL )
+    if ( pProperty == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Failure;
@@ -327,7 +337,7 @@ MODSECURITY_STORED_CONTEXT::GetTimeSpanPropertyValue(
 
     // See it there is an exception that might be due to the actual value in the 
     // config not meeting validation criteria
-    *pException = NULL;
+    *pException = nullptr;
 
     hr = pProperty->get_Exception( pException );
 
@@ -337,7 +347,7 @@ MODSECURITY_STORED_CONTEXT::GetTimeSpanPropertyValue(
     }
 
     // No need to continue if we got an exception...
-    if ( ( *pException ) != NULL )
+    if ( ( *pException ) != nullptr )
     {
         goto Failure;
     }
@@ -348,10 +358,10 @@ MODSECURITY_STORED_CONTEXT::GetTimeSpanPropertyValue(
 Failure:
     VariantClear( &vPropertyValue );
 
-    if ( pProperty != NULL )
+    if ( pProperty != nullptr )
     {
         pProperty->Release();
-        pProperty = NULL;
+        pProperty = nullptr;
     }
 
     return hr;
@@ -365,22 +375,22 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
         WCHAR**                     ppszValue )
 {
     HRESULT                 hr              = S_OK;
-    IAppHostProperty        *pProperty      = NULL;    
+    IAppHostProperty        *pProperty      = nullptr;    
     DWORD                   dwLength;
     VARIANT                 vPropertyValue;
 
     if ( 
-           ( pElement        == NULL ) || 
-           ( pszPropertyName == NULL ) ||
-           ( pException      == NULL ) ||
-           ( ppszValue       == NULL )
+           ( pElement        == nullptr ) || 
+           ( pszPropertyName == nullptr ) ||
+           ( pException      == nullptr ) ||
+           ( ppszValue       == nullptr )
        )
     {
         hr = E_INVALIDARG;
         goto Failure;
     }
 
-    *ppszValue = NULL;
+    *ppszValue = nullptr;
 
     // Get the property object for the string attribute:
     hr = pElement->GetPropertyByName( 
@@ -392,7 +402,7 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
         goto Failure;
     }
 
-    if ( pProperty == NULL )
+    if ( pProperty == nullptr )
     {
         hr = E_UNEXPECTED;
         goto Failure;
@@ -410,7 +420,7 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
 
     // See it there is an exception that might be due to the actual value in the 
     // config not meeting validation criteria
-    *pException = NULL;
+    *pException = nullptr;
 
     hr = pProperty->get_Exception( pException );
 
@@ -420,7 +430,7 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
     }
 
     // No need to continue if we got an exception...
-    if ( ( *pException ) != NULL )
+    if ( ( *pException ) != nullptr )
     {
         goto Failure;
     }
@@ -429,7 +439,7 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
     dwLength = SysStringLen( vPropertyValue.bstrVal );
     *ppszValue = new WCHAR[ dwLength + 1 ];
 
-    if ( (*ppszValue) == NULL )
+    if ( (*ppszValue) == nullptr )
     {
         hr = E_OUTOFMEMORY;
         goto Failure;
@@ -445,10 +455,10 @@ MODSECURITY_STORED_CONTEXT::GetStringPropertyValue(
 Failure:
     VariantClear( &vPropertyValue );
 
-    if ( pProperty != NULL )
+    if ( pProperty != nullptr )
     {
         pProperty->Release();
-        pProperty = NULL;
+        pProperty = nullptr;
     }
 
     return hr;
@@ -456,17 +466,17 @@ Failure:
 
 MODSECURITY_STORED_CONTEXT::~MODSECURITY_STORED_CONTEXT()
 {
-    if ( m_pszPath != NULL )
+    if ( m_pszPath != nullptr )
     {
         delete [] m_pszPath;
-        m_pszPath = NULL;
+        m_pszPath = nullptr;
     }
 }
 
 MODSECURITY_STORED_CONTEXT::MODSECURITY_STORED_CONTEXT():
     m_bIsEnabled ( FALSE ),
-    m_pszPath( NULL ),
-	m_Config( NULL )
+    m_pszPath( nullptr ),
+	m_Config( nullptr )
 {
 }
 
@@ -477,13 +487,13 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
         CHAR**  ppszDestination,
         USHORT*  pdwLengthDestination )
 {
-    DWORD       dwResult    = NULL;
+    DWORD       dwResult    = 0;
     DWORD       dwCount     = 0;
 
     if (  
-          ( pSource == NULL ) ||
-          ( ppszDestination == NULL ) ||
-          ( pdwLengthDestination == NULL ) 
+          ( pSource == nullptr ) ||
+          ( ppszDestination == nullptr ) ||
+          ( pdwLengthDestination == nullptr ) 
        )
     {
         dwResult = ERROR_INVALID_PARAMETER;
@@ -492,7 +502,7 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
 
     // Initialize result length
     *pdwLengthDestination = 0;
-    *ppszDestination     = NULL;
+    *ppszDestination     = nullptr;
 
     dwCount =   WideCharToMultiByte( 
                     CP_ACP, 
@@ -501,8 +511,8 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
                     dwLengthSource + 1, 
                     *ppszDestination, 
                     0,
-                    NULL,
-                    NULL );
+                    nullptr,
+                    nullptr );
 
     if ( 0 == dwCount )
     {
@@ -518,7 +528,7 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
 
     *ppszDestination = new CHAR[ dwCount + 1 ];
 
-    if ( NULL == ( *ppszDestination ) )
+    if ( nullptr == ( *ppszDestination ) )
     {
         dwResult = ERROR_OUTOFMEMORY;
         goto Exit;
@@ -537,8 +547,8 @@ MODSECURITY_STORED_CONTEXT::GlobalWideCharToMultiByte(
                 dwLengthSource + 1, 
                 *ppszDestination, 
                 dwCount,
-                NULL,
-                NULL )
+                nullptr,
+                nullptr )
        )
     {
         dwResult = GetLastError();
@@ -552,17 +562,17 @@ Exit:
     if ( dwResult != 0 )
     {
         // Make sure we do the proper cleanup in the error case:
-        if ( pdwLengthDestination != NULL )
+        if ( pdwLengthDestination != nullptr )
         {
             *pdwLengthDestination = 0;
         }
 
-        if ( ppszDestination != NULL )
+        if ( ppszDestination != nullptr )
         {
-            if ( ( *ppszDestination ) != NULL )
+            if ( ( *ppszDestination ) != nullptr )
             {
                 delete [] ( *ppszDestination );
-                ( *ppszDestination ) = NULL;
+                ( *ppszDestination ) = nullptr;
             }
         }
     }
@@ -577,20 +587,20 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
 )
 {
     HRESULT                          hr                 = S_OK;
-    MODSECURITY_STORED_CONTEXT * pModuleConfig      = NULL;
-    IHttpModuleContextContainer *    pMetadataContainer = NULL;
-	IAppHostConfigException *        pException         = NULL;
+    MODSECURITY_STORED_CONTEXT * pModuleConfig      = nullptr;
+    IHttpModuleContextContainer *    pMetadataContainer = nullptr;
+	IAppHostConfigException *        pException         = nullptr;
 
     pMetadataContainer = pContext->GetMetadata()->GetModuleContextContainer();
 
-	if ( pMetadataContainer == NULL )
+	if ( pMetadataContainer == nullptr )
 	{
         hr = E_UNEXPECTED;
         return hr;
 	}
 
     pModuleConfig = (MODSECURITY_STORED_CONTEXT *)pMetadataContainer->GetModuleContext( g_pModuleContext );	
-    if ( pModuleConfig != NULL )
+    if ( pModuleConfig != nullptr )
     {
         //
         // We found stored data for this module for the metadata
@@ -606,7 +616,7 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
     // if a change notification arrives for this metadata path
     //
     pModuleConfig = new MODSECURITY_STORED_CONTEXT();
-    if ( pModuleConfig == NULL )
+    if ( pModuleConfig == nullptr )
     {
         return E_OUTOFMEMORY;
     }
@@ -615,11 +625,11 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
     // Read module configuration data and store in MODSECURITY_STORED_CONTEXT
     //
     hr = pModuleConfig->Initialize( pContext, &pException );
-    if ( FAILED( hr )  || pException != NULL )
+    if ( FAILED( hr )  || pException != nullptr )
     {
         pModuleConfig->CleanupStoredContext();
 
-        pModuleConfig = NULL;
+        pModuleConfig = nullptr;
         hr = E_UNEXPECTED;
 
         return hr;
@@ -633,7 +643,7 @@ MODSECURITY_STORED_CONTEXT::GetConfig(
     if ( FAILED( hr ) )
     {
         pModuleConfig->CleanupStoredContext();
-        pModuleConfig = NULL;
+        pModuleConfig = nullptr;
 
         //
         // It is possible that some other thread stored context before this thread
