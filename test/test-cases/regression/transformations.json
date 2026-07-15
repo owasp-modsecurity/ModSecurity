@@ -165,7 +165,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains javascript:exec\" \"id:1,deny,t:trim,t:lowercase,t:htmlEntityDecode\""
+      "SecRule ARGS \"@contains javascript:exec\" \"id:1,phase:2,deny,t:trim,t:lowercase,t:htmlEntityDecode\""
     ]
   },
   {
