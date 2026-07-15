@@ -160,7 +160,7 @@
       ]
     },
     "expected": {
-      "debug_log": "htmlEntityDecode: \"javascript:execute_my_code();\"",
+      "debug_log": "t:htmlEntityDecode: \"javascript:execute_my_code\\(\\);\"",
       "http_code": 403
     },
     "rules": [
