@@ -104,5 +104,5 @@
 	name => "htmlEntityDecode",
 	input => "&unknown;",
 	output => "&unknown;",
-	ret => 1,
+	ret => 0,
 },
