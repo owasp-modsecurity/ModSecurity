@@ -13,7 +13,6 @@
  *
  */
 
-#include <bits/types/FILE.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -228,11 +227,12 @@ bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
     if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
         return false;
     }
-    *v_fp = fopen(filename, mode);
-    if (*v_fp == nullptr) {
-        return false;
-    }
-    return true;
+#if defined(_MSC_VER)
+     return fopen_s(v_fp, filename, mode) == 0 && *v_fp != nullptr;
+#else
+      *v_fp = fopen(filename, mode);
+      return *v_fp != nullptr;
+#endif
 }
 #if defined(_MSC_VER)
 #pragma warning(pop)
