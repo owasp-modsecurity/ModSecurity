@@ -13,6 +13,8 @@
  *
  */
 
+#include <stdio.h>
+
 #include <string>
 #include <list>
 
@@ -33,6 +35,7 @@ std::string get_path(const std::string& file);
 std::list<std::string> expandEnv(const std::string& var, int flags);
 bool createDir(const std::string& dir, int mode, std::string *error);
 bool isFile(const std::string& f);
+bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode);
 
 }  // namespace utils
 }  // namespace modsecurity
