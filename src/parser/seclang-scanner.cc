@@ -8401,7 +8401,7 @@ YY_RULE_SETUP
         driver.loc.push_back(new yy::location());
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
-        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r") != 0) { // NOSONAR
+        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r")) { // NOSONAR
             BEGIN(INITIAL);
             driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
@@ -8432,7 +8432,7 @@ YY_RULE_SETUP
         driver.loc.push_back(new yy::location());
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
-        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r") != 0) { // NOSONAR
+        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r")) { // NOSONAR
             BEGIN(INITIAL);
             driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);

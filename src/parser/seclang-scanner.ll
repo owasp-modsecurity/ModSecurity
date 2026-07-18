@@ -1303,7 +1303,7 @@ EQUALS_MINUS                            (?i:=\-)
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
 
-        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r") != 0) {
+        if (!modsecurity::utils::fopen_modsec(&yyin, f.c_str(), "r")) {
             BEGIN(INITIAL);
             driver.loc.pop_back();
             driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
