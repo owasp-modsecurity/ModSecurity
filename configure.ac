@@ -285,6 +285,11 @@ MSC_ARG_ENABLE_BOOL([afl-fuzz], [Turn on the afl fuzzer compilation utilities], 
 MSC_ARG_ENABLE_BOOL([examples], [Turn on the examples compilation (default option)], [true], [buildExamples])
 MSC_ARG_ENABLE_BOOL([parser-generation], [Enables parser generation during the build], [false], [buildParser])
 MSC_ARG_ENABLE_BOOL([mutex-on-pm], [Treat pm operations as critical section], [false], [mutexPm])
+MSC_ARG_ENABLE_BOOL([regex-dollar-endonly], [Compile @rx/@rxGlobal patterns with PCRE(2)_DOLLAR_ENDONLY instead of PCRE(2)_MULTILINE, matching ModSecurity v2 behavior (see issue #3295)], [false], [regexDollarEndonly])
+if test "$regexDollarEndonly" = "true"; then
+    MODSEC_REGEX_DOLLAR_ENDONLY_CPPFLAGS="-DMODSEC_REGEX_DOLLAR_ENDONLY=1"
+    GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $MODSEC_REGEX_DOLLAR_ENDONLY_CPPFLAGS"
+fi
 
 
 if test $buildParser = true; then

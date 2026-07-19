@@ -115,6 +115,11 @@ Windows build information can be found [here](build/win32/README.md).
   * **Default:** PCRE2 is detected and used.
   * **Fallback:** legacy PCRE can be used if `--with-pcre` is explicitly provided (`WITH_PCRE`).
 * In other words, current builds expect PCRE2 unless explicitly configured otherwise.
+* `@rx` and `@rxGlobal` compile patterns with `DOTALL | MULTILINE` by default. Pass
+  `--enable-regex-dollar-endonly=yes` to compile them with `DOTALL | DOLLAR_ENDONLY`
+  instead, matching ModSecurity v2's `@rx` behavior (`^`/`$` anchor only at the
+  start/end of the whole subject, not at internal line breaks). This flag is
+  disabled by default; see [issue #3295](https://github.com/owasp-modsecurity/ModSecurity/issues/3295).
 
 All other dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation.
 

@@ -87,11 +87,12 @@ bool crlfIsNewline() {
     return crlf_is_newline;
 }
 
-Regex::Regex(const std::string& pattern_, bool ignoreCase)
+Regex::Regex(const std::string& pattern_, bool ignoreCase, bool multiLine)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_pattern = reinterpret_cast<PCRE2_SPTR>(pattern.c_str());
-    uint32_t pcre2_options = (PCRE2_DOTALL|PCRE2_MULTILINE);
+    uint32_t pcre2_options = PCRE2_DOTALL |
+        (multiLine ? PCRE2_MULTILINE : PCRE2_DOLLAR_ENDONLY);
     if (ignoreCase) {
         pcre2_options |= PCRE2_CASELESS;
     }
@@ -103,7 +104,7 @@ Regex::Regex(const std::string& pattern_, bool ignoreCase)
 #else
     const char *errptr = nullptr;
     int erroffset;
-    int flags = (PCRE_DOTALL|PCRE_MULTILINE);
+    int flags = PCRE_DOTALL | (multiLine ? PCRE_MULTILINE : PCRE_DOLLAR_ENDONLY);
 
     if (ignoreCase == true) {
         flags |= PCRE_CASELESS;
