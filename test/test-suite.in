@@ -1,4 +1,5 @@
 # for i in `find test/test-cases -iname *.json`; do echo TESTS+=$i; done
+TESTS+=test/unit/regex_multiline_test
 TESTS+=test/test-cases/regression/action-allow.json
 TESTS+=test/test-cases/regression/action-block.json
 TESTS+=test/test-cases/regression/action-ctl_request_body_access.json

@@ -70,6 +70,32 @@ unit_tests_LDFLAGS = \
 	$(YAJL_LDFLAGS)
 
 
+# regex_multiline_test
+#
+# Direct coverage for the Regex(pattern, ignoreCase, multiLine) parameter
+# behind --enable-regex-dollar-endonly, independent of the rest of the
+# SecRules pipeline exercised by unit_tests/regression_tests.
+
+noinst_PROGRAMS += regex_multiline_test
+regex_multiline_test_SOURCES = \
+        unit/regex_multiline_test.cc
+
+regex_multiline_test_LDFLAGS = \
+	-L$(top_builddir)/src/.libs/ \
+	-lmodsecurity \
+	-lpthread \
+	-lm \
+	-lstdc++
+
+regex_multiline_test_CPPFLAGS = \
+	-I$(top_srcdir)/ \
+	-g \
+	-I$(top_builddir)/headers \
+	$(GLOBAL_CPPFLAGS) \
+	$(PCRE_CFLAGS) \
+	$(PCRE2_CFLAGS)
+
+
 unit_tests_CPPFLAGS = \
 	-Icommon \
 	-I$(top_srcdir)/ \

@@ -36,6 +36,7 @@ src/headers.mk
 /test/rules_optimization
 /test/regression_tests
 /test/unit_tests
+/test/regex_multiline_test
 /test-driver
 /test/massif.out.*
 /test/benchmark/benchmark
