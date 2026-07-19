@@ -88,6 +88,7 @@ TESTS+=test/test-cases/regression/operator-ipMatchFromFile.json
 TESTS+=test/test-cases/regression/operator-pm.json
 TESTS+=test/test-cases/regression/operator-pmfromfile.json
 TESTS+=test/test-cases/regression/operator-rx.json
+TESTS+=test/test-cases/regression/operator-rx-dollar-endonly.json
 TESTS+=test/test-cases/regression/operator-rxGlobal.json
 TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
 TESTS+=test/test-cases/regression/operator-validate-byte-range.json

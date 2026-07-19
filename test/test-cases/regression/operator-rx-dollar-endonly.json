@@ -1,0 +1,94 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "resource": "regex-dollar-endonly",
+    "title": "Testing Operator :: @rx --enable-regex-dollar-endonly (single-line match still blocks)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=hello%20world",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Executing operator \"Rx\"",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"^hello.*world$\" \"id:1,phase:2,deny,log,msg:'multiline-anchor-test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "resource": "regex-dollar-endonly",
+    "title": "Testing Operator :: @rx --enable-regex-dollar-endonly (anchors do not span internal line breaks)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=test%0Ahello%20world%0Amore",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Executing operator \"Rx\"",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"^hello.*world$\" \"id:1,phase:2,deny,log,msg:'multiline-anchor-test'\""
+    ]
+  }
+]
