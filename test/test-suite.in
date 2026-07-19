@@ -1,5 +1,4 @@
 # for i in `find test/test-cases -iname *.json`; do echo TESTS+=$i; done
-TESTS+=test/unit/regex_multiline_test
 TESTS+=test/test-cases/regression/action-allow.json
 TESTS+=test/test-cases/regression/action-block.json
 TESTS+=test/test-cases/regression/action-ctl_request_body_access.json
@@ -89,6 +88,7 @@ TESTS+=test/test-cases/regression/operator-ipMatchFromFile.json
 TESTS+=test/test-cases/regression/operator-pm.json
 TESTS+=test/test-cases/regression/operator-pmfromfile.json
 TESTS+=test/test-cases/regression/operator-rx.json
+TESTS+=test/test-cases/regression/operator-rx-dollar-endonly.json
 TESTS+=test/test-cases/regression/operator-rxGlobal.json
 TESTS+=test/test-cases/regression/operator-UnconditionalMatch.json
 TESTS+=test/test-cases/regression/operator-validate-byte-range.json

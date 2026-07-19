@@ -8,15 +8,7 @@ array=${@:1:$length}
 PARAM=$array
 FILE=${@: -1}
 
-if [[ $FILE != *.json ]]
-then
-    # Self-contained test binary (not a JSON test-case file) - run it directly.
-    $VALGRIND $PARAM ./$(basename $FILE)
-    RET=$?
-    if [ $RET -ne 0 ]; then
-        echo ":test-result: FAIL: ../$FILE"
-    fi
-elif [[ $FILE == *"test-cases/regression/"* ]]
+if [[ $FILE == *"test-cases/regression/"* ]]
 then
     AMOUNT=$(./regression_tests countall ../$FILE)
     RET=$?
