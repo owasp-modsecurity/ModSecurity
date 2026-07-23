@@ -1621,13 +1621,19 @@ expression:
       }
     | CONFIG_DIR_ARGS_LIMIT
       {
-        driver.m_argumentsLimit.m_set = true;
-        driver.m_argumentsLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_argumentsLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecArgumentsLimit: " + errmsg);
+          YYERROR;
+        }
       }
     | CONFIG_DIR_REQ_BODY_JSON_DEPTH_LIMIT
       {
-        driver.m_requestBodyJsonDepthLimit.m_set = true;
-        driver.m_requestBodyJsonDepthLimit.m_value = atoi($1.c_str());
+        std::string errmsg = "";
+        if (driver.m_requestBodyJsonDepthLimit.parse(std::string($1), &errmsg) != true) {
+          driver.error(@0, "Failed to parse SecRequestBodyJsonDepthLimit: " + errmsg);
+          YYERROR;
+        }
       }
     /* Body limits */
     | CONFIG_DIR_REQ_BODY_LIMIT
