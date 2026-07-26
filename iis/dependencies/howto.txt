@@ -44,16 +44,16 @@ to automatically patch security vulnerabilities in the Visual C++ runtime.
 
 The latest versions of ModSecurity dependencies known to work well are the following:
 
-cmake-3.8.2-win32-x86 (or later)
-pcre2-10.x (PCRE2 is now the default, PCRE 8.x is deprecated)
+cmake-4.2.3 (or later)
+pcre2-10.47 (or later) (PCRE2 is now the default, PCRE 8.x is deprecated)
   - Note: PCRE2 provides better performance and is actively maintained
-zlib-1.2.11 (or later)
-libxml2-2.9.4 (or later)
-lua-5.3.4 (or later)
-curl-7.54.1 (or later)
-httpd-2.4.27 (bin-VC15 or later for VS2019/2022)
+zlib-1.3.1 (or later)
+libxml2-2.15.1 (or later)
+lua-5.4.8 (or later)
+curl-8.18.0 (or later)
+httpd-2.4.66 (bin-VS16 or later for VS2019/2022)
 yajl-2.1.0
-ssdeep-2.13 (or later)
+ssdeep-2.14.1 (or later)
 
 --------------------------------------
 

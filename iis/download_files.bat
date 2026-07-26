@@ -13,7 +13,7 @@
 
 :: BITSAdmin refuses to download YAJL from GitHub URL
 :: @set YAJL_URL=https://github.com/lloyd/yajl/archive/%YAJL:~-9%
-@set YAJL_URL=http://http.debian.net/debian/pool/main/y/yajl/yajl_2.1.0.orig.tar.gz
+@set YAJL_URL=https://deb.debian.org/debian/pool/main/y/yajl/yajl_2.1.0.orig.tar.gz
 
 @set CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v4.2.3/%CMAKE%
 @set PCRE_URL=https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/%PCRE%

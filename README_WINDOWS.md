@@ -116,7 +116,7 @@ Copy these files to ``C:\Apache2466\bin``:
     C:\work\lua-5.4.8\src\lua54.dll C:\Apache2466\bin\
     C:\work\libxml2-2.15.1\win32\bin.msvc\libxml2.dll C:\Apache2466\bin\
     C:\work\curl-8.18.0\builds\libcurl-vc-x64-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.dll C:\Apache2466\bin\
-    C:\work\mod_security\apache2\mlogc-src\mlogc.exe C:\Apache2466\bin\
+    C:\work\mod_security\mlogc\mlogc.exe C:\Apache2466\bin\
 
 Copy this one file to ``C:\Apache2466\modules``:
 
@@ -150,7 +150,7 @@ Add configuration directives to your Apache conf\httpd.conf:
 
 ## Optional: Build and configure the ModSecurity-2.x MLOGC piped-logging program
 
-Edit the top of ``C:\work\mod_security\apache2\mlogc-src\Makefile.win`` and set your local paths
+Edit the top of ``C:\work\mod_security\mlogc\Makefile.win`` and set your local paths
 
         # Path to Apache httpd installation
         BASE = C:\Apache2466
@@ -168,7 +168,7 @@ Edit the top of ``C:\work\mod_security\apache2\mlogc-src\Makefile.win`` and set 
 
 Build the ``mlogc.exe`` program:
 
-        CD  C:\work\mod_security_trunk\mlogc
+        CD  C:\work\mod_security\mlogc
         NMAKE -f Makefile.win
 
 Copy ``mlogc.exe`` to ``C:\Apache2466\bin\``
