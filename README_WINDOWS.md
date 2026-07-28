@@ -8,37 +8,41 @@ by Tom Donovam, 4/2/2011
 
 Dependency | Tested with | Note
 ----|------|----
-Microsoft Visual Studio C++ | Visual Studio 2013 (aka VC12) |
-[CMake build system](http://www.cmake.org/) | CMake v3.8.2 |
-[Apache 2.4.x](http://httpd.apache.org/) | Apache 2.4.27 | Apache must be built from source using the same Visual Studio compiler as mod_security.
-[PCRE, Perl Compatible Regular Expression library](http://www.pcre.org/) | PCRE v8.40
-[LibXML2](http://xmlsoft.org/) | LibXML2 v2.9.4 |
-[Lua Scripting Language](http://www.lua.org/) | Lua v5.3.4
-[cURL multiprotocol file transfer library](http://curl.haxx.se/) | cURL v7.54.0
+Microsoft Visual Studio C++ | Visual Studio 2019 (aka VS16) |
+[CMake build system](http://www.cmake.org/) | CMake v4.2.3 |
+[Apache 2.4.x](http://httpd.apache.org/) | Apache 2.4.66 | Apache must be built from source using the same Visual Studio compiler as mod_security.
+[PCRE2, Perl Compatible Regular Expression library](https://www.pcre.org/) | PCRE2 v10.47 | ModSecurity v2 now uses PCRE2 by default (not legacy PCRE)
+[LibXML2](http://xmlsoft.org/) | LibXML2 v2.15.1 |
+[Lua Scripting Language](http://www.lua.org/) | Lua v5.4.8
+[cURL multiprotocol file transfer library](http://curl.haxx.se/) | cURL v8.18.0
+[zlib compression library](https://zlib.net/) | zlib v1.3.1
 
 
 ## Before building
 
-The directory where you build software from source ( ``C:\work`` in this exmaple)
-must contain the Apache source you used to build the Apache web serverand the mod_security source
+The directory where you build software from source ( ``C:\work`` in this example)
+must contain the Apache source you used to build the Apache web server and the mod_security source
 
-    Apache source is in             C:\work\httpd-2.4.27    in this example.
-    Apache has been installed to    C:\Apache2427           in this example.
+    Apache source is in             C:\work\httpd-2.4.66    in this example.
+    Apache has been installed to    C:\Apache2466           in this example.
     Mod_security source is in       C:\work\mod_security    in this example.
 
 ## Download and untar the prerequisite library sources:
 
-    Download pcre-8.40.tar.gz     from ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
-    untar it into C:\work\  creating C:\work\pcre-8.40
+    Download pcre2-10.47.zip from https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/
+    unzip it into C:\work\  creating C:\work\pcre2-10.47
 
-    Download libxml2-2.9.4.tar.gz    from ftp://xmlsoft.org/libxml2/
-    untar it into C:\work\ creating C:\work\libxml2-2.9.4
+    Download libxml2-2.15.1.tar.gz from https://download.gnome.org/sources/libxml2/2.15/
+    untar it into C:\work\ creating C:\work\libxml2-2.15.1
 
-    Download lua-5.3.4.tar.gz from http://www.lua.org/ftp/
-    untar it into C:\work\ creating C:\work\lua-5.3.4
+    Download lua-5.4.8.tar.gz from http://www.lua.org/ftp/
+    untar it into C:\work\ creating C:\work\lua-5.4.8
 
-    Download curl-7.54.0.tar.gz from http://curl.haxx.se/download.html
-    untar it into C:\work\ creating C:\work\curl-7.54.0
+    Download curl-8.18.0.zip from https://curl.se/download/
+    unzip it into C:\work\ creating C:\work\curl-8.18.0
+
+    Download zlib-1.3.1.tar.gz from https://github.com/madler/zlib/releases/download/v1.3.1/
+    untar it into C:\work\ creating C:\work\zlib-1.3.1
 
 ## Setup your build environment:
 
@@ -49,7 +53,7 @@ must contain the Apache source you used to build the Apache web serverand the mo
 3. Set an environment variable to the Apache source code directory:
 
 ```
-    SET HTTPD_BUILD=C:\work\httpd-2.4.27
+    SET HTTPD_BUILD=C:\work\httpd-2.4.66
 ```
 
 ### Optional:
@@ -71,54 +75,58 @@ If OpenSSL and zlib support were included when you built Apache 2.4, and you wan
 
 ## Build
 
-### PCRE-8.40
+### PCRE2-10.47
 
-    CD C:\work\pcre-8.40
-    CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True
+    CD C:\work\pcre2-10.47
+    CMAKE -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_SUPPORT_JIT=ON
     NMAKE
 
-### LibXML2-2.9.4
+Note: PCRE2 with JIT support provides better performance and fixes stack overflow issues present in older PCRE versions.
 
-    CD C:\work\libxml2-2.9.4\win32
+### LibXML2-2.15.1
+
+    CD C:\work\libxml2-2.15.1\win32
     CSCRIPT configure.js iconv=no vcmanifest=yes zlib=yes
     NMAKE -f Makefile.msvc
 
-### Lua-5.3.4
+### Lua-5.4.8
 
-    CD C:\work\lua-5.3.4\src
+    CD C:\work\lua-5.4.8\src
     CL /Ox /arch:SSE2 /GF /GL /Gy /FD /EHsc /MD  /Zi /TC /wd4005 /D "_MBCS" /D "LUA_CORE" /D "LUA_BUILD_AS_DLL" /D "_CRT_SECURE_NO_WARNINGS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_WIN32" /D "_WINDLL" /c *.c
     DEL lua.obj luac.obj
-    LINK /DLL /LTCG /DEBUG /OUT:lua5.1.dll *.obj
-    IF EXIST lua5.1.dll.manifest MT  -manifest lua5.1.dll.manifest -outputresource:lua5.1.dll;2
+    LINK /DLL /LTCG /DEBUG /OUT:lua54.dll *.obj
+    IF EXIST lua54.dll.manifest MT  -manifest lua54.dll.manifest -outputresource:lua54.dll;2
 
-### cURL-7.54.0
+### cURL-8.18.0
 
-    CD C:\work\curl-7.54.0
-    CMAKE   -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=True -DCURL_ZLIB=True
-    NMAKE
+    CD C:\work\curl-8.18.0\winbuild
+    SET ARCH=x64
+    NMAKE /f Makefile.vc mode=dll ENABLE_WINSSL=yes MACHINE=%ARCH% WITH_ZLIB=dll
 
 ### ModSecurity-2.9.x
 
     CD C:\work\mod_security\apache2
-    NMAKE -f Makefile.win APACHE=C:\Apache2427 PCRE=C:\work\pcre-8.40 LIBXML2=C:\work\libxml2-2.9.4 LUA=C:\work\lua-5.3.4\src
+    NMAKE -f Makefile.win APACHE=C:\Apache2466 PCRE=C:\work\pcre2-10.47 LIBXML2=C:\work\libxml2-2.15.1 LUA=C:\work\lua-5.4.8\src CURL=C:\work\curl-8.18.0
 
 ## Install ModSecurity and run Apache
 
-Copy these five files to ``C:\Apache2427\bin``:
+Copy these files to ``C:\Apache2466\bin``:
 
-    C:\work\pcre-8.40\pcre.dll C:\Apache2427\bin\
-    C:\work\lua-5.3.4\src\lua5.1.dll C:\Apache2427\bin\
-    C:\work\libxml2-2.9.4\win32\bin.msvc\libxml2.dll  C:\Apache2427\bin\
-    C:\work\curl-7.54.0\libcurl.dll  C:\Apache2427\bin\
-    C:\work\mod_security\apache2\mlogc-src\mlogc.exe
+    C:\work\pcre2-10.47\pcre2-8.dll C:\Apache2466\bin\
+    C:\work\lua-5.4.8\src\lua54.dll C:\Apache2466\bin\
+    C:\work\libxml2-2.15.1\win32\bin.msvc\libxml2.dll C:\Apache2466\bin\
+    C:\work\curl-8.18.0\builds\libcurl-vc-x64-release-dll-zlib-dll-ipv6-sspi-schannel-obj-lib\libcurl.dll C:\Apache2466\bin\
+    C:\work\mod_security\mlogc\mlogc.exe C:\Apache2466\bin\
 
-Copy this one file to ``C:\Apache2427\modules``:
+Copy this one file to ``C:\Apache2466\modules``:
 
     C:\work\mod_security\apache2\mod_security2.so
 
-You may also copy ``C:\work\curl-7.54.0\curl.exe`` to ``C:\Apache2427\bin``, if you want to use the cURL command-line program.
+You may also copy ``C:\work\curl-8.18.0\curl.exe`` to ``C:\Apache2466\bin``, if you want to use the cURL command-line program.
 
-Download the core rules from http://sourceforge.net/projects/mod-security/files/modsecurity-crs/0-CURRENT/ and unzip them into ``C:\Apache2427\conf\modsecurity_crs``
+Download OWASP CRS from https://github.com/coreruleset/coreruleset/releases/latest and unzip it into ``C:\Apache2466\conf\owasp_crs``
+
+For example, download ``coreruleset-4.x.x.zip``, extract it, and rename the extracted directory to ``owasp_crs``.
 
 Add configuration directives to your Apache conf\httpd.conf:
 
@@ -130,10 +138,11 @@ Add configuration directives to your Apache conf\httpd.conf:
     <IfModule security2_module>
         SecRuleEngine On
         SecDataDir   logs
-        Include conf/modsecurity_crs/*.conf
-        Include conf/modsecurity_crs/base_rules/*.conf
+        # Include OWASP CRS configuration
+        Include conf/owasp_crs/crs-setup.conf
+        Include conf/owasp_crs/rules/*.conf
         SecAuditEngine RelevantOnly
-        SecAuditLogRelevantStatus "^(?:5|4\d[^4])"
+        SecAuditLogRelevantStatus "^(?:5|4(?!04))"
         SecAuditLogType Serial
         SecAuditLogParts ABCDEFGHZ
         SecAuditLog logs/modsecurity.log
@@ -141,37 +150,37 @@ Add configuration directives to your Apache conf\httpd.conf:
 
 ## Optional: Build and configure the ModSecurity-2.x MLOGC piped-logging program
 
-Edit the top of ``C:\work\mod_security\apache2\mlogc-src\Makefile.win`` and set your local paths
+Edit the top of ``C:\work\mod_security\mlogc\Makefile.win`` and set your local paths
 
         # Path to Apache httpd installation
-        BASE = C:\Apache2427
+        BASE = C:\Apache2466
 
         # Paths to required libraries
-        PCRE = C:\work\pcre-8.40
-        CURL = C:\work\curl-7.54.0
+        PCRE = C:\work\pcre2-10.47
+        CURL = C:\work\curl-8.18.0
 
         # Linking libraries
         LIBS = $(BASE)\lib\libapr-1.lib \
                $(BASE)\lib\libaprutil-1.lib \
-               $(PCRE)\pcre.lib \
-               $(CURL)\libcurl_imp.lib \
+               $(PCRE)\pcre2-8.lib \
+               $(CURL)\libcurl.lib \
                wsock32.lib
 
 Build the ``mlogc.exe`` program:
 
-        CD  C:\work\mod_security_trunk\mlogc
+        CD  C:\work\mod_security\mlogc
         NMAKE -f Makefile.win
 
-Copy ``mlocg.exe`` to ``C:\Apache2427\bin\``
+Copy ``mlogc.exe`` to ``C:\Apache2466\bin\``
 
-Create a new command file ``C:\Apache2427\bin\mlogc.bat`` with one line:
+Create a new command file ``C:\Apache2466\bin\mlogc.bat`` with one line:
 
-        C:\Apache2427\bin\mlogc.exe C:\Apache2427\conf\mlogc.conf
+        C:\Apache2466\bin\mlogc.exe C:\Apache2466\conf\mlogc.conf
 
-Create a new configuration file ``C:\Apache2427\conf\mlogc.conf`` to control the piped-logging program ``mlogc.exe``.
+Create a new configuration file ``C:\Apache2466\conf\mlogc.conf`` to control the piped-logging program ``mlogc.exe``.
 Here is an example ``conf\mlogc.conf``:
 
-    CollectorRoot       "C:/Apache2427/logs"
+    CollectorRoot       "C:/Apache2466/logs"
     ConsoleURI          "https://localhost:8888/rpc/auditLogReceiver"
     SensorUsername      "test"
     SensorPassword      "testtest"
@@ -191,4 +200,4 @@ Here is an example ``conf\mlogc.conf``:
 
 Change the SecAuditLog directive in ``conf\httpd.conf`` to pipe the log data to mlogc instead of writing them to a file:
 
-    SecAuditLog |C:/Apache2427/bin/mlogc.bat
+    SecAuditLog |C:/Apache2466/bin/mlogc.bat

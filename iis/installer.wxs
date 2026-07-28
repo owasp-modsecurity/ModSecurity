@@ -29,6 +29,25 @@
         <Property Id="IIS">
             <RegistrySearch Id="IISInstalledVersion" Root="HKLM" Key="SOFTWARE\Microsoft\InetStp" Type="raw" Name="MajorVersion" />
         </Property>
+        <!-- Detect Visual C++ 2019 Redistributable (VC142) -->
+        <?if $(var.Win64) = "yes" ?>
+        <Property Id="VC142X64INSTALLED">
+            <RegistrySearch Id="FindVC142X64" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64"
+                Name="Installed" Type="raw" Win64="yes" />
+        </Property>
+        <Property Id="VC142X86INSTALLED">
+            <RegistrySearch Id="FindVC142X86" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
+                Name="Installed" Type="raw" Win64="no" />
+        </Property>
+        <?else?>
+        <Property Id="VC142X86INSTALLED">
+            <RegistrySearch Id="FindVC142X86" Root="HKLM"
+                Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86"
+                Name="Installed" Type="raw" Win64="no" />
+        </Property>
+        <?endif?>
         <!-- Detect if ModSecurity IIS module and its dependent DLL files exist -->
         <Property Id="FILEEXISTS" Secure="yes">
             <DirectorySearch Id="CheckFileDir1" Path="C:\Windows\System32\inetsrv" Depth="0">
@@ -50,10 +69,10 @@
                 <FileSearch Id="CheckFile6" Name="libxml2.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir7" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile7" Name="lua5.1.dll" />
+                <FileSearch Id="CheckFile7" Name="lua54.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir8" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile8" Name="pcre.dll" />
+                <FileSearch Id="CheckFile8" Name="pcre2-8.dll" />
             </DirectorySearch>
             <DirectorySearch Id="CheckFileDir9" Path="C:\Windows\System32\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile9" Name="zlib1.dll" />
@@ -61,31 +80,31 @@
             <DirectorySearch Id="CheckFileDir10" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile10" Name="ModSecurityIIS.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir11" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir11" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile11" Name="libapr-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir12" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir12" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile12" Name="libapriconv-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir13" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir13" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile13" Name="libaprutil-1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir14" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir14" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile14" Name="libcurl.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir15" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir15" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile15" Name="libxml2.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir16" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile16" Name="lua5.1.dll" />
+            <DirectorySearch Id="CheckFileDir16" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
+                <FileSearch Id="CheckFile16" Name="lua54.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\System32\inetsrv" Depth="0">
-                <FileSearch Id="CheckFile17" Name="pcre.dll" />
+            <DirectorySearch Id="CheckFileDir17" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
+                <FileSearch Id="CheckFile17" Name="pcre2-8.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir18" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir18" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile18" Name="zlib1.dll" />
             </DirectorySearch>
-            <DirectorySearch Id="CheckFileDir19" Path="C:\Windows\System32\inetsrv" Depth="0">
+            <DirectorySearch Id="CheckFileDir19" Path="C:\Windows\SysWOW64\inetsrv" Depth="0">
                 <FileSearch Id="CheckFile19" Name="fuzzy.dll" />
             </DirectorySearch>
         </Property>
@@ -96,7 +115,20 @@
         <!-- Define MSI properties, enable real administrator detection for MSI, and disable repair and modify options in "Programs and Features" -->
         <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
         <!-- Define installation conditions -->
-        <Condition Message="This setup requires IIS 7.0, 8.0 or 10.0. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10")]]></Condition>
+        <Condition Message="This setup requires IIS 7.0 or later. If that's the case, please ensure that the installer is running as administrator or try running it from the 'Apps and features' or 'Add/Remove Programs' menu"><![CDATA[(IIS="#7") OR (IIS="#8") OR (IIS="#10") OR (IIS="#11")]]></Condition>
+        <!-- Check for required Visual C++ 2019 Redistributables -->
+        <?if $(var.Win64) = "yes" ?>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x64). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x64.exe">
+            <![CDATA[Installed OR VC142X64INSTALLED]]>
+        </Condition>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86) for 32-bit support. Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
+            <![CDATA[Installed OR (&ModSec32 <> 3) OR VC142X86INSTALLED]]>
+        </Condition>
+        <?else?>
+        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
+            <![CDATA[Installed OR VC142X86INSTALLED]]>
+        </Condition>
+        <?endif?>
         <!-- Version 2.7.5 had an uninstall issue that leaves some files behind. Asking the user to manually hash this out. -->
         <Condition Message="A older version of ModSecurityIIS was found in your computer. Please complete uninstall by removing the following file: [FILEEXISTS]. You may have to remove ModSecurity module from IIS, use the IIS Manager to do so."><![CDATA[(NOT FILEEXISTS) OR (Installed)]]></Condition>
         <Condition Message="64-bit operating system was detected, please use the 64-bit installer.">
@@ -204,17 +236,6 @@
             <ComponentRef Id="ConfigSchema64" />
             <?endif?>
             <ComponentRef Id="StartMenuShortcuts" />
-        </Feature>
-        <Feature Id="VCRedist" Title="Visual C++ 12.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <?if $(var.Win64) = "yes" ?>
-            <MergeRef Id="VCRedist110_64" />
-            <MergeRef Id="VCRedist120_64" />
-            <MergeRef Id="VCRedist110_32" />
-            <MergeRef Id="VCRedist120_32" />
-            <?else?>
-            <MergeRef Id="VCRedist110_32" />
-            <MergeRef Id="VCRedist120_32" />
-            <?endif?>
         </Feature>
         <?if $(var.Win64) = "yes" ?>
         <Feature Id="ModSec64" Title="ModSecurity IIS (64 bits)" Level="1" InstallDefault="local" Display="expand" AllowAdvertise="no" Description="This option will install ModSecurityIIS 64bits with all the necessary dependencies.">
@@ -360,6 +381,7 @@
             <Custom Action="Cleanup3" Before="Cleanup2"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup4" Before="Cleanup3"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="Cleanup5" Before="Cleanup4"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
+            <Custom Action="CreateModSecurityDirs" After="InstallFiles"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <?if $(var.Win64) = "yes" ?>
             <Custom Action="InstallModule64" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallModule32" After="InstallModule64"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
@@ -389,6 +411,8 @@
         <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
         <?endif?>
+        <!-- Create required directories for ModSecurity with proper permissions for IIS -->
+        <CustomAction Id="CreateModSecurityDirs" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;New-Item -ItemType Directory -Path 'c:\inetpub\temp', 'c:\inetpub\logs' -Force | Out-Null; icacls 'c:\inetpub\temp' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null; icacls 'c:\inetpub\logs' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null&quot;" />
         <?if $(var.Win64) = "yes" ?>
         <CustomAction Id="InstallModule32" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (64bits)&quot; /image:&quot;%SystemRoot%\System32\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness64&quot;" />
         <CustomAction Id="InstallModule64" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[System64Folder]inetsrv\appcmd.exe&quot; install module /name:&quot;ModSecurity IIS (32bits)&quot; /image:&quot;%SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll&quot; /preCondition:&quot;bitness32&quot;" />
@@ -411,16 +435,5 @@
         <?else?>
         <CustomAction Id="UninstallConf" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; clear config -section:&quot;system.webServer/ModSecurity&quot;" />
         <?endif?>
-        <DirectoryRef Id="TARGETDIR">
-            <?if $(var.Win64) = "yes" ?>
-            <Merge Id="VCRedist120_64" SourceFile="wix\Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_64" SourceFile="wix\Microsoft_VC110_CRT_x64.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
-            <?else?>
-            <Merge Id="VCRedist120_32" SourceFile="wix\Microsoft_VC120_CRT_x86.msm" DiskId="1" Language="0" />
-            <Merge Id="VCRedist110_32" SourceFile="wix\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0" />
-            <?endif?>
-        </DirectoryRef>
     </Product>
 </Wix>
