@@ -38,7 +38,8 @@ bool Rx::init(const std::string &arg, std::string *error) {
 
 bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    Regex *re;
+    Regex* re = nullptr;
+    std::unique_ptr<Regex> re_ptr;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
         return true;
@@ -46,7 +47,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     if (m_string->m_containsMacro) {
         std::string eparam(m_string->evaluate(transaction));
-        re = new Regex(eparam);
+        re_ptr = std::make_unique<Regex>(eparam);
+        re = re_ptr.get();
     } else {
         re = m_re;
     }
@@ -98,10 +100,6 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     for (const auto & capture : captures) {
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
-    }
-
-    if (m_string->m_containsMacro) {
-        delete re;
     }
 
     if (!captures.empty()) {
