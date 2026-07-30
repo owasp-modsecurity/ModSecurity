@@ -53,6 +53,11 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
         re = m_re;
     }
 
+    if (re->hasError()) {
+        ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
+        return false;
+    }
+
     Utils::RegexResult regex_result;
     std::vector<Utils::SMatchCapture> captures;
     if (transaction && transaction->m_rules->m_pcreMatchLimit.m_set) {
