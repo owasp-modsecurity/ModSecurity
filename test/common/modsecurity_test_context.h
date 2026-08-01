@@ -25,6 +25,10 @@ namespace modsecurity_test {
                                             &m_server_log);
         }
 
+        void reset_server_log_callback() {
+            m_modsec.setServerLogCb(logCb);
+        }
+
         modsecurity::ModSecurity m_modsec;
         modsecurity::RulesSet m_modsec_rules;
         std::stringstream m_server_log;

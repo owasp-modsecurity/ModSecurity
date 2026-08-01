@@ -229,6 +229,9 @@ namespace modsecurity {
 namespace actions {
 class Action;
 }
+namespace intervention {
+class LogPayloadAccess;
+}
 class RuleWithOperator;
 
 #ifdef __cplusplus
@@ -292,6 +295,23 @@ class ModSecurity {
      */
     void setServerLogCb(ModSecLogCb cb, int properties);
 
+    /**
+     * Controls whether disruptive interventions include the human-readable
+     * ModSecurityIntervention::log payload.
+     *
+     * The payload is enabled by default. Connectors that do not consume it
+     * may disable it before processing transactions to avoid formatting and
+     * copying unused text. This setting does not affect disruptive actions,
+     * status codes, redirect URLs, server log callbacks, debug logs, or audit
+     * logs.
+     *
+     * This setting applies to the ModSecurity instance and every transaction
+     * created from it; it is not a per-transaction or per-rule option.
+     * Configure it before publishing the instance to worker threads. Changing
+     * it while transactions are being processed is not thread-safe.
+     */
+    void setInterventionLogPayloadEnabled(bool enabled);
+
     void serverLog(void *data, const RuleMessage &rm);
 
     const std::string& getConnectorInformation() const;
@@ -306,6 +326,14 @@ class ModSecurity {
     collection::Collection *m_user_collection;
 
  private:
+    friend class intervention::LogPayloadAccess;
+    // Reserved internal bit; it must not be exposed as a LogProperty.
+    static constexpr int InterventionLogPayloadDisabledMask = 0x40000000;
+    static_assert((InterventionLogPayloadDisabledMask
+        & (TextLogProperty | RuleMessageLogProperty
+            | IncludeFullHighlightLogProperty)) == 0,
+        "intervention log payload state must not overlap public "
+        "log properties");
     std::string m_connector;
     std::string m_whoami;
     ModSecLogCb m_logCb;
@@ -327,6 +355,23 @@ const char *msc_who_am_i(ModSecurity *msc);
 void msc_set_connector_info(ModSecurity *msc, const char *connector);
 /** @ingroup ModSecurity_C_API */
 void msc_set_log_cb(ModSecurity *msc, ModSecLogCb cb);
+/**
+ * @ingroup ModSecurity_C_API
+ *
+ * Controls whether disruptive interventions include the human-readable
+ * ModSecurityIntervention::log payload. A zero value disables the payload;
+ * any nonzero value enables it. The payload is enabled by default.
+ *
+ * This setting applies to the ModSecurity instance and every transaction
+ * created from it; it is not a per-transaction or per-rule option. Configure
+ * it before publishing the instance to worker threads. It does not affect
+ * disruptive actions, status codes, redirect URLs, server log callbacks,
+ * debug logs, or audit logs.
+ *
+ * @param msc A non-NULL ModSecurity instance.
+ * @param enabled Zero to disable the payload, nonzero to enable it.
+ */
+void msc_set_intervention_log_payload_enabled(ModSecurity *msc, int enabled);
 /** @ingroup ModSecurity_C_API */
 void msc_cleanup(ModSecurity *msc);
 
