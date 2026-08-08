@@ -31,6 +31,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <algorithm>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/collection/collections.h"
@@ -205,7 +206,7 @@ int Multipart::is_token_char(unsigned char c) {
 
 
 int Multipart::boundary_characters_valid(const char *boundary) {
-    const unsigned char *p = (unsigned char *)boundary;
+    const auto *p = reinterpret_cast<const unsigned char*>(boundary);
     unsigned char c;
 
     if (p == NULL) {
@@ -270,6 +271,9 @@ void Multipart::validate_quotes(const char *data, char quote)  {
 int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
     std::string filenameStar;
+    // need to store the offset of filename* because it will be used instead of filename if present,
+    // no matter if filename is present or not, but there can be both
+    size_t filenameStarOffset = 0;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -451,8 +455,8 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
             validate_quotes(value.c_str(), quote);
-            m_transaction->m_variableMultipartFileName.set(value, value, \
-                offset + ((p - c_d_value) - value.size()));
+            // don't forget to set up the variableMultipartFileName variable,
+            // but it will be overwritten if filename* is present
 
             if (!m_mpp->m_filename.empty()) {
                 ms_dbg_a(m_transaction, 4,
@@ -460,6 +464,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                     "filename: " + value + ".");
                 return -15;
             }
+            // here we set up the 'm_filename'
             m_mpp->m_filename.assign(value);
             m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
 
@@ -472,7 +477,10 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                     "filename*: " + value + ".");
                 return -20;
             }
+
             filenameStar.assign(value);
+            // and set the offset too
+            filenameStarOffset = offset + ((p - c_d_value) - value.size());
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + value + ".");
         } else {
@@ -507,12 +515,37 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         /* loop will stop when (*p == '\0') */
     }
 
+    /*
+    this is a wrong behavior, see RFC 6266: https://datatracker.ietf.org/doc/html/rfc6266
+
+    4.3.  Disposition Parameter: 'Filename'
+
+    ...
+
+    Many user agent implementations predating this specification do not
+    understand the "filename*" parameter.  Therefore, when both
+    "filename" and "filename*" are present in a single header field
+    value, recipients SHOULD pick "filename*" and ignore "filename".
+    This way, senders can avoid special-casing specific user agents by
+    sending both the more expressive "filename*" parameter, and the
+    "filename" parameter as fallback for legacy recipients (see Section 5
+    for an example).
+
     if (!filenameStar.empty() && m_mpp->m_filename.empty()) {
         ms_dbg_a(m_transaction, 4,
             "Multipart: Warning: no filename= but filename*:" \
             + filenameStar + ".");
         return -21;
     }
+    */
+    // good behavior: if filename* is present, it will be used instead of filename, no matter if filename is present or not
+    if (!filenameStar.empty()) {
+        m_mpp->m_filename.assign(filenameStar);
+        m_mpp->m_filenameOffset = filenameStarOffset;
+    }
+    // set up the variableMultipartFileName variable, which will be used in the rules
+    m_transaction->m_variableMultipartFileName.set(m_mpp->m_filename, m_mpp->m_filename, \
+        m_mpp->m_filenameOffset);
 
     return 1;
 }
@@ -800,8 +833,10 @@ int Multipart::process_part_header(std::string *error, int offset) {
             /* Some parsers use crude methods to extract the name and filename
              * values from the C-D header. We need to check for the case where they
              * didn't understand C-D but we did.
+             *
+             * also we need to check if any of the filename or filename* is present
              */
-            if (strstr(header_value.c_str(), "filename=") == NULL) {
+            if (strstr(header_value.c_str(), "filename=") == NULL && strstr(header_value.c_str(), "filename*=") == NULL) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Invalid Content-Disposition " \
                     "header (filename).");
@@ -922,15 +957,13 @@ int Multipart::process_part_header(std::string *error, int offset) {
             }
 
             /* check if multipart header contains any invalid characters */
-            for (const auto& ch : header_name) {
-                if (ch < 33 || ch > 126) {
-                    ms_dbg_a(m_transaction, 1,
-                        "Multipart: Invalid part header " \
-                        "(contains invalid character).");
-                    error->assign("Multipart: Invalid part header "\
-                        "(contains invalid character).");
-                    return false;
-                }
+            // replaced the following code with std::any_of to avoid issues with signed char
+            // and to avoid cppcheck warning:
+            if (std::any_of(header_name.begin(), header_name.end(), [](unsigned char ch) { return ch < 33 || ch > 126; })) {
+                ms_dbg_a(m_transaction, 1,
+                    "Multipart: Invalid part header (contains invalid character).");
+                error->assign("Multipart: Invalid part header (contains invalid character).");
+                return false;
             }
 
             /* extract the value value */
@@ -1179,7 +1212,7 @@ int Multipart::multipart_complete(std::string *error) {
                         }
                         m_transaction->m_variableMultipartStrictError.set(
                             std::to_string(m_flag_lf_line) , m_transaction->m_variableOffset);
-		    }
+                    }
                     if ((m_mpp_substate_part_data_read == 0) && (m_flag_invalid_part != 1)) {
                         // it looks like the final boundary, but it's where part data should begin
                         m_flag_invalid_part = 1;
@@ -1568,7 +1601,7 @@ bool Multipart::process(const std::string& data, std::string *error,
                         m_boundary.size()) == 0)) {
                     if (m_crlf_state_buf_end == 2) {
                         m_flag_lf_line = 1;
-		    }
+                    }
                     if ((m_mpp_substate_part_data_read == 0) && (m_boundary_count > 0)) {
                         /* string matches our boundary, but it's where part data should begin */
                         m_flag_invalid_part = 1;
