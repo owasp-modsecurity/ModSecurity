@@ -531,5 +531,59 @@
       "SecRuleEngine On",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 0\" \"id:'200003',phase:2,t:none,log,deny,status:400,msg:'Multipart request body failed strict validation: DH %{MULTIPART_DUPLICATE_PART_HEADER}'\""
     ]
+  },
+{
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart Content-Disposition filename* invalid syntax (5/7)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "349",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"name\"\n",
+        "\n",
+        "test\n",
+        "----------------------------756b6d74fa1a8ee2\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"03CB1664.txt\"; filename*=UTF-8'03CB1664.txt\n",
+        "Content-Type: text/plain\n",
+        "\n",
+        "This is a very small test file..\n",
+        "----------------------------756b6d74fa1a8ee2--\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-17",
+      "error_log": "Multipart request body failed strict validation: IQ 1",
+      "http_code": 400
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule MULTIPART_STRICT_ERROR \"!@eq 0\" \"id:'200003',phase:2,t:none,log,deny,status:400,msg:'Multipart request body failed strict validation: IQ %{MULTIPART_INVALID_QUOTING}'\""
+    ]
   }
 ]

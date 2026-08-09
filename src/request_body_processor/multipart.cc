@@ -366,6 +366,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 p++;
             }
             if (*p != '\'') {
+                m_flag_invalid_quoting = 1;
                 return -17; // Single quote for end-of-language not found
             }
             m_mpp->m_filename_language.assign(start_of_language, (p - start_of_language));
