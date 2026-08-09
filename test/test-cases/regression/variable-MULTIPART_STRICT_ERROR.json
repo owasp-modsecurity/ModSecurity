@@ -476,5 +476,60 @@
       "SecRule MULTIPART_INVALID_QUOTING \"!@eq 0\" \"id:1,phase:2,deny,status:403\"",
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 0\" \"id:2,phase:2,pass\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: MULTIPART_STRICT_ERROR with duplicate CT header",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "522",
+        "Content-Type": "multipart/form-data; boundary=b",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--b\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename*=UTF-8''shell.php\r\n",
+        "Content-Type: image/jpeg\r\n",
+        "Content-Type: application/x-php\r\n",
+        "\r\n",
+        "<?php system($_GET['c']); ?>\r\n",
+        "\r\n",
+        "--b--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Multipart: Duplicate part header: Content-Type.",
+      "error_log": "Multipart request body failed strict validation: DH 1",
+      "http_code": 400
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule MULTIPART_STRICT_ERROR \"!@eq 0\" \"id:'200003',phase:2,t:none,log,deny,status:400,msg:'Multipart request body failed strict validation: DH %{MULTIPART_DUPLICATE_PART_HEADER}'\""
+    ]
   }
 ]

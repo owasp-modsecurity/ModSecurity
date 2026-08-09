@@ -125,6 +125,7 @@ Multipart::Multipart(const std::string &header, Transaction *transaction)
     m_flag_error(0),
     m_flag_data_before(0),
     m_flag_data_after(0),
+    m_flag_duplicate_part_header(0),
     m_flag_header_folding(0),
     m_flag_boundary_quoted(0),
     m_flag_lf_line(0),
@@ -270,10 +271,10 @@ void Multipart::validate_quotes(const char *data, char quote)  {
 
 int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
-    std::string filenameStar;
-    // need to store the offset of filename* because it will be used instead of filename if present,
-    // no matter if filename is present or not, but there can be both
-    size_t filenameStarOffset = 0;
+    // store if filename is already added from the header
+    // this needs to store because there can be both filename and filename* in the header,
+    // and filename* has precedence over filename and can be first in the header
+    bool filenameAdded = false;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -347,19 +348,31 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             /* filename*=charset'[optional-language]'filename */
             /* Read beyond the charset and the optional language*/
             const char* start_of_charset = p;
-            while ((*p != '\0') && (isalnum(*p) || (strchr(mime_charset_special, *p)))) {
+            while ((*p != '\0') && (isalnum(static_cast<unsigned char>(*p)) || (strchr(mime_charset_special, *p)))) {
                 p++;
             }
             if ((*p != '\'') || (p == start_of_charset)) {
                 return -16; // Must be at least one legit char before ' for start of language
             }
+            m_mpp->m_filename_charset.assign(start_of_charset, (p - start_of_charset));
+            m_mpp->m_filename_charsetOffset = offset + ((p - c_d_value) - m_mpp->m_filename_charset.size());
+            ms_dbg_a(m_transaction, 4,
+                "Multipart: Content-Disposition filename* charset: " \
+                + m_mpp->m_filename_charset + ".");
             p++;
+            /* Read beyond the charset and the optional language*/
+            const char* start_of_language = p;
             while ((*p != '\0') && (*p != '\'')) {
                 p++;
             }
             if (*p != '\'') {
                 return -17; // Single quote for end-of-language not found
             }
+            m_mpp->m_filename_language.assign(start_of_language, (p - start_of_language));
+            m_mpp->m_filename_languageOffset = offset + ((p - c_d_value) - m_mpp->m_filename_language.size());
+            ms_dbg_a(m_transaction, 4,
+                "Multipart: Content-Disposition filename* language: " \
+                + m_mpp->m_filename_language + ".");
             p++;
 
             /* Now read what should be the actual filename */
@@ -444,6 +457,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 offset + ((p - c_d_value) - value.size()));
 
             if (!m_mpp->m_name.empty()) {
+                m_flag_duplicate_part_header = 1;
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "name: " + value + ". Previously: " + m_mpp->m_name + "");
@@ -454,35 +468,43 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
-            validate_quotes(value.c_str(), quote);
-            // don't forget to set up the variableMultipartFileName variable,
-            // but it will be overwritten if filename* is present
-
-            if (!m_mpp->m_filename.empty()) {
-                ms_dbg_a(m_transaction, 4,
-                    "Multipart: Warning: Duplicate Content-Disposition " \
-                    "filename: " + value + ".");
-                return -15;
-            }
             // here we set up the 'm_filename'
-            m_mpp->m_filename.assign(value);
-            m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
+            // only if filename* is not present, because if it is present,
+            // it will be used instead of filename, no matter if filename is present or not
+            if (filenameAdded == false) {
+                validate_quotes(value.c_str(), quote);
+                // don't forget to set up the variableMultipartFileName variable,
+                // but it will be overwritten if filename* is present
 
-            ms_dbg_a(m_transaction, 9,
-                "Multipart: Content-Disposition filename: " + value + ".");
+                if (!m_mpp->m_filename.empty()) {
+                    m_flag_duplicate_part_header = 1;
+                    ms_dbg_a(m_transaction, 4,
+                        "Multipart: Warning: Duplicate Content-Disposition " \
+                        "filename: " + value + ".");
+                    return -15;
+                }
+                m_mpp->m_filename.assign(value);
+                m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
+
+                ms_dbg_a(m_transaction, 9,
+                    "Multipart: Content-Disposition filename: " + value + ".");
+                filenameAdded = true;
+            }
         } else if (name == "filename*") {
-            if (!filenameStar.empty()) {
+            if (!m_mpp->m_filenameStar.empty()) {
+                m_flag_duplicate_part_header = 1;
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "filename*: " + value + ".");
                 return -20;
             }
 
-            filenameStar.assign(value);
-            // and set the offset too
-            filenameStarOffset = offset + ((p - c_d_value) - value.size());
+            m_mpp->m_filenameStar.assign(value);
+            m_mpp->m_filename.assign(value);
+            m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + value + ".");
+            filenameAdded = true;
         } else {
             return -11;
         }
@@ -538,15 +560,26 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         return -21;
     }
     */
-    // good behavior: if filename* is present, it will be used instead of filename, no matter if filename is present or not
-    if (!filenameStar.empty()) {
-        m_mpp->m_filename.assign(filenameStar);
-        m_mpp->m_filenameOffset = filenameStarOffset;
-    }
-    // set up the variableMultipartFileName variable, which will be used in the rules
-    m_transaction->m_variableMultipartFileName.set(m_mpp->m_filename, m_mpp->m_filename, \
-        m_mpp->m_filenameOffset);
 
+    // set up the variableMultipartFileName variable, which will be used in the rules
+    m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filename, \
+        m_mpp->m_filenameOffset);
+    if (!m_mpp->m_filename_charset.empty()) {
+        m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, m_mpp->m_filename_charset, \
+            m_mpp->m_filename_charsetOffset);
+    }
+    else {
+        m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, "", \
+            m_mpp->m_filename_charsetOffset);
+    }
+    if (!m_mpp->m_filename_language.empty()) {
+        m_transaction->m_variableMultipartFileNameLanguage.set(m_mpp->m_name, m_mpp->m_filename_language, \
+            m_mpp->m_filename_languageOffset);
+    }
+    else {
+        m_transaction->m_variableMultipartFileNameLanguage.set(m_mpp->m_name, "", \
+            m_mpp->m_filename_languageOffset);
+    }
     return 1;
 }
 
@@ -978,10 +1011,10 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
             /* error if the name already exists */
             if (m_mpp->m_headers.count(header_name) > 0) {
+                m_flag_duplicate_part_header = 1;
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Duplicate part header: " \
                     + header_name + ".");
-
                 return false;
             }
 
@@ -1106,6 +1139,14 @@ int Multipart::multipart_complete(std::string *error) {
             "Multipart: Warning: seen data after last boundary.");
     }
 
+    m_transaction->m_variableMultipartDuplicatePartHeader.set(
+        std::to_string(m_flag_duplicate_part_header),
+        m_transaction->m_variableOffset);
+    if (m_flag_duplicate_part_header) {
+        ms_dbg_a(m_transaction, 4,
+            "Multipart: Warning: seen duplicate part header.");
+    }
+
     m_transaction->m_variableMultipartBoundaryQuoted.set(
         std::to_string(m_flag_boundary_quoted),
         m_transaction->m_variableOffset);
@@ -1176,10 +1217,10 @@ int Multipart::multipart_complete(std::string *error) {
     m_transaction->m_variableMultipartStrictError.set(
         std::to_string(m_flag_error || m_flag_boundary_quoted != 0
         || m_flag_boundary_whitespace != 0 || m_flag_data_before != 0
-        || m_flag_data_after != 0 || m_flag_header_folding != 0
-        || m_flag_lf_line != 0 || m_flag_missing_semicolon != 0
-        || m_flag_invalid_quoting != 0 || m_flag_invalid_part != 0
-        || m_flag_invalid_header_folding != 0
+        || m_flag_data_after != 0 || m_flag_duplicate_part_header != 0
+        || m_flag_header_folding != 0  || m_flag_lf_line != 0
+        || m_flag_missing_semicolon != 0 || m_flag_invalid_quoting != 0
+        || m_flag_invalid_part != 0 || m_flag_invalid_header_folding != 0
         || m_flag_file_limit_exceeded != 0), m_transaction->m_variableOffset);
 
 
