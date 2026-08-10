@@ -150,7 +150,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Target value: \"03CB1664.txt\" \\(Variable: MULTIPART_FILENAME:03CB1664.txt\\)",
+      "debug_log": "Target value: \"03CB1664.txt\" \\(Variable: MULTIPART_FILENAME:filedata\\)",
       "http_code": 403
     },
     "rules": [
