@@ -1693,7 +1693,151 @@ static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    return var_simple_generate(var, vartab, mptmp, msr->multipart_filename);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    multipart_part **parts = NULL;
+    int i, j, count = 0;
+
+    if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
+
+    parts = (multipart_part **)msr->mpd->parts->elts;
+    for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
+        int match = 0;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            // check if there is "filename" in the multipart part, if not set it to empty string
+            if (parts[i]->filename == NULL) {
+                rvar->value = "";
+                rvar->value_len = 0;
+            } else {
+                rvar->value = parts[i]->filename;
+                rvar->value_len = strlen(rvar->value);
+            }
+            rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME:%s",
+                log_escape_nq(mptmp, parts[i]->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+        }
+    }
+
+    return count;
+}
+
+/* MULTIPART_FILENAME_CHARSET */
+
+static int var_multipart_filename_charset_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    multipart_part **parts = NULL;
+    int i, j, count = 0;
+
+    if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
+
+    parts = (multipart_part **)msr->mpd->parts->elts;
+    for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
+        int match = 0;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            // check if there is "filename_charset" in the multipart part, if not set it to empty string
+            if (parts[i]->filename_charset == NULL) {
+                rvar->value = "";
+                rvar->value_len = 0;
+            } else {
+                rvar->value = parts[i]->filename_charset;
+                rvar->value_len = strlen(rvar->value);
+            }
+            rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_CHARSET:%s",
+                log_escape_nq(mptmp, parts[i]->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+        }
+    }
+
+    return count;
+}
+
+/* MULTIPART_FILENAME_LANGUAGE */
+
+static int var_multipart_filename_language_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    assert(msr != NULL);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    multipart_part **parts = NULL;
+    int i, j, count = 0;
+
+    if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
+
+    parts = (multipart_part **)msr->mpd->parts->elts;
+    for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
+        int match = 0;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            // check if there is "filename_language" in the multipart part, if not set it to empty string
+            if (parts[i]->filename_language == NULL) {
+                rvar->value = "";
+                rvar->value_len = 0;
+            } else {
+                rvar->value = parts[i]->filename_language;
+                rvar->value_len = strlen(rvar->value);
+            }
+            rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_LANGUAGE:%s",
+                log_escape_nq(mptmp, parts[i]->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+        }
+    }
+
+    return count;
 }
 
 /* MULTIPART_NAME */
@@ -1702,7 +1846,49 @@ static int var_multipart_name_generate(modsec_rec *msr, msre_var *var, msre_rule
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     assert(msr != NULL);
-    return var_simple_generate(var, vartab, mptmp, msr->multipart_name);
+    assert(var != NULL);
+    assert(vartab != NULL);
+    assert(mptmp != NULL);
+    multipart_part **parts = NULL;
+    int i, j, count = 0;
+
+    if (msr->mpd == NULL) return 0;
+    assert(msr->mpd->parts != NULL);
+
+    parts = (multipart_part **)msr->mpd->parts->elts;
+    for(i = 0; i < msr->mpd->parts->nelts; i++) {
+        assert(parts[i] != NULL);
+        int match = 0;
+
+        /* Figure out if we want to include this variable. */
+        if (var->param == NULL) match = 1;
+        else {
+            if (var->param_data != NULL) { /* Regex. */
+                char *my_error_msg = NULL;
+                if (msc_regexec((msc_regex_t *)var->param_data, parts[i]->name, strlen(parts[i]->name), &my_error_msg) >= 0) match = 1;
+            } else { /* Simple comparison. */
+                if (strcasecmp(parts[i]->name, var->param) == 0) match = 1;
+            }
+        }
+
+        /* If we had a match add this argument to the collection. */
+        if (match) {
+            msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
+            // check if there is "filename_language" in the multipart part, if not set it to empty string
+            if (parts[i]->name == NULL) {
+                rvar->value = "";
+                rvar->value_len = 0;
+            } else {
+                rvar->value = parts[i]->name;
+                rvar->value_len = strlen(rvar->value);
+            }
+            rvar->name = apr_psprintf(mptmp, "MULTIPART_NAME:%s",
+                log_escape_nq(mptmp, parts[i]->name));
+            apr_table_addn(vartab, rvar->name, (void *)rvar);
+        }
+    }
+
+    return count;
 }
 
 /* MULTIPART_BOUNDARY_QUOTED */
@@ -1751,6 +1937,19 @@ static int var_multipart_data_before_generate(modsec_rec *msr, msre_var *var, ms
 {
     assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_data_before != 0)) {
+        return var_simple_generate(var, vartab, mptmp, "1");
+    } else {
+        return var_simple_generate(var, vartab, mptmp, "0");
+    }
+}
+
+/* MULTIPART_DUPLICATE_PART_HEADER */
+
+static int var_multipart_duplicate_part_header_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+    apr_table_t *vartab, apr_pool_t *mptmp)
+{
+    assert(msr != NULL);
+    if ((msr->mpd != NULL)&&(msr->mpd->flag_duplicate_part_header != 0)) {
         return var_simple_generate(var, vartab, mptmp, "1");
     } else {
         return var_simple_generate(var, vartab, mptmp, "0");
@@ -1887,6 +2086,7 @@ static int var_multipart_strict_error_generate(modsec_rec *msr, msre_var *var, m
             ||(msr->mpd->flag_boundary_whitespace != 0)
             ||(msr->mpd->flag_data_before != 0)
             ||(msr->mpd->flag_data_after != 0)
+            ||(msr->mpd->flag_duplicate_part_header != 0)
             ||(msr->mpd->flag_header_folding != 0)
             ||(msr->mpd->flag_lf_line != 0)
             ||(msr->mpd->flag_missing_semicolon != 0)
@@ -3655,10 +3855,32 @@ void msre_engine_register_default_variables(msre_engine *engine) {
     /* MULTIPART_FILENAME */
     msre_engine_variable_register(engine,
         "MULTIPART_FILENAME",
-        VAR_SIMPLE,
-        0, 0,
+        VAR_LIST,
+        0, 1,
         NULL,
         var_multipart_filename_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_FILENAME_CHARSET */
+    msre_engine_variable_register(engine,
+        "MULTIPART_FILENAME_CHARSET",
+        VAR_LIST,
+        0, 1,
+        NULL,
+        var_multipart_filename_charset_generate,
+        VAR_CACHE,
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_FILENAME_LANGUAGE */
+    msre_engine_variable_register(engine,
+        "MULTIPART_FILENAME_LANGUAGE",
+        VAR_LIST,
+        0, 1,
+        NULL,
+        var_multipart_filename_language_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
     );
@@ -3666,8 +3888,8 @@ void msre_engine_register_default_variables(msre_engine *engine) {
     /* MULTIPART_NAME */
     msre_engine_variable_register(engine,
         "MULTIPART_NAME",
-        VAR_SIMPLE,
-        0, 0,
+        VAR_LIST,
+        0, 1,
         NULL,
         var_multipart_name_generate,
         VAR_CACHE,
@@ -3714,6 +3936,17 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         0, 0,
         NULL,
         var_multipart_data_before_generate,
+        VAR_DONT_CACHE, /* flag */
+        PHASE_REQUEST_BODY
+    );
+
+    /* MULTIPART_DUPLICATE_PART_HEADER */
+    msre_engine_variable_register(engine,
+        "MULTIPART_DUPLICATE_PART_HEADER",
+        VAR_SIMPLE,
+        0, 0,
+        NULL,
+        var_multipart_duplicate_part_header_generate,
         VAR_DONT_CACHE, /* flag */
         PHASE_REQUEST_BODY
     );

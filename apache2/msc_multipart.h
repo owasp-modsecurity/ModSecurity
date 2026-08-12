@@ -52,6 +52,9 @@ struct multipart_part {
     unsigned int             tmp_file_size;
     /* files only, filename as supplied by the browser */
     char                    *filename;
+    char                    *filename_star;
+    char                    *filename_charset;
+    char                    *filename_language;
 
     char                    *last_header_name;
     apr_table_t             *headers;
@@ -128,6 +131,7 @@ struct multipart_data {
     int                      flag_error;
     int                      flag_data_before;
     int                      flag_data_after;
+    int                      flag_duplicate_part_header;
     int                      flag_header_folding;
     int                      flag_boundary_quoted;
     int                      flag_lf_line;
