@@ -307,25 +307,32 @@ jobs:
     - name: Test IIS Module in 32-bit Application Pool
       shell: pwsh
       run: |
+        $ErrorActionPreference = 'Stop'
         $appcmd = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
 
-        # Create a dedicated 32-bit application pool and site to reproduce the
-        # x86 load issue (error 126) independently of the 64-bit default pool.
+        # The MSI registers the native module "ModSecurity IIS (32bits)" globally,
+        # pointing at %SystemRoot%\SysWOW64\inetsrv\ModSecurityIIS.dll with the
+        # bitness32 precondition. It only loads inside a 32-bit application pool,
+        # which reproduces the x86 load issue (error 126 / missing MinGW runtime).
+        $modules = & $appcmd list modules | Out-String
+        if ($modules -notmatch "ModSecurity IIS \(32bits\)") {
+            Write-Host "::error:: 32-bit ModSecurity module is not registered"
+            exit 1
+        }
+
+        # Create a dedicated 32-bit application pool and site.
         & $appcmd add apppool /name:"ModSec32Test" /enable32BitAppOnWin64:"true" | Out-Null
         & $appcmd add site /name:"ModSec32Test" /id:9999 /physicalPath:"$env:SystemDrive\inetpub\wwwroot" /bindings:"http/*:8081:" | Out-Null
-        & $appcmd set site "ModSec32Test" /[name='ModSec32Test'].application.applicationPool:"ModSec32Test" | Out-Null
-        & $appcmd add module /name:"ModSecurity" /image:"%windir%\SysWOW64\inetsrv\ModSecurityIIS.dll" /appliesTo:"ModSec32Test" | Out-Null
+        & $appcmd set app "ModSec32Test/" /applicationPool:"ModSec32Test" | Out-Null
 
         Restart-Service W3SVC -Force
 
-        try {
-            $response = Invoke-WebRequest "http://localhost:8081/" -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 30
-            Write-Host "PASS: 32-bit pool returned $($response.StatusCode)"
-        }
-        catch {
-            Write-Host "ERROR: 32-bit pool request failed: $($_.Exception.Message)"
+        $response = Invoke-WebRequest "http://localhost:8081/" -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 30
+        if ($response.StatusCode -ne 200) {
+            Write-Host "::error:: 32-bit pool returned unexpected status $($response.StatusCode)"
             exit 1
         }
+        Write-Host "PASS: 32-bit pool returned $($response.StatusCode)"
 
         # Any x86 load failure (e.g. missing MinGW runtime DLLs -> error 126)
         # surfaces as an IIS event 2280 / 'dll failed to load' entry.
