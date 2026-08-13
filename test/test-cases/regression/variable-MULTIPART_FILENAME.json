@@ -336,6 +336,59 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Testing Variables :: MULTIPART_FILENAME_CHARSET with lowercase",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "522",
+        "Content-Type": "multipart/form-data; boundary=b",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--b\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename*=utf-8''shell.php\r\n",
+        "Content-Type: image/jpeg\r\n",
+        "\r\n",
+        "<?php system($_GET['c']); ?>\r\n",
+        "\r\n",
+        "--b--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"utf-8\" \\(Variable: MULTIPART_FILENAME_CHARSET:file\\)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule MULTIPART_FILENAME_CHARSET \"@strEq utf-8\" \"id:1,phase:2,pass,t:none,t:trim,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Testing Variables :: MULTIPART_FILENAME_CHARSET with key",
     "client": {
       "ip": "200.249.12.31",
