@@ -537,31 +537,6 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         /* loop will stop when (*p == '\0') */
     }
 
-    /*
-    this is a wrong behavior, see RFC 6266: https://datatracker.ietf.org/doc/html/rfc6266
-
-    4.3.  Disposition Parameter: 'Filename'
-
-    ...
-
-    Many user agent implementations predating this specification do not
-    understand the "filename*" parameter.  Therefore, when both
-    "filename" and "filename*" are present in a single header field
-    value, recipients SHOULD pick "filename*" and ignore "filename".
-    This way, senders can avoid special-casing specific user agents by
-    sending both the more expressive "filename*" parameter, and the
-    "filename" parameter as fallback for legacy recipients (see Section 5
-    for an example).
-
-    if (!filenameStar.empty() && m_mpp->m_filename.empty()) {
-        ms_dbg_a(m_transaction, 4,
-            "Multipart: Warning: no filename= but filename*:" \
-            + filenameStar + ".");
-        return -21;
-    }
-    */
-
-    // set up the variableMultipartFileName variable, which will be used in the rules
     m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filename, \
         m_mpp->m_filenameOffset);
     if (!m_mpp->m_filename_charset.empty()) {
