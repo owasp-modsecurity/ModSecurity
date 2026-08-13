@@ -61,18 +61,14 @@ jobs:
         cd ssdeep
         autoreconf -i
         
-        if [ "${{ matrix.arch }}" = "x86" ]; then
-          ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3" --build=i686-pc-mingw32
-        else
-          ./configure --enable-shared --disable-static CFLAGS="-O3" CXXFLAGS="-O3"
-        fi
-        
+        ./configure --enable-shared --disable-static CFLAGS="-O3 -static-libgcc"
+
         make dll
 
         mkdir -p "${MSYS2_WORKSPACE}/ssdeep-install/"
-        cp -v fuzzy.dll "${MSYS2_WORKSPACE}/ssdeep-install/"
-        cp -v fuzzy.h "${MSYS2_WORKSPACE}/ssdeep-install/"
-        cp -v fuzzy.def "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.dll  "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.h    "${MSYS2_WORKSPACE}/ssdeep-install/"
+        cp -v fuzzy.def  "${MSYS2_WORKSPACE}/ssdeep-install/"
 
     - name: Restore vcpkg cache
       id: vcpkg-cache
@@ -307,6 +303,44 @@ jobs:
         }
 
         Get-EventLog -LogName Application -Source ModSecurity | Format-List
+
+    - name: Test IIS Module in 32-bit Application Pool
+      shell: pwsh
+      run: |
+        $appcmd = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
+
+        # Create a dedicated 32-bit application pool and site to reproduce the
+        # x86 load issue (error 126) independently of the 64-bit default pool.
+        & $appcmd add apppool /name:"ModSec32Test" /enable32BitAppOnWin64:"true" | Out-Null
+        & $appcmd add site /name:"ModSec32Test" /id:9999 /physicalPath:"$env:SystemDrive\inetpub\wwwroot" /bindings:"http/*:8081:" | Out-Null
+        & $appcmd set site "ModSec32Test" /[name='ModSec32Test'].application.applicationPool:"ModSec32Test" | Out-Null
+        & $appcmd add module /name:"ModSecurity" /image:"%windir%\SysWOW64\inetsrv\ModSecurityIIS.dll" /appliesTo:"ModSec32Test" | Out-Null
+
+        Restart-Service W3SVC -Force
+
+        try {
+            $response = Invoke-WebRequest "http://localhost:8081/" -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 30
+            Write-Host "PASS: 32-bit pool returned $($response.StatusCode)"
+        }
+        catch {
+            Write-Host "ERROR: 32-bit pool request failed: $($_.Exception.Message)"
+            exit 1
+        }
+
+        # Any x86 load failure (e.g. missing MinGW runtime DLLs -> error 126)
+        # surfaces as an IIS event 2280 / 'dll failed to load' entry.
+        $badPattern = 'dll failed to load|The data is the error|ERROR_MOD_NOT_FOUND|failed to load'
+        $badEvents = Get-EventLog -LogName Application -Newest 100 |
+            Where-Object { $_.Message -match $badPattern } |
+            Where-Object { $_.Source -match 'IIS|W3SVC|IIS-W3SVC|IIS-W3WP|ModSecurity' }
+
+        if ($badEvents -and $badEvents.Count -gt 0) {
+            Write-Host '::error:: 32-bit pool reported module load errors'
+            $badEvents | Select-Object TimeGenerated, Source, EntryType, EventID, Message | Format-List
+            exit 1
+        }
+
+        Write-Host "PASS: 32-bit application pool loaded ModSecurity module successfully"
 
     - name: Install go-ftw
       shell: pwsh
