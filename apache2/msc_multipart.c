@@ -172,7 +172,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             const char* start_of_filename = p;
             while ((*p != '\0') && (*p != ';')) {
                 if (*p == '%') {
-                    if ((*(p+1) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*(p+2)))) {
+                    if ((*(p+1) == '\0') || (*(p+2) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*(p+2)))) {
                         return -18;
                     }
                     p += 3;
@@ -264,7 +264,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             if (filenameAdded == 0) {
                 validate_quotes(msr, value, quote);
 
-                if (msr->mpd->mpp->filename != NULL) {
+                if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
                     msr->mpd->flag_duplicate_part_header = 1;
                     msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
                         log_escape_nq(msr->mp, value));
@@ -308,7 +308,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     }
                     msr->mpd->flag_invalid_quoting = 1;
                 }
-                p++;
+                // p++;
                 return -12;
             }
             p++; /* move over the semi-colon */

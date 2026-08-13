@@ -1732,6 +1732,7 @@ static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_
             rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME:%s",
                 log_escape_nq(mptmp, parts[i]->name));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
+            count++;
         }
     }
 
@@ -1783,6 +1784,7 @@ static int var_multipart_filename_charset_generate(modsec_rec *msr, msre_var *va
             rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_CHARSET:%s",
                 log_escape_nq(mptmp, parts[i]->name));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
+            count++;
         }
     }
 
@@ -1834,6 +1836,7 @@ static int var_multipart_filename_language_generate(modsec_rec *msr, msre_var *v
             rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_LANGUAGE:%s",
                 log_escape_nq(mptmp, parts[i]->name));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
+            count++;
         }
     }
 
@@ -1885,6 +1888,7 @@ static int var_multipart_name_generate(modsec_rec *msr, msre_var *var, msre_rule
             rvar->name = apr_psprintf(mptmp, "MULTIPART_NAME:%s",
                 log_escape_nq(mptmp, parts[i]->name));
             apr_table_addn(vartab, rvar->name, (void *)rvar);
+            count++;
         }
     }
 
