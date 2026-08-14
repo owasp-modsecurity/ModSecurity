@@ -472,7 +472,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             // here we set up the 'm_filename'
             // only if filename* is not present, because if it is present,
             // it will be used instead of filename, no matter if filename is present or not
-            if (filenameAdded == false) {
+            if (!filenameAdded) {
                 validate_quotes(value.c_str(), quote);
                 // don't forget to set up the variableMultipartFileName variable,
                 // but it will be overwritten if filename* is present
