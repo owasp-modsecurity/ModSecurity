@@ -338,12 +338,37 @@ jobs:
             Write-Host "Probe request error: $($_.Exception.Message)"
         }
         Start-Sleep -Seconds 2
-        if (Test-Path -LiteralPath $auditLogPath) {
-            Write-Host "Audit log size after: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
-            Write-Host "--- TAIL OF AUDIT LOG ---"
-            Get-Content -LiteralPath $auditLogPath -Tail 60
-            Write-Host "--- marker found in log: $((Select-String -Path $auditLogPath -Pattern $marker -Quiet)) ---"
+        if (-not (Test-Path -LiteralPath $auditLogPath)) {
+            Write-Error "Audit log not found: $auditLogPath"
+            exit 1
         }
+        Write-Host "Audit log size after: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
+        Write-Host "--- TAIL OF AUDIT LOG ---"
+        Get-Content -LiteralPath $auditLogPath -Tail 60
+        $markerLine = Select-String -Path $auditLogPath -Pattern "X-CRS-Test $marker" | Select-Object -First 1
+        if (-not $markerLine) {
+            Write-Error "Marker '$marker' not found in audit log"
+            exit 1
+        }
+        $fPart = Get-Content -LiteralPath $auditLogPath |
+            Select-Object -Skip $markerLine.LineNumber |
+            Select-String -Pattern "^HTTP/1\.1 \d{3}" | Select-Object -First 1
+        if (-not $fPart) {
+            Write-Error "No F-part status line found after marker"
+            exit 1
+        }
+        Write-Host "OK: probe F part = $($fPart.Line)"
+        if ($fPart.Line -notmatch "^HTTP/1\.1 200") {
+            Write-Error "Probe F part is not 200 (bogus status): $($fPart.Line)"
+            exit 1
+        }
+        $bogus = Get-Content -LiteralPath $auditLogPath |
+            Select-String -Pattern "HTTP/1\.1 500 Internal Server Error"
+        if ($bogus) {
+            Write-Error "Found bogus 500 in audit log F parts: $($bogus.Count)"
+            exit 1
+        }
+        Write-Host "OK: no bogus 500 entries in audit log"
 
     - name: Install go-ftw and albedo
       shell: pwsh
@@ -416,21 +441,5 @@ jobs:
         & "$goBinPath\go-ftw.exe" run -d $testRuleDir --config "${{ github.workspace }}\iis\tests\ftw.yaml" --show-failures-only
         $exitCode = $LASTEXITCODE
         Write-Host "go-ftw exit code: $exitCode"
-        $auditLogPath = "c:\inetpub\logs\modsec_audit.log"
-        if (Test-Path -LiteralPath $auditLogPath) {
-            Copy-Item -LiteralPath $auditLogPath -Destination "${{ github.workspace }}\modsec_audit.log" -Force
-            Write-Host "Audit log copied for upload: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
-            Write-Host "--- TAIL OF AUDIT LOG AFTER go-ftw ---"
-            Get-Content -LiteralPath $auditLogPath -Tail 40
-        }
         exit $exitCode
-
-    - name: Upload FTW logs and audit log
-      if: always()
-      continue-on-error: true
-      uses: actions/upload-artifact@v4
-      with:
-        name: ftw-logs-${{ matrix.config }}
-        path: |
-          ${{ github.workspace }}/modsec_audit.log
 
