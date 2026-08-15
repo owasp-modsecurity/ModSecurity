@@ -450,6 +450,22 @@ CMyHttpModule::OnSendResponse(
 	pHttpResponse = pHttpContext->GetResponse();
 	pRawHttpResponse = pHttpResponse->GetRawHttpResponse();
 
+	// here we must transfer response status
+	// otherwise r->status stays 0 and the audit log records a
+	// bogus "500 Internal Server Error" (ap_get_status_line(0))
+	// for every transaction
+	//
+	if(pRawHttpResponse->StatusCode > 0)
+	{
+		r->status = pRawHttpResponse->StatusCode;
+
+		if(pRawHttpResponse->pReason != NULL && pRawHttpResponse->ReasonLength > 0)
+		{
+			r->status_line = apr_psprintf(r->pool, "%d %s", r->status,
+				ZeroTerminate(pRawHttpResponse->pReason, pRawHttpResponse->ReasonLength, r->pool));
+		}
+	}
+
 	// here we must add handling of chunked response
 	// apparently IIS 7 calls this handler once per chunk
 	// see: http://stackoverflow.com/questions/4385249/how-to-buffer-and-process-chunked-data-before-sending-headers-in-iis7-native-mod

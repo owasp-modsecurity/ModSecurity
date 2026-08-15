@@ -229,8 +229,12 @@ jobs:
               $newName = $_.Name.Replace(".example", "")
               Rename-Item -Path $_.FullName -NewName $newName
           }
-          
+
+          $testConfigDir = "${{ github.workspace }}\iis\tests"
+
           $modSecurityConfigFile = "$modSecurityConfigDir\modsecurity_iis.conf"
+
+          Add-Content -Path "$crsDir\crs-setup.conf" -Value (Get-Content -Path "$testConfigDir\crs-900005.conf")
 
           $crsRules = @(
             "Include coreruleset/crs-setup.conf",
@@ -243,6 +247,17 @@ jobs:
           Add-Content -Path $modSecurityConfigFile -Value $crsRules
 
           (Get-Content -Path $modSecurityConfigDir\modsecurity.conf) -replace 'SecRuleEngine DetectionOnly', 'SecRuleEngine On' | Set-Content -Path $modSecurityConfigDir\modsecurity.conf
+
+          $auditLogDir = "c:\inetpub\logs"
+          New-Item -ItemType Directory -Path $auditLogDir -Force | Out-Null
+          $acl = Get-Acl -LiteralPath $auditLogDir
+          foreach ($identity in @("NETWORK SERVICE", "IIS_IUSRS")) {
+              $rule = New-Object System.Security.AccessControl.FileSystemAccessRule($identity, "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
+              $acl.AddAccessRule($rule)
+          }
+          Set-Acl -LiteralPath $auditLogDir -AclObject $acl
+
+          Add-Content -Path $modSecurityConfigFile -Value (Get-Content -Path "$testConfigDir\audit-logging.conf")
 
         }
         catch {
@@ -272,8 +287,8 @@ jobs:
 
         $testCases = @(
             @{Url = "http://localhost/"; Description = "Normal request"; ExpectedCode = 200},
-            @{Url = "http://localhost/?id=1' OR '1'='1"; Description = "SQL injection attempt"; ExpectedCode = 403},
-            @{Url = "http://localhost/?q=<script>alert('test')</script>"; Description = "XSS attempt"; ExpectedCode = 403}
+            @{Url = "http://localhost/?id=1' OR '1'='1"; Description = "SQL injection attempt (logged, not blocked in DetectionOnly)"; ExpectedCode = 200},
+            @{Url = "http://localhost/?q=<script>alert('test')</script>"; Description = "XSS attempt (logged, not blocked in DetectionOnly)"; ExpectedCode = 200}
         )
         
         foreach ($test in $testCases) {
@@ -293,7 +308,6 @@ jobs:
         }
         
 
-        # Check event log
         $badMessagePattern = 'Failed to find the RegisterModule entrypoint|The description for Event ID|The data is the error|dll failed to load'
 
         $events = Get-EventLog -LogName Application -Newest 100 |
@@ -308,14 +322,109 @@ jobs:
 
         Get-EventLog -LogName Application -Source ModSecurity | Format-List
 
-    - name: Install go-ftw
+    - name: Diagnose audit log
+      shell: pwsh
+      run: |
+        $auditLogPath = "c:\inetpub\logs\modsec_audit.log"
+        Write-Host "Audit log exists: $(Test-Path -LiteralPath $auditLogPath)"
+        if (Test-Path -LiteralPath $auditLogPath) {
+            Write-Host "Audit log size before: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
+        }
+        $marker = "hello-marker-$(Get-Random)"
+        try {
+            $resp = Invoke-WebRequest "http://localhost/?probe=1" -Headers @{ "X-CRS-Test" = $marker } -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 30
+            Write-Host "Probe request status: $($resp.StatusCode)"
+        } catch {
+            Write-Host "Probe request error: $($_.Exception.Message)"
+        }
+        Start-Sleep -Seconds 2
+        if (-not (Test-Path -LiteralPath $auditLogPath)) {
+            Write-Error "Audit log not found: $auditLogPath"
+            exit 1
+        }
+        Write-Host "Audit log size after: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
+        Write-Host "--- TAIL OF AUDIT LOG ---"
+        Get-Content -LiteralPath $auditLogPath -Tail 60
+        $markerLine = Select-String -Path $auditLogPath -Pattern "X-CRS-Test: $marker" | Select-Object -First 1
+        if (-not $markerLine) {
+            Write-Error "Marker '$marker' not found in audit log"
+            exit 1
+        }
+        $fPart = Get-Content -LiteralPath $auditLogPath |
+            Select-Object -Skip $markerLine.LineNumber |
+            Select-String -Pattern "^HTTP/1\.1 \d{3}" | Select-Object -First 1
+        if (-not $fPart) {
+            Write-Error "No F-part status line found after marker"
+            exit 1
+        }
+        Write-Host "OK: probe F part = $($fPart.Line)"
+        if ($fPart.Line -notmatch "^HTTP/1\.1 200") {
+            Write-Error "Probe F part is not 200 (bogus status): $($fPart.Line)"
+            exit 1
+        }
+        $bogus = Get-Content -LiteralPath $auditLogPath |
+            Select-String -Pattern "HTTP/1\.1 500 Internal Server Error"
+        if ($bogus) {
+            Write-Error "Found bogus 500 in audit log F parts: $($bogus.Count)"
+            exit 1
+        }
+        Write-Host "OK: no bogus 500 entries in audit log"
+
+    - name: Install go-ftw and albedo
       shell: pwsh
       run: |
         go install github.com/coreruleset/go-ftw@latest
+        go install github.com/coreruleset/albedo@latest
 
-    # Certain rules are disabled due to specific IIS behavior patterns.
-    # Using go-ftw in cloud mode as the IIS connector does not generate logs in file format.
-    # Technically, Event logs can be streamed to files, but this requires implementing rate limits to avoid log overflow.
+    - name: Configure IIS reverse proxy to albedo backend
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $goBinPath = ""
+        if ($env:GOBIN) {
+            $goBinPath = $env:GOBIN
+        } elseif ($env:GOPATH) {
+            $goBinPath = Join-Path $env:GOPATH "bin"
+        } else {
+            $goBinPath = Join-Path $env:USERPROFILE "go\bin"
+        }
+
+        # Install URL Rewrite 2.0 and Application Request Routing (ARR)
+        choco install urlrewrite iis-arr -y --no-progress
+
+        & "$env:SystemRoot\system32\inetsrv\appcmd.exe" set config /section:system.webServer/proxy /enabled:true
+        if ($LASTEXITCODE -ne 0) { Write-Error "Failed to enable ARR proxy"; exit 1 }
+
+        Copy-Item -LiteralPath "${{ github.workspace }}\iis\tests\web.config" -Destination "C:\inetpub\wwwroot\web.config" -Force
+
+        $albedoExe = Join-Path $goBinPath "albedo.exe"
+        if (-not (Test-Path -LiteralPath $albedoExe)) {
+            Write-Error "albedo.exe not found at $albedoExe"
+            exit 1
+        }
+        Start-Process -FilePath $albedoExe -ArgumentList "-p", "8080" -WindowStyle Hidden
+
+        $ready = $false
+        for ($i = 0; $i -lt 30; $i++) {
+            try {
+                $resp = Invoke-WebRequest "http://localhost:8080/capabilities?quiet=true" -UseBasicParsing -TimeoutSec 3
+                if ($resp.StatusCode -eq 200) { $ready = $true; break }
+            } catch {
+                Start-Sleep -Seconds 1
+            }
+        }
+        if (-not $ready) { Write-Error "albedo did not become ready on port 8080"; exit 1 }
+        Write-Host "albedo backend is ready on http://localhost:8080"
+
+        Restart-Service W3SVC -Force
+
+        try {
+            $probe = Invoke-WebRequest "http://localhost/status/200" -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 15
+            Write-Host "Reverse proxy probe /status/200 -> $($probe.StatusCode)"
+        } catch {
+            Write-Host "Reverse proxy probe error: $($_.Exception.Message)"
+        }
+
     - name: Test ModSecurity Rules
       shell: pwsh
       run: |
@@ -329,5 +438,8 @@ jobs:
             $goBinPath = Join-Path $env:USERPROFILE "go\bin"
         }
 
-        & "$goBinPath\go-ftw.exe" run -d $testRuleDir --cloud -e "920100-2$|920100-4$|920100-8$|920100-12$|920272-5$|920290-1$|920620-1$|920380-1$" --show-failures-only
+        & "$goBinPath\go-ftw.exe" run -d $testRuleDir --config "${{ github.workspace }}\iis\tests\ftw.yaml" --show-failures-only
+        $exitCode = $LASTEXITCODE
+        Write-Host "go-ftw exit code: $exitCode"
+        exit $exitCode
 
