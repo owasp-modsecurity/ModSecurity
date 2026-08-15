@@ -1276,6 +1276,21 @@ static int hook_log_transaction(request_rec *r) {
         arr = apr_table_elts(r->headers_out);
     }
 
+#if defined(VERSION_IIS)
+    /* The IIS connector never copies the response status into the
+     * request_rec; r->status is only set in OnSendResponse. A request
+     * that was superseded by an internal redirect (e.g. the IIS default
+     * document rewrite of "/" to "/iisstart.htm") never reaches
+     * OnSendResponse, so its r->status stays 0 and the audit log F part
+     * would record a bogus "500 Internal Server Error"
+     * (ap_get_status_line(0)). Skip audit logging for such transactions
+     * unless they were actually intercepted.
+     */
+    if (r->status == 0 && msr->was_intercepted == 0) {
+        return DECLINED;
+    }
+#endif
+
     msr->r = r;
     msr->response_status = r->status;
     msr->status_line = ((r->status_line != NULL)
