@@ -345,7 +345,7 @@ jobs:
         Write-Host "Audit log size after: $((Get-Item -LiteralPath $auditLogPath).Length) bytes"
         Write-Host "--- TAIL OF AUDIT LOG ---"
         Get-Content -LiteralPath $auditLogPath -Tail 60
-        $markerLine = Select-String -Path $auditLogPath -Pattern "X-CRS-Test $marker" | Select-Object -First 1
+        $markerLine = Select-String -Path $auditLogPath -Pattern "X-CRS-Test: $marker" | Select-Object -First 1
         if (-not $markerLine) {
             Write-Error "Marker '$marker' not found in audit log"
             exit 1
