@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <memory>
@@ -508,10 +509,17 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     RulesSet * const m_rules;
 
     /**
-     *
+     * Rule IDs disabled via ctl:ruleRemoveById. O(1) average lookup —
+     * checked once per rule evaluated, so this is a hot path.
      */
-    std::list<int > m_ruleRemoveById;
-    std::list<std::pair<int, int> > m_ruleRemoveByIdRange;
+    std::unordered_set<int> m_ruleRemoveById;
+
+    /**
+     * ID ranges disabled via ctl:ruleRemoveById=min-max. Ranges are
+     * typically few in number; a vector keeps the (still linear) scan
+     * cache-friendly rather than pointer-chasing a std::list.
+     */
+    std::vector<std::pair<int, int> > m_ruleRemoveByIdRange;
 
     /**
      *
@@ -519,14 +527,19 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::list<std::string> m_ruleRemoveByTag;
 
     /**
-     *
+     * Target removals disabled via ctl:ruleRemoveTargetByTag. Matching
+     * requires containsTag(), not a simple key equality, so this stays
+     * a linear structure — vector at least keeps it cache-friendly.
      */
-    std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
+    std::vector< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
 
     /**
-     *
+     * Target removals disabled via ctl:ruleRemoveTargetById. Keyed by
+     * rule ID so RuleWithOperator::evaluate()/getFinalVars() can use
+     * equal_range() to look at only the entries for the current rule,
+     * instead of scanning the whole set for every rule x variable pair.
      */
-    std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
+    std::unordered_multimap<int, std::string> m_ruleRemoveTargetById;
 
     /**
      *
