@@ -163,20 +163,22 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         if (exclusion->contains(variable)) {
             continue;
         }
-        if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
-                trans->m_ruleRemoveTargetById.end(),
-                [&, variable, this](const auto &m) -> bool {
+        {
+            const auto& str2 = *variable->m_fullName.get();
+            const auto range = trans->m_ruleRemoveTargetById.equal_range(m_ruleId);
+            const bool removed = std::any_of(range.first, range.second,
+                [&str2](const auto &m) -> bool {
                     const auto& str1 = m.second;
-                    const auto& str2 = *variable->m_fullName.get();
-                    return m.first == m_ruleId &&
-                           str1.size() == str2.size() &&
+                    return str1.size() == str2.size() &&
                            std::equal(str1.begin(), str1.end(), str2.begin(),
                                       [](char a, char b) {
                                           return std::tolower(static_cast<unsigned char>(a)) ==
                                                  std::tolower(static_cast<unsigned char>(b));
                                       }); // end-of std::equal
-                }) != trans->m_ruleRemoveTargetById.end()) {
-            continue;
+                });
+            if (removed) {
+                continue;
+            }
         }
         if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
@@ -210,10 +212,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
 
     // FIXME: Make a class runTimeException to handle this cases.
-    for (const auto &i : trans->m_ruleRemoveById) {
-        if (m_ruleId != i) {
-            continue;
-        }
+    if (trans->m_ruleRemoveById.count(m_ruleId) != 0) {
         ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
             " was skipped due to a ruleRemoveById action...");
         return true;
@@ -262,16 +261,22 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             const std::string &value = v->getValue();
             const std::string &key = v->getKeyWithCollection();
 
-            if (exclusion.contains(v) ||
-                std::find_if(trans->m_ruleRemoveTargetById.begin(),
-                    trans->m_ruleRemoveTargetById.end(),
-                    [&, v, this](const auto &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
-                    }) != trans->m_ruleRemoveTargetById.end()
-            ) {
+            if (exclusion.contains(v)) {
                 delete v;
                 v = nullptr;
                 continue;
+            }
+            {
+                const auto range = trans->m_ruleRemoveTargetById.equal_range(m_ruleId);
+                const bool removedById = std::any_of(range.first, range.second,
+                    [&v](const auto &m) -> bool {
+                        return m.second == v->getKeyWithCollection();
+                    });
+                if (removedById) {
+                    delete v;
+                    v = nullptr;
+                    continue;
+                }
             }
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
