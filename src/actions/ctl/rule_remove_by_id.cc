@@ -90,7 +90,7 @@ bool RuleRemoveById::init(std::string *error) {
 
 bool RuleRemoveById::evaluate(RuleWithActions *rule, Transaction *transaction) {
     for (const auto &i : m_ids) {
-        transaction->m_ruleRemoveById.push_back(i);
+        transaction->m_ruleRemoveById.insert(i);
     }
     for (const auto &i : m_ranges) {
         transaction->m_ruleRemoveByIdRange.push_back(i);

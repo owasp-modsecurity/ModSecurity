@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <memory>
@@ -47,6 +48,7 @@ typedef struct Rules_t RulesSet;
 #include "modsecurity/anchored_variable.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/collection/collections.h"
+#include "modsecurity/variable_names.h"
 #include "modsecurity/variable_value.h"
 #include "modsecurity/collection/collection.h"
 #include "modsecurity/variable_origin.h"
@@ -124,87 +126,101 @@ class Operator;
 class TransactionAnchoredVariables {
  public:
     explicit TransactionAnchoredVariables(Transaction *t)
-        : m_variableRequestHeadersNames(t, "REQUEST_HEADERS_NAMES"),
-        m_variableResponseContentType(t, "RESPONSE_CONTENT_TYPE"),
-        m_variableResponseHeadersNames(t, "RESPONSE_HEADERS_NAMES"),
-        m_variableARGScombinedSize(t, "ARGS_COMBINED_SIZE"),
-        m_variableAuthType(t, "AUTH_TYPE"),
-        m_variableFilesCombinedSize(t, "FILES_COMBINED_SIZE"),
-        m_variableFullRequest(t, "FULL_REQUEST"),
-        m_variableFullRequestLength(t, "FULL_REQUEST_LENGTH"),
-        m_variableInboundDataError(t, "INBOUND_DATA_ERROR"),
-        m_variableMatchedVar(t, "MATCHED_VAR"),
-        m_variableMatchedVarName(t, "MATCHED_VAR_NAME"),
-        m_variableMscPcreError(t, "MSC_PCRE_ERROR"),
-        m_variableMscPcreLimitsExceeded(t, "MSC_PCRE_LIMITS_EXCEEDED"),
-        m_variableMultipartBoundaryQuoted(t, "MULTIPART_BOUNDARY_QUOTED"),
+        : m_variableRequestHeadersNames(t,
+            variable_names::REQUEST_HEADERS_NAMES),
+        m_variableResponseContentType(t, variable_names::RESPONSE_CONTENT_TYPE),
+        m_variableResponseHeadersNames(t,
+            variable_names::RESPONSE_HEADERS_NAMES),
+        m_variableARGScombinedSize(t, variable_names::ARGS_COMBINED_SIZE),
+        m_variableAuthType(t, variable_names::AUTH_TYPE),
+        m_variableFilesCombinedSize(t, variable_names::FILES_COMBINED_SIZE),
+        m_variableFullRequest(t, variable_names::FULL_REQUEST),
+        m_variableFullRequestLength(t, variable_names::FULL_REQUEST_LENGTH),
+        m_variableInboundDataError(t, variable_names::INBOUND_DATA_ERROR),
+        m_variableMatchedVar(t, variable_names::MATCHED_VAR),
+        m_variableMatchedVarName(t, variable_names::MATCHED_VAR_NAME),
+        m_variableMscPcreError(t, variable_names::MSC_PCRE_ERROR),
+        m_variableMscPcreLimitsExceeded(t,
+            variable_names::MSC_PCRE_LIMITS_EXCEEDED),
+        m_variableMultipartBoundaryQuoted(t,
+            variable_names::MULTIPART_BOUNDARY_QUOTED),
         m_variableMultipartBoundaryWhiteSpace(t,
-            "MULTIPART_BOUNDARY_WHITESPACE"),
-        m_variableMultipartCrlfLFLines(t, "MULTIPART_CRLF_LF_LINES"),
-        m_variableMultipartDataAfter(t, "MULTIPART_DATA_AFTER"),
-        m_variableMultipartDataBefore(t, "MULTIPART_DATA_BEFORE"),
+            variable_names::MULTIPART_BOUNDARY_WHITESPACE),
+        m_variableMultipartCrlfLFLines(t,
+            variable_names::MULTIPART_CRLF_LF_LINES),
+        m_variableMultipartDataAfter(t, variable_names::MULTIPART_DATA_AFTER),
+        m_variableMultipartDataBefore(t, variable_names::MULTIPART_DATA_BEFORE),
         m_variableMultipartFileLimitExceeded(t,
-            "MULTIPART_FILE_LIMIT_EXCEEDED"),
-        m_variableMultipartHeaderFolding(t, "MULTIPART_HEADER_FOLDING"),
+            variable_names::MULTIPART_FILE_LIMIT_EXCEEDED),
+        m_variableMultipartHeaderFolding(t,
+            variable_names::MULTIPART_HEADER_FOLDING),
         m_variableMultipartInvalidHeaderFolding(t,
-            "MULTIPART_INVALID_HEADER_FOLDING"),
-        m_variableMultipartInvalidPart(t, "MULTIPART_INVALID_PART"),
-        m_variableMultipartInvalidQuoting(t, "MULTIPART_INVALID_QUOTING"),
-        m_variableMultipartLFLine(t, "MULTIPART_LF_LINE"),
-        m_variableMultipartMissingSemicolon(t, "MULTIPART_MISSING_SEMICOLON"),
-        m_variableMultipartStrictError(t, "MULTIPART_STRICT_ERROR"),
+            variable_names::MULTIPART_INVALID_HEADER_FOLDING),
+        m_variableMultipartInvalidPart(t,
+            variable_names::MULTIPART_INVALID_PART),
+        m_variableMultipartInvalidQuoting(t,
+            variable_names::MULTIPART_INVALID_QUOTING),
+        m_variableMultipartLFLine(t, variable_names::MULTIPART_LF_LINE),
+        m_variableMultipartMissingSemicolon(t,
+            variable_names::MULTIPART_MISSING_SEMICOLON),
+        m_variableMultipartStrictError(t,
+            variable_names::MULTIPART_STRICT_ERROR),
         m_variableMultipartUnmatchedBoundary(t,
-            "MULTIPART_UNMATCHED_BOUNDARY"),
-        m_variableOutboundDataError(t, "OUTBOUND_DATA_ERROR"),
-        m_variablePathInfo(t, "PATH_INFO"),
-        m_variableQueryString(t, "QUERY_STRING"),
-        m_variableRemoteAddr(t, "REMOTE_ADDR"),
-        m_variableRemoteHost(t, "REMOTE_HOST"),
-        m_variableRemotePort(t, "REMOTE_PORT"),
-        m_variableReqbodyError(t, "REQBODY_ERROR"),
-        m_variableReqbodyErrorMsg(t, "REQBODY_ERROR_MSG"),
-        m_variableReqbodyProcessorError(t, "REQBODY_PROCESSOR_ERROR"),
-        m_variableReqbodyProcessorErrorMsg(t, "REQBODY_PROCESSOR_ERROR_MSG"),
-        m_variableReqbodyProcessor(t, "REQBODY_PROCESSOR"),
-        m_variableRequestBasename(t, "REQUEST_BASENAME"),
-        m_variableRequestBody(t, "REQUEST_BODY"),
-        m_variableRequestBodyLength(t, "REQUEST_BODY_LENGTH"),
-        m_variableRequestFilename(t, "REQUEST_FILENAME"),
-        m_variableRequestLine(t, "REQUEST_LINE"),
-        m_variableRequestMethod(t, "REQUEST_METHOD"),
-        m_variableRequestProtocol(t, "REQUEST_PROTOCOL"),
-        m_variableRequestURI(t, "REQUEST_URI"),
-        m_variableRequestURIRaw(t, "REQUEST_URI_RAW"),
-        m_variableResource(t, "RESOURCE"),
-        m_variableResponseBody(t, "RESPONSE_BODY"),
-        m_variableResponseContentLength(t, "RESPONSE_CONTENT_LENGTH"),
-        m_variableResponseProtocol(t, "RESPONSE_PROTOCOL"),
-        m_variableResponseStatus(t, "RESPONSE_STATUS"),
-        m_variableServerAddr(t, "SERVER_ADDR"),
-        m_variableServerName(t, "SERVER_NAME"),
-        m_variableServerPort(t, "SERVER_PORT"),
-        m_variableSessionID(t, "SESSIONID"),
-        m_variableUniqueID(t, "UNIQUE_ID"),
-        m_variableUrlEncodedError(t, "URLENCODED_ERROR"),
-        m_variableUserID(t, "USERID"),
-        m_variableArgs(t, "ARGS"),
-        m_variableArgsGet(t, "ARGS_GET"),
-        m_variableArgsPost(t, "ARGS_POST"),
-        m_variableFilesSizes(t, "FILES_SIZES"),
-        m_variableFilesNames(t, "FILES_NAMES"),
-        m_variableFilesTmpContent(t, "FILES_TMP_CONTENT"),
-        m_variableMultipartFileName(t, "MULTIPART_FILENAME"),
-        m_variableMultipartName(t, "MULTIPART_NAME"),
-        m_variableMatchedVarsNames(t, "MATCHED_VARS_NAMES"),
-        m_variableMatchedVars(t, "MATCHED_VARS"),
-        m_variableFiles(t, "FILES"),
-        m_variableRequestCookies(t, "REQUEST_COOKIES"),
-        m_variableRequestHeaders(t, "REQUEST_HEADERS"),
-        m_variableResponseHeaders(t, "RESPONSE_HEADERS"),
-        m_variableGeo(t, "GEO"),
-        m_variableRequestCookiesNames(t, "REQUEST_COOKIES_NAMES"),
-        m_variableFilesTmpNames(t, "FILES_TMPNAMES"),
-        m_variableMultipartPartHeaders(t, "MULTIPART_PART_HEADERS"),
+            variable_names::MULTIPART_UNMATCHED_BOUNDARY),
+        m_variableOutboundDataError(t, variable_names::OUTBOUND_DATA_ERROR),
+        m_variablePathInfo(t, variable_names::PATH_INFO),
+        m_variableQueryString(t, variable_names::QUERY_STRING),
+        m_variableRemoteAddr(t, variable_names::REMOTE_ADDR),
+        m_variableRemoteHost(t, variable_names::REMOTE_HOST),
+        m_variableRemotePort(t, variable_names::REMOTE_PORT),
+        m_variableReqbodyError(t, variable_names::REQBODY_ERROR),
+        m_variableReqbodyErrorMsg(t, variable_names::REQBODY_ERROR_MSG),
+        m_variableReqbodyProcessorError(t,
+            variable_names::REQBODY_PROCESSOR_ERROR),
+        m_variableReqbodyProcessorErrorMsg(t,
+            variable_names::REQBODY_PROCESSOR_ERROR_MSG),
+        m_variableReqbodyProcessor(t, variable_names::REQBODY_PROCESSOR),
+        m_variableRequestBasename(t, variable_names::REQUEST_BASENAME),
+        m_variableRequestBody(t, variable_names::REQUEST_BODY),
+        m_variableRequestBodyLength(t, variable_names::REQUEST_BODY_LENGTH),
+        m_variableRequestFilename(t, variable_names::REQUEST_FILENAME),
+        m_variableRequestLine(t, variable_names::REQUEST_LINE),
+        m_variableRequestMethod(t, variable_names::REQUEST_METHOD),
+        m_variableRequestProtocol(t, variable_names::REQUEST_PROTOCOL),
+        m_variableRequestURI(t, variable_names::REQUEST_URI),
+        m_variableRequestURIRaw(t, variable_names::REQUEST_URI_RAW),
+        m_variableResource(t, variable_names::RESOURCE),
+        m_variableResponseBody(t, variable_names::RESPONSE_BODY),
+        m_variableResponseContentLength(t,
+            variable_names::RESPONSE_CONTENT_LENGTH),
+        m_variableResponseProtocol(t, variable_names::RESPONSE_PROTOCOL),
+        m_variableResponseStatus(t, variable_names::RESPONSE_STATUS),
+        m_variableServerAddr(t, variable_names::SERVER_ADDR),
+        m_variableServerName(t, variable_names::SERVER_NAME),
+        m_variableServerPort(t, variable_names::SERVER_PORT),
+        m_variableSessionID(t, variable_names::SESSIONID),
+        m_variableUniqueID(t, variable_names::UNIQUE_ID),
+        m_variableUrlEncodedError(t, variable_names::URLENCODED_ERROR),
+        m_variableUserID(t, variable_names::USERID),
+        m_variableArgs(t, variable_names::ARGS),
+        m_variableArgsGet(t, variable_names::ARGS_GET),
+        m_variableArgsPost(t, variable_names::ARGS_POST),
+        m_variableFilesSizes(t, variable_names::FILES_SIZES),
+        m_variableFilesNames(t, variable_names::FILES_NAMES),
+        m_variableFilesTmpContent(t, variable_names::FILES_TMP_CONTENT),
+        m_variableMultipartFileName(t, variable_names::MULTIPART_FILENAME),
+        m_variableMultipartName(t, variable_names::MULTIPART_NAME),
+        m_variableMatchedVarsNames(t, variable_names::MATCHED_VARS_NAMES),
+        m_variableMatchedVars(t, variable_names::MATCHED_VARS),
+        m_variableFiles(t, variable_names::FILES),
+        m_variableRequestCookies(t, variable_names::REQUEST_COOKIES),
+        m_variableRequestHeaders(t, variable_names::REQUEST_HEADERS),
+        m_variableResponseHeaders(t, variable_names::RESPONSE_HEADERS),
+        m_variableGeo(t, variable_names::GEO),
+        m_variableRequestCookiesNames(t, variable_names::REQUEST_COOKIES_NAMES),
+        m_variableFilesTmpNames(t, variable_names::FILES_TMPNAMES),
+        m_variableMultipartPartHeaders(t,
+            variable_names::MULTIPART_PART_HEADERS),
         m_variableOffset(0),
         m_variableArgsNames("ARGS_NAMES", &m_variableArgs),
         m_variableArgsGetNames("ARGS_GET_NAMES", &m_variableArgsGet),
@@ -508,10 +524,17 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     RulesSet * const m_rules;
 
     /**
-     *
+     * Rule IDs disabled via ctl:ruleRemoveById. O(1) average lookup —
+     * checked once per rule evaluated, so this is a hot path.
      */
-    std::list<int > m_ruleRemoveById;
-    std::list<std::pair<int, int> > m_ruleRemoveByIdRange;
+    std::unordered_set<int> m_ruleRemoveById;
+
+    /**
+     * ID ranges disabled via ctl:ruleRemoveById=min-max. Ranges are
+     * typically few in number; a vector keeps the (still linear) scan
+     * cache-friendly rather than pointer-chasing a std::list.
+     */
+    std::vector<std::pair<int, int> > m_ruleRemoveByIdRange;
 
     /**
      *
@@ -519,14 +542,19 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     std::list<std::string> m_ruleRemoveByTag;
 
     /**
-     *
+     * Target removals disabled via ctl:ruleRemoveTargetByTag. Matching
+     * requires containsTag(), not a simple key equality, so this stays
+     * a linear structure — vector at least keeps it cache-friendly.
      */
-    std::list< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
+    std::vector< std::pair<std::string, std::string> > m_ruleRemoveTargetByTag;
 
     /**
-     *
+     * Target removals disabled via ctl:ruleRemoveTargetById. Keyed by
+     * rule ID so RuleWithOperator::evaluate()/getFinalVars() can use
+     * equal_range() to look at only the entries for the current rule,
+     * instead of scanning the whole set for every rule x variable pair.
      */
-    std::list< std::pair<int, std::string> > m_ruleRemoveTargetById;
+    std::unordered_multimap<int, std::string> m_ruleRemoveTargetById;
 
     /**
      *

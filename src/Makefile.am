@@ -54,6 +54,7 @@ pkginclude_HEADERS = \
 	../headers/modsecurity/rules_set_properties.h \
 	../headers/modsecurity/rules_exceptions.h \
 	../headers/modsecurity/transaction.h \
+	../headers/modsecurity/variable_names.h \
 	../headers/modsecurity/variable_origin.h \
 	../headers/modsecurity/variable_value.h
 
