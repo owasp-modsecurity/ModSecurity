@@ -1147,6 +1147,17 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 		// not possible
     }
 
+	// Remove the Transfer-Encoding header if "chunked" is set in the request.
+	// ModSecurity always sends Content-Length, so leaving chunked would produce a
+	// request with both headers, which is malformed.
+	USHORT teLen = 0;
+	PCSTR te = pHttpRequest->GetHeader(HttpHeaderTransferEncoding, &teLen);
+	if (te != NULL && teLen != 0 &&
+	    0 == stricmp(ZeroTerminate(te, teLen, r->pool), "chunked"))
+	{
+		pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
+	}
+
     hr = pHttpRequest->SetHeader(
             HttpHeaderContentLength, 
             szLength, 
