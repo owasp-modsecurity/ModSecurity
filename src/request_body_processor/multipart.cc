@@ -490,6 +490,13 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                     "Multipart: Content-Disposition filename: " + value + ".");
                 filenameAdded = true;
             }
+            else {
+                m_flag_duplicate_part_header = 1;
+                ms_dbg_a(m_transaction, 4,
+                    "Multipart: Warning: Duplicate Content-Disposition " \
+                    "filename: " + value + ".");
+                return -20;
+            }
         } else if (name == "filename*") {
             if (!m_mpp->m_filenameStar.empty()) {
                 m_flag_duplicate_part_header = 1;
