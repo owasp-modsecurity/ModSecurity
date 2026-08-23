@@ -278,6 +278,14 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 }
                 filenameAdded = 1;
             }
+            else {
+                if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
+                    msr->mpd->flag_duplicate_part_header = 1;
+                    msr_log(msr, 4,
+                        "Multipart: Warning: Duplicate Content-Disposition filename: %s.",  log_escape_nq(msr->mp, value));
+                    return -20;
+                }
+            }
         } else if (strcmp(name, "filename*") == 0) {
             if (msr->mpd->mpp->filename_star != NULL && strlen(msr->mpd->mpp->filename_star) != 0) {
                 msr->mpd->flag_duplicate_part_header = 1;
