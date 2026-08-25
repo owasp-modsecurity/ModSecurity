@@ -97,6 +97,7 @@ class MultipartPart {
      m_value_parts(),
      m_tmp_file_size(),
      m_filename(""),
+     m_filenameStar(""),
      m_filenameOffset(0),
      m_filename_charset(""),
      m_filename_charsetOffset(0),
