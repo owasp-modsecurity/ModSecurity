@@ -88,10 +88,6 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     assert(msr != NULL);
     assert(c_d_value != NULL);
     char *p = NULL, *t = NULL;
-    // store if filename is already added from the header
-    // this needs to store because there can be both filename and filename* in the header,
-    // and filename* has precedence over filename and can be first in the header
-    unsigned int filenameAdded = 0;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -258,48 +254,36 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             }
         }
         else if (strcmp(name, "filename") == 0) {
-            // here we set up the 'filename'
-            // only if filename* is not present, because if it is present,
-            // it will be used instead of filename, no matter if filename is present or not
-            if (filenameAdded == 0) {
+            // check if the 'filename' (and not the `filename*`) is already added from the header, if yes then return error
+            if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
+                msr->mpd->flag_duplicate_part_header = 1;
+                msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
+                    log_escape_nq(msr->mp, value));
+                return -15;
+            }
+            else {
                 validate_quotes(msr, value, quote);
 
-                if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
-                    msr->mpd->flag_duplicate_part_header = 1;
-                    msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
-                        log_escape_nq(msr->mp, value));
-                    return -15;
-                }
                 msr->mpd->mpp->filename = apr_pstrdup(msr->mp, value);
 
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
                         log_escape_nq(msr->mp, value));
                 }
-                filenameAdded = 1;
-            }
-            else {
-                if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
-                    msr->mpd->flag_duplicate_part_header = 1;
-                    msr_log(msr, 4,
-                        "Multipart: Warning: Duplicate Content-Disposition filename: %s.",  log_escape_nq(msr->mp, value));
-                    return -20;
-                }
             }
         } else if (strcmp(name, "filename*") == 0) {
+            // check if the 'filename*' (and not the `filename`) is already added from the header, if yes then return error
             if (msr->mpd->mpp->filename_star != NULL && strlen(msr->mpd->mpp->filename_star) != 0) {
                 msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4,
                     "Multipart: Warning: Duplicate Content-Disposition filename*: %s.",  log_escape_nq(msr->mp, value));
-                return -20;
+                return -15;
             }
             msr->mpd->mpp->filename_star = apr_pstrdup(msr->mp, value);
-            msr->mpd->mpp->filename = apr_pstrdup(msr->mp, value);
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename*: %s.",
                     log_escape_nq(msr->mp, value));
             }
-            filenameAdded = 1;
         }
         else return -11;
 

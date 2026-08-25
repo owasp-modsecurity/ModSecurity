@@ -513,7 +513,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-20\): form-data; name="file"; filename="safe.jpg"; filename="safe.php"./s, 1 ],
+		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename="safe.jpg"; filename="safe.php"./s, 1 ],
 		error => [ qr/data \"RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1/s, 1 ],
 	},
 	match_response => {
@@ -557,7 +557,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-20\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename\*=UTF8''safe.php./s, 1 ],
+		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename\*=UTF8''safe.php./s, 1 ],
 		error => [ qr/data \"RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1/s, 1 ],
 	},
 	match_response => {
@@ -601,7 +601,7 @@
         SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-20\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename="safe.jpg"; filename="safe.php"./s, 1 ],
+		debug => [ qr/Multipart parsing error: Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename="safe.jpg"; filename="safe.php"./s, 1 ],
 		error => [ qr/data \"RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1/s, 1 ],
 	},
 	match_response => {

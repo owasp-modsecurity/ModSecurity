@@ -1722,12 +1722,15 @@ static int var_multipart_filename_generate(modsec_rec *msr, msre_var *var, msre_
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             // check if there is "filename" in the multipart part, if not set it to empty string
-            if (parts[i]->filename == NULL) {
-                rvar->value = "";
-                rvar->value_len = 0;
-            } else {
+            if (parts[i]->filename_star != NULL) {
+                rvar->value = parts[i]->filename_star;
+                rvar->value_len = strlen(rvar->value);
+            } else if (parts[i]->filename != NULL) {
                 rvar->value = parts[i]->filename;
                 rvar->value_len = strlen(rvar->value);
+            } else {
+                rvar->value = "";
+                rvar->value_len = 0;
             }
             rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME:%s",
                 log_escape_nq(mptmp, parts[i]->name));
