@@ -99,6 +99,7 @@ class MultipartPart {
      m_filename(""),
      m_filenameStar(""),
      m_filenameOffset(0),
+     m_filenameStarOffset(0),
      m_filename_charset(""),
      m_filename_charsetOffset(0),
      m_filename_language(""),
@@ -140,6 +141,7 @@ class MultipartPart {
     std::string m_filename;
     std::string m_filenameStar; // need to keep track of this for filename* parsing
     size_t m_filenameOffset;
+    size_t m_filenameStarOffset;
 
     std::string m_filename_charset;
     size_t m_filename_charsetOffset;

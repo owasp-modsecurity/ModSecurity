@@ -271,10 +271,6 @@ void Multipart::validate_quotes(const char *data, char quote)  {
 
 int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
-    // store if filename is already added from the header
-    // this needs to store because there can be both filename and filename* in the header,
-    // and filename* has precedence over filename and can be first in the header
-    bool filenameAdded = false;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
@@ -470,48 +466,37 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 "Multipart: Content-Disposition name: " + value + ".");
         } else if (name == "filename") {
             // here we set up the 'm_filename'
-            // only if filename* is not present, because if it is present,
-            // it will be used instead of filename, no matter if filename is present or not
-            if (!filenameAdded) {
+            // only if it's not set up already (and not the m_filenameStar)
+            if (!m_mpp->m_filename.empty()) {
+                m_flag_duplicate_part_header = 1;
+                ms_dbg_a(m_transaction, 4,
+                    "Multipart: Warning: Duplicate Content-Disposition " \
+                    "filename: " + value + ".");
+                return -15;
+            }
+            else {
                 validate_quotes(value.c_str(), quote);
-                // don't forget to set up the variableMultipartFileName variable,
-                // but it will be overwritten if filename* is present
-                if (!m_mpp->m_filename.empty()) {
-                    m_flag_duplicate_part_header = 1;
-                    ms_dbg_a(m_transaction, 4,
-                        "Multipart: Warning: Duplicate Content-Disposition " \
-                        "filename: " + value + ".");
-                    return -15;
-                }
                 m_mpp->m_filename.assign(value);
                 m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
 
                 ms_dbg_a(m_transaction, 9,
                     "Multipart: Content-Disposition filename: " + value + ".");
-                filenameAdded = true;
-            }
-            else {
-                m_flag_duplicate_part_header = 1;
-                ms_dbg_a(m_transaction, 4,
-                    "Multipart: Warning: Duplicate Content-Disposition " \
-                    "filename: " + value + ".");
-                return -20;
             }
         } else if (name == "filename*") {
+            // here we set up the 'm_filenameStar'
+            // only if it's not set up already (and not the m_filename)
             if (!m_mpp->m_filenameStar.empty()) {
                 m_flag_duplicate_part_header = 1;
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "filename*: " + value + ".");
-                return -20;
+                return -15;
             }
 
             m_mpp->m_filenameStar.assign(value);
-            m_mpp->m_filename.assign(value);
-            m_mpp->m_filenameOffset = offset + ((p - c_d_value) - value.size());
+            m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - value.size());
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + value + ".");
-            filenameAdded = true;
         } else {
             return -11;
         }
@@ -544,8 +529,15 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         /* loop will stop when (*p == '\0') */
     }
 
-    m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filename, \
-        m_mpp->m_filenameOffset);
+    // filename* takes precedence over filename, so we set the variable accordingly
+    if (!m_mpp->m_filenameStar.empty()) {
+        m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filenameStar, \
+            m_mpp->m_filenameStarOffset);
+    }
+    else {
+        m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filename, \
+            m_mpp->m_filenameOffset);
+    }
     if (!m_mpp->m_filename_charset.empty()) {
         m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, m_mpp->m_filename_charset, \
             m_mpp->m_filename_charsetOffset);

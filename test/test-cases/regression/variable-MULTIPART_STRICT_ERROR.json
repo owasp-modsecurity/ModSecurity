@@ -627,7 +627,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-20\\): form-data; name=\"file\"; filename=\"safe.jpg\"; filename=\"safe.php\"",
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-15\\): form-data; name=\"file\"; filename=\"safe.jpg\"; filename=\"safe.php\"",
       "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1",
       "http_code": 400
     },
@@ -680,7 +680,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-20\\): form-data; name=\"file\"; filename\\*=UTF8''safe.jpg; filename\\*=UTF8''safe.php",
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-15\\): form-data; name=\"file\"; filename\\*=UTF8''safe.jpg; filename\\*=UTF8''safe.php",
       "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1",
       "http_code": 400
     },
@@ -733,7 +733,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-20\\): form-data; name=\"file\"; filename\\*=UTF8''safe.jpg; filename=\"safe.jpg\"; filename=\"safe.php\"",
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(\\-15\\): form-data; name=\"file\"; filename\\*=UTF8''safe.jpg; filename=\"safe.jpg\"; filename=\"safe.php\"",
       "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1",
       "http_code": 400
     },
