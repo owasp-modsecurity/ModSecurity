@@ -36,6 +36,7 @@
 #include "modsecurity/rules_set.h"
 #include "modsecurity/collection/collections.h"
 #include "src/utils/string.h"
+#include "src/utils/decode.h"
 
 
 namespace modsecurity {
@@ -493,10 +494,16 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 return -15;
             }
 
-            m_mpp->m_filenameStar.assign(value);
+            int invalid_count;
+            std::string decoded_value = value;
+            utils::urldecode_nonstrict_inplace(decoded_value, invalid_count);
+            if (invalid_count > 0) {
+                m_flag_invalid_part = 1;
+            }
+            m_mpp->m_filenameStar.assign(decoded_value);
             m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - value.size());
             ms_dbg_a(m_transaction, 9,
-                "Multipart: Content-Disposition filename*: " + value + ".");
+                "Multipart: Content-Disposition filename*: " + decoded_value + ".");
         } else {
             return -11;
         }
@@ -533,27 +540,21 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     if (!m_mpp->m_filenameStar.empty()) {
         m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filenameStar, \
             m_mpp->m_filenameStarOffset);
+
+        if (!m_mpp->m_filename_charset.empty()) {
+            m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, m_mpp->m_filename_charset, \
+                m_mpp->m_filename_charsetOffset);
+        }
+        if (!m_mpp->m_filename_language.empty()) {
+            m_transaction->m_variableMultipartFileNameLanguage.set(m_mpp->m_name, m_mpp->m_filename_language, \
+                m_mpp->m_filename_languageOffset);
+        }
     }
-    else {
+    else if (!m_mpp->m_filename.empty()) {
         m_transaction->m_variableMultipartFileName.set(m_mpp->m_name, m_mpp->m_filename, \
             m_mpp->m_filenameOffset);
     }
-    if (!m_mpp->m_filename_charset.empty()) {
-        m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, m_mpp->m_filename_charset, \
-            m_mpp->m_filename_charsetOffset);
-    }
-    else {
-        m_transaction->m_variableMultipartFileNameCharset.set(m_mpp->m_name, "", \
-            m_mpp->m_filename_charsetOffset);
-    }
-    if (!m_mpp->m_filename_language.empty()) {
-        m_transaction->m_variableMultipartFileNameLanguage.set(m_mpp->m_name, m_mpp->m_filename_language, \
-            m_mpp->m_filename_languageOffset);
-    }
-    else {
-        m_transaction->m_variableMultipartFileNameLanguage.set(m_mpp->m_name, "", \
-            m_mpp->m_filename_languageOffset);
-    }
+
     return 1;
 }
 
@@ -836,7 +837,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
             return false;
         }
 
-        if (!m_mpp->m_filename.empty()) {
+        if (!m_mpp->m_filename.empty() || !m_mpp->m_filenameStar.empty()) {
             /* Some parsers use crude methods to extract the name and filename
              * values from the C-D header. We need to check for the case where they
              * didn't understand C-D but we did.
@@ -1048,7 +1049,7 @@ int Multipart::process_boundary(int last_part) {
                 ms_dbg_a(m_transaction, 9,
                     "Multipart: Added file part to the list: name \"" \
                     + m_mpp->m_name + "\" "
-                    "file name \"" + m_mpp->m_filename + "\" (offset " \
+                    "file name \"" + (!m_mpp->m_filenameStar.empty() ?  m_mpp->m_filenameStar : m_mpp->m_filename) + "\" (offset " \
                     + std::to_string(m_mpp->m_offset) +
                     ", length " + std::to_string(m_mpp->m_length) + ")");
             } else {
@@ -1279,8 +1280,13 @@ int Multipart::multipart_complete(std::string *error) {
                     m->m_tmp_file->getFilename(), m->m_filenameOffset);
             }
 
-            m_transaction->m_variableFiles.set(m->m_name,
-                m->m_filename, m->m_filenameOffset);
+            if (!m->m_filenameStar.empty()) {
+                m_transaction->m_variableFiles.set(m->m_name,
+                    m->m_filenameStar, m->m_filenameStarOffset);
+            } else if (!m->m_filename.empty()) {
+                m_transaction->m_variableFiles.set(m->m_name,
+                    m->m_filename, m->m_filenameOffset);
+            }
 
             m_transaction->m_variableFilesNames.set(m->m_name,
                 m->m_name, m->m_nameOffset);

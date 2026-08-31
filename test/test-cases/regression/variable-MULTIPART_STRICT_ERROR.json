@@ -532,7 +532,7 @@
       "SecRule MULTIPART_STRICT_ERROR \"!@eq 0\" \"id:'200003',phase:2,t:none,log,deny,status:400,msg:'Multipart request body failed strict validation: DH %{MULTIPART_DUPLICATE_PART_HEADER}'\""
     ]
   },
-{
+  {
     "enabled": 1,
     "version_min": 300000,
     "title": "multipart Content-Disposition filename* invalid syntax",
@@ -623,7 +623,7 @@
         "Content-Length": "0"
       },
       "body": [
-
+        ""
       ]
     },
     "expected": {
@@ -656,7 +656,7 @@
         "Host": "localhost",
         "User-Agent": "curl/7.38.0",
         "Accept": "*/*",
-        "Content-Length": "157",
+        "Content-Length": "167",
         "Content-Type": "multipart/form-data; boundary=AaB03x",
         "Expect": "100-continue"
       },
@@ -676,7 +676,7 @@
         "Content-Length": "0"
       },
       "body": [
-
+        ""
       ]
     },
     "expected": {
