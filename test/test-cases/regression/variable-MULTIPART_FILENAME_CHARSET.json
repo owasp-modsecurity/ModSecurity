@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_FILENAME filename* expectes charset",
+    "title": "Testing Variables :: MULTIPART_FILENAME filename* expects charset (1/5)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -55,7 +55,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_FILENAME filename* expectes charset",
+    "title": "Testing Variables :: MULTIPART_FILENAME filename* expects charset (2/5)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -98,6 +98,59 @@
     },
     "expected": {
       "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\"\"id:1,phase:2,deny,t:none,chain\"",
+      "SecRule MULTIPART_FILENAME_CHARSET \"!@rx ^(?:utf-8|iso-8859-1|us-ascii)$\" \"t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: MULTIPART_FILENAME filename* expects charset (3/5)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "360",
+        "Content-Type": "multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "----------------------------756b6d74fa1a8ee2\r\n",
+        "Content-Disposition: form-data; name=\"name\"\r\n",
+        "\r\n",
+        "test\r\n",
+        "----------------------------756b6d74fa1a8ee2\r\n",
+        "Content-Disposition: form-data; name=\"filedata\"; filename=\"03CB1664.txt\"; filename*=utf-8''03CB1664.txt\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "This is a very small test file..\r\n",
+        "----------------------------756b6d74fa1a8ee2--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
@@ -483,7 +536,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_FILENAME filename* expectes charset",
+    "title": "Testing Variables :: MULTIPART_FILENAME filename* expects charset (4/5)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -535,7 +588,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_FILENAME filename* expectes charset",
+    "title": "Testing Variables :: MULTIPART_FILENAME filename* expects charset (5/5)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
