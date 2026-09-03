@@ -496,12 +496,12 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
             int invalid_count;
             std::string decoded_value = value;
-            utils::urldecode_nonstrict_inplace(decoded_value, invalid_count);
+            utils::urldecode_nonstrict_inplace_ext(decoded_value, false, invalid_count);
             if (invalid_count > 0) {
                 m_flag_invalid_part = 1;
             }
             m_mpp->m_filenameStar.assign(decoded_value);
-            m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - value.size());
+            m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - decoded_value.size());
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + decoded_value + ".");
         } else {
