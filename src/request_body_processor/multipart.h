@@ -139,6 +139,8 @@ class MultipartPart {
 
     /* files only, filename as supplied by the browser */
     std::string m_filename;
+    // Note: Every consumer reading the filename must evaluate m_filenameStar first
+    // to respect RFC precedence rules before falling back to m_filename.
     std::string m_filenameStar; // need to keep track of this for filename* parsing
     size_t m_filenameOffset;
     size_t m_filenameStarOffset;

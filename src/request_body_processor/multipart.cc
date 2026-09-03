@@ -1045,6 +1045,8 @@ int Multipart::process_boundary(int last_part) {
             /* add the part to the list of parts */
             m_parts.push_back(m_mpp);
 
+            // see the inline condition
+            // filename* takes precedence over filename, so we set the variable accordingly
             if (m_mpp->m_type == MULTIPART_FILE) {
                 ms_dbg_a(m_transaction, 9,
                     "Multipart: Added file part to the list: name \"" \
@@ -1280,6 +1282,7 @@ int Multipart::multipart_complete(std::string *error) {
                     m->m_tmp_file->getFilename(), m->m_filenameOffset);
             }
 
+            // filename* takes precedence over filename, so we set the variable accordingly
             if (!m->m_filenameStar.empty()) {
                 m_transaction->m_variableFiles.set(m->m_name,
                     m->m_filenameStar, m->m_filenameStarOffset);
