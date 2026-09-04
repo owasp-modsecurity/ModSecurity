@@ -1489,8 +1489,13 @@ static int var_files_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
             if (match) {
                 msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
 
-                rvar->value = parts[i]->filename;
-                rvar->value_len = strlen(rvar->value);
+                if (parts[i]->filename_star != NULL) {
+                    rvar->value = parts[i]->filename_star;
+                    rvar->value_len = strlen(rvar->value);
+                } else if (parts[i]->filename != NULL) {
+                    rvar->value = parts[i]->filename;
+                    rvar->value_len = strlen(rvar->value);
+                }
                 rvar->name = apr_psprintf(mptmp, "FILES:%s",
                     log_escape_nq(mptmp, parts[i]->name));
                 apr_table_addn(vartab, rvar->name, (void *)rvar);
@@ -1777,17 +1782,14 @@ static int var_multipart_filename_charset_generate(modsec_rec *msr, msre_var *va
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
             // check if there is "filename_charset" in the multipart part, if not set it to empty string
-            if (parts[i]->filename_charset == NULL) {
-                rvar->value = "";
-                rvar->value_len = 0;
-            } else {
+            if (parts[i]->filename_star != NULL && parts[i]->filename_star != "" && parts[i]->filename_charset != NULL) {
                 rvar->value = parts[i]->filename_charset;
                 rvar->value_len = strlen(rvar->value);
+                rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_CHARSET:%s",
+                    log_escape_nq(mptmp, parts[i]->name));
+                apr_table_addn(vartab, rvar->name, (void *)rvar);
+                count++;
             }
-            rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_CHARSET:%s",
-                log_escape_nq(mptmp, parts[i]->name));
-            apr_table_addn(vartab, rvar->name, (void *)rvar);
-            count++;
         }
     }
 
@@ -1828,18 +1830,15 @@ static int var_multipart_filename_language_generate(modsec_rec *msr, msre_var *v
         /* If we had a match add this argument to the collection. */
         if (match) {
             msre_var *rvar = apr_pmemdup(mptmp, var, sizeof(msre_var));
-            // check if there is "filename_language" in the multipart part, if not set it to empty string
-            if (parts[i]->filename_language == NULL) {
-                rvar->value = "";
-                rvar->value_len = 0;
-            } else {
+            // check if there is "filename_language" in the multipart part
+            if (parts[i]->filename_star != NULL && parts[i]->filename_star != "" && parts[i]->filename_language != NULL) {
                 rvar->value = parts[i]->filename_language;
                 rvar->value_len = strlen(rvar->value);
+                rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_LANGUAGE:%s",
+                    log_escape_nq(mptmp, parts[i]->name));
+                apr_table_addn(vartab, rvar->name, (void *)rvar);
+                count++;
             }
-            rvar->name = apr_psprintf(mptmp, "MULTIPART_FILENAME_LANGUAGE:%s",
-                log_escape_nq(mptmp, parts[i]->name));
-            apr_table_addn(vartab, rvar->name, (void *)rvar);
-            count++;
         }
     }
 
@@ -3864,7 +3863,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         "MULTIPART_FILENAME",
         VAR_LIST,
         0, 1,
-        NULL,
+        var_generic_list_validate,
         var_multipart_filename_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
@@ -3875,7 +3874,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         "MULTIPART_FILENAME_CHARSET",
         VAR_LIST,
         0, 1,
-        NULL,
+        var_generic_list_validate,
         var_multipart_filename_charset_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY
@@ -3886,7 +3885,7 @@ void msre_engine_register_default_variables(msre_engine *engine) {
         "MULTIPART_FILENAME_LANGUAGE",
         VAR_LIST,
         0, 1,
-        NULL,
+        var_generic_list_validate,
         var_multipart_filename_language_generate,
         VAR_CACHE,
         PHASE_REQUEST_BODY

@@ -2,17 +2,17 @@
 # 
 {
 	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME",
+	comment => "Testing Variables :: FILES (1/5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRuleEngine On
-		SecRule MULTIPART_FILENAME "\@contains 0" "id:1,phase:3,pass,t:trim"
+		SecRule FILES "\@contains small_text_file.txt" "id:1,phase:3,pass,t:trim"
 	),
 	match_log => {
-		debug => [ qr/Target value: "small_text_file.txt"/s, 1 ],
+		debug => [ qr/T \(0\) trim: "small_text_file/s, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
@@ -54,20 +54,20 @@
 # 
 {
 	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME",
+	comment => "Testing Variables :: FILES (2/5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRuleEngine On
-		SecRule MULTIPART_FILENAME "\@contains 0" "id:1,phase:3,pass,t:trim"
+		SecRule FILES:filedata1 "\@contains myfile.txt" "id:1,phase:2,deny,status:403"
 	),
 	match_log => {
-		debug => [ qr/Target value: "small_text_file2.txt"/s, 1 ],
+
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -75,7 +75,7 @@
 			"Host" => q(localhost),
 			"User-Agent" => q(curl/7.38.0),
 			"Accept" => q(*/*),
-			"Content-Length" => q(532),
+			"Content-Length" => q(517),
 			"Content-Type" => q(multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2),
 			"Expect" => q(100-continue),
 		],
@@ -86,12 +86,12 @@
 			
 			test
 			----------------------------756b6d74fa1a8ee2
-			Content-Disposition: form-data; name="filedata"; filename="small_text_file.txt"
+			Content-Disposition: form-data; name="filedata1"; filename="myfile.txt"
 			Content-Type: text/plain
 			
 			This is a very small test file..
 			----------------------------756b6d74fa1a8ee2
-			Content-Disposition: form-data; name="filedata"; filename="small_text_file2.txt"
+			Content-Disposition: form-data; name="filedata2"; filename="nextfile.txt"
 			Content-Type: text/plain
 			
 			This is another very small test file..
@@ -106,20 +106,20 @@
 # 
 {
 	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME* (no regular filename)",
+	comment => "Testing Variables :: FILES (3/5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRuleEngine On
-		SecRule MULTIPART_FILENAME "\@contains shell" "id:1,phase:2,pass,t:trim"
+		SecRule FILES:filedata "\@contains myfile.txt" "id:1,phase:2,deny,status:403"
 	),
 	match_log => {
-		debug => [ qr/Target value: "shell.php"/s, 1 ],
+
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -127,19 +127,27 @@
 			"Host" => q(localhost),
 			"User-Agent" => q(curl/7.38.0),
 			"Accept" => q(*/*),
-			"Content-Length" => q(145),
-			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Content-Length" => q(515),
+			"Content-Type" => q(multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2),
 			"Expect" => q(100-continue),
 		],
 	    normalize_raw_request_data(
 		q(
-			--b
-			Content-Disposition: form-data; name="file"; filename*=UTF-8''shell.php
-			Content-Type: image/jpeg
+			----------------------------756b6d74fa1a8ee2
+			Content-Disposition: form-data; name="name"
 			
-			<?php system($_GET['c']); ?>
+			test
+			----------------------------756b6d74fa1a8ee2
+			Content-Disposition: form-data; name="filedata"; filename="myfile.txt"
+			Content-Type: text/plain
 			
-			--b--
+			This is a very small test file..
+			----------------------------756b6d74fa1a8ee2
+			Content-Disposition: form-data; name="filedata"; filename="nextfile.txt"
+			Content-Type: text/plain
+			
+			This is another very small test file..
+			----------------------------756b6d74fa1a8ee2--
 		),
 	    ),
 	),
@@ -150,20 +158,20 @@
 # 
 {
 	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME* (regular filename after the asterisked one)",
+	comment => "Testing Variables :: FILES (4/5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRuleEngine On
-		SecRule MULTIPART_FILENAME "\@contains shell" "id:1,phase:2,pass,t:trim"
+		SecRule FILES "\@rx .*\.ph(?:p\d*|tml|ar|ps|t|pt)\.*\$" "id:1,phase:2,deny,status:403"
 	),
 	match_log => {
-		debug => [ qr/Target value: "shell.php"/s, 1 ],
+
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -171,19 +179,17 @@
 			"Host" => q(localhost),
 			"User-Agent" => q(curl/7.38.0),
 			"Accept" => q(*/*),
-			"Content-Length" => q(167),
-			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Content-Length" => q(198),
+			"Content-Type" => q(multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2),
 			"Expect" => q(100-continue),
 		],
 	    normalize_raw_request_data(
 		q(
-			--b
-			Content-Disposition: form-data; name="file"; filename*=UTF-8''shell.php; filename="image.jpg"
-			Content-Type: image/jpeg
+			----------------------------756b6d74fa1a8ee2
+			Content-Disposition: form-data; name="upload"; filename="safe.jpg"; filename*=UTF-8''shell.php
 			
-			<?php system($_GET['c']); ?>
-			
-			--b--
+			test
+			----------------------------756b6d74fa1a8ee2--
 		),
 	    ),
 	),
@@ -194,20 +200,20 @@
 # 
 {
 	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME* with key",
+	comment => "Testing Variables :: FILES (5/5)",
 	conf => qq(
 		SecRuleEngine On
 		SecDebugLog $ENV{DEBUG_LOG}
 		SecDebugLogLevel 9
 		SecRequestBodyAccess On
 		SecRuleEngine On
-		SecRule MULTIPART_FILENAME:file "\@contains shell" "id:1,phase:2,pass,t:trim"
+		SecRule FILES "\@rx .*\.ph(?:p\d*|tml|ar|ps|t|pt)\.*\$" "id:1,phase:2,deny,status:403"
 	),
 	match_log => {
-		debug => [ qr/Target value: "shell.php"/s, 1 ],
+
 	},
 	match_response => {
-		status => qr/^200$/,
+		status => qr/^403$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -215,66 +221,19 @@
 			"Host" => q(localhost),
 			"User-Agent" => q(curl/7.38.0),
 			"Accept" => q(*/*),
-			"Content-Length" => q(167),
-			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Content-Length" => q(200),
+			"Content-Type" => q(multipart/form-data; boundary=--------------------------756b6d74fa1a8ee2),
 			"Expect" => q(100-continue),
 		],
 	    normalize_raw_request_data(
 		q(
-			--b
-			Content-Disposition: form-data; name="file"; filename*=UTF-8''shell.php; filename="image.jpg"
-			Content-Type: image/jpeg
+			----------------------------756b6d74fa1a8ee2
+			Content-Disposition: form-data; name="upload"; filename="safe.jpg"; filename*=UTF-8''shell.%70hp
 			
-			<?php system($_GET['c']); ?>
-			
-			--b--
+			test
+			----------------------------756b6d74fa1a8ee2--
 		),
 	    ),
 	),
 },
-
-
-
-# 
-{
-	type => "misc",
-	comment => "Testing Variables :: MULTIPART_FILENAME* with '+' in the filename",
-	conf => qq(
-		SecRuleEngine On
-		SecDebugLog $ENV{DEBUG_LOG}
-		SecDebugLogLevel 9
-		SecRequestBodyAccess On
-		SecRuleEngine On
-		SecRule MULTIPART_FILENAME:file "\@contains Math+physics v1.pdf" "id:1,phase:2,pass,t:trim"
-	),
-	match_log => {
-		debug => [ qr/Target value: "Math\+physics v1.pdf"/s, 1 ],
-	},
-	match_response => {
-		status => qr/^200$/,
-	},
-	request => new HTTP::Request(
-		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
-		[
-			"Host" => q(localhost),
-			"User-Agent" => q(curl/7.38.0),
-			"Accept" => q(*/*),
-			"Content-Length" => q(142),
-			"Content-Type" => q(multipart/form-data; boundary=b),
-			"Expect" => q(100-continue),
-		],
-	    normalize_raw_request_data(
-		q(
-			--b
-			Content-Disposition: form-data; name="file"; filename*=UTF-8''Math+physics%20v1.pdf
-			Content-Type: application/pdf
-			
-			%PDF-1.7
-			
-			--b--
-		),
-	    ),
-	),
-},
-
 

@@ -279,10 +279,17 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     "Multipart: Warning: Duplicate Content-Disposition filename*: %s.",  log_escape_nq(msr->mp, value));
                 return -15;
             }
-            msr->mpd->mpp->filename_star = apr_pstrdup(msr->mp, value);
+            int invalid_count = 0;
+            int changed = 0;
+            char *decoded_value = apr_pstrdup(msr->mp, value);
+            int decoded_len = urldecode_nonstrict_inplace_ex_plus((unsigned char *)decoded_value, strlen(decoded_value), 0, &invalid_count, &changed);
+            if (invalid_count > 0) {
+                msr->mpd->flag_invalid_part = 1;
+            }
+            msr->mpd->mpp->filename_star = apr_pstrdup(msr->mp, decoded_value);
             if (msr->txcfg->debuglog_level >= 9) {
                 msr_log(msr, 9, "Multipart: Content-Disposition filename*: %s.",
-                    log_escape_nq(msr->mp, value));
+                    log_escape_nq(msr->mp, decoded_value));
             }
         }
         else return -11;
