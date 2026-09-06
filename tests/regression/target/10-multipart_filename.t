@@ -278,3 +278,88 @@
 },
 
 
+#
+{
+	type => "misc",
+	comment => "Testing Variables :: MULTIPART_FILENAME* with invalid encoded name",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRuleEngine On
+		SecRule MULTIPART_FILENAME:file "\@contains Math+physics v1.pdf" "id:1,phase:2,pass,t:trim"
+	),
+	match_log => {
+		debug => [ qr/Invalid Content-Disposition header \(-18\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Host" => q(localhost),
+			"User-Agent" => q(curl/7.38.0),
+			"Accept" => q(*/*),
+			"Content-Length" => q(145),
+			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Expect" => q(100-continue),
+		],
+	    normalize_raw_request_data(
+		q(
+			--b
+			Content-Disposition: form-data; name="file"; filename*=UTF-8''Math+physics%20v1.pdf%ZZ
+			Content-Type: application/pdf
+
+			%PDF-1.7
+
+			--b--
+		),
+	    ),
+	),
+},
+
+
+
+#
+{
+	type => "misc",
+	comment => "Testing Variables :: MULTIPART_FILENAME* with invalid quoted name",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRuleEngine On
+		SecRule MULTIPART_FILENAME:file "\@contains Math+physics v1.pdf" "id:1,phase:2,pass,t:trim"
+	),
+	match_log => {
+		debug => [ qr/Invalid Content-Disposition header \(-16\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Host" => q(localhost),
+			"User-Agent" => q(curl/7.38.0),
+			"Accept" => q(*/*),
+			"Content-Length" => q(144),
+			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Expect" => q(100-continue),
+		],
+	    normalize_raw_request_data(
+		q(
+			--b
+			Content-Disposition: form-data; name="file"; filename*="UTF-8''Math+physics%20v1.pdf"
+			Content-Type: application/pdf
+
+			%PDF-1.7
+
+			--b--
+		),
+	    ),
+	),
+},

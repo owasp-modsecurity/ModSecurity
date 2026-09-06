@@ -634,3 +634,95 @@
 	    ),
 	),
 },
+
+#
+{
+	type => "misc",
+	comment => "Testing Variables :: MULTIPART_FILENAME* with invalid encoded name",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
+		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
+	),
+	match_log => {
+		debug => [ qr/Invalid Content-Disposition header \(-18\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Host" => q(localhost),
+			"User-Agent" => q(curl/7.38.0),
+			"Accept" => q(*/*),
+			"Content-Length" => q(145),
+			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Expect" => q(100-continue),
+		],
+	    normalize_raw_request_data(
+		q(
+			--b
+			Content-Disposition: form-data; name="file"; filename*=UTF-8''Math+physics%20v1.pdf%ZZ
+			Content-Type: application/pdf
+
+			%PDF-1.7
+
+			--b--
+		),
+	    ),
+	),
+},
+
+
+
+#
+{
+	type => "misc",
+	comment => "Testing Variables :: MULTIPART_FILENAME* with invalid quoted name",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
+		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
+	),
+	match_log => {
+		debug => [ qr/Invalid Content-Disposition header \(-16\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Host" => q(localhost),
+			"User-Agent" => q(curl/7.38.0),
+			"Accept" => q(*/*),
+			"Content-Length" => q(144),
+			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Expect" => q(100-continue),
+		],
+	    normalize_raw_request_data(
+		q(
+			--b
+			Content-Disposition: form-data; name="file"; filename*="UTF-8''Math+physics%20v1.pdf"
+			Content-Type: application/pdf
+
+			%PDF-1.7
+
+			--b--
+		),
+	    ),
+	),
+},
