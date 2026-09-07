@@ -219,7 +219,7 @@
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_HEADERS:Authorization \"@rx (?i)^Bearer[\\s\\x0b]+(eyJ[\\-0-9_a-z]+)\\.\" \"id:100,phase:1,capture,deny,t:none,chain\"",
-      "SecRule TX:1 @rx (?i)alg[^0-9A-Z_a-z]*:[^0-9A-Z_a-z]*none\" \"t:base64DecodeExt\""
+      "SecRule TX:1 \"@rx (?i)alg[^0-9A-Z_a-z]*:[^0-9A-Z_a-z]*none\" \"t:base64DecodeExt\""
     ]
   }
 ]
