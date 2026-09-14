@@ -905,6 +905,8 @@ EQUALS_MINUS                            (?i:=\-)
 [ \t]*\"[ \t]*                { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 [ \t]*\\\n[ \t]*\"[ \t]*      { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 [ \t]*\\\r\n[ \t]*\"[ \t]*    { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+[ \t]*\n[ \t]*                { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(INITIAL); }
+[ \t]*\r\n[ \t]*              { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(INITIAL); }
 }
 
 
@@ -1371,4 +1373,3 @@ void Driver::scan_end () {
 }
 
 }
-
