@@ -81,7 +81,9 @@ bool PmFromFile::init(const std::string &config, std::string *error) {
     }
 
     while (m_p->is_failtree_done == 0) {
-        acmp_prepare(m_p);
+        if (acmp_prepare(m_p) != 1) {
+            return false;
+        }
     }
 
     return true;
