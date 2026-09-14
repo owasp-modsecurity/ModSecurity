@@ -206,7 +206,7 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
 /**
  * Builds balanced binary tree from children nodes of given node.
  */
-static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
+static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     size_t count, i, j;
     acmp_node_t *child = node->child;
     acmp_node_t **nodes;
@@ -215,7 +215,7 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     /* Build an array big enough */
     for (count = 0; child != NULL; child = child->sibling) count++;
     nodes = (acmp_node_t **)calloc(1, count * sizeof(acmp_node_t *));
-    /* ENH: Check alloc succeded */
+    if (!nodes) return false;
 
     /* ENH: Combine this in the loop below - we do not need two loops */
     child = node->child;
@@ -236,24 +236,32 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
             nodes[i] = nodes[j];
             nodes[j] = tmp;
         }
-    }       
+    }
     if (node->btree != NULL) {
         free(node->btree);
         node->btree = NULL;
     }
     node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+    if (!(node->btree)) {
+        free(nodes);
+        return false;
+    }
 
-    /* ENH: Check alloc succeded */
     pos = count / 2;
     node->btree->node = nodes[pos];
     node->btree->letter = nodes[pos]->letter;
     acmp_add_btree_leaves(node->btree, nodes, pos, -1, count);
     for (i = 0; i < count; i++) {
-        if (nodes[i]->child != NULL) acmp_build_binary_tree(parser, nodes[i]);
+        if (nodes[i]->child != NULL)
+            if (!acmp_build_binary_tree(parser, nodes[i])) {
+                free(nodes);
+                return false;
+            }
     }
-    if (nodes != NULL) {
-        free(nodes);
-    }
+
+    free(nodes);
+    return true;
+
 }
 
 /**
@@ -305,7 +313,11 @@ static int acmp_connect_fail_branches(ACMP *parser) {
     }
 
     acmp_connect_other_matches(parser, parser->root_node);
-    if (parser->root_node->child != NULL) acmp_build_binary_tree(parser, parser->root_node);
+    if (parser->root_node->child != NULL) {
+        if (!acmp_build_binary_tree(parser, parser->root_node)) {
+            return 0;
+        }
+    }
     parser->is_failtree_done = 1;
 
     return 1;
