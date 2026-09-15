@@ -163,13 +163,16 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
 /**
  * Adds leaves to binary tree, working from sorted array of keyword tree nodes
  */
-static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
+static bool acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         int pos, int lb, int rb) {
 
     int left = 0, right = 0;
     if ((pos - lb) > 1) {
         left = lb + (pos - lb) / 2;
         node->left = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        if (!(node->left)) {
+            return false;
+        }
         node->left->node = NULL;
         node->left->right = NULL;
         node->left->left = NULL;
@@ -184,6 +187,9 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
         node->right = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        if (!(node->right)) {
+            return false;
+        }
         node->right->node = NULL;
         node->right->right = NULL;
         node->right->left = NULL;
@@ -196,11 +202,17 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
 #endif
     }
     if (node->right != NULL) {
-        acmp_add_btree_leaves(node->right, nodes, right, pos, rb);
+        if (!acmp_add_btree_leaves(node->right, nodes, right, pos, rb)){
+            return false;
+        }
     }
     if (node->left != NULL) {
-        acmp_add_btree_leaves(node->left, nodes, left, lb, pos);
+        if (!acmp_add_btree_leaves(node->left, nodes, left, lb, pos)){
+            return false;
+        }
     }
+
+    return true;
 }
 
 /**
@@ -250,7 +262,10 @@ static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     pos = count / 2;
     node->btree->node = nodes[pos];
     node->btree->letter = nodes[pos]->letter;
-    acmp_add_btree_leaves(node->btree, nodes, pos, -1, count);
+    if (!acmp_add_btree_leaves(node->btree, nodes, pos, -1, count)){
+        free(nodes);
+        return false;
+    }
     for (i = 0; i < count; i++) {
         if (nodes[i]->child != NULL)
             if (!acmp_build_binary_tree(parser, nodes[i])) {
