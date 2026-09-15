@@ -165,7 +165,7 @@ bool Pm::init(const std::string &file, std::string *error) {
 
     while (m_p->is_failtree_done == 0) {
         if (acmp_prepare(m_p) != 1) {
-            error->assign("Failed to prepare pattern matcher.");
+            if (error) error->assign("Failed to prepare pattern matcher.");
             return false;
         }
     }
