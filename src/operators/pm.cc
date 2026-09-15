@@ -111,7 +111,7 @@ void Pm::cleanup(acmp_node_t *n) {
     cleanup(n->sibling);
     cleanup(n->child);
 
-    postOrderTraversal(n->btree);
+    acmp_btree_free(n->btree);
 
     if (n->text && strlen(n->text) > 0) {
         free(n->text);
@@ -124,18 +124,6 @@ void Pm::cleanup(acmp_node_t *n) {
     }
 
     free(n);
-}
-
-
-void Pm::postOrderTraversal(acmp_btree_node_t *node) {
-    if (node == NULL) {
-        return;
-    }
-
-    postOrderTraversal(node->right);
-    postOrderTraversal(node->left);
-
-    free(node);
 }
 
 

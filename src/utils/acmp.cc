@@ -160,6 +160,17 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
     }
 }
 
+void acmp_btree_free(acmp_btree_node_t *node) {
+    if (node == NULL) {
+        return;
+    }
+
+    acmp_btree_free(node->right);
+    acmp_btree_free(node->left);
+
+    free(node);
+}
+
 /**
  * Adds leaves to binary tree, working from sorted array of keyword tree nodes
  */
@@ -250,7 +261,7 @@ static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
         }
     }
     if (node->btree != NULL) {
-        free(node->btree);
+        acmp_btree_free(node->btree);
         node->btree = NULL;
     }
     node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
