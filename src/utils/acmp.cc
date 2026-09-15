@@ -260,9 +260,9 @@ static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
             nodes[j] = tmp;
         }
     }
-    if (node->btree != NULL) {
+    if (node->btree != nullptr) {
         acmp_btree_free(node->btree);
-        node->btree = NULL;
+        node->btree = nullptr;
     }
     node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
     if (!(node->btree)) {
@@ -278,11 +278,12 @@ static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
         return false;
     }
     for (i = 0; i < count; i++) {
-        if (nodes[i]->child != NULL)
+        if (nodes[i]->child != nullptr) {
             if (!acmp_build_binary_tree(parser, nodes[i])) {
                 free(nodes);
                 return false;
             }
+        }
     }
 
     free(nodes);
@@ -339,7 +340,7 @@ static int acmp_connect_fail_branches(ACMP *parser) {
     }
 
     acmp_connect_other_matches(parser, parser->root_node);
-    if (parser->root_node->child != NULL) {
+    if (parser->root_node->child != nullptr) {
         if (!acmp_build_binary_tree(parser, parser->root_node)) {
             return 0;
         }
