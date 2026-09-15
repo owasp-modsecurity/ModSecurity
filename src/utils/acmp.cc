@@ -212,10 +212,10 @@ static bool acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         fprintf(stderr, "%lc ->right %lc\n", (wint_t)node->node->letter, (wint_t)node->right->node->letter);
 #endif
     }
-    if ((node->right != NULL) && !acmp_add_btree_leaves(node->right, nodes, right, pos, rb)) {
+    if ((node->right != nullptr) && !acmp_add_btree_leaves(node->right, nodes, right, pos, rb)) {
         return false;
     }
-    if ((node->left != NULL) && !acmp_add_btree_leaves(node->left, nodes, left, lb, pos)) {
+    if ((node->left != nullptr) && !acmp_add_btree_leaves(node->left, nodes, left, lb, pos)) {
         return false;
     }
 
