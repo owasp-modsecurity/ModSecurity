@@ -113,9 +113,13 @@ void CPTFreePrefix(TreePrefix *prefix) {
     if (prefix->buffer) {
         free(prefix->buffer);
     }
-    if (prefix->prefix_data) {
-        free(prefix->prefix_data);
+
+    while (prefix->prefix_data) {
+        CPTData *tmp = prefix->prefix_data;
+        prefix->prefix_data = tmp->next;
+        free(tmp);
     }
+
     free(prefix);
 }
 
