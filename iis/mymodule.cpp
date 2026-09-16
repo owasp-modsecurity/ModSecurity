@@ -459,7 +459,7 @@ CMyHttpModule::OnSendResponse(
 	{
 		r->status = pRawHttpResponse->StatusCode;
 
-		if(pRawHttpResponse->pReason != NULL && pRawHttpResponse->ReasonLength > 0)
+		if(pRawHttpResponse->pReason != nullptr && pRawHttpResponse->ReasonLength > 0)
 		{
 			r->status_line = apr_psprintf(r->pool, "%d %s", r->status,
 				ZeroTerminate(pRawHttpResponse->pReason, pRawHttpResponse->ReasonLength, r->pool));
