@@ -109,6 +109,16 @@ TreePrefix *InsertDataPrefix(TreePrefix *prefix, unsigned char *ipdata, unsigned
     return prefix;
 }
 
+void CPTFreePrefix(TreePrefix *prefix) {
+    if (prefix->buffer) {
+        free(prefix->buffer);
+    }
+    if (prefix->prefix_data) {
+        free(prefix->prefix_data);
+    }
+    free(prefix);
+}
+
 TreePrefix *CPTCreatePrefix(unsigned char *ipdata, unsigned int ip_bitmask,
         unsigned char netmask)  {
 
@@ -444,6 +454,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
             node->prefix = CPTCreatePrefix(prefix->buffer, prefix->bitlen,
                     NETMASK_256-1);
         }
+        CPTFreePrefix(prefix);
         return node;
     }
 
@@ -472,7 +483,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
         i_node = CPTCreateNode();
 
         if (i_node == NULL) {
-            free(new_node->prefix);
+            CPTFreePrefix(new_node->prefix);
             free(new_node);
             return NULL;
         }
@@ -494,7 +505,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
             memset(i_node->netmasks, 0, ((node->count - i) * sizeof(unsigned char)));
 
             if(i_node->netmasks == NULL) {
-                free(new_node->prefix);
+                CPTFreePrefix(new_node->prefix);
                 free(new_node);
                 free(i_node);
                 return NULL;

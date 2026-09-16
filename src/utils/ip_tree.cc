@@ -47,15 +47,7 @@ void IpTree::postOrderTraversal(TreeNode *node) {
         node->netmasks = NULL;
     }
     if (node->prefix) {
-        if (node->prefix->buffer) {
-            free(node->prefix->buffer);
-            node->prefix->buffer = NULL;
-        }
-        if (node->prefix->prefix_data) {
-            free(node->prefix->prefix_data);
-            node->prefix->prefix_data = NULL;
-        }
-        free(node->prefix);
+        CPTFreePrefix(node->prefix);
         node->prefix = NULL;
     }
     free(node);
