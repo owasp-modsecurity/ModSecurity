@@ -239,3 +239,53 @@
 		),
 	) . encode_chunked('{ "id" : "123"', 3),
 },
+
+{
+	type => "rule",
+	comment => "json parser - issue #2807 - no error rule allows the request",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRule REQUEST_HEADERS:Content-Type "^application/json" \\
+		    "id:200001,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecAction "id:200005,phase:2,pass,log,msg:'JSON phase 2 reached'"
+	),
+	match_log => {
+		error => [ qr/JSON parser error:.*premature EOF.*\[id "200005"\].*JSON phase 2 reached/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[ "Content-Type" => "application/json" ],
+		'{',
+	),
+},
+
+{
+	type => "rule",
+	comment => "json parser - issue #2807 - excluded error rule allows the request",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRule REQUEST_HEADERS:Content-Type "^application/json" \\
+		    "id:200001,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+		SecRule REQUEST_URI "^/test[.]txt\$" \\
+		    "id:200004,phase:1,pass,nolog,ctl:ruleRemoveById=200002"
+		SecRule REQBODY_ERROR "!\@eq 0" \\
+		    "id:200002,phase:2,t:none,log,deny,status:400,msg:'JSON body error'"
+		SecAction "id:200005,phase:2,pass,log,msg:'JSON phase 2 reached'"
+	),
+	match_log => {
+		error => [ qr/JSON parser error:.*premature EOF.*\[id "200005"\].*JSON phase 2 reached/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[ "Content-Type" => "application/json" ],
+		'{',
+	),
+},
