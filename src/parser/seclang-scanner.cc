@@ -4952,7 +4952,8 @@ static std::stack<int> YY_PREVIOUS_STATE;
 
 static const char* find_separator(const char *s) {
     while (*s && *s != ' ' && *s != '\t') s++;
-    return (*s) ? s + 1 : s;
+    while (*s == ' ' || *s == '\t') s++;
+    return s;
 }
 
 // Work around an incompatibility in flex (at least versions
