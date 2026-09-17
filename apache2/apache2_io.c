@@ -351,11 +351,13 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
 
-    if (rcbe == -5) {
-        return HTTP_REQUEST_ENTITY_TOO_LARGE;
-    }
-    if (rcbe == -2) {
-        return HTTP_BAD_REQUEST;
+    switch (rcbe) {
+        case -5:
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        case -2:
+            return HTTP_BAD_REQUEST;
+        default:
+            break;
     }
     if (rcbe < 0) {
         return HTTP_INTERNAL_SERVER_ERROR;
