@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Testing action :: SecRuleScript (1/4)",
+    "title": "Testing action :: SecRuleScript (1/6)",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -56,7 +56,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Testing action :: SecRuleScript (2/4)",
+    "title": "Testing action :: SecRuleScript (2/6)",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -109,7 +109,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Testing action :: SecRuleScript (3/4)",
+    "title": "Testing action :: SecRuleScript (3/6)",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -162,7 +162,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Testing action :: SecRuleScript (4/4)",
+    "title": "Testing action :: SecRuleScript (4/6)",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -209,6 +209,112 @@
     "rules": [
       "SecRuleEngine On",
       "SecRuleScript test-cases/data/match.lua \"id:1,t:lowercase,t:none,status:404,deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing action :: SecRuleScript (5/6)",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Keep-Alive": "300",
+        "Connection": "keep-alive",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=   test   &param2=test2",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 404
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar.lua",
+      "SecRule REQUEST_FILENAME \"@streq /test.pl\" \"id:1,phase:1,deny,status:404\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing action :: SecRuleScript (6/6)",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Keep-Alive": "300",
+        "Connection": "keep-alive",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=   test   &param2=test2",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 404
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar.lua nolog",
+      "SecRule REQUEST_FILENAME \"@streq /test.pl\" \"id:1,phase:1,deny,status:404\""
     ]
   }
 ]

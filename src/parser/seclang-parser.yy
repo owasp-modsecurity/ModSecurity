@@ -1208,6 +1208,25 @@ expression:
             YYERROR;
         }
       }
+    | DIRECTIVE_SECRULESCRIPT
+      {
+        std::string err;
+        std::unique_ptr<RuleScript> r(new RuleScript(
+            /* path to script */ $1,
+            /* actions */ NULL,
+            /* transformations */ NULL,
+            /* file name */ std::string(*@1.end.filename),
+            /* line number */ @1.end.line
+            ));
+
+        if (r->init(&err) == false) {
+            driver.error(@0, "Failed to load script: " + err);
+            YYERROR;
+        }
+        if (driver.addSecRuleScript(std::move(r)) == false) {
+            YYERROR;
+        }
+      }
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
         bool hasDisruptive = false;
