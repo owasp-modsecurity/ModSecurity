@@ -412,6 +412,7 @@ CONFIG_VALUE_OFF                        (?i:Off)
 CONFIG_VALUE_ON                         (?i:On)
 CONFIG_VALUE_PARALLEL                   (?i:Parallel|Concurrent)
 CONFIG_VALUE_PATH                       (?i:[0-9a-z_/.*: \\()-]+)
+CONFIG_VALUE_SCRIPT_PATH                (?i:[0-9a-z_/.*:\\()-]+)
 CONFIG_VALUE_PROCESS_PARTIAL            (?i:ProcessPartial)
 CONFIG_VALUE_REJECT                     (?i:Reject)
 CONFIG_VALUE_RELEVANT_ONLY              (?i:RelevantOnly)
@@ -840,7 +841,7 @@ EQUALS_MINUS                            (?i:=\-)
 {CONGIG_DIR_SEC_STATUS_ENGINE}[ \t]+{FREE_TEXT_NEW_LINE}                { return p::make_CONGIG_DIR_SEC_STATUS_ENGINE(yytext, *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+{CONFIG_VALUE_PATH}                       { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 {CONGIG_DIR_SEC_TMP_DIR}[ \t]+["]{CONFIG_VALUE_PATH}["]                 { return p::make_CONGIG_DIR_SEC_TMP_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
-{DIRECTIVE_SECRULESCRIPT}[ \t]+{CONFIG_VALUE_PATH}                      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
+{DIRECTIVE_SECRULESCRIPT}[ \t]+{CONFIG_VALUE_SCRIPT_PATH}               { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 {DIRECTIVE_SECRULESCRIPT}[ \t]+["]{FREE_TEXT_SPACE_COMMA_QUOTE}["]      { BEGIN(TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS); return p::make_DIRECTIVE_SECRULESCRIPT(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
 {CONFIG_SEC_CACHE_TRANSFORMATIONS}{FREE_TEXT_NEW_LINE}                  { return p::make_CONFIG_SEC_CACHE_TRANSFORMATIONS(yytext, *driver.loc.back()); }
 {CONFIG_SEC_CHROOT_DIR}[ \t]+{CONFIG_VALUE_PATH}                        { return p::make_CONFIG_SEC_CHROOT_DIR(parserSanitizer(find_separator(yytext)), *driver.loc.back()); }
@@ -901,7 +902,7 @@ EQUALS_MINUS                            (?i:=\-)
 }
 
 <TRANSACTION_FROM_DIRECTIVE_TO_ACTIONS>{
-[ \t]* {  }
+[ \t]+                         { BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 [ \t]*\"[ \t]*                { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 [ \t]*\\\n[ \t]*\"[ \t]*      { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 [ \t]*\\\r\n[ \t]*\"[ \t]*    { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
