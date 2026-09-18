@@ -65,7 +65,7 @@ void ConvertIPNetmask(unsigned char *buffer, unsigned char netmask, unsigned int
     return;
 }
 
-TreeNode *CPTCreateNode()   {
+static TreeNode *CPTCreateNode()   {
     TreeNode *node;
 
     node = reinterpret_cast<TreeNode *>(malloc(sizeof(TreeNode)));
@@ -314,7 +314,11 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     if (tree->head == NULL) {
         node = CPTCreateNode();
-        CPTCreateHead(prefix, node, tree, netmask, ip_bitmask);
+        if (node) {
+            CPTCreateHead(prefix, node, tree, netmask, ip_bitmask);
+        } else {
+            CPTFreePrefix(prefix);
+        }
         return node;
     }
 
