@@ -220,36 +220,16 @@ int CheckBitmask(unsigned char netmask, unsigned int ip_bitmask)   {
     return 0;
 }
 
-TreeNode *CPTCreateHead(TreePrefix *prefix, TreeNode *node, CPTTree *tree, unsigned char netmask, unsigned int ip_bitmask)    {
-
-    if(tree == NULL)
-        return NULL;
-
-    if(prefix == NULL)
-        return NULL;
-
-    if (node != NULL)   {
-
-        node->prefix = prefix;
-        node->bit = prefix->bitlen;
-        tree->head = node;
-
-        if(CheckBitmask(netmask, ip_bitmask))
-            return node;
-
-        node->count++;
-        node->netmasks = reinterpret_cast<unsigned char *>(malloc(node->count *  sizeof(unsigned char)));
-
-        if(node->netmasks)
-            node->netmasks[0] = netmask;
-
-        return node;
-
-    } else {
-        return NULL;
-    }
-
-    return NULL;
+static void CPTCreateHead(TreePrefix *prefix, TreeNode *node, CPTTree *tree, unsigned char netmask, unsigned int ip_bitmask)    {
+    node->prefix = prefix;
+    node->bit = prefix->bitlen;
+    tree->head = node;
+    if(CheckBitmask(netmask, ip_bitmask))
+        return ;
+    node->count++;
+    node->netmasks = reinterpret_cast<unsigned char *>(malloc(node->count *  sizeof(unsigned char)));
+    if(node->netmasks)
+        node->netmasks[0] = netmask;
 }
 
 TreeNode *SetParentNode(TreeNode *node, TreeNode *new_node, CPTTree *tree)  {
@@ -334,7 +314,8 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     if (tree->head == NULL) {
         node = CPTCreateNode();
-        return CPTCreateHead(prefix, node, tree, netmask, ip_bitmask);
+        CPTCreateHead(prefix, node, tree, netmask, ip_bitmask);
+        return node;
     }
 
     node = tree->head;
@@ -467,8 +448,10 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     new_node = CPTCreateNode();
 
-    if(new_node == NULL)
-        return NULL;
+    if(new_node == nullptr) {
+        CPTFreePrefix(prefix);
+        return nullptr;
+    }
 
     new_node->prefix = prefix;
     new_node->bit = prefix->bitlen;
