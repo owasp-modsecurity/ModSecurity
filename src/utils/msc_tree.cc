@@ -70,10 +70,9 @@ static TreeNode *CPTCreateNode()   {
 
     node = reinterpret_cast<TreeNode *>(malloc(sizeof(TreeNode)));
 
-    if(node == NULL)
-        return NULL;
+    if(node)
+        memset(node, 0, sizeof(TreeNode));
 
-    memset(node, 0, sizeof(TreeNode));
     return node;
 }
 
