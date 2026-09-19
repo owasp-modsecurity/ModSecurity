@@ -44,12 +44,12 @@ static const char* mime_charset_special = "!#$%&+-^_`{}~";
 static const char* attr_char_special = "!#$&+-.^_`~";
 
 MultipartPartTmpFile::~MultipartPartTmpFile() {
-    if (!m_tmp_file_name.empty() && m_delete) {
-        /* make sure it is closed first */
-        if (m_tmp_file_fd > 0) {
-            Close();
-        }
+    /* make sure it is closed first */
+    if (m_tmp_file_fd >= 0) {
+        Close();
+    }
 
+    if (!m_tmp_file_name.empty() && m_delete) {
         const int unlink_rc = unlink(m_tmp_file_name.c_str());
         if (unlink_rc < 0) {
             ms_dbg_a(m_transaction, 1, "Multipart: Failed to delete file (part) \"" \
@@ -93,7 +93,7 @@ void MultipartPartTmpFile::Open() {
 #else
         if (_chmod(m_tmp_file_name.c_str(), mode) == -1) {
 #endif
-            m_tmp_file_fd = -1;
+            Close();
         }
     }
 }
@@ -157,6 +157,14 @@ Multipart::~Multipart() {
                 m->m_tmp_file->setDelete();
             }
 
+        }
+
+        /* the part being built when the payload ended is not in m_parts */
+        if ((m_mpp != nullptr) && (m_mpp->m_type == MULTIPART_FILE)
+            && (m_mpp->m_tmp_file)) {
+            ms_dbg_a(m_transaction, 9, "Multipart: Marking temporary file for deletion: " \
+                + m_mpp->m_tmp_file->getFilename());
+            m_mpp->m_tmp_file->setDelete();
         }
     }
 

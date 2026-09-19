@@ -98,6 +98,7 @@ TESTS+=test/test-cases/regression/operator-verifysvnr.json
 TESTS+=test/test-cases/regression/request-body-parser-json.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart-crlf.json
 TESTS+=test/test-cases/regression/request-body-parser-multipart.json
+TESTS+=test/test-cases/regression/request-body-parser-multipart-truncated.json
 TESTS+=test/test-cases/regression/request-body-parser-xml.json
 TESTS+=test/test-cases/regression/request-body-parser-xml-validade-dtd.json
 TESTS+=test/test-cases/regression/rule-920120.json

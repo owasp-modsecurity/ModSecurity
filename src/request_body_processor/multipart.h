@@ -58,7 +58,7 @@ class MultipartPartTmpFile {
  public:
      explicit MultipartPartTmpFile(Transaction *transaction)
         : m_transaction(transaction),
-        m_tmp_file_fd(0),
+        m_tmp_file_fd(-1),
         m_delete(false)
     { }
 
@@ -73,7 +73,7 @@ class MultipartPartTmpFile {
     const std::string& getFilename() const {return m_tmp_file_name;}
     void setDelete() {m_delete = true;}
 
-    bool isValid() const {return ((m_tmp_file_fd != 0) && (!m_tmp_file_name.empty()));}
+    bool isValid() const {return ((m_tmp_file_fd >= 0) && (!m_tmp_file_name.empty()));}
 
     void Open();
     void Close();
