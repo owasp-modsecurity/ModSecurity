@@ -30,6 +30,12 @@ namespace operators {
 bool RxGlobal::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
         m_re = new Regex(m_param);
+        if (m_re->hasError()) {
+            if (error) {
+                *error = "Invalid regular expression: " + m_param;
+            }
+            return false;
+        }
     }
 
     return true;
