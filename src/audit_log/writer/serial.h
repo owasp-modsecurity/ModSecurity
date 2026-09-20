@@ -47,6 +47,7 @@ class Serial : public Writer {
     bool init(std::string *error) override;
     bool write(Transaction *transaction, int parts,
         std::string *error) override;
+    bool reopen(std::string *error) override;
 };
 
 }  // namespace writer

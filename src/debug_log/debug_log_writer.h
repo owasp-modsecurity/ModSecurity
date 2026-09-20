@@ -35,6 +35,7 @@ class DebugLogWriter {
     static void write_log(const std::string& file, const std::string& msg);
     static void close(const std::string& m_fileName);
     static int open(const std::string& m_fileName, std::string *error);
+    static bool reopen(const std::string& fileName, std::string *error);
 
  private:
     DebugLogWriter() = default;
