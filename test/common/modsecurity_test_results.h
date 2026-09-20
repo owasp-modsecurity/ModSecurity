@@ -27,6 +27,7 @@ template <class T> class ModSecurityTestResults : public std::vector<T *> {
     std::string log_raw_debug_log;
     int status = 0;
     std::string location;
+    bool intervention_log_payload_present = false;
 };
 
 }  // namespace modsecurity_test
