@@ -1211,14 +1211,11 @@ expression:
     | CONFIG_DIR_SEC_DEFAULT_ACTION actions
       {
         bool hasDisruptive = false;
-        std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
-        for (auto &i : *$2.get()) {
-            actions->push_back(i.release());
-        }
-        std::vector<actions::Action *> checkedActions;
+        std::vector<std::unique_ptr<actions::Action>> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
-        for (actions::Action *a : *actions) {
+        for (auto &i : *$2.get()) {
+            actions::Action *a = i.get();
             actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
             if (a->isDisruptive() == true && dynamic_cast<actions::Block *>(a) == NULL) {
                 hasDisruptive = true;
@@ -1226,7 +1223,6 @@ expression:
             if (phase != NULL) {
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
-                delete phase;
             } else if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind ||
                 a->action_kind == actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                                 actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
@@ -1234,7 +1230,7 @@ expression:
                     driver.error(@0, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
                 }
-                checkedActions.push_back(a);
+                checkedActions.push_back(std::move(i));
             } else {
                 driver.error(@0, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
@@ -1258,12 +1254,9 @@ expression:
             YYERROR;
         }
 
-        for (actions::Action *a : checkedActions) {
-            driver.m_defaultActions[definedPhase].push_back(
-                std::unique_ptr<actions::Action>(a));
+        for (auto &a : checkedActions) {
+            driver.m_defaultActions[definedPhase].push_back(std::move(a));
         }
-
-        delete actions;
       }
     | CONFIG_DIR_SEC_MARKER
       {
