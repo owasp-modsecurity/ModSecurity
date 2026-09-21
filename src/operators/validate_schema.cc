@@ -54,22 +54,21 @@ bool ValidateSchema::evaluate(Transaction *transaction,
         return true;
     }
 
+    std::string schemaErr;
+
     xmlSchemaParserCtxtPtr parserCtx = xmlSchemaNewParserCtxt(m_resource.c_str());
     if (parserCtx == NULL) {
         std::stringstream err;
         err << "XML: Failed to load Schema from file: ";
         err << m_resource;
         err << ". ";
-        if (m_err.empty() == false) {
-            err << m_err;
-        }
         ms_dbg_a(transaction, 4, err.str());
         return true;
     }
 
     xmlSchemaSetParserErrors(parserCtx,
         (xmlSchemaValidityErrorFunc)error_load,
-        (xmlSchemaValidityWarningFunc)warn_load, &m_err);
+        (xmlSchemaValidityWarningFunc)warn_load, &schemaErr);
 
     xmlSchemaPtr schema = xmlSchemaParse(parserCtx);
     if (schema == NULL) {
@@ -77,8 +76,8 @@ bool ValidateSchema::evaluate(Transaction *transaction,
         err << "XML: Failed to load Schema: ";
         err << m_resource;
         err << ".";
-        if (m_err.empty() == false) {
-            err << " " << m_err;
+        if (schemaErr.empty() == false) {
+            err << " " << schemaErr;
         }
         ms_dbg_a(transaction, 4, err.str());
         xmlSchemaFreeParserCtxt(parserCtx);
@@ -88,8 +87,8 @@ bool ValidateSchema::evaluate(Transaction *transaction,
     xmlSchemaValidCtxtPtr validCtx = xmlSchemaNewValidCtxt(schema);
     if (validCtx == NULL) {
         std::stringstream err("XML: Failed to create validation context.");
-        if (m_err.empty() == false) {
-            err << " " << m_err;
+        if (schemaErr.empty() == false) {
+            err << " " << schemaErr;
         }
         ms_dbg_a(transaction, 4, err.str());
         xmlSchemaFree(schema);
