@@ -448,9 +448,11 @@ FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION          ((([^"%])|([%][^{]))|([^\\][\\][
  * above rely on. That happens right after a %{VARIABLE} macro closes
  * (the closing '}' is consumed by its own rule, in EXPECTING_ACTION_PREDICATE_VARIABLE,
  * and is not available to the next token) and at the very start of a
- * quoted value. These two macros cover that leading-escape case. */
-FREE_TEXT_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE          [\\][']{FREE_TEXT_QUOTE_MACRO_EXPANSION}?
-FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE   [\\]["]{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}?
+ * quoted value. These two macros cover that leading-escape case: an odd
+ * run of backslashes (1, 3, 5, ...) before the quote still escapes it,
+ * matching the pairing convention used by the alternatives above. */
+FREE_TEXT_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE          [\\]([\\][\\])*[']{FREE_TEXT_QUOTE_MACRO_EXPANSION}?
+FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE   [\\]([\\][\\])*["]{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}?
 FREE_TEXT_EQUALS_MACRO_EXPANSION                ((([^",=%])|([%][^{]))|([^\\][\\][%][{])|([^\\]([\\][\\])+[\\][%][{])|[^\\][\\][=]|[^\\]([\\][\\])+[\\][=])+
 FREE_TEXT_EQUALS_QUOTE_MACRO_EXPANSION          ((([^'",=%])|([%][^{]))|([^\\][\\][%][{])|([^\\]([\\][\\])+[\\][%][{])|[^\\][\\][=]|[^\\][\\][']|[^\\]([\\][\\])+[\\][=])+
 FREE_TEXT_COMMA_MACRO_EXPANSION                 (([^%,])|([^\\][\\][%][{])|([^\\]([\\][\\])+[\\][%][{])|[^\\][\\][,]|[^\\]([\\][\\])+[\\][,])+
