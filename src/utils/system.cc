@@ -36,6 +36,7 @@
 #if defined _MSC_VER
 #include "src/compat/msvc.h"
 #include <direct.h>
+#include <share.h>
 #elif defined __GNUC__
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,7 +49,7 @@
 
 // Public domain code from mingw-w64's winpthreads
 // https://sourceforge.net/p/mingw-w64/code/HEAD/tree/trunk/mingw-w64-libraries/winpthreads/src/clock.c
-// 
+//
 
 #define CLOCK_PROCESS_CPUTIME_ID    2
 #define POW10_7                 10000000
@@ -205,8 +206,8 @@ bool createDir(const std::string& dir, int mode, std::string *error) {
 
 bool isFile(const std::string& f) {
     struct stat fileInfo;
-    FILE *fp = fopen(f.c_str(), "r");
-    if (fp == NULL) {
+    FILE *fp;
+    if (!fopen_modsec(&fp, f.c_str(), "r")) {
         return false;
     }
     fstat(fileno(fp), &fileInfo);
@@ -219,6 +220,18 @@ bool isFile(const std::string& f) {
     return true;
 }
 
+bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
+    if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
+        return false;
+    }
+#if defined(_MSC_VER)
+    *v_fp = _fsopen(filename, mode, _SH_DENYNO);
+    return *v_fp != nullptr;
+#else
+    *v_fp = fopen(filename, mode);
+    return *v_fp != nullptr;
+#endif
+}
 
 }  // namespace utils
 }  // namespace modsecurity
