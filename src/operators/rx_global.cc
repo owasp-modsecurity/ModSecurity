@@ -60,7 +60,10 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     if (re->hasError()) {
-        ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
+        if (transaction) {
+            ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
+            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+        }
         return false;
     }
 
