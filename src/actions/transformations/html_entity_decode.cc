@@ -154,7 +154,7 @@ static inline bool inplace(std::string &value) {
 
 HTML_ENT_OUT:
 
-        for (auto z = 0; z < copy; z++) {
+        for (std::string::size_type z = 0; z < copy; z++) {
             *d++ = input[i++];
         }
     }
