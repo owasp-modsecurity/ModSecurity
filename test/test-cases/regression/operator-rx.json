@@ -284,5 +284,102 @@
       "SecRule ARGS:rxtest \"@rx (w+)+$\" \"id:1,phase:1,pass,t:trim,block\"",
       "SecRule TX:MSC_PCRE_LIMITS_EXCEEDED \"@streq 1\" \"id:2,phase:1,pass,t:trim,block\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @rx with a macro that expands to a non-compiling pattern",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?rxtest=value1",
+      "method": "HEAD",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Error with regular expression",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.pattern=(\"",
+      "SecRule ARGS:rxtest \"@rx %{tx.pattern}\" \"id:2,phase:1,pass,t:trim,block\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @rx with a macro pattern and PCRE match limits exceeded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?rxtest=wwwwwwwwwwwwwwwwwwwwwowwwwwwwwwww",
+      "method": "HEAD",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "rx: regex error 'MATCH_LIMIT' for pattern",
+      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `TX:MSC_PCRE_LIMITS_EXCEEDED'",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecPcreMatchLimit 2",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.pattern=(w+)+$\"",
+      "SecRule ARGS:rxtest \"@rx %{tx.pattern}\" \"id:2,phase:1,pass,t:trim,block\"",
+      "SecRule TX:MSC_PCRE_LIMITS_EXCEEDED \"@streq 1\" \"id:3,phase:1,pass,t:trim,block\""
+    ]
   }
 ]
