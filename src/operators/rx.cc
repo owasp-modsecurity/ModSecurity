@@ -30,6 +30,12 @@ namespace operators {
 bool Rx::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
         m_re = new Regex(m_param);
+        if (m_re->hasError()) {
+            if (error) {
+                *error = "Invalid regular expression: " + m_param;
+            }
+            return false;
+        }
     }
 
     return true;
@@ -54,7 +60,10 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     if (re->hasError()) {
-        ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
+        if (transaction) {
+            ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
+            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+        }
         return false;
     }
 
