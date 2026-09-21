@@ -36,6 +36,7 @@
 #if defined _MSC_VER
 #include "src/compat/msvc.h"
 #include <direct.h>
+#include <share.h>
 #elif defined __GNUC__
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -224,7 +225,8 @@ bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
         return false;
     }
 #if defined(_MSC_VER)
-    return fopen_s(v_fp, filename, mode) == 0 && *v_fp != nullptr;
+    *v_fp = _fsopen(filename, mode, _SH_DENYNO);
+    return *v_fp != nullptr;
 #else
     *v_fp = fopen(filename, mode);
     return *v_fp != nullptr;
