@@ -205,8 +205,8 @@ bool createDir(const std::string& dir, int mode, std::string *error) {
 
 bool isFile(const std::string& f) {
     struct stat fileInfo;
-    FILE *fp = fopen(f.c_str(), "r");
-    if (fp == NULL) {
+    FILE *fp;
+    if (!fopen_modsec(&fp, f.c_str(), "r")) {
         return false;
     }
     fstat(fileno(fp), &fileInfo);
@@ -219,6 +219,23 @@ bool isFile(const std::string& f) {
     return true;
 }
 
-
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
+    if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
+        return false;
+    }
+#if defined(_MSC_VER)
+     return fopen_s(v_fp, filename, mode) == 0 && *v_fp != nullptr;
+#else
+      *v_fp = fopen(filename, mode);
+      return *v_fp != nullptr;
+#endif
+}
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 }  // namespace utils
 }  // namespace modsecurity
