@@ -48,7 +48,7 @@
 
 // Public domain code from mingw-w64's winpthreads
 // https://sourceforge.net/p/mingw-w64/code/HEAD/tree/trunk/mingw-w64-libraries/winpthreads/src/clock.c
-// 
+//
 
 #define CLOCK_PROCESS_CPUTIME_ID    2
 #define POW10_7                 10000000
@@ -219,23 +219,17 @@ bool isFile(const std::string& f) {
     return true;
 }
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#endif
 bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
     if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
         return false;
     }
 #if defined(_MSC_VER)
-     return fopen_s(v_fp, filename, mode) == 0 && *v_fp != nullptr;
+    return fopen_s(v_fp, filename, mode) == 0 && *v_fp != nullptr;
 #else
-      *v_fp = fopen(filename, mode);
-      return *v_fp != nullptr;
+    *v_fp = fopen(filename, mode);
+    return *v_fp != nullptr;
 #endif
 }
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+
 }  // namespace utils
 }  // namespace modsecurity
