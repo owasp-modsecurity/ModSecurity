@@ -70,7 +70,7 @@ cd ModSecurity
 This repository uses git submodules. After cloning, make sure to initialize and fetch all submodules:
 
 ```sh
-git submodule update --init --recursive
+git submodule update --depth 1 --init --recursive
 ```
 
 You can verify that all submodules are properly initialized with:
@@ -139,7 +139,7 @@ The repository includes the following submodules:
   After merging PR #3532, it is required to run:
 
   ```sh
-  git submodule update --init --recursive
+  git submodule update --depth 1 --init --recursive
   ```
 
   This ensures that all required submodules are fetched. Without this step, the project will not build successfully.
@@ -327,7 +327,7 @@ the utilities, follow the commands listed below:
 
 ```shell
 $ cd /path/to/your/ModSecurity
-$ git submodule update --init --recursive
+$ git submodule update --depth 1 --init --recursive
 $ make check
  ```
 
