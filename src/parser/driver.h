@@ -91,6 +91,7 @@ class Driver : public RulesSetProperties {
     // Ordinarily other solutions would have been preferable, but location.hh is a
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
+
 };
 
 

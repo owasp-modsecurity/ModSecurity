@@ -32,7 +32,7 @@
 
 
 /**
- ** \file y.tab.h
+ ** \file seclang-parser.hh
  ** Define the yy::parser class.
  */
 

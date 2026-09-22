@@ -26,6 +26,31 @@ using modsecurity::RuleWithOperator;
 namespace modsecurity {
 namespace Parser {
 
+namespace {
+
+template <typename RuleType>
+bool appendRuleToChain(RuleWithActions **lastRule,
+    std::unique_ptr<RuleType> *rule,
+    std::ostringstream *parserError) {
+    /* is it a chained rule? */
+    if (*lastRule != nullptr && (*lastRule)->isChained()) {
+        rule->get()->setPhase((*lastRule)->getPhase());
+        if (rule->get()->hasDisruptiveAction()) {
+            *parserError << "Disruptive actions can only be specified by";
+            *parserError << " chain starter rules.";
+            return false;
+        }
+        (*lastRule)->m_chainedRuleChild = std::move(*rule);
+        (*lastRule)->m_chainedRuleChild->m_chainedRuleParent = *lastRule;
+        *lastRule = (*lastRule)->m_chainedRuleChild.get();
+        return true;
+    }
+
+    return false;
+}
+
+}  // namespace
+
 Driver::Driver()
   : RulesSetProperties(),
   trace_scanning(false),
@@ -68,6 +93,10 @@ int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
 
 
 int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
+    if (appendRuleToChain(&m_lastRule, &rule, &m_parserError) == true) {
+        return true;
+    }
+
     m_rulesSetPhases.insert(std::move(rule));
     return true;
 }
@@ -80,17 +109,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         return false;
     }
 
-    /* is it a chained rule? */
-    if (m_lastRule != nullptr && m_lastRule->isChained()) {
-        r->setPhase(m_lastRule->getPhase());
-        if (r->hasDisruptiveAction()) {
-            m_parserError << "Disruptive actions can only be specified by";
-            m_parserError << " chain starter rules.";
-            return false;
-        }
-        m_lastRule->m_chainedRuleChild = std::move(r);
-        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
-        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+    if (appendRuleToChain(&m_lastRule, &r, &m_parserError) == true) {
         return true;
     }
 
