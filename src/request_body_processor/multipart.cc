@@ -1140,6 +1140,10 @@ int Multipart::multipart_complete(std::string *error) {
             "Multipart: Warning: invalid header folding used.");
     }
 
+    m_transaction->m_variableMultipartFileLimitExceeded.set(
+        std::to_string(m_flag_file_limit_exceeded),
+        m_transaction->m_variableOffset);
+
     m_transaction->m_variableMultipartStrictError.set(
         std::to_string(m_flag_error || m_flag_boundary_quoted != 0
         || m_flag_boundary_whitespace != 0 || m_flag_data_before != 0
