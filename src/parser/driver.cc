@@ -68,8 +68,50 @@ int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
 
 
 int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
+    if (appendRuleToChain(&rule) == true) {
+        return true;
+    }
+
     m_rulesSetPhases.insert(std::move(rule));
     return true;
+}
+
+
+bool Driver::appendRuleToChain(std::unique_ptr<RuleWithActions> *rule) {
+    /* is it a chained rule? */
+    if (m_lastRule != nullptr && m_lastRule->isChained()) {
+        rule->get()->setPhase(m_lastRule->getPhase());
+        if (rule->get()->hasDisruptiveAction()) {
+            m_parserError << "Disruptive actions can only be specified by";
+            m_parserError << " chain starter rules.";
+            return false;
+        }
+        m_lastRule->m_chainedRuleChild = std::move(*rule);
+        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
+        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+        return true;
+    }
+
+    return false;
+}
+
+
+bool Driver::appendRuleToChain(std::unique_ptr<RuleScript> *rule) {
+    /* is it a chained rule? */
+    if (m_lastRule != nullptr && m_lastRule->isChained()) {
+        rule->get()->setPhase(m_lastRule->getPhase());
+        if (rule->get()->hasDisruptiveAction()) {
+            m_parserError << "Disruptive actions can only be specified by";
+            m_parserError << " chain starter rules.";
+            return false;
+        }
+        m_lastRule->m_chainedRuleChild = std::move(*rule);
+        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
+        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -80,17 +122,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         return false;
     }
 
-    /* is it a chained rule? */
-    if (m_lastRule != nullptr && m_lastRule->isChained()) {
-        r->setPhase(m_lastRule->getPhase());
-        if (r->hasDisruptiveAction()) {
-            m_parserError << "Disruptive actions can only be specified by";
-            m_parserError << " chain starter rules.";
-            return false;
-        }
-        m_lastRule->m_chainedRuleChild = std::move(r);
-        m_lastRule->m_chainedRuleChild->m_chainedRuleParent = m_lastRule;
-        m_lastRule = m_lastRule->m_chainedRuleChild.get();
+    if (appendRuleToChain(&r) == true) {
         return true;
     }
 

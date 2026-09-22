@@ -91,6 +91,10 @@ class Driver : public RulesSetProperties {
     // Ordinarily other solutions would have been preferable, but location.hh is a
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
+
+ private:
+    bool appendRuleToChain(std::unique_ptr<RuleWithActions> *rule);
+    bool appendRuleToChain(std::unique_ptr<RuleScript> *rule);
 };
 
 
