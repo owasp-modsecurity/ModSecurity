@@ -87,7 +87,7 @@ class XML {
  public:
     explicit XML(Transaction *transaction);
     ~XML();
-    bool init();
+    bool init(bool require_well_formed = true);
     bool processChunk(const char *buf, unsigned int size, std::string *err);
     bool complete(std::string *err);
     static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
@@ -98,6 +98,7 @@ class XML {
  private:
     Transaction *m_transaction;
     std::string m_header;
+    bool m_require_well_formed;
 };
 
 #endif

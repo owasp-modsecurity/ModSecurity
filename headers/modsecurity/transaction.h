@@ -398,7 +398,7 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     bool addArgument(const std::string& orig, const std::string& key,
         const std::string& value, size_t offset);
     bool extractArguments(const std::string &orig, const std::string& buf,
-        size_t offset);
+        size_t offset, bool partial_processing_enabled = false);
 
     const char *getResponseBody() const;
     size_t getResponseBodyLength();
@@ -644,16 +644,34 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 
     std::vector<std::shared_ptr<RequestBodyProcessor::MultipartPartTmpFile>> m_multipartPartTmpFiles;
 
+    static const size_t DEFAULT_REQUEST_BODY_LIMIT = 134217728;
+    static const size_t DEFAULT_REQUEST_BODY_NO_FILES_LIMIT = 1048576;
+
  private:
 
     Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         void *logCbData, const time_t timestamp);
+
+    void setRequestBodyNoFilesLimitExceeded();
+    int rejectLongRequestIfActionIsReject();
 
     /**
      * Pointer to the callback function that will be called to fill
      * the web server (connector) log.
      */
     void *m_logCbData;
+
+    /**
+     * Whether the request body was bigger than RequestNoFilesBodyLimit.
+     */
+    bool m_requestBodyNoFilesLimitExceeded;
+
+    /**
+     * Whether the request body was bigger than RequestBodyLimit.
+     */
+    bool m_requestBodyLimitExceeded;
+
+    size_t requestBodyLengthToProcess() const;
 };
 
 
