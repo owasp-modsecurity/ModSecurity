@@ -883,5 +883,56 @@
       "SecAuditLogFileMode 0600",
       "SecAuditLogType Serial"
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "auditlog : negated operator is rendered with `!` prefix in match message",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=hello",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "plain/text\n\r",
+        "Content-Length": "4"
+      },
+      "body": [
+        "test"
+      ]
+    },
+    "expected": {
+      "audit_log": "Operator `!Contains'",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"!@contains world\" \"id:1902,phase:1,deny,auditlog\"",
+      "SecAuditEngine On",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/audit_test_negated_operator.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0600",
+      "SecAuditLogType Serial"
+    ]
   }
 ]
