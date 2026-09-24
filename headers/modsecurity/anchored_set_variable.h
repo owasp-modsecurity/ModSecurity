@@ -71,8 +71,19 @@ struct MyHash{
 class AnchoredSetVariable : public std::unordered_multimap<std::string,
 	VariableValue *, MyHash, MyEqual> {
  public:
+    // `name` is bound by reference into m_name and must outlive this
+    // object - pass one of the constants from variable_names.h (or
+    // another object with static/program-duration storage), never a
+    // temporary or a name built at runtime.
     AnchoredSetVariable(Transaction *t, const std::string &name);
     ~AnchoredSetVariable();
+
+    // A reference member makes copy-assignment ill-formed already;
+    // deleting explicitly here documents that rather than relying on
+    // the implicit rule, and gives a clearer compiler error if any
+    // code tries to copy/assign one of these.
+    AnchoredSetVariable(const AnchoredSetVariable &a) = delete;
+    AnchoredSetVariable &operator=(const AnchoredSetVariable &a) = delete;
 
     void unset();
 
@@ -114,7 +125,7 @@ class AnchoredSetVariable : public std::unordered_multimap<std::string,
     std::unique_ptr<std::string> resolveFirst(const std::string &key);
 
     Transaction *m_transaction;
-    std::string m_name;
+    const std::string &m_name;
 };
 
 }  // namespace modsecurity

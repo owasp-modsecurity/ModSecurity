@@ -42,6 +42,10 @@ class Transaction;
 
 class AnchoredVariable {
  public:
+    // `name` is bound by reference into m_name and must outlive this
+    // object - pass one of the constants from variable_names.h (or
+    // another object with static/program-duration storage), never a
+    // temporary or a name built at runtime.
     AnchoredVariable(Transaction* t, const std::string &name);
 
     AnchoredVariable(const AnchoredVariable &a) = delete;
@@ -59,7 +63,7 @@ class AnchoredVariable {
 
     Transaction *m_transaction;
     int m_offset;
-    std::string m_name;
+    const std::string &m_name;
     std::string m_value;
 
  private:
