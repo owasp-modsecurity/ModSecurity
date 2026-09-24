@@ -163,8 +163,6 @@ class TransactionAnchoredVariables {
         m_variableRemotePort(t, "REMOTE_PORT"),
         m_variableReqbodyError(t, "REQBODY_ERROR"),
         m_variableReqbodyErrorMsg(t, "REQBODY_ERROR_MSG"),
-        m_variableReqbodyProcessorError(t, "REQBODY_PROCESSOR_ERROR"),
-        m_variableReqbodyProcessorErrorMsg(t, "REQBODY_PROCESSOR_ERROR_MSG"),
         m_variableReqbodyProcessor(t, "REQBODY_PROCESSOR"),
         m_variableRequestBasename(t, "REQUEST_BASENAME"),
         m_variableRequestBody(t, "REQUEST_BODY"),
@@ -246,8 +244,6 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableRemotePort;
     AnchoredVariable m_variableReqbodyError;
     AnchoredVariable m_variableReqbodyErrorMsg;
-    AnchoredVariable m_variableReqbodyProcessorError;
-    AnchoredVariable m_variableReqbodyProcessorErrorMsg;
     AnchoredVariable m_variableReqbodyProcessor;
     AnchoredVariable m_variableRequestBasename;
     AnchoredVariable m_variableRequestBody;

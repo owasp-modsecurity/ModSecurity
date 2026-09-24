@@ -724,12 +724,8 @@ int Transaction::processRequestBody() {
                 m_variableReqbodyError.set("1", m_variableOffset);
                 m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
                     m_variableOffset);
-                m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
-                    + error, m_variableOffset);
-                m_variableReqbodyProcessorError.set("1", m_variableOffset);
             } else {
                 m_variableReqbodyError.set("0", m_variableOffset);
-                m_variableReqbodyProcessorError.set("0", m_variableOffset);
             }
         }
 #endif
@@ -753,14 +749,10 @@ int Transaction::processRequestBody() {
             }
             if (error.empty() == false && m_requestBody.str().size() > 0) {
                 m_variableReqbodyError.set("1", m_variableOffset);
-                m_variableReqbodyProcessorError.set("1", m_variableOffset);
                 m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
                     m_variableOffset);
-                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
-                    + error, m_variableOffset);
             } else {
                 m_variableReqbodyError.set("0", m_variableOffset);
-                m_variableReqbodyProcessorError.set("0", m_variableOffset);
             }
         }
 #endif
@@ -781,11 +773,8 @@ int Transaction::processRequestBody() {
         }
         if (error.empty() == false) {
             m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
             m_variableReqbodyErrorMsg.set("Multipart parsing error: " + error,
                 m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set("Multipart parsing " \
-                "error: " + error, m_variableOffset);
         } else if (((m_rules->m_requestBodyNoFilesLimit.m_set)
                    && (reqbodyNoFilesLength > m_rules->m_requestBodyNoFilesLimit.m_value))) {
             m_variableReqbodyError.set("1", 0);
@@ -795,7 +784,6 @@ int Transaction::processRequestBody() {
                 + std::to_string(m_rules->m_requestBodyNoFilesLimit.m_value));
         } else {
             m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
         }
     } else if (m_requestBodyType == WWWFormUrlEncoded) {
         m_variableOffset++;
@@ -814,14 +802,10 @@ int Transaction::processRequestBody() {
         }
 
         m_variableReqbodyError.set("1", m_variableOffset);
-        m_variableReqbodyProcessorError.set("1", m_variableOffset);
         m_variableReqbodyErrorMsg.set("Unknown request body processor: " \
             + error, m_variableOffset);
-        m_variableReqbodyProcessorErrorMsg.set("Unknown request body " \
-            "processor: " + error, m_variableOffset);
     } else {
         m_variableReqbodyError.set("0", m_variableOffset);
-        m_variableReqbodyProcessorError.set("0", m_variableOffset);
     }
 
     if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
