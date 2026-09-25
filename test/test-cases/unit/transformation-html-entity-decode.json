@@ -39,7 +39,7 @@
     "name": "htmlEntityDecode",
     "input": "&NewLine;&Tab;&shy;&NonBreakingSpace;",
     "ret": 1,
-    "output": "\n\t­ "
+    "output": "\n\t\\xad\\xa0"
   },
   {
     "type": "tfn",
