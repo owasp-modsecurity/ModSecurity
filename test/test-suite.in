@@ -74,7 +74,11 @@ TESTS+=test/test-cases/regression/issue-2423-msg-in-chain.json
 TESTS+=test/test-cases/regression/issue-2427.json
 TESTS+=test/test-cases/regression/issue-2296.json
 TESTS+=test/test-cases/regression/issue-3340.json
+if LOG_MESSAGE_ESCAPE
 TESTS+=test/test-cases/regression/issue-3601.json
+else
+TESTS+=test/test-cases/regression/issue-3601-legacy.json
+endif
 TESTS+=test/test-cases/regression/issue-394.json
 TESTS+=test/test-cases/regression/issue-849.json
 TESTS+=test/test-cases/regression/issue-960.json

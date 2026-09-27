@@ -33,6 +33,11 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
+          - { label: "with log message escape", opt: "--enable-log-message-escape" }
+
+        exclude:
+          - compiler: { label: "clang" }
+            configure: { label: "with log message escape" }
 
     steps:
       - uses: actions/checkout@v6
