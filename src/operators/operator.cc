@@ -112,17 +112,20 @@ std::string Operator::resolveMatchMessage(Transaction *t,
         if (m_couldContainsMacro == false) {
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
                 utils::string::limitTo(200, m_param) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, true) + "' (Value: `" +
                 utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) + \
+                    utils::string::toHexIfNeeded(value, true)) + \
                 "' )";
         } else {
             std::string p(m_string->evaluate(t));
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
-                utils::string::limitTo(200, p) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
+                utils::string::toHexIfNeeded(
+                    utils::string::limitTo(200, p), true) +
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, true) + "' (Value: `" +
                 utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) +
+                    utils::string::toHexIfNeeded(value, true)) +
                 "' )";
         }
     }
