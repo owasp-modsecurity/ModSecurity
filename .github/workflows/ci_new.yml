@@ -192,6 +192,7 @@ jobs:
           - { label: "without maxmind",  opt: "-DWITH_MAXMIND=OFF" }
           - { label: "without libxml",   opt: "-DWITH_LIBXML2=OFF" }
           - { label: "with lmdb",        opt: "-DWITH_LMDB=ON" }
+          - { label: "with log message escape", opt: "-DLOG_MESSAGE_ESCAPE=ON" }
 
     steps:
       - uses: actions/checkout@v6

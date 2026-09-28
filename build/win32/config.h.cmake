@@ -63,6 +63,9 @@
 /* Define if libcurl is available */
 #cmakedefine HAVE_CURL
 
+/* Define to escape quotes and backslashes in textual log message fields */
+#cmakedefine MSC_LOG_MESSAGE_ESCAPE 1
+
 /* Name of package */
 #define PACKAGE "@PACKAGE_NAME@"
 
