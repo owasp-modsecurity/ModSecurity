@@ -661,7 +661,7 @@ class Variables : public std::vector<Variable *> {
     bool contains(const VariableValue *v) {
         return std::find_if(begin(), end(),
             [v](Variable *m) -> bool {
-                VariableRegex *r = dynamic_cast<VariableRegex *>(m);
+                const VariableRegex *r = dynamic_cast<VariableRegex *>(m);
                 if (r) {
                     return r->m_r.searchAll(v->getKey()).size() > 0;
                 }

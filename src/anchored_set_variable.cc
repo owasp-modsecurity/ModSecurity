@@ -120,7 +120,7 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
     return nullptr;
 }
 
-
+// cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l) const {
     for (const auto& x : *this) {
@@ -138,7 +138,7 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     static_cast<const AnchoredSetVariable&>(*this).resolveRegularExpression(r, l);
 }
 
-
+// cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l,
     const variables::KeyExclusions &ke) const {

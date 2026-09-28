@@ -57,7 +57,7 @@ class Rule_DictElement : public VariableDictElement { \
     static void rev(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
-        RuleWithActions *r = rule;
+        const RuleWithActions *r = rule;
 
         while (r && r->m_rev.empty()) {
             r = r->m_chainedRuleParent;

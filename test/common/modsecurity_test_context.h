@@ -18,6 +18,8 @@ namespace modsecurity_test {
             m_modsec.setServerLogCb(logCb);
         }
         ~ModSecurityTestContext() = default;
+        ModSecurityTestContext(const ModSecurityTestContext &) = delete;
+        ModSecurityTestContext &operator=(const ModSecurityTestContext &) = delete;
 
         modsecurity::Transaction create_transaction() {
             return modsecurity::Transaction(&m_modsec,

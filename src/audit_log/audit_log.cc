@@ -329,7 +329,7 @@ bool AuditLog::close() {
     return true;
 }
 
-
+// cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
 bool AuditLog::merge(AuditLog *from, std::string *error) {
     AL_MERGE_STRING_CONF(from->m_path1, m_path1);
     AL_MERGE_STRING_CONF(from->m_path2, m_path2);
