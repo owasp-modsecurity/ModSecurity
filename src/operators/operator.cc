@@ -122,9 +122,11 @@ std::string Operator::resolveMatchMessage(Transaction *t,
                 "' against variable `" +
                 utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
                 "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(
-                        value, kEscapeLogMessage)) + \
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         } else {
             std::string p(m_string->evaluate(t));
@@ -134,9 +136,11 @@ std::string Operator::resolveMatchMessage(Transaction *t,
                 "' against variable `" +
                 utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
                 "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(
-                        value, kEscapeLogMessage)) +
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         }
     }
