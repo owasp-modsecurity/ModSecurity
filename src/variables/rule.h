@@ -53,7 +53,7 @@ class Rule_DictElement : public VariableDictElement { \
         addVariableOrigin(m_rule_id, std::to_string(r->m_ruleId), l);
     }
 
-
+    // cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
     static void rev(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) {
