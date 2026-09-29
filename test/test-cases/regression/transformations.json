@@ -268,5 +268,73 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@rx (?i)<script[^>]*>[\\s\\S]*?\" \"id:941110,phase:2,deny,capture,t:none,t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing transformations :: removeComments - C, SQL style",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Accept": "*/*",
+        "Content-Type": "application/json"
+      },
+      "uri": "/index.php",
+      "method": "POST",
+      "body": [
+        "{\"q\":\"UNION/**//**/SELECT\"}"
+      ]
+    },
+    "expected": {
+      "debug_log": "T \\(0\\) t:removeComments: \"UNIONSELECT\"",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"@rx UNIONSELECT\" \"id:100,phase:2,t:none,t:removeComments,log,deny,status:403,msg:'Invalid input'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing transformations :: removeComments - HTML style",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Accept": "*/*",
+        "Content-Type": "application/json"
+      },
+      "uri": "/index.php",
+      "method": "POST",
+      "body": [
+        "{\"q\":\"foo<!-- first comment --><!-- second comment -->bar\"}"
+      ]
+    },
+    "expected": {
+      "debug_log": "T \\(0\\) t:removeComments: \"foobar\"",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"@rx foobar\" \"id:100,phase:2,t:none,t:removeComments,log,deny,status:403,msg:'Invalid input'\""
+    ]
   }
 ]
