@@ -159,6 +159,9 @@
     <ClInclude Include="..\apache2\msc_release.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
+    <ClInclude Include="..\apache2\msc_reqbody.h">
+      <Filter>ModSecurity</Filter>
+    </ClInclude>
     <ClInclude Include="..\apache2\msc_unicode.h">
       <Filter>ModSecurity</Filter>
     </ClInclude>
