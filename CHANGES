@@ -1,3 +1,22 @@
+29 Sep 2026 - 2.9.15
+--------------------
+
+ * fix: t:htmlEntityDecode does not decode all ASCII named HTML entities
+   [PR from private repo - @marcstern, @fzipi, @airween; fixed GHSA-cxqf-vgrr-xxrv]
+ * fix: use secure value for host verification in case of remote rules download
+   [PR from private repo - @amitu314, @airween; fixed GHSA-2vqc-36qp-ccmw]
+ * fix: add guard to check XML parser context pointer before use
+   [PR from private repo - Tobias Klein (www.trapkit.de), @airween; fixed GHSA-jx3r-phvx-2jmj]
+ * fix: t:removeComments behavior in case of adjacent comments
+   [PR from private repo - @HEXER365, @airween; fixed GHSA-qrch-pjfr-9g47]
+ * fix: t:base64DecodeExt does not handle '-' and '_' characters (URL-safe alphabet)
+   [PR from private repo - @fzipi, @airween; fixed GHSA-4j47-8qcr-jf59]
+ * fix: handle 'filename*' and duplicated 'filename' parameters in multipart Content-Disposition header;
+   add new variables MULTIPART_DUPLICATE_PART_HEADER, MULTIPART_FILENAME_CHARSET, MULTIPART_FILENAME_LANGUAGE
+   [PR from private repo - @hnakamur, @fzipi, @theseion, @airween; fixed GHSA-5pww-8rfg-9crf]
+ * fix(iis): correct InstallModule32/64 CustomAction ID naming swap
+   [Issue #3603 - @fzipi]
+
 02 Jul 2026 - 2.9.14
 --------------------
 
