@@ -655,20 +655,20 @@ class VariableRegex : public Variable {
 
 class Variables : public std::vector<Variable *> {
  public:
-    bool contains(Variable *v) {
+    bool contains(const Variable *v) const {
         return std::find_if(begin(), end(),
-            [v](const Variable *m) -> bool { return *v == *m; }) != end();
-    };
-    bool contains(const VariableValue *v) {
+            [v](const Variable *m) { return *v == *m; }) != end();
+    }
+    bool contains(const VariableValue *v) const {
         return std::find_if(begin(), end(),
-            [v](const Variable *m) -> bool {
+            [v](const Variable *m) {
                 const auto *r = dynamic_cast<const VariableRegex *>(m);
                 if (r) {
-                    return r->m_r.searchAll(v->getKey()).size() > 0;
+                    return !r->m_r.searchAll(v->getKey()).empty();
                 }
                 return v->getKeyWithCollection() == *m->m_fullName.get();
             }) != end();
-    };
+    }
 };
 
 
