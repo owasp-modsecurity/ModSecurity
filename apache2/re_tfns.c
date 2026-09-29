@@ -382,16 +382,10 @@ static int msre_fn_removeComments_execute(apr_pool_t *mptmp, unsigned char *inpu
             if ((input[i] == '*')&&(i + 1 < input_len)&&(input[i + 1] == '/')) {
                 incomment = 0;
                 i += 2;
-                input[j] = input[i];
-                i++;
-                j++;
             } else if ((input[i] == '-')&&(i + 1 < input_len)&&(input[i + 1] == '-')&&
                     (i + 2 < input_len)&&(input[i+2] == '>'))   {
                 incomment = 0;
                 i += 3;
-                input[j] = input[i];
-                i++;
-                j++;
             } else {
                 i++;
             }
