@@ -20,6 +20,9 @@
 #include "msc_util.h"
 #include "msc_parsers.h"
 
+static const char* mime_charset_special = "!#$%&+-^_`{}~";
+static const char* attr_char_special = "!#$&+-.^_`~";
+
 void validate_quotes(modsec_rec *msr, char *data, char quote)  {
     assert(msr != NULL);
     int i, len;
@@ -130,7 +133,53 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
          */
 
         char quote = '\0';
-        if ((*p == '"') || (*p == '\'')) {
+        if (strcmp(name, "filename*") == 0) {
+            /* filename*=charset'[optional-language]'filename */
+            /* Read beyond the charset and the optional language*/
+            const char* start_of_charset = p;
+            while ((*p != '\0') && (isalnum(*p) || (strchr(mime_charset_special, *p)))) {
+                p++;
+            }
+            if ((*p != '\'') || (p == start_of_charset)) {
+                return -16; // Must be at least one legit char before ' for start of language
+            }
+            msr->mpd->mpp->filename_charset = apr_pstrmemdup(msr->mp, start_of_charset, (p - start_of_charset));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition filename* charset: %s",
+                    log_escape_nq(msr->mp, msr->mpd->mpp->filename_charset));
+            }
+            p++;
+            const char* start_of_language = p;
+            while ((*p != '\0') && (*p != '\'')) {
+                p++;
+            }
+            if (*p != '\'') {
+                msr->mpd->flag_invalid_quoting = 1;
+                return -17; // Single quote for end-of-language not found
+            }
+            msr->mpd->mpp->filename_language = apr_pstrmemdup(msr->mp, start_of_language, (p - start_of_language));
+            if (msr->txcfg->debuglog_level >= 9) {
+                msr_log(msr, 9, "Multipart: Content-Disposition filename* language: %s",
+                    log_escape_nq(msr->mp, msr->mpd->mpp->filename_language));
+            }
+            p++;
+
+            /* Now read what should be the actual filename */
+            const char* start_of_filename = p;
+            while ((*p != '\0') && (*p != ';')) {
+                if (*p == '%') {
+                    if ((*(p+1) == '\0') || (*(p+2) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*(p+2)))) {
+                        return -18;
+                    }
+                    p += 3;
+                } else if (isalnum(*p) || strchr(attr_char_special, *p)) {
+                    p++;
+                } else {
+                    return -19;
+                }
+            }
+            value = apr_pmemdup(msr->mp, start_of_filename, p - start_of_filename);
+        } else if ((*p == '"') || (*p == '\'')) {
             /* quoted */
             quote = *p; // remember which quote character was used for the value
 
@@ -191,9 +240,8 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
             validate_quotes(msr, value, quote);
 
-            msr->multipart_name = apr_pstrdup(msr->mp, value);
-
             if (msr->mpd->mpp->name != NULL) {
+                msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
                     log_escape_nq(msr->mp, value));
                 return -14;
@@ -205,23 +253,43 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     log_escape_nq(msr->mp, value));
             }
         }
-        else
-        if (strcmp(name, "filename") == 0) {
-
-            validate_quotes(msr, value, quote);
-
-            msr->multipart_filename = apr_pstrdup(msr->mp, value);
-
-            if (msr->mpd->mpp->filename != NULL) {
+        else if (strcmp(name, "filename") == 0) {
+            // check if the 'filename' (and not the `filename*`) is already added from the header, if yes then return error
+            if (msr->mpd->mpp->filename != NULL && strlen(msr->mpd->mpp->filename) != 0) {
+                msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
                     log_escape_nq(msr->mp, value));
                 return -15;
             }
-            msr->mpd->mpp->filename = value;
+            else {
+                validate_quotes(msr, value, quote);
 
+                msr->mpd->mpp->filename = apr_pstrdup(msr->mp, value);
+
+                if (msr->txcfg->debuglog_level >= 9) {
+                    msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
+                        log_escape_nq(msr->mp, value));
+                }
+            }
+        } else if (strcmp(name, "filename*") == 0) {
+            // check if the 'filename*' (and not the `filename`) is already added from the header, if yes then return error
+            if (msr->mpd->mpp->filename_star != NULL && strlen(msr->mpd->mpp->filename_star) != 0) {
+                msr->mpd->flag_duplicate_part_header = 1;
+                msr_log(msr, 4,
+                    "Multipart: Warning: Duplicate Content-Disposition filename*: %s.",  log_escape_nq(msr->mp, value));
+                return -15;
+            }
+            int invalid_count = 0;
+            int changed = 0;
+            char *decoded_value = apr_pstrdup(msr->mp, value);
+            int decoded_len = urldecode_nonstrict_inplace_ex_plus((unsigned char *)decoded_value, strlen(decoded_value), 0, &invalid_count, &changed);
+            if (invalid_count > 0) {
+                msr->mpd->flag_invalid_part = 1;
+            }
+            msr->mpd->mpp->filename_star = apr_pstrdup(msr->mp, decoded_value);
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Content-Disposition filename: %s",
-                    log_escape_nq(msr->mp, value));
+                msr_log(msr, 9, "Multipart: Content-Disposition filename*: %s.",
+                    log_escape_nq(msr->mp, decoded_value));
             }
         }
         else return -11;
@@ -239,7 +307,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     }
                     msr->mpd->flag_invalid_quoting = 1;
                 }
-                p++;
+                // p++;
                 return -12;
             }
             p++; /* move over the semi-colon */
@@ -315,7 +383,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
              * values from the C-D header. We need to check for the case where they
              * didn't understand C-D but we did.
              */
-            if (strstr(header_value, "filename=") == NULL) {
+            if (strstr(header_value, "filename=") == NULL && strstr(header_value, "filename*=") == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
                 return -1;
             }
@@ -442,6 +510,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
             /* error if the name already exists */
             if (apr_table_get(msr->mpd->mpp->headers, header_name) != NULL) {
+                msr->mpd->flag_duplicate_part_header = 1;
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Duplicate part header: %s.",
                     log_escape_nq(msr->mp, header_name));
                 return -1;

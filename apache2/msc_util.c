@@ -1636,6 +1636,14 @@ int urldecode_uni_nonstrict_inplace_ex(unsigned char *input, long int input_len,
  * IMP1 Assumes NUL-terminated
  */
 int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int *invalid_count, int *changed) {
+    return urldecode_nonstrict_inplace_ex_plus(input, input_len, 1, invalid_count, changed);
+}
+
+/**
+ *
+ * IMP1 Assumes NUL-terminated
+ */
+int urldecode_nonstrict_inplace_ex_plus(unsigned char *input, long int input_len, int plus_to_space, int *invalid_count, int *changed) {
     unsigned char *d = (unsigned char *)input;
     long int i, count;
 
@@ -1673,7 +1681,7 @@ int urldecode_nonstrict_inplace_ex(unsigned char *input, long int input_len, int
             }
         } else {
             /* Character is not a percent sign. */
-            if (input[i] == '+') {
+            if (plus_to_space && input[i] == '+') {
                 *d++ = ' ';
                 *changed = 1;
             } else {
