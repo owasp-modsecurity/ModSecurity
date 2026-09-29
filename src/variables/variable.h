@@ -1,6 +1,7 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 - 2023 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ * Copyright (c) 2026 OWASP Foundation (http://www.owasp.org/)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -654,20 +655,20 @@ class VariableRegex : public Variable {
 
 class Variables : public std::vector<Variable *> {
  public:
-    bool contains(Variable *v) {
+    bool contains(const Variable *v) const {
         return std::find_if(begin(), end(),
-            [v](const Variable *m) -> bool { return *v == *m; }) != end();
-    };
-    bool contains(const VariableValue *v) {
+            [v](const Variable *m) { return *v == *m; }) != end();
+    }
+    bool contains(const VariableValue *v) const {
         return std::find_if(begin(), end(),
-            [v](Variable *m) -> bool {
-                VariableRegex *r = dynamic_cast<VariableRegex *>(m);
+            [v](const Variable *m) {
+                const auto *r = dynamic_cast<const VariableRegex *>(m);
                 if (r) {
-                    return r->m_r.searchAll(v->getKey()).size() > 0;
+                    return !r->m_r.searchAll(v->getKey()).empty();
                 }
                 return v->getKeyWithCollection() == *m->m_fullName.get();
             }) != end();
-    };
+    }
 };
 
 
