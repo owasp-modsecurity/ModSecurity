@@ -44,7 +44,7 @@ bool Rx::init(const std::string &arg, std::string *error) {
 
 bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    Regex* re = nullptr;
+    const Regex* re = nullptr;
     std::unique_ptr<Regex> re_ptr;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
