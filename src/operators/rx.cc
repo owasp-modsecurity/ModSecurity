@@ -26,10 +26,15 @@
 namespace modsecurity {
 namespace operators {
 
+#ifdef MODSEC_REGEX_DOLLAR_ENDONLY
+static const bool kRxMultiLine = false;
+#else
+static const bool kRxMultiLine = true;
+#endif
 
 bool Rx::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
-        m_re = new Regex(m_param);
+        m_re = new Regex(m_param, false, kRxMultiLine);
     }
 
     return true;
@@ -46,7 +51,7 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     if (m_string->m_containsMacro) {
         std::string eparam(m_string->evaluate(transaction));
-        re = new Regex(eparam);
+        re = new Regex(eparam, false, kRxMultiLine);
     } else {
         re = m_re;
     }
