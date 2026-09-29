@@ -115,4 +115,54 @@
 	),
 },
 
+### invalide base64 encoded with base64DecodeExt
+{
+	type => "rule",
+	comment => "transformation: none,base64DecodeExt",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleEngine On
+		SecRule \&REQUEST_HEADERS:foo "\@gt 0" "id:110,phase:1,deny,capture,t:none,t:base64DecodeExt"
+	),
+	match_log => {
+		debug => [ qr/T \(0\) base64DecodeExt: ""/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html",
+		[
+			"Foo" => "dzBzV==YWxlcnQoMSk="
+		]
+	),
+},
 
+### decode base64 string with '-'
+{
+	type => "rule",
+	comment => "transformation: none,base64DecodeExt",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRule REQUEST_HEADERS:Authorization "\@rx \(?i\)^Bearer[\\s\\x0b]+\(eyJ[\\-0-9_a-z]+\)\\." "id:100,phase:1,deny,capture,t:none,chain"
+		SecRule TX:1 "\@rx \(?i\)alg[^0-9A-Z_a-z]*:[^0-9A-Z_a-z]*none" "t:base64DecodeExt"
+	),
+	match_log => {
+		debug => [ qr/T \(0\) base64DecodeExt: "{\"p\":\"xx~\",\"alg\":\"none\",\"typ\":\"JWT\"}"/, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/index.html",
+		[
+			"Authorization" => "Bearer eyJwIjoieHh-IiwiYWxnIjoibm9uZSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0In0."
+		]
+	),
+},
