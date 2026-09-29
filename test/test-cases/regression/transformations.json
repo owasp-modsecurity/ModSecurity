@@ -123,6 +123,106 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
+    "title": "Testing transformations :: deny,t:trim,t:lowercase,t:htmlEntityDecode :: percent-encoded ampersand in a named entity must not be split by argument parsing",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Connection": "keep-alive",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?q=javascript%26colon;execute_my_code();",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "t:htmlEntityDecode: \"javascript:execute_my_code\\(\\);\"",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains javascript:exec\" \"id:1,phase:2,deny,t:trim,t:lowercase,t:htmlEntityDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing transformations :: deny,t:trim,t:lowercase,t:htmlEntityDecode :: named entity in a JSON body value must not be split like a query-string argument",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+        "Connection": "keep-alive",
+        "Content-Length": "0",
+        "Content-Type": "application/json"
+      },
+      "uri": "/",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "{\"q\":\"javascript&colon;execute_my_code();\"}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "t:htmlEntityDecode: \"javascript:execute_my_code\\(\\);\"",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS \"@contains javascript:exec\" \"id:1,phase:2,deny,t:trim,t:lowercase,t:htmlEntityDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
     "title": "Testing transformations :: none,utf8toUnicode,urlDecodeUni,htmlEntityDecode,jsDecode,cssDecode,removeNulls",
     "client": {
       "ip": "200.249.12.31",
