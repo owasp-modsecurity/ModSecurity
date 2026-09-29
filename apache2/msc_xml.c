@@ -83,7 +83,9 @@ static void msc_xml_on_end_elementns(
             }
             msr->msc_reqbody_error = 1;
             msr->xml->xml_error = apr_psprintf(msr->mp, "More than %ld ARGS (GET + XML)", msr->txcfg->arguments_limit);
-            xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+            if (msr->xml->parsing_ctx_arg != NULL) {
+                xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+            }
         }
         else {
 
@@ -135,7 +137,9 @@ static void msc_xml_on_characters(void *ctx, const xmlChar *ch, int len) {
     // check if the memory allocation was successful
     if (xml_parser_state->currval == NULL) {
         msr->xml->xml_error = apr_psprintf(msr->mp, "Failed to allocate memory for XML value.");
-        xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+	if (msr->xml->parsing_ctx_arg != NULL) {
+            xmlStopParser((xmlParserCtxtPtr)msr->xml->parsing_ctx_arg);
+	}
     }
 
 }
@@ -190,6 +194,7 @@ int xml_init(modsec_rec *msr, char **error_msg) {
         // this will store the information about nodes
         // 10 is just an initial value, it can be automatically incremented
         msr->xml->xml_parser_state->has_child_stack = apr_array_make(msr->mp, 10, sizeof(int));
+	msr->xml->parsing_ctx_arg                   = NULL;
     }
 
     return 1;
