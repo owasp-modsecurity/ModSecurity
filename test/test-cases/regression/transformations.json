@@ -381,7 +381,7 @@
       ]
     },
     "expected": {
-      "debug": "T (0) t:base64DecodeExt: \"{\"p\":\"xx~\",\"alg\":\"none\",\"typ\":\"JWT\"}",
+      "debug_log": "T \\(0\\) t:base64DecodeExt: \"\\{\"p\":\"xx~\",\"alg\":\"none\",\"typ\":\"JWT\"\\}\"",
       "http_code": 403
     },
     "rules": [
