@@ -63,7 +63,7 @@ int DSOLOCAL parse_boolean(const char *input);
 
 char DSOLOCAL *remove_quotes(apr_pool_t *mptmp, const char *input, int input_len);
 
-char DSOLOCAL *parse_pm_content(const char *op_parm, unsigned short int op_len, msre_rule *rule, char **error_msg);
+char DSOLOCAL *parse_pm_content(const char *op_parm, size_t op_len, msre_rule *rule, char **error_msg);
 
 char DSOLOCAL *remove_escape(apr_pool_t *mptmp, const char *input, int input_len);
 

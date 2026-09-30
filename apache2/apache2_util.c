@@ -238,7 +238,7 @@ static void internal_log_ex(request_rec *r, directory_config *dcfg, modsec_rec *
     /* Construct the message. */
     apr_vsnprintf(str1, sizeof(str1), text, ap);
     if (fixup) {
-        int len = strlen(str1);
+        size_t len = strlen(str1);
 
         /* Strip line ending. */
         if (len && str1[len - 1] == '\n') {
