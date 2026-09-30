@@ -354,6 +354,9 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
     if (rcbe == -5) {
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
+    if (rcbe == -2) {
+        return HTTP_BAD_REQUEST;
+    }
     if (rcbe < 0) {
         return HTTP_INTERNAL_SERVER_ERROR;
     }
