@@ -995,6 +995,74 @@ msre_action *msre_create_action(msre_engine *engine, apr_pool_t *mp, const char 
     return action;
 }
 
+/** 
+ * Helper function for action_exists. It checks if "name=value" is present in table for supplied action.
+ */
+static int apr_table_action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* action, const char* name, const char* value) {
+    const apr_array_header_t *arr = NULL;
+    const apr_table_entry_t *elts = NULL;
+    int i = 0;
+    apr_size_t value_len = 0;
+    (void)p;
+    if (strcmp(name, action) != 0) return 0;
+    if ((vartable == NULL) || (value == NULL)) return 0;
+    value_len = strlen(value);
+    arr = apr_table_elts(vartable);
+    if (arr == NULL) return 0;
+    elts = (const apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        const char *vars = NULL;
+        const char *segment_start = NULL;
+        const char *cursor = NULL;
+        if ((elts[i].key == NULL) || (strcmp(elts[i].key, name) != 0)) {
+            continue;
+        }
+        vars = elts[i].val;
+        if (vars == NULL) {
+            continue;
+        }
+        segment_start = vars;
+        cursor = vars;
+        for (;;) {
+            if ((*cursor == ',') || (*cursor == '\0')) {
+                apr_size_t segment_len = (apr_size_t)(cursor - segment_start);
+                if ((segment_len == value_len) &&
+                    (strncmp(segment_start, value, value_len) == 0)) {
+                    return 1;
+                }
+                if (*cursor == '\0') {
+                    break;
+                }
+                segment_start = cursor + 1;
+            }
+            cursor++;
+        }
+    }
+    return 0;
+}
+
+/**
+ * Checks if "name=value" is present in table for tags, logdata (and others).
+ */
+static int action_exists(apr_pool_t* p, const apr_table_t* vartable, const char* name, const char* value) {
+    /* logdata & msg cannot be used because ',' is used as entries separators */
+    if (apr_table_action_exists(p, vartable, "capture", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "chain", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "initcol", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "multiMatch", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "phase", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeArg", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeMatched", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeMatchedBytes", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeRequestHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "sanitizeResponseHeader", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setrsc", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setsid", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "setuid", name, value)) return 1;
+    if (apr_table_action_exists(p, vartable, "tag", name, value)) return 1;
+	return 0;
+}
+
 /**
  * Generic parser that is used as basis for target and action parsing.
  * It breaks up the input string into name-parameter pairs and places
@@ -1112,9 +1180,11 @@ int msre_parse_generic(apr_pool_t *mp, const char *text, apr_table_t *vartable,
             value = apr_pstrmemdup(mp, value, p - value);
         }
 
-        /* add to table */
-        apr_table_addn(vartable, name, value);
-        count++;
+        /* add to table (only if not already present) */
+        if (!action_exists(mp, vartable, name, value)) {
+			apr_table_addn(vartable, name, value);
+			count++;
+		}
 
         /* move to the first character of the next name-value pair */
         while(isspace(*p)||(*p == ',')||(*p == '|')) p++;
