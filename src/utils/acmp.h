@@ -190,6 +190,12 @@ int acmp_process_quick(ACMPT *acmpt, const char **match, const char *data, size_
  */
 int acmp_prepare(ACMP *parser);
 
+/**
+ * Destroying the tree and freeing the memory.
+ */
+void acmp_btree_free(acmp_btree_node_t *node);
+
+
 }
 
 #endif /*ACMP_H_*/

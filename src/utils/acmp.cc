@@ -160,16 +160,30 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
     }
 }
 
+void acmp_btree_free(acmp_btree_node_t *node) {
+    if (node == NULL) {
+        return;
+    }
+
+    acmp_btree_free(node->right);
+    acmp_btree_free(node->left);
+
+    free(node);
+}
+
 /**
  * Adds leaves to binary tree, working from sorted array of keyword tree nodes
  */
-static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
+static bool acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         int pos, int lb, int rb) {
 
     int left = 0, right = 0;
     if ((pos - lb) > 1) {
         left = lb + (pos - lb) / 2;
         node->left = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        if (!(node->left)) {
+            return false;
+        }
         node->left->node = NULL;
         node->left->right = NULL;
         node->left->left = NULL;
@@ -184,6 +198,9 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
     if ((rb - pos) > 1) {
         right = pos + (rb - pos) / 2;
         node->right = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+        if (!(node->right)) {
+            return false;
+        }
         node->right->node = NULL;
         node->right->right = NULL;
         node->right->left = NULL;
@@ -195,18 +212,20 @@ static void acmp_add_btree_leaves(acmp_btree_node_t *node, acmp_node_t *nodes[],
         fprintf(stderr, "%lc ->right %lc\n", (wint_t)node->node->letter, (wint_t)node->right->node->letter);
 #endif
     }
-    if (node->right != NULL) {
-        acmp_add_btree_leaves(node->right, nodes, right, pos, rb);
+    if ((node->right != nullptr) && !acmp_add_btree_leaves(node->right, nodes, right, pos, rb)) {
+        return false;
     }
-    if (node->left != NULL) {
-        acmp_add_btree_leaves(node->left, nodes, left, lb, pos);
+    if ((node->left != nullptr) && !acmp_add_btree_leaves(node->left, nodes, left, lb, pos)) {
+        return false;
     }
+
+    return true;
 }
 
 /**
  * Builds balanced binary tree from children nodes of given node.
  */
-static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
+static bool acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     size_t count, i, j;
     acmp_node_t *child = node->child;
     acmp_node_t **nodes;
@@ -215,7 +234,7 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
     /* Build an array big enough */
     for (count = 0; child != NULL; child = child->sibling) count++;
     nodes = (acmp_node_t **)calloc(1, count * sizeof(acmp_node_t *));
-    /* ENH: Check alloc succeded */
+    if (!nodes) return false;
 
     /* ENH: Combine this in the loop below - we do not need two loops */
     child = node->child;
@@ -236,24 +255,34 @@ static void acmp_build_binary_tree(ACMP *parser, acmp_node_t *node) {
             nodes[i] = nodes[j];
             nodes[j] = tmp;
         }
-    }       
-    if (node->btree != NULL) {
-        free(node->btree);
-        node->btree = NULL;
+    }
+    if (node->btree != nullptr) {
+        acmp_btree_free(node->btree);
+        node->btree = nullptr;
     }
     node->btree = reinterpret_cast<acmp_btree_node_t *>(calloc(1, sizeof(acmp_btree_node_t)));
+    if (!(node->btree)) {
+        free(nodes);
+        return false;
+    }
 
-    /* ENH: Check alloc succeded */
     pos = count / 2;
     node->btree->node = nodes[pos];
     node->btree->letter = nodes[pos]->letter;
-    acmp_add_btree_leaves(node->btree, nodes, pos, -1, count);
-    for (i = 0; i < count; i++) {
-        if (nodes[i]->child != NULL) acmp_build_binary_tree(parser, nodes[i]);
-    }
-    if (nodes != NULL) {
+    if (!acmp_add_btree_leaves(node->btree, nodes, pos, -1, count)){
         free(nodes);
+        return false;
     }
+    for (i = 0; i < count; i++) {
+        if ((nodes[i]->child != nullptr) && !acmp_build_binary_tree(parser, nodes[i])) {
+            free(nodes);
+            return false;
+        }
+    }
+
+    free(nodes);
+    return true;
+
 }
 
 /**
@@ -305,7 +334,9 @@ static int acmp_connect_fail_branches(ACMP *parser) {
     }
 
     acmp_connect_other_matches(parser, parser->root_node);
-    if (parser->root_node->child != NULL) acmp_build_binary_tree(parser, parser->root_node);
+    if ((parser->root_node->child != nullptr) && !acmp_build_binary_tree(parser, parser->root_node)) {
+        return 0;
+    }
     parser->is_failtree_done = 1;
 
     return 1;
