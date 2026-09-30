@@ -34,6 +34,7 @@
 
 #include "modsecurity/actions/action.h"
 #include "src/actions/disruptive/deny.h"
+#include "src/intervention_log.h"
 #include "modsecurity/intervention.h"
 #include "modsecurity/modsecurity.h"
 #include "src/request_body_processor/multipart.h"
@@ -953,8 +954,8 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
                     "request");
                 if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
                     intervention::free(&m_it);
-                    m_it.log = strdup("Request body limit is marked to " \
-                            "reject the request");
+                    intervention::setLogPayload(this,
+                        "Request body limit is marked to reject the request");
                     m_it.status = 403;
                     m_it.disruptive = true;
                 } else {
@@ -1212,8 +1213,8 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
                     "request");
                 if (getRuleEngineState() == RulesSet::EnabledRuleEngine) {
                     intervention::free(&m_it);
-                    m_it.log = strdup("Response body limit is marked to reject " \
-                        "the request");
+                    intervention::setLogPayload(this,
+                        "Response body limit is marked to reject the request");
                     m_it.status = 403;
                     m_it.disruptive = true;
                 } else {

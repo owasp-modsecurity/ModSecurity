@@ -26,6 +26,7 @@
 #include "modsecurity/rule.h"
 #include "src/utils/string.h"
 #include "modsecurity/modsecurity.h"
+#include "src/intervention_log.h"
 
 namespace modsecurity {
 namespace actions {
@@ -42,10 +43,8 @@ bool Drop::evaluate(RuleWithActions *rule, Transaction *transaction,
     }
 
     transaction->m_it.disruptive = true;
-    intervention::freeLog(&transaction->m_it);
     ruleMessage.m_isDisruptive = true;
-    transaction->m_it.log = strdup(
-        ruleMessage.log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+    intervention::setLogPayload(transaction, ruleMessage);
 
     return true;
 }
