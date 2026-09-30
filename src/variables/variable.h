@@ -214,6 +214,10 @@ class VariableMonkeyResolution {
             anchoredSetVariable = &t->m_variableFilesTmpContent;
         } else if (comp(col, "MULTIPART_FILENAME")) {
             anchoredSetVariable = &t->m_variableMultipartFileName;
+        } else if (comp(col, "MULTIPART_FILENAME_CHARSET")) {
+            anchoredSetVariable = &t->m_variableMultipartFileNameCharset;
+        } else if (comp(col, "MULTIPART_FILENAME_LANGUAGE")) {
+            anchoredSetVariable = &t->m_variableMultipartFileNameLanguage;
         } else if (comp(col, "MULTIPART_NAME")) {
             anchoredSetVariable = &t->m_variableMultipartName;
         } else if (comp(col, "MATCHED_VARS_NAMES")) {
@@ -301,6 +305,8 @@ class VariableMonkeyResolution {
             t->m_variableMultipartCrlfLFLines.evaluate(l);
         } else if (comp(variable, "MULTIPART_DATA_AFTER")) {
             t->m_variableMultipartDataAfter.evaluate(l);
+        } else if (comp(variable, "MULTIPART_DUPLICATE_PART_HEADER")) {
+            t->m_variableMultipartDuplicatePartHeader.evaluate(l);
         } else if (comp(variable, "MULTIPART_FILE_LIMIT_EXCEEDED")) {
             t->m_variableMultipartFileLimitExceeded.evaluate(l);
         } else if (comp(variable, "MULTIPART_STRICT_ERROR")) {
