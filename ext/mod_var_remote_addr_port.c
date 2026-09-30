@@ -27,7 +27,7 @@
 /**
  * Generates a variable from a string and a length.
  */
-static int var_simple_generate_ex(msre_var *var, apr_table_t *vartab, apr_pool_t *mptmp,
+static int var_simple_generate_ex(msre_var const *var, apr_table_t *vartab, apr_pool_t *mptmp,
     const char *value, int value_len)
 {
     msre_var *rvar = NULL;
@@ -45,7 +45,7 @@ static int var_simple_generate_ex(msre_var *var, apr_table_t *vartab, apr_pool_t
 /**
  * Generates a variable from a NULL-terminated string.
  */
-static int var_simple_generate(msre_var *var, apr_table_t *vartab, apr_pool_t *mptmp,
+static int var_simple_generate(msre_var const *var, apr_table_t *vartab, apr_pool_t *mptmp,
     const char *value)
 {
     if (value == NULL) return 0;
@@ -58,7 +58,7 @@ static int var_simple_generate(msre_var *var, apr_table_t *vartab, apr_pool_t *m
 /**
  * Create a silly variable with value = a.b.c.d:port
  */
-static int var_remote_addr_port_generate(modsec_rec *msr, msre_var *var, msre_rule *rule,
+static int var_remote_addr_port_generate(modsec_rec *msr, msre_var const *var, msre_rule *rule,
     apr_table_t *vartab, apr_pool_t *mptmp)
 {
     const char *value = apr_psprintf(mptmp, "%s:%d", msr->remote_addr, msr->remote_port);

@@ -684,11 +684,11 @@ void modsecSetReadResponse(apr_status_t (*func)(request_rec *r, char *buf, unsig
     modsecReadResponse = func;
 }
 
-void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length))   {
+void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, const char *buf, unsigned int length))   {
     modsecWriteBody = func;
 }
 
-void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length))   {
+void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, const char *buf, unsigned int length))   {
     modsecWriteResponse = func;
 }
 

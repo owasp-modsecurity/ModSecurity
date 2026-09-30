@@ -259,7 +259,7 @@ static char *_log_escape(apr_pool_t *mp, const char *input,
  * into a proper byte. Handles uppercase and lowercase letters
  * but does not check for overflows.
  */
-static unsigned char x2c(unsigned char *what) {
+static unsigned char x2c(unsigned char const *what) {
     register unsigned char digit;
 
     digit = (what[0] >= 'A' ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
@@ -397,9 +397,11 @@ static void add_entry(const char *data, int start_worker)
     entry_t *entry = NULL;
 
     entry = (entry_t *)malloc(sizeof(entry_t));
-    entry->id = 0;
-    entry->line = strdup(data);
-    entry->line_size = strlen(entry->line);
+    if(entry != NULL){
+        entry->id = 0;
+        entry->line = strdup(data);
+        entry->line_size = strlen(entry->line);
+    }
 
     error_log(LOG_DEBUG, NULL, "Queue locking thread mutex.");
     if (APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(mutex))) {
@@ -408,7 +410,9 @@ static void add_entry(const char *data, int start_worker)
     }
 
     /* Assign unique ID to this log entry. */
-    entry->id = entry_counter++;
+    if(entry != NULL) {
+        entry->id = entry_counter++;
+    }
 
     /* Add the new audit log entry to the queue. */
     *(entry_t **)apr_array_push(queue) = entry;
@@ -435,12 +439,11 @@ static int read_queue_entries(apr_file_t *fd, apr_time_t *queue_time)
     char linebuf[4100];
     int line_count = -1;
     int line_size = 0;
-    apr_status_t rc = 0;
     char *p = NULL;
 
     for(;;) {
         memset(linebuf, 0, 4100);
-        rc = apr_file_gets(linebuf, 4096, fd);
+        apr_status_t rc = apr_file_gets(linebuf, 4096, fd);
 
         if (rc == APR_EOF) break;
         if (rc != APR_SUCCESS) {
@@ -644,7 +647,7 @@ static void transaction_checkpoint(void)
 
     /* Dump the entries sitting in the queue first. */
     for (i = 0; i < queue->nelts; i++) {
-        entry_t *entry = ((entry_t **)queue->elts)[i];
+        const entry_t *entry = ((entry_t **)queue->elts)[i];
         apr_file_write_full(queue_fd, entry->line, entry->line_size, NULL);
         apr_file_write_full(queue_fd, &"\n", 1, NULL);
     }
@@ -657,7 +660,7 @@ static void transaction_checkpoint(void)
          hi != NULL; hi = apr_hash_next(hi))\
     {
         void *e;
-        entry_t *entry = NULL;
+        const entry_t *entry = NULL;
 
         i++;
         apr_hash_this(hi, NULL, NULL, &e);
@@ -693,7 +696,8 @@ static void transaction_checkpoint(void)
  */
 static void parse_configuration_line(const char *line, int line_count)
 {
-    char *start = NULL, *command = NULL;
+    const char *start = NULL;
+    const char *command = NULL;
     char *p = NULL;
 
     /* Remove the trailing newline character. */
@@ -1099,7 +1103,7 @@ static size_t curl_readfunction(void *ptr, size_t size,
 static size_t curl_writefunction(void *ptr, size_t size,
                                  size_t nmemb, void *stream)
 {
-    unsigned char *data = (unsigned char *)ptr;
+    const unsigned char *data = (unsigned char *)ptr;
     unsigned char *status = (unsigned char *)stream;
 
     /* Grab the status line text from the first line of output */
@@ -1162,7 +1166,7 @@ static int curl_debugfunction(CURL *curl, curl_infotype infotype,
         case CURLINFO_TEXT:
             /* More verbose data starts with an indent */
             if (apr_isspace(data[0])) {
-                char *dataptr = data + 1;
+                const char *dataptr = data + 1;
                 
                 /* Skip initial whitespace (indent) */
                 while (   ((size_t)(dataptr - data) > datalen)
@@ -1214,8 +1218,10 @@ static void logc_init(void)
 {
     char errstr[1024];
     apr_status_t rc = 0;
-    const char *errptr = NULL;
-    int i, erroffset;
+    /* These variables are used by pcre_compile() and pcre2_compile() */
+    const char *errptr = NULL; // cppcheck-suppress unreadVariable
+    int i;
+    int erroffset; // cppcheck-suppress unusedVariable
     /* cURL major, minor and patch version */
     short cmaj, cmin, cpat = 0;
 #ifndef WITH_PCRE
@@ -1320,8 +1326,9 @@ static void logc_init(void)
 
         *(CURL **)apr_array_push(curl_handles) = curl;
     }
-
-    if (cmaj <= 7 && cmin < 34) {
+    /* These variables are initialized in the beginning of logc_init */
+    if (cmaj <= 7 && cmin < 34) // cppcheck-suppress uninitvar
+    {
     	error_log(LOG_DEBUG2, NULL, "TLSv1.2 is unsupported in cURL %d.%d.%d",  cmaj, cmin, cpat);
     }
 
@@ -1469,7 +1476,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
      * with rapid requests.  With an invalid entry we never hit the
      * server, so we should not delay processing the next event.
      */
-    int nodelay = 0;
+    int nodelay = 0; // cppcheck-suppress unreadVariable
 
 
     error_log(LOG_DEBUG, thread, "Worker thread starting.");
@@ -1568,7 +1575,7 @@ static void * APR_THREAD_FUNC thread_worker(apr_thread_t *thread, void *data)
         rc = pcre2_match(logline_regex, entry->line, entry->line_size, 0, 0,
             pcre2_match_data, NULL);
 	if (rc > 0) {
-            PCRE2_SIZE *pcre2_ovector = pcre2_get_ovector_pointer(pcre2_match_data);
+            const PCRE2_SIZE *pcre2_ovector = pcre2_get_ovector_pointer(pcre2_match_data);
             for (int i = 0; i < rc; i++) {
                 capturevector[2*i] = pcre2_ovector[2*i];
                 capturevector[2*i+1] = pcre2_ovector[2*i+1];
@@ -1973,12 +1980,11 @@ static void create_new_worker(int lock)
 static void * APR_THREAD_FUNC thread_manager(apr_thread_t *thread, void *data)
 {
     apr_time_t last = 0;
-    apr_time_t now = 0;
 
     error_log(LOG_DEBUG, thread, "Management thread: Starting.");
 
     for(;;) {
-        now = apr_time_now();
+        apr_time_t now = apr_time_now();
 
         /* Should we stop running? */
         if (running == 0) {
@@ -2110,8 +2116,6 @@ static void receive_loop(void) {
 
     /* Loop forever receiving entries from stdin. */
     while(!done || (curr < next)) {
-        apr_status_t rc;
-
         if (error_log_level >= LOG_DEBUG2) {
             error_log(LOG_DEBUG2, NULL,
                       "Internal state: "
@@ -2126,7 +2130,7 @@ static void receive_loop(void) {
         if (!done && (nbytes > 0)) {
             buffered_events = 0;
             nbytes = PIPE_BUF_SIZE - next;
-            rc = apr_file_read(fd_stdin, (buf + next), &nbytes);
+            apr_status_t rc = apr_file_read(fd_stdin, (buf + next), &nbytes);
             if (rc != APR_SUCCESS) {
                 if (have_read_data) {
                     error_log(LOG_NOTICE, NULL,
