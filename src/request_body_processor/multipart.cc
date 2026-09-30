@@ -501,7 +501,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 m_flag_invalid_part = 1;
             }
             m_mpp->m_filenameStar.assign(decoded_value);
-            m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - decoded_value.size());
+            m_mpp->m_filenameStarOffset = offset + ((p - c_d_value) - value.size());
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + decoded_value + ".");
         } else {
