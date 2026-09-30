@@ -176,6 +176,120 @@ apr_status_t input_filter(ap_filter_t *f, apr_bucket_brigade *bb_out,
 }
 
 /**
+ * Check the whole-body limit before storing a bucket. DetectionOnly retains
+ * its existing non-disruptive behavior for both configured limit actions.
+ */
+static apr_status_t check_request_body_limit(modsec_rec *msr, apr_size_t buflen,
+    char **error_msg)
+{
+    if (msr->reqbody_length + buflen <= (apr_size_t)msr->txcfg->reqbody_limit) {
+        return APR_SUCCESS;
+    }
+
+    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
+        "configured limit (%ld).", msr->txcfg->reqbody_limit);
+
+    if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL
+        && (msr->txcfg->is_enabled == MODSEC_ENABLED
+            || msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY)) {
+        return APR_SUCCESS;
+    }
+    if (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT
+        && msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) {
+        return APR_SUCCESS;
+    }
+    return HTTP_REQUEST_ENTITY_TOO_LARGE;
+}
+
+/**
+ * Store a nonempty chunk and apply the existing storage-error policy.
+ */
+static apr_status_t store_request_body_chunk(modsec_rec *msr, const char *buf,
+    apr_size_t buflen, unsigned int *finished_reading, char **error_msg)
+{
+    int rc = modsecurity_request_body_store(msr, buf, buflen, error_msg);
+
+    if (msr->reqbody_length > (apr_size_t)msr->txcfg->reqbody_limit
+        && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
+        *finished_reading = 1;
+    }
+    if (rc >= 0) {
+        return APR_SUCCESS;
+    }
+
+    if (rc == -5) {
+        *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
+            "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
+
+        /* Unlike the whole-body limit, this path only continues for
+         * ProcessPartial, including when the engine is DetectionOnly.
+         */
+        if (msr->txcfg->if_limit_action != REQUEST_BODY_LIMIT_ACTION_PARTIAL
+            || (msr->txcfg->is_enabled != MODSEC_ENABLED
+                && msr->txcfg->is_enabled != MODSEC_DETECTION_ONLY)) {
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        }
+    }
+
+    if (msr->txcfg->is_enabled == MODSEC_ENABLED
+        && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT) {
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
+    return APR_SUCCESS;
+}
+
+/**
+ * Read and process one bucket, preserving accounting and end-of-stream state.
+ */
+static apr_status_t read_request_body_bucket(modsec_rec *msr, apr_bucket *bucket,
+    unsigned int *finished_reading, char **error_msg)
+{
+    const char *buf;
+    apr_size_t buflen;
+    apr_status_t rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
+
+    if (rc != APR_SUCCESS) {
+        *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%d): %s", rc, get_apr_error(msr->mp, rc));
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
+    if (msr->txcfg->debuglog_level >= 9) {
+        msr_log(msr, 9, "Input filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
+            bucket->type->name, buflen);
+    }
+
+    /* This limit check should only trigger on chunked requests. */
+    rc = check_request_body_limit(msr, buflen, error_msg);
+    if (rc != APR_SUCCESS) {
+        return rc;
+    }
+
+    if (msr->txcfg->stream_inbody_inspection == 1) {
+#ifndef MSC_LARGE_STREAM_INPUT
+        msr->stream_input_length += buflen;
+        modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
+#else
+        if (modsecurity_request_body_to_stream(msr, buf, buflen, error_msg) < 0) {
+            return HTTP_INTERNAL_SERVER_ERROR;
+        }
+#endif
+    }
+
+    msr->reqbody_length += buflen;
+    if (buflen != 0) {
+        rc = store_request_body_chunk(msr, buf, buflen, finished_reading, error_msg);
+        if (rc != APR_SUCCESS) {
+            return rc;
+        }
+    }
+
+    if (APR_BUCKET_IS_EOS(bucket)) {
+        *finished_reading = 1;
+        msr->if_seen_eos = 1;
+    }
+    return APR_SUCCESS;
+}
+
+/**
  * Reads request body from a client.
  */
 apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
@@ -244,98 +358,9 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
                 bucket != APR_BRIGADE_SENTINEL(bb_in);
                 bucket = APR_BUCKET_NEXT(bucket))
         {
-            const char *buf;
-            apr_size_t buflen;
-
-            rc = apr_bucket_read(bucket, &buf, &buflen, APR_BLOCK_READ);
+            rc = read_request_body_bucket(msr, bucket, &finished_reading, error_msg);
             if (rc != APR_SUCCESS) {
-                *error_msg = apr_psprintf(msr->mp, "Failed reading input / bucket (%d): %s", rc, get_apr_error(msr->mp, rc));
-                return HTTP_INTERNAL_SERVER_ERROR;
-            }
-
-            if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Input filter: Bucket type %s contains %" APR_SIZE_T_FMT " bytes.",
-                        bucket->type->name, buflen);
-            }
-
-            /* Check request body limit (should only trigger on chunked requests). */
-            if (msr->reqbody_length + buflen > (apr_size_t)msr->txcfg->reqbody_limit) {
-                if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
-                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
-                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
-                } else if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
-
-                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
-
-                } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)){
-
-                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
-
-                } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)){
-
-                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
-
-                } else  {
-
-                    *error_msg = apr_psprintf(msr->mp, "Request body is larger than the "
-                            "configured limit (%ld).", msr->txcfg->reqbody_limit);
-
-                    return HTTP_REQUEST_ENTITY_TOO_LARGE;
-                }
-            }
-
-            if (msr->txcfg->stream_inbody_inspection == 1)   {
-#ifndef MSC_LARGE_STREAM_INPUT
-                msr->stream_input_length+=buflen;
-                modsecurity_request_body_to_stream(msr, buf, buflen, error_msg);
-#else
-                if (modsecurity_request_body_to_stream(msr, buf, buflen, error_msg) < 0) {
-                    return HTTP_INTERNAL_SERVER_ERROR;
-                }
-#endif
-            }
-
-            msr->reqbody_length += buflen;
-
-            if (buflen != 0) {
-                int rcbs = modsecurity_request_body_store(msr, buf, buflen, error_msg);
-
-                if (msr->reqbody_length > (apr_size_t)msr->txcfg->reqbody_limit && msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL) {
-                    finished_reading = 1;
-                }
-
-                if (rcbs < 0) {
-                    if (rcbs == -5) {
-                        if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT)) {
-                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
-                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            return HTTP_REQUEST_ENTITY_TOO_LARGE;
-                        } else if ((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
-                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
-                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                        } else if ((msr->txcfg->is_enabled == MODSEC_DETECTION_ONLY) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_PARTIAL)) {
-                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
-                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                        } else {
-                            *error_msg = apr_psprintf(msr->mp, "Request body no files data length is larger than the "
-                                    "configured limit (%ld).", msr->txcfg->reqbody_no_files_limit);
-                            return HTTP_REQUEST_ENTITY_TOO_LARGE;
-                        }
-                    }
-
-                    if((msr->txcfg->is_enabled == MODSEC_ENABLED) && (msr->txcfg->if_limit_action == REQUEST_BODY_LIMIT_ACTION_REJECT))
-                        return HTTP_INTERNAL_SERVER_ERROR;
-                }
-
-            }
-
-            if (APR_BUCKET_IS_EOS(bucket)) {
-                finished_reading = 1;
-                msr->if_seen_eos = 1;
+                return rc;
             }
         }
 
@@ -351,8 +376,13 @@ apr_status_t read_request_body(modsec_rec *msr, char **error_msg) {
 
     msr->if_status = IF_STATUS_WANTS_TO_RUN;
 
-    if (rcbe == -5) {
-        return HTTP_REQUEST_ENTITY_TOO_LARGE;
+    switch (rcbe) {
+        case -5:
+            return HTTP_REQUEST_ENTITY_TOO_LARGE;
+        case -2:
+            return HTTP_BAD_REQUEST;
+        default:
+            break;
     }
     if (rcbe < 0) {
         return HTTP_INTERNAL_SERVER_ERROR;
