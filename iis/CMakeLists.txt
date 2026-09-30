@@ -166,6 +166,11 @@ target_compile_definitions(${IIS_MODULE_NAME} PRIVATE
     ${MODSECURITY_VERSION_FLAG}
 )
 
+option(WITH_PCRE_JIT "Enable PCRE2 JIT support" OFF)
+if(WITH_PCRE_JIT)
+    target_compile_definitions(${IIS_MODULE_NAME} PRIVATE WITH_PCRE_JIT)
+endif()
+
 option(WITH_LUA "Enable Lua support" OFF)
 if(WITH_LUA)
     find_package(Lua CONFIG REQUIRED)
