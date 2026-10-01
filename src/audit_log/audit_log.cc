@@ -326,6 +326,14 @@ bool AuditLog::saveIfRelevant(Transaction *transaction, int parts) {
 }
 
 
+bool AuditLog::reopen(std::string *error) {
+    if (m_writer != nullptr) {
+        return m_writer->reopen(error);
+    }
+    return true;
+}
+
+
 bool AuditLog::close() {
     return true;
 }
