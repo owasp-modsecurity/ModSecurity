@@ -1,0 +1,152 @@
+name: Runtime Sanitizers
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+jobs:
+  asan-ubsan-linux:
+    name: ASan/UBSan Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y -qq
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            build-essential \
+            clang \
+            libtool \
+            pkg-config \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            pcre2-utils \
+            libpcre3-dev \
+            bison \
+            flex \
+            python3 \
+            python3-venv
+
+      - name: Build with AddressSanitizer and UndefinedBehaviorSanitizer
+        env:
+          CC: clang
+          CXX: clang++
+          CFLAGS: "-fsanitize=address,undefined -fno-omit-frame-pointer -O1"
+          CXXFLAGS: "-fsanitize=address,undefined -fno-omit-frame-pointer -O1"
+          LDFLAGS: "-fsanitize=address,undefined"
+          ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1:strict_string_checks=1"
+          UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
+        run: |
+          ./build.sh
+          ./configure --enable-assertions=yes
+          make -j"$(nproc)"
+          timeout 30m make check
+
+  valgrind-linux:
+    name: Valgrind Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y -qq
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            build-essential \
+            valgrind \
+            libtool \
+            pkg-config \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            pcre2-utils \
+            libpcre3-dev \
+            bison \
+            flex \
+            python3 \
+            python3-venv
+
+      - name: Build
+        run: |
+          ./build.sh
+          ./configure --enable-assertions=yes
+          make -j"$(nproc)"
+
+      - name: Run tests under Valgrind
+        run: |
+          timeout 45m valgrind \
+            --error-exitcode=1 \
+            --leak-check=full \
+            --show-leak-kinds=definite,indirect \
+            make check

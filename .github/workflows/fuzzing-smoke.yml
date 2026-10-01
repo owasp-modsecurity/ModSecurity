@@ -1,0 +1,146 @@
+name: Fuzzing Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_minutes:
+        description: "How many minutes AFL++ should fuzz"
+        required: false
+        default: "10"
+      fail_on_hangs:
+        description: "Fail workflow when AFL++ reports hangs"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  schedule:
+    - cron: "0 2 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzzing-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fuzzing-smoke:
+    name: AFL++ fuzzing smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      AFL_SKIP_CPUFREQ: "1"
+      AFL_NO_AFFINITY: "1"
+      AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES: "1"
+      AFL_NO_UI: "1"
+      AFL_FAST_CAL: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua packages
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update -y -qq
+
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          BEST_VER="$(printf '%s\n' "$BEST_PKG" | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1/')"
+          LUA_PKG="lua$BEST_VER"
+
+          echo "lua_dev_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "lua_pkg=$LUA_PKG" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y \
+            autoconf automake build-essential afl++ clang libtool pkg-config \
+            libyajl-dev libcurl4-openssl-dev liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_dev_pkg }} \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev libpcre2-dev libxml2-dev libfuzzy-dev \
+            pcre2-utils libpcre3-dev bison flex python3 python3-venv
+
+      - name: Build ModSecurity with AFL++
+        env:
+          CC: afl-clang-fast
+          CXX: afl-clang-fast++
+        run: |
+          ./build.sh
+          ./configure --enable-afl-fuzz --enable-parser-generation --enable-assertions=yes
+          make -j"$(nproc)"
+
+      - name: Locate AFL target
+        id: target
+        run: |
+          for f in ./test/fuzzer/afl_fuzzer ./test/fuzzer/.libs/afl_fuzzer; do
+            [ -x "$f" ] && echo "target=$f" >> $GITHUB_OUTPUT && exit 0
+          done
+          echo "Fuzzer not found" && exit 1
+
+      - name: Create seed corpus
+        run: |
+          rm -rf fuzz-in fuzz-out
+          mkdir -p fuzz-in fuzz-out
+          printf '' > fuzz-in/empty
+          printf 'abc' > fuzz-in/plain
+
+      - name: Dry-run
+        run: timeout 10s "${{ steps.target.outputs.target }}" < fuzz-in/plain
+
+      - name: Run AFL++
+        run: |
+          timeout "${{ github.event.inputs.run_minutes || '10' }}m" \
+            afl-fuzz -i fuzz-in -o fuzz-out -m none -t 1000+ \
+            -- "${{ steps.target.outputs.target }}" || true
+
+      - name: Summarize
+        id: summary
+        run: |
+          CRASH=$(find fuzz-out -path '*/crashes/id:*' -type f | wc -l)
+          HANG=$(find fuzz-out -path '*/hangs/id:*' -type f | wc -l)
+          echo "crash_count=$CRASH" >> $GITHUB_OUTPUT
+          echo "hang_count=$HANG" >> $GITHUB_OUTPUT
+
+      - name: Package results
+        if: always()
+        run: |
+          tar -czf afl-fuzz-results.tar.gz fuzz-in fuzz-out
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: afl-fuzz-results-${{ github.run_id }}
+          path: afl-fuzz-results.tar.gz
+
+      - name: Fail on crashes
+        if: steps.summary.outputs.crash_count != '0'
+        run: exit 1
+
+      - name: Fail on hangs
+        if: github.event.inputs.fail_on_hangs == 'true' && steps.summary.outputs.hang_count != '0'
+        run: exit 1
