@@ -118,5 +118,47 @@
       "SecRule REQUEST_HEADERS \"@rx PHPSESSID\" \"id:1,capture,t:lowercase,t:none,msg:'This is a test: %{TX.0}% ops'\"",
       "SecRule TX \"@rx to_test\" \"id:2,t:lowercase,capture,t:none\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing action :: msg - informed twice, last one wins",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=   test   &param2=test2",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving msg: the second message",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,phase:2,pass,msg:'the first message',msg:'the second message'\""
+    ]
   }
 ]
