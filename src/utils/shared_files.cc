@@ -14,6 +14,7 @@
  */
 
 #include "src/utils/shared_files.h"
+#include "src/utils/system.h"
 
 #include <fcntl.h>
 #ifdef WIN32
@@ -27,8 +28,8 @@ namespace utils {
 
 SharedFiles::handlers_map::iterator SharedFiles::add_new_handler(
     const std::string &fileName, std::string *error) {
-    FILE *fp = fopen(fileName.c_str(), "a");
-    if (fp == 0) {
+    FILE *fp;
+    if (!fopen_modsec(&fp, fileName.c_str(), "a")) {
         error->assign("Failed to open file: " + fileName);
         return m_handlers.end();
     }
