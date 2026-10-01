@@ -96,6 +96,7 @@ class XML {
     xml_data m_data;
 
  private:
+    void freeArgsParserCtx();
     Transaction *m_transaction;
     std::string m_header;
 };

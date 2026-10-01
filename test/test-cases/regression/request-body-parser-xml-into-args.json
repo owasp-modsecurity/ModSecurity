@@ -1,0 +1,96 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "XML request body parser with SecParseXmlIntoArgs (mismatched end tag)",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/xml",
+        "Content-Length": "10"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "<a><b></a>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "XML: Failed to parse document",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecParseXmlIntoArgs On",
+      "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500080,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:500081,phase:2,pass,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "XML request body parser with SecParseXmlIntoArgs (truncated document)",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/xml",
+        "Content-Length": "6"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "<a><b>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "XML: Failed to parse document",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecParseXmlIntoArgs On",
+      "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500080,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:500081,phase:2,pass,log\""
+    ]
+  }
+]

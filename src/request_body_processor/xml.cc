@@ -167,9 +167,18 @@ XML::~XML() {
         xmlFreeParserCtxt(m_data.parsing_ctx);
         m_data.parsing_ctx = NULL;
     }
+    freeArgsParserCtx();
     if (m_data.doc != NULL) {
         xmlFreeDoc(m_data.doc);
         m_data.doc = NULL;
+    }
+}
+
+
+void XML::freeArgsParserCtx() {
+    if (m_data.parsing_ctx_arg != nullptr) {
+        xmlFreeParserCtxt(m_data.parsing_ctx_arg);
+        m_data.parsing_ctx_arg = nullptr;
     }
 }
 
@@ -335,6 +344,7 @@ bool XML::complete(std::string *error) {
             if (m_data.well_formed != 1) {
                 error->assign("XML: Failed to parse document.");
                 ms_dbg_a(m_transaction, 4, "XML: Failed to parse document.");
+                freeArgsParserCtx();
                 return false;
             }
         }
