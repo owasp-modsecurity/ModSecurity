@@ -43,6 +43,7 @@
 #define AUDITLOG_PART_ENDMARKER             'Z'
 
 #include "modsecurity.h"
+#include "httpd.h"
 #include "apr_pools.h"
 
 int DSOLOCAL is_valid_parts_specification(char *p);
@@ -50,5 +51,7 @@ int DSOLOCAL is_valid_parts_specification(char *p);
 char DSOLOCAL *construct_log_vcombinedus_limited(modsec_rec *msr, int _limit, int *was_limited);
 
 void DSOLOCAL sec_audit_logger(modsec_rec *msr);
+
+int modsec_open_logs(apr_pool_t *pconf, apr_pool_t *p, apr_pool_t *ptemp, server_rec *s_main);
 
 #endif
