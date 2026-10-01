@@ -85,6 +85,7 @@ struct TreeRoot {
     CPTTree *ipv6_tree;
 };
 
+void CPTFreePrefix(TreePrefix *prefix);
 CPTTree *CPTCreateRadixTree();
 TreeNode *CPTIpMatch(unsigned char *ipdata, CPTTree *tree, int type);
 TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type);
