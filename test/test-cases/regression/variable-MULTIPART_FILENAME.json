@@ -326,6 +326,7 @@
     },
     "expected": {
       "debug_log": "Target value: \"Math\\+physics v1.pdf\" \\(Variable: MULTIPART_FILENAME",
+      "error_log": "o0,19v219,19t:trim",
       "http_code": 200
     },
     "rules": [
