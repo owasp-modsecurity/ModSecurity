@@ -349,6 +349,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 p++;
             }
             if ((*p != '\'') || (p == start_of_charset)) {
+                m_flag_invalid_quoting = 1;
                 return -16; // Must be at least one legit char before ' for start of language
             }
             m_mpp->m_filename_charset.assign(start_of_charset, (p - start_of_charset));
@@ -766,7 +767,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 "Multipart: Nul byte in part headers.");
 
             error->assign("Multipart: Nul byte in part headers.");
-            return false;
+            return -1;
         }
     }
 
@@ -802,9 +803,10 @@ int Multipart::process_part_header(std::string *error, int offset) {
             ms_dbg_a(m_transaction, 1,
                 "Multipart: Part missing Content-Disposition header.");
 
+            m_flag_invalid_part = 1;
             error->assign("Multipart: Part missing " \
                 "Content-Disposition header.");
-            return false;
+            return -1;
         }
         header_value = m_mpp->m_headers.at("Content-Disposition").second;
 
@@ -821,9 +823,10 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 "Multipart: Invalid Content-Disposition header ("
                 + std::to_string(rc) + "): " + header_value);
 
+            m_flag_invalid_part = 1;
             error->assign("Multipart: Invalid Content-Disposition header ("
                 + std::to_string(rc) + "): " + header_value);
-            return false;
+            return -1;
         }
 
         if (m_mpp->m_name.empty()) {
@@ -831,10 +834,11 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 "Multipart: Content-Disposition header missing " \
                 "name field.");
 
+            m_flag_invalid_part = 1;
             error->assign("Multipart: Content-Disposition header missing " \
                 "name field.");
 
-            return false;
+            return -1;
         }
 
         if (!m_mpp->m_filename.empty() || !m_mpp->m_filenameStar.empty()) {
@@ -851,7 +855,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
                 error->assign("Multipart: Invalid Content-Disposition " \
                     "header (filename).");
-                return false;
+                return -1;
             }
 
             m_mpp->m_type = MULTIPART_FILE;
@@ -886,7 +890,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
                 error->assign("Multipart: Invalid part header " \
                     "(folding error).");
-                return false;
+                return -1;
             }
 
             /* locate the beginning of data */
@@ -920,7 +924,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 ms_dbg_a(m_transaction, 1, "Multipart: Part header too long.");
 
                 error->assign("Multipart: Part header too long.");
-                return false;
+                return -1;
             }
 
             m_mpp->m_last_header_line = m_mpp->m_last_header_name + ": " + new_value;
@@ -949,7 +953,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
                 error->assign("Multipart: Invalid part header " \
                     "(colon missing): " + std::string(m_buf));
-                return false;
+                return -1;
             }
 
             /* extract header name */
@@ -961,7 +965,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
 
                 error->assign("Multipart: Invalid part header " \
                     "(header name missing).");
-                 return false;
+                 return -1;
             }
 
             /* check if multipart header contains any invalid characters */
@@ -971,7 +975,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Invalid part header (contains invalid character).");
                 error->assign("Multipart: Invalid part header (contains invalid character).");
-                return false;
+                return -1;
             }
 
             /* extract the value value */
@@ -990,7 +994,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Duplicate part header: " \
                     + header_name + ".");
-                return false;
+                return -1;
             }
 
             m_mpp->m_last_header_name.assign(header_name);
@@ -1011,7 +1015,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
         }
     }
 
-    return true;
+    return 1;
 }
 
 

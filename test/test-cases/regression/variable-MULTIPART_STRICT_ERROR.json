@@ -791,7 +791,7 @@
     },
     "expected": {
       "debug_log": "Invalid Content-Disposition header \\(-18\\): form-data; name=\"file\"; filename\\*=UTF-8''Math\\+physics%20v1\\.pdf%ZZ",
-      "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1",
+      "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 0, HF 0, LF 0, SM 0, IQ 0, IP 1",
       "http_code": 400
     },
     "rules": [
@@ -848,7 +848,7 @@
     },
     "expected": {
       "debug_log": "Invalid Content-Disposition header \\(-16\\): form-data; name=\"file\"; filename\\*=\"UTF-8''Math\\+physics%20v1\\.pdf\"",
-      "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1",
+      "error_log": "data \"PE 1, BQ 0, BW 0, DB 0, DA 0, DH 0, HF 0, LF 0, SM 0, IQ 1, IP 1",
       "http_code": 400
     },
     "rules": [
