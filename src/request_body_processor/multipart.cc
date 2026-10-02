@@ -994,6 +994,8 @@ int Multipart::process_part_header(std::string *error, int offset) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Duplicate part header: " \
                     + header_name + ".");
+                error->assign("Multipart: Duplicate part header: " \
+                    + header_name + ".");
                 return -1;
             }
 
@@ -1260,13 +1262,19 @@ int Multipart::multipart_complete(std::string *error) {
             if (m_is_complete == 0) {
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Final boundary missing.");
-                error->assign("Multipart: Final boundary missing.");
+                // keep the error of the processing step, if there was any
+                if (error->empty()) {
+                    error->assign("Multipart: Final boundary missing.");
+                }
                 return false;
             }
         } else {
             ms_dbg_a(m_transaction, 1,
                 "Multipart: No boundaries found in payload.");
-            error->assign("Multipart: No boundaries found in payload.");
+            // keep the error of the processing step, if there was any
+            if (error->empty()) {
+                error->assign("Multipart: No boundaries found in payload.");
+            }
             return false;
         }
     }

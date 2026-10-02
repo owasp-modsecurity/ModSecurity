@@ -3468,5 +3468,261 @@
       "SecruleEngine On",
       "SecRule REQBODY_ERROR \"@eq 1\" \"phase:2,deny,status:403,id:500077\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (error message - duplicate part header)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "143",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename=\"a.txt\"\r\n",
+        "Content-Type: image/jpeg\r\n",
+        "Content-Type: text/plain\r\n",
+        "\r\n",
+        "Some content\r\n",
+        "--a--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_ERROR_MSG \"@contains Multipart: Duplicate part header: Content-Type.\" \"id:1,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (error message - invalid filename* encoding)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "100",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename*=UTF-8''a%ZZ.txt\r\n",
+        "\r\n",
+        "Some content\r\n",
+        "--a--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_ERROR_MSG \"@contains Multipart: Invalid Content-Disposition header (-18)\" \"id:1,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (error message - not form-data)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "61",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: attachment\r\n",
+        "\r\n",
+        "Some content\r\n",
+        "--a--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_ERROR_MSG \"@contains Multipart: Invalid Content-Disposition header (-1)\" \"id:1,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (error message - missing name)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "78",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: form-data; filename=\"a.txt\"\r\n",
+        "\r\n",
+        "Some content\r\n",
+        "--a--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_ERROR_MSG \"@contains Multipart: Content-Disposition header missing name field.\" \"id:1,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (error message - final boundary missing)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "84",
+        "Content-Type": "multipart/form-data; boundary=a",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--a\r\n",
+        "Content-Disposition: form-data; name=\"file\"; filename=\"a.txt\"\r\n",
+        "\r\n",
+        "Some content\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_ERROR_MSG \"@contains Multipart: Final boundary missing.\" \"id:1,phase:2,deny,status:403,log\""
+    ]
   }
 ]
