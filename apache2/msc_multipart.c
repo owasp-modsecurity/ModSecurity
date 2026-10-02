@@ -141,6 +141,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 p++;
             }
             if ((*p != '\'') || (p == start_of_charset)) {
+                msr->mpd->flag_invalid_quoting = 1;
                 return -16; // Must be at least one legit char before ' for start of language
             }
             msr->mpd->mpp->filename_charset = apr_pstrmemdup(msr->mp, start_of_charset, (p - start_of_charset));
@@ -362,18 +363,21 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
         header_value = (char *)apr_table_get(msr->mpd->mpp->headers, "Content-Disposition");
         if (header_value == NULL) {
+            msr->mpd->flag_invalid_part = 1;
             *error_msg = apr_psprintf(msr->mp, "Multipart: Part missing Content-Disposition header.");
             return -1;
         }
 
         rc = multipart_parse_content_disposition(msr, header_value);
         if (rc < 0) {
+            msr->mpd->flag_invalid_part = 1;
             *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%d): %s.",
                     rc, log_escape_nq(msr->mp, header_value));
             return -1;
         }
 
         if (msr->mpd->mpp->name == NULL) {
+            msr->mpd->flag_invalid_part = 1;
             *error_msg = apr_psprintf(msr->mp, "Multipart: Content-Disposition header missing name field.");
             return -1;
         }

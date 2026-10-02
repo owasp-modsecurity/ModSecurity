@@ -421,6 +421,7 @@
 	),
 	match_log => {
 		debug => [ qr/Multipart: Duplicate part header: Content-Type./s, 1 ],
+		error => [ qr/Multipart request body failed strict validation: DH 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -466,6 +467,7 @@
 	),
 	match_log => {
 		debug => [ qr/Multipart: Invalid Content-Disposition header \(-17/s, 1 ],
+		error => [ qr/Multipart request body failed strict validation: IQ 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -510,12 +512,13 @@
 		SecRequestBodyAccess On
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
 		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename="safe.jpg"; filename="safe.php"/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -556,12 +559,13 @@
 		SecRequestBodyAccess On
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
 		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename\*=UTF8''safe.php/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -602,12 +606,13 @@
 		SecRequestBodyAccess On
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
 		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename="safe.jpg"; filename="safe.php"/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 1, HF 0, LF 0, SM 0, IQ 0, IP 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -646,12 +651,13 @@
 		SecRequestBodyAccess On
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
 		debug => [ qr/Invalid Content-Disposition header \(-18\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 0, HF 0, LF 0, SM 0, IQ 0, IP 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -693,12 +699,13 @@
 		SecRequestBodyAccess On
 		SecRuleEngine On
 		SecRequestBodyAccess On
-		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'PE %{REQBODY_PROCESSOR_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
 		debug => [ qr/Invalid Content-Disposition header \(-16\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 0, HF 0, LF 0, SM 0, IQ 1, IP 1/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
