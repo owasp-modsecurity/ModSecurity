@@ -99,6 +99,13 @@ class InMemoryPerProcess :
     void resolveRegularExpression(const std::string& var,
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) override;
+    // Concrete fast path: reuse an already-compiled regex (e.g. the one a
+    // VariableRegex holds in m_r) instead of recompiling the pattern on every
+    // call. Intentionally NOT declared on the Collection base class, to keep
+    // that public interface's vtable - and therefore its ABI - unchanged.
+    void resolveRegularExpression(const Utils::Regex *r,
+        std::vector<const VariableValue *> *l,
+        variables::KeyExclusions &ke);
 
     /* store */
     virtual void store(const std::string &key, std::string &compartment,
