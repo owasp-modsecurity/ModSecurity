@@ -849,6 +849,7 @@ int Multipart::process_part_header(std::string *error, int offset) {
              * also we need to check if any of the filename or filename* is present
              */
             if (strstr(header_value.c_str(), "filename=") == NULL && strstr(header_value.c_str(), "filename*=") == NULL) {
+                m_flag_invalid_part = 1;
                 ms_dbg_a(m_transaction, 1,
                     "Multipart: Invalid Content-Disposition " \
                     "header (filename).");
