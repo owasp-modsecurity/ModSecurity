@@ -388,6 +388,7 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
              * didn't understand C-D but we did.
              */
             if (strstr(header_value, "filename=") == NULL && strstr(header_value, "filename*=") == NULL) {
+                msr->mpd->flag_invalid_part = 1;
                 *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (filename).");
                 return -1;
             }
