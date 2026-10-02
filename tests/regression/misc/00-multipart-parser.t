@@ -378,11 +378,13 @@
         SecRequestBodyAccess On
         SecAuditLog "$ENV{AUDIT_LOG}"
         SecAuditEngine RelevantOnly
+        SecAction "id:500300,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
     ),
     match_log => {
         -debug => [ qr/Multipart error:/, 1 ],
         audit => [ qr/Content-Disposition header missing name field/, 1 ],
         debug => [ qr/Content-Disposition header missing name field/, 1 ],
+        error => [ qr/msg "PARSER_STATE".*data "RE 1, [^"]*IP 1,/, 1 ],
 
     },
     match_response => {
@@ -1675,12 +1677,13 @@
         SecDebugLog $ENV{DEBUG_LOG}
         SecDebugLogLevel 9
         SecRequestBodyAccess On
-        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500155"
+        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500155,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500156"
         SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500157"
     ),
     match_log => {
         debug => [ qr/Invalid Content-Disposition header/, 1 ],
+        error => [ qr/msg "Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1/, 1 ],
     },
     match_response => {
         status => qr/^403$/,
@@ -1728,12 +1731,13 @@
         SecDebugLog $ENV{DEBUG_LOG}
         SecDebugLogLevel 9
         SecRequestBodyAccess On
-        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500158"
+        SecRule MULTIPART_STRICT_ERROR "\@eq 1" "phase:2,deny,id:500158,msg:'Multipart request body failed strict validation:RE %{REQBODY_ERROR},BQ %{MULTIPART_BOUNDARY_QUOTED},BW %{MULTIPART_BOUNDARY_WHITESPACE},DB %{MULTIPART_DATA_BEFORE},DA %{MULTIPART_DATA_AFTER},HF %{MULTIPART_HEADER_FOLDING},LF %{MULTIPART_LF_LINE},SM %{MULTIPART_MISSING_SEMICOLON},IQ %{MULTIPART_INVALID_QUOTING},IP %{MULTIPART_INVALID_PART},IH %{MULTIPART_INVALID_HEADER_FOLDING},FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
         SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "phase:2,deny,id:500159"
         SecRule REQBODY_ERROR "\@eq 1" "phase:2,deny,id:500160"
     ),
     match_log => {
         debug => [ qr/Part missing Content-Disposition header/, 1 ],
+        error => [ qr/msg "Multipart request body failed strict validation:RE 1,BQ 0,BW 0,DB 0,DA 0,HF 0,LF 0,SM 0,IQ 0,IP 1/, 1 ],
     },
     match_response => {
         status => qr/^403$/,
