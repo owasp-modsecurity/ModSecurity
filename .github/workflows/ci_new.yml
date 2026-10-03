@@ -10,11 +10,12 @@ jobs:
 
     # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
     # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04,ubuntu-26.04]
         platform:
           - { label: "x64", arch: "amd64", configure: "" }
 
@@ -35,7 +36,7 @@ jobs:
           - { label: "with pcre",        opt: "--with-pcre" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -121,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
+        os: [macos-15,macos-26,xcode-27]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -135,7 +136,7 @@ jobs:
           - { label: "with pcre",       opt: "--with-pcre" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -172,11 +173,12 @@ jobs:
 
   build-windows:
     name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2022
+    runs-on: windows-2025-vs2026
 
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-2025-vs2026,windows-2022]
         platform:
           - { label: "x64", arch: "x86_64" }
         configuration: [Release]
@@ -189,7 +191,7 @@ jobs:
           - { label: "with lmdb",        opt: "-DWITH_LMDB=ON" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -238,7 +240,7 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -269,7 +271,7 @@ jobs:
       - name: Mark repo as safe for git
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
         
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
