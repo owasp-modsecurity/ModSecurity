@@ -173,7 +173,7 @@ jobs:
 
   build-windows:
     name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2025-vs2026
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
