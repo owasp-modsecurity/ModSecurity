@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
+#include "src/config.h"
 #include "src/run_time_string.h"
 #include "src/utils/string.h"
 #include "src/operators/begins_with.h"
@@ -65,6 +66,12 @@
 
 #define IF_MATCH(a) \
     if (op_ == #a)
+
+#ifdef MSC_LOG_MESSAGE_ESCAPE
+constexpr bool kEscapeLogMessage = true;
+#else
+constexpr bool kEscapeLogMessage = false;
+#endif
 
 namespace modsecurity {
 namespace operators {
@@ -112,17 +119,28 @@ std::string Operator::resolveMatchMessage(Transaction *t,
         if (m_couldContainsMacro == false) {
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
                 utils::string::limitTo(200, m_param) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) + \
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
+                "' (Value: `" +
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         } else {
             std::string p(m_string->evaluate(t));
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
-                utils::string::limitTo(200, p) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) +
+                utils::string::toHexIfNeeded(
+                    utils::string::limitTo(200, p), kEscapeLogMessage) +
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
+                "' (Value: `" +
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         }
     }

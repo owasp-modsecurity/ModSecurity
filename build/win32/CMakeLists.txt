@@ -7,6 +7,8 @@ option(WITH_LUA     "Include LUA support"     ON)
 option(WITH_LIBXML2 "Include LibXML2 support" ON)
 option(WITH_MAXMIND "Include MaxMind support" ON)
 option(WITH_CURL    "Include CURL support"    ON)
+option(LOG_MESSAGE_ESCAPE
+  "Escape quotes and backslashes in textual log message fields" OFF)
 
 option(USE_ASAN     "Build with Address Sanitizer" OFF)
 
@@ -126,6 +128,7 @@ enable_feature(HAVE_LUA ${WITH_LUA})
 enable_feature(HAVE_LIBXML2 ${WITH_LIBXML2})
 enable_feature(HAVE_MAXMIND ${WITH_MAXMIND})
 enable_feature(HAVE_CURL ${WITH_CURL})
+enable_feature(MSC_LOG_MESSAGE_ESCAPE ${LOG_MESSAGE_ESCAPE})
 
 include(${CMAKE_CURRENT_LIST_DIR}/ConfigureChecks.cmake)
 
@@ -218,7 +221,33 @@ enable_testing()
 file(READ ${BASE_DIR}/test/test-suite.in TEST_FILES_RAW)
 string(REPLACE "\n" ";" TEST_FILES ${TEST_FILES_RAW})
 
+set(SKIP_CONDITIONAL_TEST FALSE)
 foreach(TEST_FILE ${TEST_FILES})
+  string(STRIP "${TEST_FILE}" TEST_FILE)
+
+  # Select the appropriate branch of the Automake conditional shared by
+  # the Autotools and CMake test suites.
+  if(TEST_FILE STREQUAL "if LOG_MESSAGE_ESCAPE")
+    if(LOG_MESSAGE_ESCAPE)
+      set(SKIP_CONDITIONAL_TEST FALSE)
+    else()
+      set(SKIP_CONDITIONAL_TEST TRUE)
+    endif()
+    continue()
+  elseif(TEST_FILE STREQUAL "else")
+    if(SKIP_CONDITIONAL_TEST)
+      set(SKIP_CONDITIONAL_TEST FALSE)
+    else()
+      set(SKIP_CONDITIONAL_TEST TRUE)
+    endif()
+    continue()
+  elseif(TEST_FILE STREQUAL "endif")
+    set(SKIP_CONDITIONAL_TEST FALSE)
+    continue()
+  elseif(SKIP_CONDITIONAL_TEST)
+    continue()
+  endif()
+
   # ignore comment lines
   string(FIND ${TEST_FILE} "#" is_comment)
   if(NOT is_comment EQUAL 0)
