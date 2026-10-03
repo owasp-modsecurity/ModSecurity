@@ -1,6 +1,6 @@
 # libModSecurity Windows build information <!-- omit from toc -->
 
-The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 (for Visual C++ & CMake) and Conan package manager.
+The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 or 2026 (for Visual C++) and Conan 2.x. Conan's generated CMake presets select the Visual Studio generator from the detected compiler profile.
 
 ## Contents <!-- omit from toc -->
 
@@ -12,16 +12,18 @@ The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 (for
 
 ## Prerequisites
 
- * [Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_buildtools.exe)
-    * Install *Desktop development with C++* workload, which includes:
-        * MSVC C++ compiler
+ * Either [Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_buildtools.exe) or [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/) (under *Tools for Visual Studio*).
+    * In either installer, select the *Desktop development with C++* workload and ensure these components are installed:
+        * MSVC C++ x64/x86 build tools for the selected Visual Studio version
         * Windows SDK
         * CMake
         * Address Sanitizer
- * [Conan package manager 2.27.1](https://github.com/conan-io/conan/releases/download/2.27.1/conan-2.27.1-windows-x86_64-installer.exe)
-    * Install and then setup the default Conan profile to use the MSVC C++ compiler:
-      1. Open a command-prompt and set the MSVC C++ compiler environment by executing: `C:\BuildTools\VC\Auxiliary\Build\vcvars64.bat`
-      2. Execute: `conan profile detect --force`
+ * [Conan 2 package manager](https://docs.conan.io/2/installation.html) and CMake
+    * Windows CI uses the validated Conan 2.33.0 and CMake 4.4.3 versions. With Python available on `PATH`, install the same versions from binary wheels:
+      * `python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"`
+    * Set up the default Conan profile to use the selected MSVC C++ compiler:
+      1. Open the *x64 Native Tools Command Prompt* for VS 2022 or VS 2026 from the Start menu. Alternatively, in a regular `cmd.exe` prompt, execute the quoted full path to `VC\Auxiliary\Build\vcvars64.bat` inside your actual Visual Studio installation. The installation directory depends on the version, edition and location you selected; use the toolchain you intend to build with.
+      2. In that same initialized prompt, execute: `conan profile detect --force`
  * [Git for Windows 2.53.0](https://github.com/git-for-windows/git/releases/download/v2.53.0.windows.1/Git-2.53.0-64-bit.exe)
     * To clone the libModSecurity repository.
     * NOTE: Make sure to initialize and update submodules (to get `libinjection`, `mbedtls` and regression tests)
@@ -37,6 +39,8 @@ vcbuild.bat [build_configuration] [arch] [USE_ASAN]
 ```
 
 where `[build_configuration]` can be: `Release` (default), `RelWithDebInfo`, `MinSizeRel` or `Debug`, and `[arch]` can be: `x86_64` (default) or `x86`.
+
+`build/win32/conanfile.py` uses the Conan 2 `CMakeDeps`, `CMakeToolchain` and `cmake_layout` APIs. Generated files are placed in `build/win32/build/generators`. The build script first exports the local YAJL recipe as `yajl/2.1.0@modsecurity/ci`; this recipe fixes the CMake 4 policy and target-path incompatibilities without changing the Conan Center cache recipe.
 
 Built files will be located in the directory: `build\win32\build\[build_configuration]` and include:
 

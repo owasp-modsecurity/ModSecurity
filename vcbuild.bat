@@ -1,7 +1,7 @@
 @rem For Windows build information, see build\win32\README.md
 
 @echo off
-pushd %CD%
+setlocal
 
 if not "%1"=="" (set build_type=%1) else (set build_type=Release)
 echo Build type: %build_type%
@@ -11,7 +11,7 @@ echo Arch: %arch%
 
 if "%3"=="USE_ASAN" (
     echo Address Sanitizer: Enabled
-    set CI_ASAN=-c tools.build:cxxflags="[""/fsanitize=address""]"
+    set CI_ASAN=-c:h tools.build:cxxflags="[""/fsanitize=address""]"
     set ASAN_FLAG=ON
 ) else (
     echo Address Sanitizer: Disabled
@@ -19,10 +19,25 @@ if "%3"=="USE_ASAN" (
     set ASAN_FLAG=OFF
 )
 
-cd build\win32
-conan install . -s compiler.cppstd=17 %CI_ASAN% --output-folder=build --build=missing --settings=build_type=%build_type% --settings=arch=%arch%
-cd build
-cmake --fresh .. -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DUSE_ASAN=%ASAN_FLAG% %4 %5 %6 %7 %8 %9
-cmake --build . --config %build_type%
+pushd "%~dp0build\win32"
+if errorlevel 1 exit /b %errorlevel%
+
+conan export conan\yajl --user=modsecurity --channel=ci
+if errorlevel 1 goto error
+
+conan install . -pr:h default -pr:b default -s:h compiler.cppstd=17 %CI_ASAN% --build=missing -s:h build_type=%build_type% -s:h arch=%arch%
+if errorlevel 1 goto error
+
+cmake --fresh --preset conan-default -DUSE_ASAN=%ASAN_FLAG% %~4 %~5 %~6 %~7 %~8 %~9
+if errorlevel 1 goto error
+
+cmake --build build --config %build_type%
+if errorlevel 1 goto error
 
 popd
+exit /b 0
+
+:error
+set "build_exit_code=%errorlevel%"
+popd
+exit /b %build_exit_code%
