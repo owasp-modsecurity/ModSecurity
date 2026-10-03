@@ -94,7 +94,7 @@ message("-- Detecting Mbed TLS version - ${MBEDTLS_VERSION}")
 
 project(libModSecurity
     VERSION
-        3.0.14
+        3.0.17
     LANGUAGES
         CXX
 )
