@@ -1,6 +1,6 @@
 # libModSecurity Windows build information <!-- omit from toc -->
 
-The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 (for Visual C++ & CMake) and Conan package manager.
+The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 or 2026 (for Visual C++) and Conan 2.x. Conan's generated CMake presets select the Visual Studio generator from the detected compiler profile.
 
 ## Contents <!-- omit from toc -->
 
@@ -19,6 +19,7 @@ The Windows build of libModSecurity uses Build Tools for Visual Studio 2022 (for
         * CMake
         * Address Sanitizer
  * [Conan package manager 2.27.1](https://github.com/conan-io/conan/releases/download/2.27.1/conan-2.27.1-windows-x86_64-installer.exe)
+    * Use Conan >= 2.27.1 and < 3, and CMake >= 4.2 for Visual Studio 2026.
     * Install and then setup the default Conan profile to use the MSVC C++ compiler:
       1. Open a command-prompt and set the MSVC C++ compiler environment by executing: `C:\BuildTools\VC\Auxiliary\Build\vcvars64.bat`
       2. Execute: `conan profile detect --force`
@@ -37,6 +38,8 @@ vcbuild.bat [build_configuration] [arch] [USE_ASAN]
 ```
 
 where `[build_configuration]` can be: `Release` (default), `RelWithDebInfo`, `MinSizeRel` or `Debug`, and `[arch]` can be: `x86_64` (default) or `x86`.
+
+`build/win32/conanfile.py` uses the Conan 2 `CMakeDeps`, `CMakeToolchain` and `cmake_layout` APIs. Generated files are placed in `build/win32/build/generators`. The build script first exports the local YAJL recipe as `yajl/2.1.0@modsecurity/ci`; this recipe fixes the CMake 4 policy and target-path incompatibilities without changing the Conan Center cache recipe.
 
 Built files will be located in the directory: `build\win32\build\[build_configuration]` and include:
 

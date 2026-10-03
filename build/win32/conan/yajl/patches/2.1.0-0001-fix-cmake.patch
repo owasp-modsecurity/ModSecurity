@@ -1,0 +1,85 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,7 +12,10 @@
+ # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ 
+-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
++CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
++if(POLICY CMP0026)
++    cmake_policy(SET CMP0026 OLD)
++endif()
+ 
+ PROJECT(YetAnotherJSONParser C)
+ 
+@@ -26,6 +29,7 @@ IF (NOT CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE "Release")
+ ENDIF (NOT CMAKE_BUILD_TYPE)
+ 
++if(0)
+ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+ 
+ IF (WIN32)
+@@ -61,16 +65,13 @@ ELSE (WIN32)
+   SET(CMAKE_C_FLAGS_DEBUG "-DDEBUG -g")
+   SET(CMAKE_C_FLAGS_RELEASE "-DNDEBUG -O2 -Wuninitialized")
+ ENDIF (WIN32)
++endif()
+ 
+ 
+ ADD_SUBDIRECTORY(src)
+-ADD_SUBDIRECTORY(test)
+ ADD_SUBDIRECTORY(reformatter)
+ ADD_SUBDIRECTORY(verify)
+-ADD_SUBDIRECTORY(example)
+-ADD_SUBDIRECTORY(perf)
+ 
+-INCLUDE(YAJLDoc.cmake)
+ 
+ # a test target
+ ADD_CUSTOM_TARGET(test
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -25,7 +25,6 @@ SET (PUB_HDRS api/yajl_parse.h api/yajl_gen.h api/yajl_common.h api/yajl_tree.h)
+ # Ensure defined when building YAJL (as opposed to using it from
+ # another project).  Used to ensure correct function export when
+ # building win32 DLL.
+-ADD_DEFINITIONS(-DYAJL_BUILD)
+ 
+ # set up some paths
+ SET (libDir ${CMAKE_CURRENT_BINARY_DIR}/../${YAJL_DIST_NAME}/lib)
+@@ -37,20 +36,19 @@ SET(LIBRARY_OUTPUT_PATH ${libDir})
+ 
+ ADD_LIBRARY(yajl_s STATIC ${SRCS} ${HDRS} ${PUB_HDRS})
+ 
++target_compile_features(yajl_s PRIVATE c_std_99)
+ ADD_LIBRARY(yajl SHARED ${SRCS} ${HDRS} ${PUB_HDRS})
++target_compile_features(yajl PRIVATE c_std_99)
++target_compile_definitions(yajl PUBLIC YAJL_SHARED)
+ 
+ #### setup shared library version number
+ SET_TARGET_PROPERTIES(yajl PROPERTIES
+-                      DEFINE_SYMBOL YAJL_SHARED
++                      DEFINE_SYMBOL YAJL_BUILD
++                      C_VISIBILITY_PRESET hidden
+                       SOVERSION ${YAJL_MAJOR}
+                       VERSION ${YAJL_MAJOR}.${YAJL_MINOR}.${YAJL_MICRO})
+ 
+ #### ensure a .dylib has correct absolute installation paths upon installation
+-IF(APPLE)
+-  MESSAGE("INSTALL_NAME_DIR: ${CMAKE_INSTALL_PREFIX}/lib")
+-  SET_TARGET_PROPERTIES(yajl PROPERTIES
+-                        INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+-ENDIF(APPLE)
+ 
+ #### build up an sdk as a post build step
+ 
+@@ -78,7 +76,7 @@ INCLUDE_DIRECTORIES(${incDir}/..)
+ # at build time you may specify the cmake variable LIB_SUFFIX to handle
+ # 64-bit systems which use 'lib64'
+ INSTALL(TARGETS yajl
+-        RUNTIME DESTINATION lib${LIB_SUFFIX}
++        RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib${LIB_SUFFIX}
+         ARCHIVE DESTINATION lib${LIB_SUFFIX})
+ INSTALL(TARGETS yajl_s ARCHIVE DESTINATION lib${LIB_SUFFIX})
