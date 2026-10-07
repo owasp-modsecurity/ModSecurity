@@ -224,4 +224,47 @@
       "SecRule ARGS_NAMES \"@contains yyy\" \"id:1,phase:2,deny,status:403\""
     ]
   }
+
+  ,
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateTargetById - REQUEST_HEADERS exclusion is case insensitive",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Referer": "This is an attack"
+      },
+      "uri": "/index.html",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleUpdateTargetById 1 !REQUEST_HEADERS:referer",
+      "SecRule REQUEST_HEADERS:Referer \"@contains attack\" \"id:1,phase:1,deny,status:403\""
+    ]
+  }
+
 ]
