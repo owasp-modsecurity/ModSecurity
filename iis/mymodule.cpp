@@ -22,6 +22,7 @@
 //  IIS7 Server API header file
 #include <Windows.h>
 #include <sal.h>
+#include <string.h>
 #include <strsafe.h>
 #include "httpserv.h"
 
@@ -104,7 +105,14 @@ char *GetIpAddr(apr_pool_t *pool, PSOCKADDR pAddr)
     if (GetNameInfo(pAddr, addrSize, buf, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST) != 0) {
         return apr_pstrdup(pool, "");
     }
-    
+
+    if (pAddr->sa_family == AF_INET6) {
+        char *zone = strchr(buf, '%');
+        if (zone != nullptr) {
+            *zone = '\0';
+        }
+    }
+
     return buf;
 }
 
