@@ -83,8 +83,8 @@
       ]
     },
     "expected": {
-      "debug_log": "Executing operator \"Rx\" with param \"\\^0\\$\"",
-      "error_log": "Matched \"Operator `Rx' with parameter `\\^0\\$'",
+      "debug_log": "Executing operator \"!Rx\" with param \"\\^0\\$\"",
+      "error_log": "Matched \"Operator `!Rx' with parameter `\\^0\\$'",
       "http_code": 200
     },
     "rules": [
