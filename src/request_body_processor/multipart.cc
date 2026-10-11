@@ -1633,13 +1633,15 @@ bool Multipart::process(const std::string& data, std::string *error,
 
                     } else {
                         char *boundary_end = m_buf + 2 + m_boundary.size();
-                        /* if it match, AND there was a matched boundary at least,
-                           set the m_flag_unmatched_boundary flag to 2
-                           this indicates that there were an opened boundary, which
-                           matches the reference, and here is the final boundary.
-                           The flag will differ from 0, so the previous rules ("!@eq 0")
-                           will catch all "errors", without any modification, but we can
-                           use the new, permission mode with "@eq 1"
+                        /* The line matches our boundary. If an unmatched
+                           boundary was seen earlier (flag is 1) and at least
+                           one boundary was already matched, set the flag to 2:
+                           the suspicious line was followed by a valid boundary,
+                           so it was most likely part data starting with "--".
+                           If no unmatched boundary was seen, the flag stays 0.
+                           Rules using "!@eq 0" (strict) catch both 1 and 2,
+                           while "@eq 1" (permissive) catches only unmatched
+                           boundaries that are not followed by a valid one.
                         */
                         if (m_boundary_count > 0 && m_flag_unmatched_boundary == 1) {
                             m_flag_unmatched_boundary = 2;
