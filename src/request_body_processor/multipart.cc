@@ -1248,6 +1248,17 @@ int Multipart::multipart_complete(std::string *error) {
                         return -1;
                     }
 
+                    /* Same transition as in process(): the unmatched line
+                       was followed by a valid (final) boundary. The variable
+                       was already set at the beginning of this function, so
+                       update it here too. */
+                    if (m_flag_unmatched_boundary == 1) {
+                        m_flag_unmatched_boundary = 2;
+                        m_transaction->m_variableMultipartUnmatchedBoundary.set(
+                            std::to_string(m_flag_unmatched_boundary),
+                            m_transaction->m_variableOffset);
+                    }
+
                     /* The payload is complete after all. */
                     m_is_complete = 1;
                 }
@@ -1633,19 +1644,6 @@ bool Multipart::process(const std::string& data, std::string *error,
 
                     } else {
                         char *boundary_end = m_buf + 2 + m_boundary.size();
-                        /* The line matches our boundary. If an unmatched
-                           boundary was seen earlier (flag is 1) and at least
-                           one boundary was already matched, set the flag to 2:
-                           the suspicious line was followed by a valid boundary,
-                           so it was most likely part data starting with "--".
-                           If no unmatched boundary was seen, the flag stays 0.
-                           Rules using "!@eq 0" (strict) catch both 1 and 2,
-                           while "@eq 1" (permissive) catches only unmatched
-                           boundaries that are not followed by a valid one.
-                        */
-                        if (m_boundary_count > 0 && m_flag_unmatched_boundary == 1) {
-                            m_flag_unmatched_boundary = 2;
-                        }
                         int is_final = 0;
 
                         /* Is this the final boundary? */
@@ -1681,6 +1679,22 @@ bool Multipart::process(const std::string& data, std::string *error,
                             if (process_boundary((is_final ? 1 : 0)) < 0) {
                                 m_flag_error = true;
                                 return false;
+                            }
+
+                            /* The line is a valid boundary. If an unmatched
+                               boundary was seen earlier (flag is 1) and at least
+                               one boundary was already matched, set the flag to 2:
+                               the suspicious line was followed by a valid boundary,
+                               so it was most likely part data starting with "--".
+                               If no unmatched boundary was seen, the flag stays 0.
+                               Rules using "!@eq 0" (strict) catch both 1 and 2,
+                               while "@eq 1" (permissive) catches only unmatched
+                               boundaries that are not followed by a valid one.
+                               The same transition is done in multipart_complete()
+                               for a final boundary without a trailing newline.
+                            */
+                            if (m_boundary_count > 0 && m_flag_unmatched_boundary == 1) {
+                                m_flag_unmatched_boundary = 2;
                             }
 
                             if (is_final) {
