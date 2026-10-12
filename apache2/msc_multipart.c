@@ -223,7 +223,10 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
                 *(t++) = *(p++);
             }
-            if (*p == '\0') return -10;
+            if (*p == '\0') {
+                msr->mpd->flag_invalid_quoting = 1;
+                return -10; /* closing quote not found */
+            }
 
             p++; /* go over the quote at the end */
 

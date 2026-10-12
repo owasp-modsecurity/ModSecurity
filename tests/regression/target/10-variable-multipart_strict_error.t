@@ -779,3 +779,47 @@
 	    ),
 	),
 },
+
+
+{
+	type => "misc",
+	comment => "multipart Content-Disposition value without closing quote",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecAction "id:990100,phase:2,pass,log,t:none,msg:'PARSER_STATE',logdata:'RE %{REQBODY_ERROR}, BQ %{MULTIPART_BOUNDARY_QUOTED}, BW %{MULTIPART_BOUNDARY_WHITESPACE}, DB %{MULTIPART_DATA_BEFORE}, DA %{MULTIPART_DATA_AFTER}, DH %{MULTIPART_DUPLICATE_PART_HEADER}, HF %{MULTIPART_HEADER_FOLDING}, LF %{MULTIPART_LF_LINE}, SM %{MULTIPART_MISSING_SEMICOLON}, IQ %{MULTIPART_INVALID_QUOTING}, IP %{MULTIPART_INVALID_PART}, IH %{MULTIPART_INVALID_HEADER_FOLDING}, FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+		SecRule REQBODY_ERROR "!\@eq 0" "id:990101,phase:2,deny,status:400,log,t:none"
+		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
+	),
+	match_log => {
+		debug => [ qr/Invalid Content-Disposition header \(-10\): form-data; name="file"; filename="a\.txt/s, 1 ],
+		error => [ qr/data "RE 1, BQ 0, BW 0, DB 0, DA 0, DH 0, HF 0, LF 0, SM 0, IQ 1, IP 1/s, 1 ],
+	},
+	match_response => {
+		status => qr/^400$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Host" => q(localhost),
+			"User-Agent" => q(curl/7.38.0),
+			"Accept" => q(*/*),
+			"Content-Length" => q(118),
+			"Content-Type" => q(multipart/form-data; boundary=b),
+			"Expect" => q(100-continue),
+		],
+	    normalize_raw_request_data(
+		q(
+			--b
+			Content-Disposition: form-data; name="file"; filename="a.txt
+			Content-Type: text/plain
+
+			Some content
+
+			--b--
+		),
+	    ),
+	),
+},
