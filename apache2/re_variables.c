@@ -2115,7 +2115,9 @@ static int var_multipart_unmatched_boundary_generate(modsec_rec *msr, msre_var *
 {
     assert(msr != NULL);
     if ((msr->mpd != NULL)&&(msr->mpd->flag_unmatched_boundary != 0)) {
-        return var_simple_generate(var, vartab, mptmp, "1");
+        /* 1: unmatched boundary, 2: unmatched boundary followed by a valid one */
+        return var_simple_generate(var, vartab, mptmp,
+            apr_psprintf(mptmp, "%d", msr->mpd->flag_unmatched_boundary));
     } else {
         return var_simple_generate(var, vartab, mptmp, "0");
     }

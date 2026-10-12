@@ -95,6 +95,52 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 
 # Did we see anything that might be a boundary?
 #
+# Here is a short description about the ModSecurity Multipart parser: the
+# parser returns with value 0, if all "boundary-like" line matches with
+# the boundary string which given in MIME header. In any other cases it returns
+# with different value, eg. 1 or 2.
+#
+# The RFC 1341 descript the multipart content-type and its syntax must contains
+# only three mandatory lines (above the content):
+# * Content-Type: multipart/mixed; boundary=BOUNDARY_STRING
+# * --BOUNDARY_STRING
+# * --BOUNDARY_STRING--
+#
+# First line indicates, that this is a multipart content, second shows that
+# here starts a part of the multipart content, third shows the end of content.
+#
+# If there are any other lines, which starts with "--", then it should be
+# another boundary id - or not.
+#
+# After 2.9.15, there are two kinds of types of boundary errors: strict and permissive.
+#
+# If multipart content contains the three necessary lines with correct order, but
+# there are one or more lines with "--", then parser returns with value 2 (non-zero).
+#
+# If some of the necessary lines (usually the start or end) misses, or the order
+# is wrong, then parser returns with value 1 (also a non-zero).
+#
+# You can choose which one you need. The rule below uses the 'strict' mode:
+# the content is blocked in case of any non-zero value.
+#
+# If you need the 'permissive' mode, change the operator to "@eq 1": then the
+# content is blocked only if the value is exactly 1, so values 0 and 2 are
+# allowed. This lets you upload eg. PEM files ("-----BEGIN...") or other text
+# files which contain lines starting with "--".
+#
+# Here is a brief summary:
+#
+# +--------------------------+-------+--------+-------+
+# | Body                     | Value | !@eq 0 | @eq 1 |
+# +--------------------------+-------+--------+-------+
+# | valid body               | 0     | pass   | pass  |
+# | missing final boundary   | 1     | block  | block |
+# | part data starts with -- | 2     | block  | pass  |
+# +--------------------------+-------+--------+-------+
+#
+# See #1747, #1924 and #3654 for further information on the possible values for
+# MULTIPART_UNMATCHED_BOUNDARY.
+#
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
 "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
 

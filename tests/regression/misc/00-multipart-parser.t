@@ -265,12 +265,13 @@
         SecRequestBodyAccess On
         SecAuditLog "$ENV{AUDIT_LOG}"
         SecAuditEngine RelevantOnly
+        SecRule REQBODY_ERROR "!\@eq 0" "phase:2,deny,status:400,id:500131"
     ),
     match_log => {
         debug => [ qr/Final boundary missing/, 1 ],
     },
     match_response => {
-        status => qr/^500$/,
+        status => qr/^400$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1123,7 +1124,7 @@
         debug => [ qr/Multipart: Warning: boundary whitespace in C-T header./, 1 ],
     },
     match_response => {
-        status => qr/^500$/,
+        status => qr/^403$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1219,7 +1220,7 @@
         debug => [ qr/Multipart parsing error: Multipart: No boundaries found in payload./, 1 ],
     },
     match_response => {
-        status => qr/^500$/,
+        status => qr/^403$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -1266,7 +1267,7 @@
 
     },
     match_response => {
-        status => qr/^500$/,
+        status => qr/^403$/,
     },
     request => new HTTP::Request(
         POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",

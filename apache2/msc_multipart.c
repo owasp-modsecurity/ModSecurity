@@ -1118,6 +1118,12 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
                         return -1;
                     }
 
+                    /* Same transition as in multipart_process_chunk(): the
+                       unmatched line was followed by a valid (final) boundary. */
+                    if (msr->mpd->flag_unmatched_boundary == 1) {
+                        msr->mpd->flag_unmatched_boundary = 2;
+                    }
+
                     /* The payload is complete after all. */
                     msr->mpd->is_complete = 1;
                 }
@@ -1246,6 +1252,22 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                             if (multipart_process_boundary(msr, (is_final ? 1 : 0), error_msg) < 0) {
                                 msr->mpd->flag_error = 1;
                                 return -1;
+                            }
+
+                            /* The line is a valid boundary. If an unmatched
+                               boundary was seen earlier (flag is 1) and at least
+                               one boundary was already matched, set the flag to 2:
+                               the suspicious line was followed by a valid boundary,
+                               so it was most likely part data starting with "--".
+                               If no unmatched boundary was seen, the flag stays 0.
+                               Rules using "!@eq 0" (strict) catch both 1 and 2,
+                               while "@eq 1" (permissive) catches only unmatched
+                               boundaries that are not followed by a valid one.
+                               The same transition is done in multipart_complete()
+                               for a final boundary without a trailing newline.
+                            */
+                            if ((msr->mpd->boundary_count > 0) && (msr->mpd->flag_unmatched_boundary == 1)) {
+                                msr->mpd->flag_unmatched_boundary = 2;
                             }
 
                             if (is_final) {
