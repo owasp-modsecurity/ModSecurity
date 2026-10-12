@@ -7,8 +7,9 @@
 # Every case is checked with the 'strict' ("!@eq 0") and the 'permissive'
 # ("@eq 1") rule.
 #
-# Value 1 remains only if the body is broken (no valid boundary follows the
-# unmatched line), so in these cases REQBODY_ERROR is also set.
+# In these tests value 1 remains only if the body is broken (no valid
+# boundary follows the unmatched line), so REQBODY_ERROR is also set.
+# (An unmatched line before the first boundary also leaves it at 1.)
 
 {
 	type => "target",
