@@ -340,7 +340,7 @@ int Lua::setvar(lua_State *L) {
     if (nargs != 2) {
         ms_dbg_a(t, 8,
             "m.setvar: Failed m.setvar funtion must has 2 arguments");
-        return -1;
+        return 0;
     }
     var_value = luaL_checkstring(L, 2);
     var_name = luaL_checkstring(L, 1);
@@ -348,7 +348,7 @@ int Lua::setvar(lua_State *L) {
     lua_pop(L, 2);
 
     if (var_value == NULL || var_name == NULL) {
-        return -1;
+        return 0;
     }
 
     vname.assign(var_name);
@@ -363,7 +363,7 @@ int Lua::setvar(lua_State *L) {
         ms_dbg_a(t, 8,
             "m.setvar: Must specify a collection using dot character" \
             " - ie m.setvar(tx.myvar,mydata)");
-        return -1;
+        return 0;
     }
 
     if (collection == "TX") {
