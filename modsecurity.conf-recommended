@@ -127,6 +127,9 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # is blocked, so part data with lines starting with "--" (eg. PEM files)
 # is allowed.
 #
+# The outcomes below apply with "SecRuleEngine On"; in DetectionOnly mode
+# the rule only logs the match.
+#
 # +-------------------------------------------+-------+--------+-------+
 # | Body                                      | Value | !@eq 0 | @eq 1 |
 # +-------------------------------------------+-------+--------+-------+
