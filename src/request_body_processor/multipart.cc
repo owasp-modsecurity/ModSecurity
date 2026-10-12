@@ -270,12 +270,60 @@ void Multipart::validate_quotes(const char *data, char quote)  {
 }
 
 
+const char *contentDispositionErrorMessage(int rc) {
+    switch (rc) {
+        case CD_ERR_NOT_FORM_DATA:
+            return "disposition type is not form-data";
+        case CD_ERR_SEMICOLON_EXPECTED:
+            return "expected ';' after form-data";
+        case CD_ERR_PARAMETER_MISSING:
+            return "missing parameter after ';'";
+        case CD_ERR_VALUE_MISSING:
+            return "parameter has no value";
+        case CD_ERR_EQUALS_MISSING:
+            return "missing '=' after parameter name";
+        case CD_ERR_VALUE_EMPTY:
+            return "parameter value is empty";
+        case CD_ERR_QUOTE_EMPTY_UNTERMINATED:
+            return "end of header after opening quote";
+        case CD_ERR_ESCAPE_INCOMPLETE:
+            return "backslash at end of quoted value";
+        case CD_ERR_UNKNOWN_PARAMETER:
+            return "unknown parameter";
+        case CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE:
+            return "expected ';' after parameter value";
+        case CD_ERR_EQUALS_EXPECTED:
+            return "expected '=' after parameter name";
+        case CD_ERR_DUPLICATE_NAME:
+            return "duplicate name parameter";
+        case CD_ERR_QUOTE_UNTERMINATED:
+            return "closing quote not found";
+        case CD_ERR_FILENAME_STAR_CHARSET:
+            return "filename*: charset missing";
+        case CD_ERR_FILENAME_STAR_LANGUAGE:
+            return "filename*: closing quote of language not found";
+        case CD_ERR_FILENAME_STAR_PCT_ENCODING:
+            return "filename*: invalid percent-encoding";
+        case CD_ERR_FILENAME_STAR_CHARACTER:
+            return "filename*: invalid character";
+        case CD_ERR_DUPLICATE_FILENAME:
+            return "duplicate filename parameter";
+        case CD_ERR_DUPLICATE_FILENAME_STAR:
+            return "duplicate filename* parameter";
+        case CD_ERR_EXCEPTION:
+            return "unexpected exception";
+        default:
+            return "unknown error";
+    }
+}
+
+
 int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     const char *p = NULL;
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
-        return -1;
+        return CD_ERR_NOT_FORM_DATA;
     }
 
     /* see if there are any other parts to parse */
@@ -287,7 +335,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
     }
 
     if (*p != ';') {
-        return -2;
+        return CD_ERR_SEMICOLON_EXPECTED;
     }
     p++;
 
@@ -304,7 +352,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         }
 
         if (*p == '\0') {
-            return -3;
+            return CD_ERR_PARAMETER_MISSING;
         }
 
         start = p;
@@ -313,7 +361,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         }
 
         if (*p == '\0') {
-            return -4;
+            return CD_ERR_VALUE_MISSING;
         }
 
         name = std::string(start, (p - start));
@@ -323,11 +371,11 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         }
 
         if (*p == '\0') {
-            return -5;
+            return CD_ERR_EQUALS_MISSING;
         }
 
         if (*p != '=') {
-            return -13;
+            return CD_ERR_EQUALS_EXPECTED;
         }
 
         p++;
@@ -337,7 +385,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
         }
 
         if (*p == '\0') {
-            return -6;
+            return CD_ERR_VALUE_EMPTY;
         }
 
         char quote = '\0';
@@ -349,7 +397,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 p++;
             }
             if ((*p != '\'') || (p == start_of_charset)) {
-                return -16; // Must be at least one legit char before ' for start of language
+                return CD_ERR_FILENAME_STAR_CHARSET; // Must be at least one legit char before ' for start of language
             }
             m_mpp->m_filename_charset.assign(start_of_charset, (p - start_of_charset));
             m_mpp->m_filename_charsetOffset = offset + ((p - c_d_value) - m_mpp->m_filename_charset.size());
@@ -364,7 +412,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             }
             if (*p != '\'') {
                 m_flag_invalid_quoting = 1;
-                return -17; // Single quote for end-of-language not found
+                return CD_ERR_FILENAME_STAR_LANGUAGE; // Single quote for end-of-language not found
             }
             m_mpp->m_filename_language.assign(start_of_language, (p - start_of_language));
             m_mpp->m_filename_languageOffset = offset + ((p - c_d_value) - m_mpp->m_filename_language.size());
@@ -378,13 +426,13 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             while ((*p != '\0') && (*p != ';')) {
                 if (*p == '%') {
                     if ((*(p+1) == '\0') || (*(p+2) == '\0') || (!isxdigit(static_cast<unsigned char>(*(p+1)))) || (!isxdigit(static_cast<unsigned char>(*(p+2))))) {
-                        return -18;
+                        return CD_ERR_FILENAME_STAR_PCT_ENCODING;
                     }
                     p += 3;
                 } else if (isalnum(static_cast<unsigned char>(*p)) || strchr(attr_char_special, *p)) {
                     p++;
                 } else {
-                    return -19;
+                    return CD_ERR_FILENAME_STAR_CHARACTER;
                 }
             }
             value.assign(start_of_filename, p - start_of_filename);
@@ -401,14 +449,14 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
 
             p++;
             if (*p == '\0') {
-                return -7;
+                return CD_ERR_QUOTE_EMPTY_UNTERMINATED;
             }
 
             while (*p != '\0') {
                 if (*p == '\\') {
                     if (*(p + 1) == '\0') {
                         /* improper escaping */
-                        return -8;
+                        return CD_ERR_ESCAPE_INCOMPLETE;
                     }
                     /* only quote and \ can be escaped */
                     if ((*(p + 1) == quote) || (*(p + 1) == '\\')) {
@@ -434,7 +482,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 p++; /* go over the quote at the end */
             } else {
                 m_flag_invalid_quoting = 1;
-                return -15; /* closing quote not found */
+                return CD_ERR_QUOTE_UNTERMINATED;
             }
 
         } else {
@@ -459,7 +507,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "name: " + value + ". Previously: " + m_mpp->m_name + "");
-                return -14;
+                return CD_ERR_DUPLICATE_NAME;
             }
             m_mpp->m_name.assign(value);
             m_mpp->m_nameOffset = offset + ((p - c_d_value) - value.size());
@@ -473,7 +521,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "filename: " + value + ".");
-                return -15;
+                return CD_ERR_DUPLICATE_FILENAME;
             }
             else {
                 validate_quotes(value.c_str(), quote);
@@ -491,7 +539,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Warning: Duplicate Content-Disposition " \
                     "filename*: " + value + ".");
-                return -15;
+                return CD_ERR_DUPLICATE_FILENAME_STAR;
             }
 
             int invalid_count;
@@ -505,7 +553,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
             ms_dbg_a(m_transaction, 9,
                 "Multipart: Content-Disposition filename*: " + decoded_value + ".");
         } else {
-            return -11;
+            return CD_ERR_UNKNOWN_PARAMETER;
         }
 
         if (*p != '\0') {
@@ -527,7 +575,7 @@ int Multipart::parse_content_disposition(const char *c_d_value, int offset) {
                         m_flag_invalid_quoting = 1;
                     }
                     /* p++; */
-                    return -12;
+                    return CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE;
                 }
                 p++; /* move over the semi-colon */
             }
@@ -814,15 +862,17 @@ int Multipart::process_part_header(std::string *error, int offset) {
         } catch (...) {
             ms_dbg_a(m_transaction, 1,
                 "Multipart: Unexpected error parsing Content-Disposition header.");
-            rc = -99;
+            rc = CD_ERR_EXCEPTION;
         }
         if (rc < 0) {
             ms_dbg_a(m_transaction, 1,
                 "Multipart: Invalid Content-Disposition header ("
-                + std::to_string(rc) + "): " + header_value);
+                + std::to_string(rc) + ": " + contentDispositionErrorMessage(rc)
+                + "): " + header_value);
 
             error->assign("Multipart: Invalid Content-Disposition header ("
-                + std::to_string(rc) + "): " + header_value);
+                + std::to_string(rc) + ": " + contentDispositionErrorMessage(rc)
+                + "): " + header_value);
             return false;
         }
 
