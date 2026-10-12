@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_UNMATCHED_BOUNDARY :: missing final boundary, !@eq 0",
+    "title": "Testing Variables :: MULTIPART_UNMATCHED_BOUNDARY :: delimiter lines do not match the declared boundary, !@eq 0",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -185,7 +185,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: MULTIPART_UNMATCHED_BOUNDARY :: missing final boundary, @eq 1",
+    "title": "Testing Variables :: MULTIPART_UNMATCHED_BOUNDARY :: delimiter lines do not match the declared boundary, @eq 1",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
