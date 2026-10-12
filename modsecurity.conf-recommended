@@ -100,11 +100,9 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # the boundary string which given in MIME header. In any other cases it returns
 # with different value, eg. 1 or 2.
 #
-# The RFC 1341 descript the multipart content-type and its syntax must contains
-# only three mandatory lines (above the content):
-# * Content-Type: multipart/mixed; boundary=BOUNDARY_STRING
-# * --BOUNDARY_STRING
-# * --BOUNDARY_STRING--
+# RFC 1341 defines multipart bodies using the boundary parameter from the
+# Content-Type header. Each part starts with `--BOUNDARY_STRING`, and the body
+# ends with `--BOUNDARY_STRING--`.
 #
 # First line indicates, that this is a multipart content, second shows that
 # here starts a part of the multipart content, third shows the end of content.
