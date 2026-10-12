@@ -124,21 +124,25 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # If some of the necessary lines (usually the start or end) misses, or the order
 # is wrong, then parser returns with value 1 (also a non-zero).
 #
-# You can choose, which one is what you need. The example below contains the
-# 'strict' mode, which means if there are any lines with start of "--", then
-# ModSecurity blocked the content. But the next, commented example contains
-# the 'permissive' mode, then you check only if the necessary lines exists in
-# correct order. Whit this, you can enable to upload PEM files (eg "----BEGIN.."),
-# or other text files, which contains eg. HTTP headers.
+# You can choose which one you need. The rule below uses the 'permissive'
+# mode: the content is blocked only if the value is exactly 1, so values 0
+# and 2 are allowed. This lets you upload eg. PEM files ("-----BEGIN...")
+# or other text files which contain lines starting with "--".
 #
-# The difference is only the operator - in strict mode (first) the content blocked
-# in case of any non-zero value. In permissive mode (second, commented) the
-# content blocked only if the value is explicit 1. If it 0 or 2, the content will
-# allowed.
+# If you need the 'strict' mode, change the operator to "!@eq 0": then the
+# content is blocked in case of any non-zero value.
 #
-
+# Here is a brief summary:
 #
-# See #1747 and #1924 for further information on the possible values for
+# +--------------------------+-------+--------+-------+
+# | Body                     | Value | !@eq 0 | @eq 1 |
+# +--------------------------+-------+--------+-------+
+# | valid body               | 0     | 200    | 200   |
+# | missing final boundary   | 1     | 403    | 403   |
+# | part data starts with -- | 2     | 403    | 200   |
+# +--------------------------+-------+--------+-------+
+#
+# See #1747, #1924 and #3654 for further information on the possible values for
 # MULTIPART_UNMATCHED_BOUNDARY.
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
