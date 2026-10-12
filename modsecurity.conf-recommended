@@ -131,6 +131,9 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # For the 'strict' mode, change the operator to "!@eq 0": then the request
 # is blocked for any non-zero value.
 #
+# The outcomes below apply with "SecRuleEngine On"; in DetectionOnly mode
+# the rule only logs the match.
+#
 # +-------------------------------------------+-------+--------+-------+
 # | Body                                      | Value | !@eq 0 | @eq 1 |
 # +-------------------------------------------+-------+--------+-------+
