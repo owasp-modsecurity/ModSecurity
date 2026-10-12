@@ -1120,7 +1120,8 @@ int multipart_complete(modsec_rec *msr, char **error_msg) {
 
                     /* Same transition as in multipart_process_chunk(): the
                        unmatched line was followed by a valid (final) boundary. */
-                    if (msr->mpd->flag_unmatched_boundary == 1) {
+                    if ((msr->mpd->flag_unmatched_boundary == 1)
+                        && (msr->mpd->flag_unmatched_boundary_preamble == 0)) {
                         msr->mpd->flag_unmatched_boundary = 2;
                     }
 
@@ -1255,10 +1256,12 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                             }
 
                             /* The line is a valid boundary. If an unmatched
-                               boundary was seen earlier (flag is 1) and at least
-                               one boundary was already matched, set the flag to 2:
-                               the suspicious line was followed by a valid boundary,
-                               so it was most likely part data starting with "--".
+                               boundary was seen earlier inside a part (flag is 1),
+                               set the flag to 2: the suspicious line was followed
+                               by a valid boundary, so it was most likely part data
+                               starting with "--". An unmatched line seen before
+                               the first boundary (preamble) is not part data, so
+                               the flag stays 1 in that case.
                                If no unmatched boundary was seen, the flag stays 0.
                                Rules using "!@eq 0" (strict) catch both 1 and 2,
                                while "@eq 1" (permissive) catches only unmatched
@@ -1266,7 +1269,8 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                                The same transition is done in multipart_complete()
                                for a final boundary without a trailing newline.
                             */
-                            if ((msr->mpd->boundary_count > 0) && (msr->mpd->flag_unmatched_boundary == 1)) {
+                            if ((msr->mpd->flag_unmatched_boundary == 1)
+                                && (msr->mpd->flag_unmatched_boundary_preamble == 0)) {
                                 msr->mpd->flag_unmatched_boundary = 2;
                             }
 
@@ -1316,6 +1320,11 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                     }
 
                     msr->mpd->flag_unmatched_boundary = 1;
+                    if (msr->mpd->boundary_count == 0) {
+                        /* Seen before the first boundary (preamble): it is not
+                           part data, so it must not be changed to 2 later. */
+                        msr->mpd->flag_unmatched_boundary_preamble = 1;
+                    }
                 }
             } else { /* We do not think the buffer contains a boundary. */
                 /* Look into the buffer to see if there's anything
@@ -1330,6 +1339,11 @@ int multipart_process_chunk(modsec_rec *msr, const char *buf,
                         {
                             if (strncmp(p + i + 2, msr->mpd->boundary, strlen(msr->mpd->boundary)) == 0) {
                                 msr->mpd->flag_unmatched_boundary = 1;
+                                if (msr->mpd->boundary_count == 0) {
+                                    /* Preamble, not part data: the flag
+                                       must not be changed to 2 later. */
+                                    msr->mpd->flag_unmatched_boundary_preamble = 1;
+                                }
                                 break;
                             }
                         }

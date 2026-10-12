@@ -7,9 +7,9 @@
 # Every case is checked with the 'strict' ("!@eq 0") and the 'permissive'
 # ("@eq 1") rule.
 #
-# In these tests value 1 remains only if the body is broken (no valid
-# boundary follows the unmatched line), so REQBODY_ERROR is also set.
-# (An unmatched line before the first boundary also leaves it at 1.)
+# Value 1 remains if no valid boundary follows the unmatched line (broken
+# body, REQBODY_ERROR is also set), or if the unmatched line is before the
+# first boundary (preamble, MULTIPART_STRICT_ERROR is also set).
 
 {
 	type => "target",
@@ -309,6 +309,84 @@
 
 			--BINARYDATA
 			--0000--),
+	    ),
+	),
+},
+
+{
+	type => "target",
+	comment => "MULTIPART_UNMATCHED_BOUNDARY :: '--' line before the first boundary, !\@eq 0",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "!\@eq 0" "id:500409,phase:2,deny,log"
+	),
+	match_log => {
+		debug => [ qr/Target value: "1"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => q(multipart/form-data; boundary=0000),
+		],
+	    normalize_raw_request_data(
+		q(
+			--preamble
+			--0000
+			Content-Disposition: form-data; name="name"
+
+			Brian Rectanus
+			--0000
+			Content-Disposition: form-data; name="image"; filename="image.jpg"
+			Content-Type: image/jpeg
+
+			BINARYDATA
+			--0000--
+		),
+	    ),
+	),
+},
+
+{
+	type => "target",
+	comment => "MULTIPART_UNMATCHED_BOUNDARY :: '--' line before the first boundary, \@eq 1",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRequestBodyAccess On
+		SecRule MULTIPART_UNMATCHED_BOUNDARY "\@eq 1" "id:500410,phase:2,deny,log"
+	),
+	match_log => {
+		debug => [ qr/Target value: "1"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => q(multipart/form-data; boundary=0000),
+		],
+	    normalize_raw_request_data(
+		q(
+			--preamble
+			--0000
+			Content-Disposition: form-data; name="name"
+
+			Brian Rectanus
+			--0000
+			Content-Disposition: form-data; name="image"; filename="image.jpg"
+			Content-Type: image/jpeg
+
+			BINARYDATA
+			--0000--
+		),
 	    ),
 	),
 },

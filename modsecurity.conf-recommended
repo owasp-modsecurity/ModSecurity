@@ -110,8 +110,8 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # but does not match the boundary, MULTIPART_UNMATCHED_BOUNDARY is set:
 #
 # * 0: no unmatched boundary-like line was seen.
-# * 2: an unmatched boundary-like line was seen, and a valid delimiter
-#      (not the first one) followed it, so it was most likely part data.
+# * 2: an unmatched boundary-like line was seen inside a part, and a valid
+#      delimiter followed it, so it was most likely part data.
 # * 1: an unmatched boundary-like line was seen, and no valid delimiter
 #      followed it (broken body, REQBODY_ERROR is also set), or the line
 #      was before the first delimiter (MULTIPART_STRICT_ERROR is also set).
@@ -134,6 +134,8 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # | part data line starting with "--"         | 2     | block  | pass  |
 # | unmatched "--" line, no valid delimiter   | 1     | block  | block |
 # | after it                                  |       |        |       |
+# | unmatched "--" line before the first      | 1     | block  | block |
+# | delimiter                                 |       |        |       |
 # | broken body without unmatched "--" line   | 0     | pass   | pass  |
 # +-------------------------------------------+-------+--------+-------+
 #
