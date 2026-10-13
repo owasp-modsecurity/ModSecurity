@@ -28,6 +28,33 @@
 static void dummy_free_func(void *data) {}
 #endif
 
+#if defined(VERSION_STANDALONE) || defined(VERSION_IIS) || defined(VERSION_NGINX)
+/* ap_map_http_request_error() lives in httpd itself (modules/http/
+ * http_filters.c), so builds that do not link against httpd need their own
+ * copy of it (#3451). */
+static int msc_ap_map_http_request_error(apr_status_t rv, int status)
+{
+    switch (rv) {
+    case AP_FILTER_ERROR:
+        return AP_FILTER_ERROR;
+
+    case APR_ENOSPC:
+        return HTTP_REQUEST_ENTITY_TOO_LARGE;
+
+    case APR_ENOTIMPL:
+        return HTTP_NOT_IMPLEMENTED;
+
+    case APR_TIMEUP:
+    case APR_ETIMEDOUT:
+        return HTTP_REQUEST_TIME_OUT;
+
+    default:
+        return status;
+    }
+}
+#define ap_map_http_request_error msc_ap_map_http_request_error
+#endif
+
 /**
  * This request filter will forward the previously stored
  * request body further down the chain (most likely to the
