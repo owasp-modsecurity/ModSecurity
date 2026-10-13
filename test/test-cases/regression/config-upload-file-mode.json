@@ -1,0 +1,67 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecUploadFileMode preserves octal permissions",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "280",
+        "Content-Type": "multipart/form-data; boundary=0000",
+        "Expect": "100-continue"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"name\"\r\n",
+        "\r\n",
+        "Brian Rectanus\r\n",
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"email\"\r\n",
+        "\r\n",
+        "brian.rectanus@breach.com\r\n",
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n",
+        "Content-Type: image/jpeg\r\n",
+        "\r\n",
+        "BINARYDATA\r\n",
+        "--0000--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecUploadKeepFiles On",
+      "SecUploadDir /tmp/",
+      "SecTmpDir /tmp/",
+      "SecUploadFileMode 0600",
+      "SecRule FILES_TMPNAMES \"@inspectFile test-cases/data/inspectFile-mode-600.lua\" \"id:1234,phase:2,deny,status:403\""
+    ]
+  }
+]
