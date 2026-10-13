@@ -78,6 +78,8 @@ TreeNode *CPTCreateNode(apr_pool_t *pool)   {
     return node;
 }
 
+int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, unsigned int netmask);
+
 CPTData *CPTCreateCPTData(unsigned char netmask, apr_pool_t *pool) {
 
     CPTData *prefix_data = apr_palloc(pool, sizeof(CPTData));
@@ -249,48 +251,54 @@ TreeNode *SetParentNode(TreeNode *node, TreeNode *new_node, CPTTree *tree)  {
     return new_node;
 }
 
-int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
-        CPTTree *tree, unsigned char netmask, unsigned char bitlen) {
+/*
+ * Adds a netmask to a node, keeping the array sorted from the most to the
+ * least specific netmask. The array is grown (copied), not replaced, so the
+ * netmasks already on the node survive (#3588).
+ */
+int CPTAddNetmask(TreeNode *node, unsigned char netmask, apr_pool_t *pool) {
+    unsigned char *netmasks;
     int i;
 
-    if (netmask != NETMASK_256-1 && netmask != NETMASK_128) {
-        if ((netmask != NETMASK_32 || (netmask == NETMASK_32 && bitlen != NETMASK_32))) {
+    netmasks = apr_palloc(pool, (node->count + 1) * sizeof(unsigned char));
+    if (netmasks == NULL)
+        return 0;
+    if (node->count > 0)
+        memcpy(netmasks, node->netmasks, node->count * sizeof(unsigned char));
 
-            node = new_node;
-            parent = new_node->parent;
+    i = node->count - 1;
+    while (i >= 0 && netmasks[i] < netmask) {
+        netmasks[i + 1] = netmasks[i];
+        i--;
+    }
+    netmasks[i + 1] = netmask;
 
-            while (parent != NULL && netmask < (parent->bit + 1)) {
-                node = parent;
-                parent = parent->parent;
-            }
+    node->netmasks = netmasks;
+    node->count++;
 
-            node->count++;
-            node->netmasks = apr_palloc(tree->pool, (node->count * sizeof(unsigned char)));
+    return 1;
+}
 
-            if(node->netmasks == NULL)
-                return 0;
-            if ((node->count-1) == 0) {
-                node->netmasks[0] = netmask;
-                return 1;
-            }
+/*
+ * Registers a netmask on the node that covers it: starting from new_node,
+ * walk up while the netmask is wider than the parent's branching bit.
+ */
+int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
+        CPTTree *tree, unsigned char netmask, unsigned char bitlen) {
+    if (netmask == NETMASK_256-1 || netmask == NETMASK_128)
+        return 0;
+    if (netmask == NETMASK_32 && bitlen == NETMASK_32)
+        return 0;
 
-            node->netmasks[node->count - 1] = netmask;
+    node = new_node;
+    parent = new_node->parent;
 
-            i = node->count - 2;
-            while (i >= 0) {
-                if (netmask < node->netmasks[i]) {
-                    node->netmasks[i + 1] = netmask;
-                    break;
-                }
-
-                node->netmasks[i + 1] = node->netmasks[i];
-                node->netmasks[i] = netmask;
-                i--;
-            }
-        }
+    while (parent != NULL && netmask < (parent->bit + 1)) {
+        node = parent;
+        parent = parent->parent;
     }
 
-    return 0;
+    return CPTAddNetmask(node, netmask, tree->pool);
 }
 
 TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree *tree, unsigned char netmask)   {
@@ -388,52 +396,21 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
     if (test_bit == bitlen && node->bit == bitlen) {
         if (node->prefix != NULL) {
-            int found = 0;
-            CPTData *prefix_data = NULL;
-
-            prefix_data = node->prefix->prefix_data;
-
-            while(prefix_data != NULL)  {
-                if (prefix_data->netmask == netmask)
-                    ++found;
-                prefix_data = prefix_data->next;
-            }
-
-            if (found != 0) {
-
+            /*
+             * Same key already in the tree (e.g. 10.0.0.0/16 and then
+             * 10.0.0.0/8). Record the netmask unless it is a duplicate;
+             * previously anything but an exact duplicate was dropped (#3588).
+             */
+            if (TreeCheckData(node->prefix, node->prefix->prefix_data,
+                    netmask) == 0) {
                 CPTData *prefix_data = CPTCreateCPTData(netmask, tree->pool);
-                CPTAppendToCPTDataList(prefix_data, &prefix->prefix_data);
+                if (prefix_data == NULL)
+                    return NULL;
+                CPTAppendToCPTDataList(prefix_data, &node->prefix->prefix_data);
 
-                if(CheckBitmask(netmask, ip_bitmask))
-                    return node;
-
-                parent = node->parent;
-                while (parent != NULL && netmask < (parent->bit + 1)) {
-                    node = parent;
-                    parent = parent->parent;
-                }
-
-                node->count++;
-                new_node = node;
-                node->netmasks = apr_palloc(tree->pool, (node->count *  sizeof(unsigned char)));
-
-                if ((node->count -1) == 0) {
-                    node->netmasks[0] = netmask;
-                    return new_node;
-                }
-
-                node->netmasks[node->count - 1] = netmask;
-
-                i = node->count - 2;
-                while (i >= 0) {
-                    if (netmask < node->netmasks[i]) {
-                        node->netmasks[i + 1] = netmask;
-                        break;
-                    }
-
-                    node->netmasks[i + 1] = node->netmasks[i];
-                    node->netmasks[i] = netmask;
-                    i--;
+                if (CheckBitmask(netmask, ip_bitmask) == 0) {
+                    InsertNetmask(node, node->parent, node, tree, netmask,
+                        bitlen);
                 }
             }
         } else {
@@ -645,6 +622,10 @@ TreeNode *CPTFindElementIPNetblock(modsec_rec *msr, unsigned char *ipdata, unsig
     while(j < netmask_node->count)    {
         bytes = ip_bitmask / 8;
 
+        /* Netmasks are sorted from most to least specific, so masking the
+         * already masked address again is the same as masking the original.
+         * Previously only the first netmask was applied (#3588). */
+        i = 0;
         while( i < bytes )  {
 
             mask = -1;
