@@ -39,7 +39,6 @@
 #include "src/collection/backend/lmdb.h"
 #include "src/unique_id.h"
 #include "src/utils/regex.h"
-#include "src/utils/geo_lookup.h"
 #include "src/actions/transformations/transformation.h"
 
 namespace modsecurity {
@@ -94,9 +93,6 @@ ModSecurity::ModSecurity()
 ModSecurity::~ModSecurity() {
 #ifdef MSC_WITH_CURL
     curl_global_cleanup();
-#endif
-#ifdef WITH_GEOIP
-    Utils::GeoLookup::getInstance().cleanUp();
 #endif
 #ifdef WITH_LIBXML2
     xmlCleanupParser();
