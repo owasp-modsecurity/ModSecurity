@@ -184,5 +184,52 @@
       "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:400,id:500097,msg:'%{REQBODY_ERROR_MSG}'\"",
       "SecRule ARGS:namea \"@streq 111\" \"phase:2,deny,status:403,id:500098\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "multipart parser (boundary parameter count) (5) - two boundary parameters with a vertical tab before the equals are still rejected",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Type": "multipart/form-data; boundary=0000; boundary\u000b=1111",
+        "Content-Length": "71"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "--0000\r\n",
+        "Content-Disposition: form-data; name=\"namea\"\r\n",
+        "\r\n",
+        "111\r\n",
+        "--0000--\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Multiple boundary parameters in C-T",
+      "http_code": 400
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"phase:2,deny,status:400,id:500097,msg:'%{REQBODY_ERROR_MSG}'\"",
+      "SecRule ARGS:namea \"@streq 111\" \"phase:2,deny,status:403,id:500098\""
+    ]
   }
 ]

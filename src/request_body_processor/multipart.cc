@@ -1353,11 +1353,11 @@ int Multipart::count_boundary_params(const std::string& str_header_value) {
          * or after a ';' / whitespace, and followed by '='. A boundary value
          * such as "----geckoformboundary..." followed by another parameter
          * ("charset=UTF-8") must not count (#3610). */
-        bool param_start = (s == start) || s[-1] == ';' || s[-1] == ' '
-            || s[-1] == '\t';
+        bool param_start = (s == start) || s[-1] == ';' || isspace(s[-1]);
         s += 8;
         const char *p = s;
-        while (*p == ' ' || *p == '\t') {
+        /* Same whitespace as Multipart::init accepts before the '='. */
+        while (isspace(*p)) {
             p++;
         }
         if (param_start && *p == '=') {
