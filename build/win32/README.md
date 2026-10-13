@@ -69,11 +69,11 @@ NOTE: When building a different configuration, it's recommended to reset:
 
 By default the following all the following features are enabled by including the associated third-party library through a Conan package:
 
- * libxml2 2.15.2 for XML processing support
- * libcurl 8.19.0 to support http requests from rules
+ * libxml2 2.15.4 for XML processing support
+ * libcurl 8.22.0 to support http requests from rules
  * libmaxminddb 1.12.2 to support reading MaxMind DB files.
  * LUA 5.5.0 to enable rules to run scripts in this language for extensibility
- * lmdb 0.9.32 in-memory database
+ * lmdb 1.0.2 in-memory database
 
 Each of these can be turned off by updating the associated `HAVE_xxx` variable (setting it to zero) in the beginning of the libModSecurity section of `CMakeLists.txt`.
 
