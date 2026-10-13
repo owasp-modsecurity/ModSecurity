@@ -84,6 +84,80 @@ static char *multipart_construct_filename(modsec_rec *msr) {
 /**
  *
  */
+/*
+ * Error codes of multipart_parse_content_disposition(). The numeric values
+ * are part of the REQBODY_ERROR_MSG text, so keep them stable; add new codes
+ * at the end. Use multipart_cd_error_message() for the description.
+ */
+enum ContentDispositionError {
+    CD_ERR_NOT_FORM_DATA = -1,
+    CD_ERR_SEMICOLON_EXPECTED = -2,
+    CD_ERR_PARAMETER_MISSING = -3,
+    CD_ERR_VALUE_MISSING = -4,
+    CD_ERR_EQUALS_MISSING = -5,
+    CD_ERR_VALUE_EMPTY = -6,
+    CD_ERR_QUOTE_EMPTY_UNTERMINATED = -7,
+    CD_ERR_ESCAPE_INCOMPLETE = -8,
+    /* -9 is reserved: improper escaping, tolerated because of IE */
+    CD_ERR_QUOTE_UNTERMINATED = -10,
+    CD_ERR_UNKNOWN_PARAMETER = -11,
+    CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE = -12,
+    CD_ERR_EQUALS_EXPECTED = -13,
+    CD_ERR_DUPLICATE_NAME = -14,
+    /* -15 was shared by both duplicate filename cases, see -20 and -21 */
+    CD_ERR_FILENAME_STAR_CHARSET = -16,
+    CD_ERR_FILENAME_STAR_LANGUAGE = -17,
+    CD_ERR_FILENAME_STAR_PCT_ENCODING = -18,
+    CD_ERR_FILENAME_STAR_CHARACTER = -19,
+    CD_ERR_DUPLICATE_FILENAME = -20,
+    CD_ERR_DUPLICATE_FILENAME_STAR = -21,
+};
+
+static const char *multipart_cd_error_message(int rc) {
+    switch (rc) {
+        case CD_ERR_NOT_FORM_DATA:
+            return "disposition type is not form-data";
+        case CD_ERR_SEMICOLON_EXPECTED:
+            return "expected ';' after form-data";
+        case CD_ERR_PARAMETER_MISSING:
+            return "missing parameter after ';'";
+        case CD_ERR_VALUE_MISSING:
+            return "parameter has no value";
+        case CD_ERR_EQUALS_MISSING:
+            return "missing '=' after parameter name";
+        case CD_ERR_VALUE_EMPTY:
+            return "parameter value is empty";
+        case CD_ERR_QUOTE_EMPTY_UNTERMINATED:
+            return "end of header after opening quote";
+        case CD_ERR_ESCAPE_INCOMPLETE:
+            return "backslash at end of quoted value";
+        case CD_ERR_UNKNOWN_PARAMETER:
+            return "unknown parameter";
+        case CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE:
+            return "expected ';' after parameter value";
+        case CD_ERR_EQUALS_EXPECTED:
+            return "expected '=' after parameter name";
+        case CD_ERR_DUPLICATE_NAME:
+            return "duplicate name parameter";
+        case CD_ERR_QUOTE_UNTERMINATED:
+            return "closing quote not found";
+        case CD_ERR_FILENAME_STAR_CHARSET:
+            return "filename*: charset missing";
+        case CD_ERR_FILENAME_STAR_LANGUAGE:
+            return "filename*: closing quote of language not found";
+        case CD_ERR_FILENAME_STAR_PCT_ENCODING:
+            return "filename*: invalid percent encoding";
+        case CD_ERR_FILENAME_STAR_CHARACTER:
+            return "filename*: invalid character";
+        case CD_ERR_DUPLICATE_FILENAME:
+            return "duplicate filename parameter";
+        case CD_ERR_DUPLICATE_FILENAME_STAR:
+            return "duplicate filename* parameter";
+        default:
+            return "unknown error";
+    }
+}
+
 static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value) {
     assert(msr != NULL);
     assert(c_d_value != NULL);
@@ -259,7 +333,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition filename: %s",
                     log_escape_nq(msr->mp, value));
-                return -15;
+                return CD_ERR_DUPLICATE_FILENAME;
             }
             else {
                 validate_quotes(msr, value, quote);
@@ -277,7 +351,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4,
                     "Multipart: Warning: Duplicate Content-Disposition filename*: %s.",  log_escape_nq(msr->mp, value));
-                return -15;
+                return CD_ERR_DUPLICATE_FILENAME_STAR;
             }
             int invalid_count = 0;
             int changed = 0;
@@ -368,8 +442,8 @@ static int multipart_process_part_header(modsec_rec *msr, char **error_msg) {
 
         rc = multipart_parse_content_disposition(msr, header_value);
         if (rc < 0) {
-            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%d): %s.",
-                    rc, log_escape_nq(msr->mp, header_value));
+            *error_msg = apr_psprintf(msr->mp, "Multipart: Invalid Content-Disposition header (%d: %s): %s.",
+                    rc, multipart_cd_error_message(rc), log_escape_nq(msr->mp, header_value));
             return -1;
         }
 
