@@ -88,12 +88,17 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         return NULL;
     }
 
+    /* Register the cleanup as soon as there is something to free, so the
+     * compiled pattern is released even if a later step fails (#2407). */
+    regex->match_context = NULL;
+    apr_pool_cleanup_register(pool, (void *)regex,
+        (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
+
 #ifdef WITH_PCRE_JIT
     regex->jit_compile_rc = pcre2_jit_compile(regex->re, PCRE2_JIT_COMPLETE);
 #endif
 
     /* Setup the pcre2 match context */
-    regex->match_context = NULL;
     match_context = pcre2_match_context_create(NULL);
     if (match_context == NULL) {
         return NULL;
@@ -131,9 +136,6 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 
     regex->match_context = match_context;
 
-    apr_pool_cleanup_register(pool, (void *)regex,
-        (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
-
     return regex;
 }
 #else /* not WITH_PCRE2 */
@@ -153,6 +155,10 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
         regex->re = pcre_compile(pattern, options, _errptr, _erroffset, NULL);
     }
     if (regex->re == NULL) return NULL;
+
+    /* Register the cleanup as soon as there is something to free (#2407). */
+    apr_pool_cleanup_register(pool, (void *)regex,
+        (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
 
     #ifdef WITH_PCRE_STUDY
         #ifdef WITH_PCRE_JIT
@@ -210,9 +216,6 @@ void *msc_pregcomp_ex(apr_pool_t *pool, const char *pattern, int options,
 #endif /* PCRE_EXTRA_MATCH_LIMIT_RECURSION */
 
     regex->pe = pe;
-
-    apr_pool_cleanup_register(pool, (void *)regex,
-        (apr_status_t (*)(void *))msc_pcre_cleanup, apr_pool_cleanup_null);
 
     return regex;
 }
