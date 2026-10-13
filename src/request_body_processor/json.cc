@@ -18,6 +18,8 @@
 
 #include "src/request_body_processor/json.h"
 
+#include "src/utils/string.h"
+
 #include <list>
 #include <iostream>
 #include <string>
@@ -95,8 +97,10 @@ bool JSON::processChunk(const char *buf, unsigned int size, std::string *err) {
     if (m_status != yajl_status_ok) {
         unsigned char *e = yajl_get_error(m_handle, 0,
             (const unsigned char *)buf, size);
-        /* We need to free the yajl error message later, how to do this? */
+        /* yajl terminates the message with a newline; keep REQBODY_ERROR_MSG
+         * and the log lines on one line (#2278). */
         err->assign((const char *)e);
+        utils::string::chomp(*err);
         if (m_depth_limit_exceeded) {
             err->append(json_depth_limit_exceeded_msg);
 	}
@@ -113,8 +117,10 @@ bool JSON::complete(std::string *err) {
     m_status = yajl_complete_parse(m_handle);
     if (m_status  != yajl_status_ok) {
         unsigned char *e = yajl_get_error(m_handle, 0, NULL, 0);
-        /* We need to free the yajl error message later, how to do this? */
+        /* yajl terminates the message with a newline; keep REQBODY_ERROR_MSG
+         * and the log lines on one line (#2278). */
         err->assign((const char *)e);
+        utils::string::chomp(*err);
         if (m_depth_limit_exceeded) {
             err->append(json_depth_limit_exceeded_msg);
 	}
