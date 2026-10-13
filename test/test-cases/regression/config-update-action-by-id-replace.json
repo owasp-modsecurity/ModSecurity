@@ -1,0 +1,162 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById replaces single instance actions (1) - msg is replaced",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?test=value1",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[msg \"def\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,msg:'abc',logdata:'ld-abc',severity:2\"",
+      "SecRuleUpdateActionById 200004 \"msg:'def'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById replaces single instance actions (2) - logdata is replaced",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?test=value1",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-def\"\\] \\[severity \"2\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,msg:'abc',logdata:'ld-abc',severity:2\"",
+      "SecRuleUpdateActionById 200004 \"logdata:'ld-def'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById replaces single instance actions (3) - severity is replaced",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?test=value1",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"5\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,msg:'abc',logdata:'ld-abc',severity:2\"",
+      "SecRuleUpdateActionById 200004 \"severity:5\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById replaces single instance actions (4) - rule without update keeps its own",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?test=value1",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,msg:'abc',logdata:'ld-abc',severity:2\"",
+      "SecRuleUpdateActionById 200005 \"msg:'def'\""
+    ]
+  }
+]
