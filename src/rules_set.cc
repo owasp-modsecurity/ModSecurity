@@ -205,6 +205,32 @@ int RulesSet::evaluate(int phase, Transaction *t) {
 
 
             if (ruleWithActions) {
+                // ctl:ruleRemoveById applies to SecAction as well as SecRule,
+                // so it is checked here and not in RuleWithOperator (#3053).
+                for (const auto &i : t->m_ruleRemoveById) {
+                    if (ruleWithActions->m_ruleId != i) {
+                        continue;
+                    }
+                    ms_dbg_a(t, 9, "Rule id: " \
+                        + std::to_string(ruleWithActions->m_ruleId) \
+                        + " was skipped due to a ruleRemoveById action...");
+                    remove_rule = true;
+                    break;
+                }
+                for (const auto &i : t->m_ruleRemoveByIdRange) {
+                    if (remove_rule || !(i.first <= ruleWithActions->m_ruleId
+                        && i.second >= ruleWithActions->m_ruleId)) {
+                        continue;
+                    }
+                    ms_dbg_a(t, 9, "Rule id: " \
+                        + std::to_string(ruleWithActions->m_ruleId) \
+                        + " was skipped due to a ruleRemoveById action...");
+                    remove_rule = true;
+                    break;
+                }
+                if (remove_rule) {
+                    continue;
+                }
                 for (const auto &z : t->m_ruleRemoveByTag) {
                     if (ruleWithActions->containsTag(z, t) == true) {
                         ms_dbg_a(t, 9, "Skipped rule id '" \
