@@ -232,6 +232,15 @@ static char *xml_parse_error(modsec_rec *msr, xmlParserCtxtPtr ctx, const char *
         what, log_escape_nq(msr->mp, detail), e->line, e->int2);
 }
 
+/**
+ * Keep libxml2 from writing parser errors to stderr on its own; the reason
+ * is reported through xml_parse_error() instead. Must go through
+ * xmlCtxtUseOptions(): OR-ing ctx->options directly is a no-op before
+ * libxml2 2.13 (see v3 #3563).
+ */
+static void xml_silence_parser(xmlParserCtxtPtr ctx) {
+    xmlCtxtUseOptions(ctx, XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
+}
 
 /**
  * Feed one chunk of data to the XML parser.
@@ -269,6 +278,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context.");
                 return -1;
             }
+            xml_silence_parser(msr->xml->parsing_ctx);
         }
         if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
             msr->xml->parsing_ctx_arg = xmlCreatePushParserCtxt(
@@ -281,6 +291,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context for ARGS.");
                 return -1;
             }
+            xml_silence_parser(msr->xml->parsing_ctx_arg);
         }
     } else {
 
