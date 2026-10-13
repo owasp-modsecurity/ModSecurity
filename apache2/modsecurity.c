@@ -178,6 +178,13 @@ int msr_global_mutex_unlock(modsec_rec* msr, apr_global_mutex_t* lock, const cha
     return rc;
 }
 
+#ifdef WITH_CURL
+static apr_status_t modsecurity_curl_cleanup(void *data) {
+    curl_global_cleanup();
+    return APR_SUCCESS;
+}
+#endif
+
 /**
  * Initialise the modsecurity engine. This function must be invoked
  * after configuration processing is complete as Apache needs to know the
@@ -192,14 +199,20 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
 #endif
 
     /**
-     * Notice that curl is initialized here but never cleaned up. First version
-     * of this implementation curl was initialized and cleaned for every
-     * utilization. Turns out that it was not only cleaning stuff that was
-     * utilized by Curl but also other OpenSSL stuff that was utilized by
-     * mod_ssl leading the SSL support to crash.
+     * curl_global_init() runs on every (re)start, so it has to be paired
+     * with curl_global_cleanup() when the configuration pool goes away,
+     * otherwise the TLS backend is initialised once more on each reload
+     * without ever being released. With a GnuTLS backed libcurl that
+     * exhausts the random source after a few thousand reloads (#3590).
+     *
+     * The cleanup is registered on the configuration pool, not called per
+     * utilisation as an early version did: with OpenSSL before 1.1.0 that
+     * tore down global OpenSSL state that mod_ssl was still using.
      */
 #ifdef WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
+    apr_pool_cleanup_register(mp, NULL, modsecurity_curl_cleanup,
+        apr_pool_cleanup_null);
 #endif
     /* Serial audit log mutex */
     rc = acquire_global_lock(&msce->auditlog_lock, mp);
