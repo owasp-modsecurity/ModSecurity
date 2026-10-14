@@ -638,9 +638,11 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
                 m_nfiles++;
 
+                char mode[16];
+                snprintf(mode, sizeof(mode), "0%o", m_transaction->m_rules->m_uploadFileMode.m_value);
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Created temporary file " \
-                    + std::to_string(m_nfiles) + " (mode o" + std::to_string(m_transaction->m_rules->m_uploadFileMode.m_value) + "): " \
+                    + std::to_string(m_nfiles) + " (mode " + mode + "): " \
                     + m_mpp->m_tmp_file->getFilename());
             }
 
