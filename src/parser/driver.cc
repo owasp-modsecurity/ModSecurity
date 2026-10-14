@@ -28,25 +28,30 @@ namespace Parser {
 
 namespace {
 
+/*
+ * Attaches the rule to the chain opened by *lastRule, if any.
+ *
+ * Returns 1 when the rule was appended, 0 when there is no open chain and
+ * -1 when the rule is not a valid chain link (the error is written to
+ * parserError).
+ */
 template <typename RuleType>
-bool appendRuleToChain(RuleWithActions **lastRule,
+int appendRuleToChain(RuleWithActions **lastRule,
     std::unique_ptr<RuleType> *rule,
     std::ostringstream *parserError) {
-    /* is it a chained rule? */
-    if (*lastRule != nullptr && (*lastRule)->isChained()) {
-        rule->get()->setPhase((*lastRule)->getPhase());
-        if (rule->get()->hasDisruptiveAction()) {
-            *parserError << "Disruptive actions can only be specified by";
-            *parserError << " chain starter rules.";
-            return false;
-        }
-        (*lastRule)->m_chainedRuleChild = std::move(*rule);
-        (*lastRule)->m_chainedRuleChild->m_chainedRuleParent = *lastRule;
-        *lastRule = (*lastRule)->m_chainedRuleChild.get();
-        return true;
+    if (*lastRule == nullptr || !(*lastRule)->isChained()) {
+        return 0;
     }
-
-    return false;
+    rule->get()->setPhase((*lastRule)->getPhase());
+    if (rule->get()->hasDisruptiveAction()) {
+        *parserError << "Disruptive actions can only be specified by";
+        *parserError << " chain starter rules.";
+        return -1;
+    }
+    (*lastRule)->m_chainedRuleChild = std::move(*rule);
+    (*lastRule)->m_chainedRuleChild->m_chainedRuleParent = *lastRule;
+    *lastRule = (*lastRule)->m_chainedRuleChild.get();
+    return 1;
 }
 
 }  // namespace
@@ -93,8 +98,9 @@ int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
 
 
 int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
-    if (appendRuleToChain(&m_lastRule, &rule, &m_parserError) == true) {
-        return true;
+    const int chained = appendRuleToChain(&m_lastRule, &rule, &m_parserError);
+    if (chained != 0) {
+        return chained > 0;
     }
 
     m_rulesSetPhases.insert(std::move(rule));
@@ -109,8 +115,9 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         return false;
     }
 
-    if (appendRuleToChain(&m_lastRule, &r, &m_parserError) == true) {
-        return true;
+    const int chained = appendRuleToChain(&m_lastRule, &r, &m_parserError);
+    if (chained != 0) {
+        return chained > 0;
     }
 
     std::shared_ptr<RuleWithActions> rule(std::move(r));
