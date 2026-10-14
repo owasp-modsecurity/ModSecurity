@@ -31,6 +31,7 @@
 #include <set>
 #include <cstring>
 #include <limits>
+#include <algorithm>
 #include <cstdint>
 #endif
 
@@ -203,15 +204,18 @@ class ConfigOctalInt : public ConfigUnsignedInt {
             }
             return false;
         }
+        // Leading zeroes are not significant ("000640" is still 0640).
+        const std::string digits = a.substr(
+            std::min(a.find_first_not_of('0'), a.size() - 1));
         // 11 octal digits always fit in uint64_t, so stoull cannot throw;
         // the base class then checks the value against uint32_t.
-        if (a.size() > 11) {
+        if (digits.size() > 11) {
             if (errmsg) {
                 *errmsg = "Value is too big.";
             }
             return false;
         }
-        return ConfigUnsignedInt::parse(std::to_string(std::stoull(a, nullptr, 8)), errmsg);
+        return ConfigUnsignedInt::parse(std::to_string(std::stoull(digits, nullptr, 8)), errmsg);
     }
 };
 
