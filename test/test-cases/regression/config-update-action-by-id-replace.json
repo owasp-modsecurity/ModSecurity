@@ -30,7 +30,7 @@
       ]
     },
     "expected": {
-      "error_log": "\\[msg \"def\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\]",
+      "error_log": "\\[id \"200004\"\\] \\[rev \"\"\\] \\[msg \"def\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\] \\[ver \"\"\\]",
       "http_code": 403
     },
     "rules": [
@@ -70,7 +70,7 @@
       ]
     },
     "expected": {
-      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-def\"\\] \\[severity \"2\"\\]",
+      "error_log": "\\[id \"200004\"\\] \\[rev \"\"\\] \\[msg \"abc\"\\] \\[data \"ld-def\"\\] \\[severity \"2\"\\] \\[ver \"\"\\]",
       "http_code": 403
     },
     "rules": [
@@ -110,7 +110,7 @@
       ]
     },
     "expected": {
-      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"5\"\\]",
+      "error_log": "\\[id \"200004\"\\] \\[rev \"\"\\] \\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"5\"\\] \\[ver \"\"\\]",
       "http_code": 403
     },
     "rules": [
@@ -150,7 +150,7 @@
       ]
     },
     "expected": {
-      "error_log": "\\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\]",
+      "error_log": "\\[id \"200004\"\\] \\[rev \"\"\\] \\[msg \"abc\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\] \\[ver \"\"\\]",
       "http_code": 403
     },
     "rules": [
