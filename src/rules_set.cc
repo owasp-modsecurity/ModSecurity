@@ -207,8 +207,8 @@ int RulesSet::evaluate(int phase, Transaction *t) {
             if (ruleWithActions) {
                 // ctl:ruleRemoveById applies to SecAction as well as SecRule,
                 // so it is checked here and not in RuleWithOperator (#3053).
-                for (const auto &i : t->m_ruleRemoveById) {
-                    if (ruleWithActions->m_ruleId != i) {
+                for (const auto id : t->m_ruleRemoveById) {
+                    if (ruleWithActions->m_ruleId != id) {
                         continue;
                     }
                     ms_dbg_a(t, 9, "Rule id: " \
@@ -217,9 +217,9 @@ int RulesSet::evaluate(int phase, Transaction *t) {
                     remove_rule = true;
                     break;
                 }
-                for (const auto &i : t->m_ruleRemoveByIdRange) {
-                    if (remove_rule || !(i.first <= ruleWithActions->m_ruleId
-                        && i.second >= ruleWithActions->m_ruleId)) {
+                for (const auto &[first, last] : t->m_ruleRemoveByIdRange) {
+                    if (remove_rule || !(first <= ruleWithActions->m_ruleId
+                        && last >= ruleWithActions->m_ruleId)) {
                         continue;
                     }
                     ms_dbg_a(t, 9, "Rule id: " \
