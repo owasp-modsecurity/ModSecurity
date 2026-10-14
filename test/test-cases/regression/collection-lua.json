@@ -353,7 +353,7 @@
       "SecRuleEngine On",
       "SecAction \"id:1,pass,setvar:TX.lua_set_var=1\"",
       "SecRuleScript test-cases/data/setvar-bad-args.lua \"id:2,pass\"",
-      "SecRule TX.lua_set_var \"@eq 1\" \"id:3,t:none\""
+      "SecRule TX.lua_set_var \"!@eq 1\" \"id:3,phase:2,deny,status:500,t:none\""
     ]
   }
 ]
