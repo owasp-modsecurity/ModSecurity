@@ -191,7 +191,7 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
         if (unicode_len > 0) {
             i += unicode_len;
             /* code points above U+FFFF need five hex digits */
-            data += sprintf(data, "%%u%04x", d);
+            data += snprintf(data, len - (data - rval), "%%u%04x", d);
             *changed = 1;
         }
         else {
