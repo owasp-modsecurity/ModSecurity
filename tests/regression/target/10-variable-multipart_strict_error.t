@@ -515,7 +515,7 @@
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename="safe.jpg"; filename="safe.php"/s, 1 ],
+		debug => [ qr/Multipart: Invalid Content-Disposition header \(-20: duplicate filename parameter\): form-data; name="file"; filename="safe.jpg"; filename="safe.php"/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -561,7 +561,7 @@
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename\*=UTF8''safe.php/s, 1 ],
+		debug => [ qr/Multipart: Invalid Content-Disposition header \(-21: duplicate filename\* parameter\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename\*=UTF8''safe.php/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -607,7 +607,7 @@
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Multipart: Invalid Content-Disposition header \(\-15\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename="safe.jpg"; filename="safe.php"/s, 1 ],
+		debug => [ qr/Multipart: Invalid Content-Disposition header \(-20: duplicate filename parameter\): form-data; name="file"; filename\*=UTF8''safe.jpg; filename="safe.jpg"; filename="safe.php"/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -651,7 +651,7 @@
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Invalid Content-Disposition header \(-18\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
+		debug => [ qr/Invalid Content-Disposition header \(-18: filename\*: invalid percent encoding\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
@@ -698,7 +698,7 @@
 		SecRule MULTIPART_STRICT_ERROR "!\@eq 0" "id:990102,phase:2,deny,status:400,log,t:none"
 	),
 	match_log => {
-		debug => [ qr/Invalid Content-Disposition header \(-16\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
+		debug => [ qr/Invalid Content-Disposition header \(-16: filename\*: charset missing\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
 	},
 	match_response => {
 		status => qr/^400$/,
