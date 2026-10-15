@@ -35,6 +35,12 @@ static const bool kRxMultiLine = true;
 bool Rx::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
         m_re = new Regex(m_param, false, kRxMultiLine);
+        if (m_re->hasError()) {
+            if (error) {
+                *error = "Invalid regular expression: " + m_param;
+            }
+            return false;
+        }
     }
 
     return true;
@@ -43,7 +49,8 @@ bool Rx::init(const std::string &arg, std::string *error) {
 
 bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    Regex *re;
+    const Regex* re = nullptr;
+    std::unique_ptr<Regex> re_ptr;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
         return true;
@@ -51,13 +58,17 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     if (m_string->m_containsMacro) {
         std::string eparam(m_string->evaluate(transaction));
-        re = new Regex(eparam, false, kRxMultiLine);
+        re_ptr = std::make_unique<Regex>(eparam, false, kRxMultiLine);
+        re = re_ptr.get();
     } else {
         re = m_re;
     }
 
     if (re->hasError()) {
-        ms_dbg_a(transaction, 3, "Error with regular expression: \"" + re->pattern + "\"");
+        if (transaction) {
+            ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
+            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+        }
         return false;
     }
 
@@ -103,10 +114,6 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     for (const auto & capture : captures) {
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
-    }
-
-    if (m_string->m_containsMacro) {
-        delete re;
     }
 
     if (!captures.empty()) {

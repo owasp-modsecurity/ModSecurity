@@ -456,9 +456,13 @@ is one.
 
 ### Security issue
 
-Please do not make public any security issue. Contact us at:
-modsecurity@owasp.org reporting the issue. Once the problem is fixed your
-credit will be given.
+Please do not report security issues publicly. Instead, open a
+[draft security advisory](https://github.com/owasp-modsecurity/ModSecurity/security/advisories/new)
+on GitHub so the report stays private while the maintainers triage it and
+prepare a fix. The advisory is published together with the fixed release, and
+reporters are credited in it.
+
+If you cannot use GitHub, email modsecurity@owasp.org instead.
 
 ## Feature request
 
