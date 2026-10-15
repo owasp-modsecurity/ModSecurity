@@ -14,6 +14,7 @@
  */
 
 #include <string>
+#include <string_view>
 #include <memory>
 #include <optional>
 #include <utility>
@@ -41,7 +42,7 @@ class Tag : public Action {
             : std::optional<std::string>(m_string->evaluate())) { }
 
     std::string getName(Transaction *transaction);
-    bool hasName(const std::string &name, Transaction *transaction);
+    bool hasName(std::string_view name, Transaction *transaction);
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) override;
 
