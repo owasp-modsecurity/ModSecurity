@@ -1,0 +1,134 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RuleMessage text log preserves normal field delimiters",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "normal.example"
+    },
+    "request": {
+      "headers": {
+        "Host": "normal.example",
+        "X-Log": "ordinary",
+        "Content-Length": "0"
+      },
+      "uri": "/normal",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "error_log": "\\Q[msg \"request=ordinary\"] [data \"\"] [severity \"0\"] [ver \"\"] [maturity \"0\"] [accuracy \"0\"] [hostname \"normal.example\"] [uri \"/normal\"]\\E",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains /normal\" \"id:3601001,phase:1,pass,log,msg:'request=%{REQUEST_HEADERS:X-Log}'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RuleMessage text log escapes request-derived field delimiters",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "host.example\" ] [uri \"forged\\literal\\x22\r\nend"
+    },
+    "request": {
+      "headers": {
+        "Host": "request.example",
+        "X-Log": "message\" ] [hostname \"forged\\literal\\x22\r\nend",
+        "Content-Length": "0"
+      },
+      "uri": "/safe\" ] [unique_id \"forged\\literal\\x22\r\nend",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "error_log": "(?=.*\\Q(Value: `/safe\\x22 ] [unique_id \\x22forged\\x5cliteral\\x5cx22\\x0d\\x0aend' )\\E)(?=.*\\Q[msg \"request=message\\x22 ] [hostname \\x22forged\\x5cliteral\\x5cx22\\x0d\\x0aend\"] [data \"\"] [severity \"0\"] [ver \"\"] [maturity \"0\"] [accuracy \"0\"] [hostname \"host.example\\x22 ] [uri \\x22forged\\x5cliteral\\x5cx22\\x0d\\x0aend\"] [uri \"/safe\\x22 ] [unique_id \\x22forged\\x5cliteral\\x5cx22\\x0d\\x0aend\"]\\E)",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains /safe\" \"id:3601002,phase:1,pass,log,msg:'request=%{REQUEST_HEADERS:X-Log}'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "msg (unquoted action value): escaped double quote immediately after a %{macro} does not truncate the action value",
+    "url": "https://github.com/owasp-modsecurity/ModSecurity/pull/3641#pullrequestreview",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/test",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "error_log": "\\Q[msg \"prefixGET\\x5c\\x22suffix\"]\\E",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_METHOD \"@unconditionalMatch\" \"phase:1,id:10007,log,pass,msg:prefix%{REQUEST_METHOD}\\\"suffix\""
+    ]
+  }
+]

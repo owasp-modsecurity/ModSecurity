@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
+#include "src/config.h"
 #include "src/run_time_string.h"
 #include "src/utils/string.h"
 #include "src/operators/begins_with.h"
@@ -66,6 +67,12 @@
 #define IF_MATCH(a) \
     if (op_ == #a)
 
+#ifdef MSC_LOG_MESSAGE_ESCAPE
+constexpr bool kEscapeLogMessage = true;
+#else
+constexpr bool kEscapeLogMessage = false;
+#endif
+
 namespace modsecurity {
 namespace operators {
 
@@ -104,6 +111,17 @@ bool Operator::evaluateInternal(Transaction *transaction,
 }
 
 
+/**
+ * Returns the operator's custom match message, or builds the default message.
+ * MSC_LOG_MESSAGE_ESCAPE enables quote and backslash escaping in variable
+ * names, values and macro-expanded parameters. In that mode, values are
+ * limited before escaping; otherwise the legacy formatting order is retained.
+ *
+ * @param t Transaction used to evaluate macro-expanded operator parameters.
+ * @param key Matched variable name, including its collection.
+ * @param value Matched variable value before transformations.
+ * @return Custom or generated textual match description.
+ */
 std::string Operator::resolveMatchMessage(Transaction *t,
     std::string key, std::string value) {
     std::string ret = m_match_message;
@@ -112,17 +130,28 @@ std::string Operator::resolveMatchMessage(Transaction *t,
         if (m_couldContainsMacro == false) {
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
                 utils::string::limitTo(200, m_param) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) + \
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
+                "' (Value: `" +
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         } else {
             std::string p(m_string->evaluate(t));
             ret = "Matched \"Operator `" + m_op + "' with parameter `" +
-                utils::string::limitTo(200, p) +
-                "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
-                utils::string::limitTo(100,
-                    utils::string::toHexIfNeeded(value)) +
+                utils::string::toHexIfNeeded(
+                    utils::string::limitTo(200, p), kEscapeLogMessage) +
+                "' against variable `" +
+                utils::string::toHexIfNeeded(key, kEscapeLogMessage) +
+                "' (Value: `" +
+                (kEscapeLogMessage
+                    ? utils::string::toHexIfNeeded(
+                        utils::string::limitTo(100, value), true)
+                    : utils::string::limitTo(100,
+                        utils::string::toHexIfNeeded(value, false))) + \
                 "' )";
         }
     }

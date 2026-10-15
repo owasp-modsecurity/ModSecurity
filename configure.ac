@@ -276,9 +276,17 @@ AC_SUBST([MSC_GIT_VERSION])
 
 MSC_ARG_ENABLE_BOOL([assertions], [Turn on assertions feature: undefine NDEBUG], [false], [assertions])
 MSC_ARG_ENABLE_BOOL([debug-logs], [Turn off the SecDebugLog feature], [true], [debugLogs])
+MSC_ARG_ENABLE_BOOL([log-message-escape],
+    [Escape quotes and backslashes in textual log message fields],
+    [false], [logMessageEscape])
 if test "$debugLogs" != "true"; then
     MODSEC_NO_LOGS="-DNO_LOGS=1"
     AC_SUBST(MODSEC_NO_LOGS)
+fi
+
+if test "$logMessageEscape" = "true"; then
+    AC_DEFINE([MSC_LOG_MESSAGE_ESCAPE], [1],
+        [Define to escape quotes and backslashes in textual log message fields])
 fi
 
 MSC_ARG_ENABLE_BOOL([afl-fuzz], [Turn on the afl fuzzer compilation utilities], [false], [aflFuzzer])
@@ -328,6 +336,7 @@ fi
 AM_CONDITIONAL([EXAMPLES], [test $buildExamples = true])
 AM_CONDITIONAL([BUILD_PARSER], [test $buildParser = true])
 AM_CONDITIONAL([USE_MUTEX_ON_PM], [test $mutexPm = true])
+AM_CONDITIONAL([LOG_MESSAGE_ESCAPE], [test $logMessageEscape = true])
 
 
 # General link options
@@ -490,6 +499,12 @@ if test $debugLogs = true; then
     echo "   + SecDebugLog                                   ....enabled"
 else
     echo "   + SecDebugLog                                   ....disabled"
+fi
+
+if test "$logMessageEscape" = "true"; then
+    echo "   + Log message escape                            ....enabled"
+else
+    echo "   + Log message escape                            ....disabled"
 fi
 
 if test "$aflFuzzer" = "true"; then
