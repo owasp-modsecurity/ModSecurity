@@ -1,0 +1,78 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "TX regex variable selector (precompiled regex) - matches in a chained rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Content-Length": "0"
+      },
+      "uri": "/test",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": ["no need."]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,nolog,pass,setvar:'tx.score_a=1',setvar:'tx.score_b=1',setvar:'tx.other=1'\"",
+      "SecRule REQUEST_URI \"@contains /test\" \"id:2,phase:2,deny,status:403,log,chain\"",
+      "    SecRule TX:/^score_/ \"@eq 1\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "TX regex variable selector (precompiled regex) - selector excludes non-matching keys",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Content-Length": "0"
+      },
+      "uri": "/test",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": ["no need."]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,nolog,pass,setvar:'tx.other=1'\"",
+      "SecRule REQUEST_URI \"@contains /test\" \"id:2,phase:2,deny,status:403,log,chain\"",
+      "    SecRule TX:/^score_/ \"@eq 1\" \"t:none\""
+    ]
+  }
+]
