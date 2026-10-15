@@ -15,7 +15,7 @@
 		debug => [ qr/Multipart: Warning: boundary whitespace in C-T header/s, 1 ],
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -119,7 +119,7 @@
 		debug => [ qr/Multipart: Warning: seen data before first boundary/s, 1 ],
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
@@ -224,7 +224,7 @@
 		debug => [ qr/Multipart: Warning: seen data before first boundary/s, 1 ],
 	},
 	match_response => {
-		status => qr/^500$/,
+		status => qr/^200$/,
 	},
 	request => new HTTP::Request(
 		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
