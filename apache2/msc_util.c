@@ -103,6 +103,49 @@ int swap_int32(int x) {
  *
  * \retval rval On Success
  */
+/**
+ * Decodes the multibyte UTF-8 sequence that starts with the lead byte utf[0]
+ * (a byte with the high bit set). Returns the sequence length (2 to 4) and
+ * stores the character number in *d, or a negative UNICODE_ERROR_* value.
+ * Overlong and restricted-range checks are left to the caller.
+ */
+static int utf8_decode_sequence(const unsigned char *utf, unsigned int bytes_left, unsigned int *d) {
+    unsigned char c = utf[0];
+    unsigned int seq_len, k, cp;
+
+    /* If first byte begins with binary 110 it is two byte encoding */
+    if ((c & 0xE0) == 0xC0) {
+        seq_len = 2;
+        cp = c & 0x1F;
+    }
+    /* If first byte begins with binary 1110 it is three byte encoding */
+    else if ((c & 0xF0) == 0xE0) {
+        seq_len = 3;
+        cp = c & 0x0F;
+    }
+    /* If first byte begins with binary 11110 it is four byte encoding */
+    else if ((c & 0xF8) == 0xF0) {
+        /* restrict characters to UTF-8 range (U+0000 - U+10FFFF) */
+        if (c >= 0xF5) return UNICODE_ERROR_RESTRICTED_CHARACTER;
+        seq_len = 4;
+        cp = c & 0x07;
+    }
+    /* any other first byte is invalid (RFC 3629) */
+    else return UNICODE_ERROR_INVALID_ENCODING;
+
+    /* check we have enough bytes */
+    if (bytes_left < seq_len) return UNICODE_ERROR_CHARACTERS_MISSING;
+
+    /* check the continuation bytes start with binary 10 and compute character number */
+    for (k = 1; k < seq_len; k++) {
+        if ((utf[k] & 0xC0) != 0x80) return UNICODE_ERROR_INVALID_ENCODING;
+        cp = (cp << 6) | (utf[k] & 0x3F);
+    }
+
+    *d = cp;
+    return seq_len;
+}
+
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
     int unicode_len = 0;
     unsigned int d = 0;
@@ -133,49 +176,8 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
                 d = (bytes_left >= 2) ? utf[1] : 0;
             }
         }
-        /* If first byte begins with binary 110 it is two byte encoding*/
-        else if ((c & 0xE0) == 0xC0) {
-            /* check we have at least two bytes */
-            if (bytes_left < 2) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-            /* check second byte starts with binary 10 */
-            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            else {
-                unicode_len = 2;
-                /* compute character number */
-                d = ((c & 0x1F) << 6) | (utf[1] & 0x3F);
-            }
-        }
-        /* If first byte begins with binary 1110 it is three byte encoding */
-        else if ((c & 0xF0) == 0xE0) {
-            /* check we have at least three bytes */
-            if (bytes_left < 3) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-            /* check second byte starts with binary 10 */
-            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            /* check third byte starts with binary 10 */
-            else if (((*(utf + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            else {
-                unicode_len = 3;
-                /* compute character number */
-                d = ((c & 0x0F) << 12) | ((utf[1] & 0x3F) << 6) | (*(utf + 2) & 0x3F);
-            }
-        }
-        /* If first byte begins with binary 11110 it is four byte encoding */
-        else if ((c & 0xF8) == 0xF0) {
-            /* restrict characters to UTF-8 range (U+0000 - U+10FFFF)*/
-            if (c >= 0xF5) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
-            /* check we have at least four bytes */
-            else if (bytes_left < 4) unicode_len = UNICODE_ERROR_CHARACTERS_MISSING;
-            /* check second byte starts with binary 10 */
-            else if ((utf[1] & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            /* check third byte starts with binary 10 */
-            else if (((*(utf + 2)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            /* check forth byte starts with binary 10 */
-            else if (((*(utf + 3)) & 0xC0) != 0x80) unicode_len = UNICODE_ERROR_INVALID_ENCODING;
-            else {
-                unicode_len = 4;
-                /* compute character number */
-                d = ((c & 0x07) << 18) | ((utf[1] & 0x3F) << 12) | ((*(utf + 2) & 0x3F) << 6) | (*(utf + 3) & 0x3F);
-            }
+        else {
+            unicode_len = utf8_decode_sequence(utf, bytes_left, &d);
         }
         /* invalid UTF-8 character number range (RFC 3629) */
         if ((d >= 0xD800) && (d <= 0xDFFF)) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
@@ -195,7 +197,7 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
             *changed = 1;
         }
         else {
-            /* any other first byte is invalid (RFC 3629), so assume it's an ASCII character */
+            /* not a valid UTF-8 sequence, so pass the byte through unchanged */
             *data++ = c;
             i++;
         }
