@@ -1,0 +1,91 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2306 - setvar =+N adds to the stored counter",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving variable: IP:counter with value: 5",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,initcol:ip=%{REMOTE_ADDR}\"",
+      "SecAction \"id:2,phase:1,pass,nolog,setvar:ip.counter=+2,setvar:ip.counter=+3\"",
+      "SecRule IP:counter \"@eq 5\" \"id:3,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2306 - setvar =-N on a non-numeric value counts it as 0",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving variable: TX:counter with value: -3",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.counter=abc,setvar:tx.counter=-3\"",
+      "SecRule TX:counter \"@eq -3\" \"id:2,phase:1,deny,status:403\""
+    ]
+  }
+]

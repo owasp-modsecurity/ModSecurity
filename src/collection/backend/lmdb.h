@@ -103,6 +103,8 @@ class LMDB :
     bool updateFirst(const std::string &key,
         const std::string &value) override;
 
+    int incrementFirst(const std::string &key, int delta) override;
+
     void del(const std::string& key) override;
 
     void setExpiry(const std::string& key, int32_t expiry_seconds) override;
