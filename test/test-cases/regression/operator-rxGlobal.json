@@ -273,5 +273,53 @@
       "SecRuleEngine On",
       "SecRule ARGS:subject \"@rxGlobal %{ARGS:patt}\" \"id:4001,phase:2,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: !@rxGlobal with PCRE match limits exceeded does not match (issue #3123)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?rxtest=wwwwwwwwwwwwwwwwwwwwwowwwwwwwwwww",
+      "method": "HEAD",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "rxGlobal: regex error 'MATCH_LIMIT' for pattern",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecPcreMatchLimit 2",
+      "SecRule ARGS:rxtest \"!@rxGlobal (w+)+$\" \"id:1,phase:1,deny,status:403,t:trim\"",
+      "SecRule MSC_PCRE_LIMITS_EXCEEDED \"@streq 1\" \"id:2,phase:1,pass,t:trim,block\""
+    ]
   }
 ]
