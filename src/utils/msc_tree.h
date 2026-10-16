@@ -23,6 +23,8 @@
 #ifndef SRC_UTILS_MSC_TREE_H_
 #define SRC_UTILS_MSC_TREE_H_
 
+#include <string>
+
 
 typedef struct CPTData CPTData;
 typedef struct TreePrefix TreePrefix;
@@ -95,11 +97,11 @@ unsigned char is_netmask_v6(char *ip_strv6);
 
 /** @ingroup ModSecurity_Legacy */
 int tree_contains_ip(TreeRoot *rtree,
-    const char *value, char **error_msg);
+    const char *value, std::string *error_msg);
 
-int add_ip_from_param(const char *param, TreeRoot **rtree, char **error_msg);
-int ip_tree_from_param(const char *param, TreeRoot **rtree, char **error_msg);
-int create_radix_tree(TreeRoot **rtree, char **error_msg);
+int add_ip_from_param(const char *param, TreeRoot **rtree, std::string *error_msg);
+int ip_tree_from_param(const char *param, TreeRoot **rtree, std::string *error_msg);
+int create_radix_tree(TreeRoot **rtree, std::string *error_msg);
 }
 
 #endif  // SRC_UTILS_MSC_TREE_H_

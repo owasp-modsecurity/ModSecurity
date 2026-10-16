@@ -939,7 +939,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
 
 
 int tree_contains_ip(TreeRoot *rtree,
-    const char *value, char **error_msg)
+    const char *value, std::string *error_msg)
 {
     struct in_addr in;
     struct in6_addr in6;
@@ -951,8 +951,7 @@ int tree_contains_ip(TreeRoot *rtree,
 
     if (strchr(value, ':') == NULL) {
         if (inet_pton(AF_INET, value, &(in.s_addr)) <= 0) {
-            //*error_msg = apr_psprintf(mp, "IPmatch: bad IPv4 " \
-            //    "specification \"%s\".", value);
+            *error_msg = "IPmatch: bad IPv4 specification \"" + std::string(value) + "\".";
             return -1;
         }
 
@@ -963,8 +962,7 @@ int tree_contains_ip(TreeRoot *rtree,
     }
     else {
         if (inet_pton(AF_INET6, value, &(in6.s6_addr)) <= 0) {
-            //*error_msg = apr_psprintf(mp, "IPmatch: bad IPv6 " \
-             //   "specification \"%s\".", value);
+            *error_msg = "IPmatch: bad IPv6 specification \"" + std::string(value) + "\".";
             return -1;
         }
 
@@ -981,7 +979,7 @@ int tree_contains_ip(TreeRoot *rtree,
 
 
 int add_ip_from_param(
-    const char *param, TreeRoot **rtree, char **error_msg)
+    const char *param, TreeRoot **rtree, std::string *error_msg)
 {
     char *param_copy = strdup(param);
     char *saved = NULL;
@@ -1002,8 +1000,7 @@ int add_ip_from_param(
 
         if (tnode == NULL)
         {
-            //*error_msg = apr_psprintf("Could not add entry " \
-            //    "\"%s\" from: %s.", str, param);
+            *error_msg = "IPmatch: could not add entry \"" + std::string(str) + "\" from: " + param + ".";
             free(param_copy);
             return -1;
         }
@@ -1017,7 +1014,7 @@ int add_ip_from_param(
 
 
 int ip_tree_from_param(
-    const char *param, TreeRoot **rtree, char **error_msg)
+    const char *param, TreeRoot **rtree, std::string *error_msg)
 {
     char *param_copy = strdup(param);
     char *saved = NULL;
@@ -1044,8 +1041,7 @@ int ip_tree_from_param(
 
         if (tnode == NULL)
         {
-            //*error_msg = apr_psprintf("Could not add entry " \
-            //    "\"%s\" from: %s.", str, param);
+            *error_msg = "IPmatch: could not add entry \"" + std::string(str) + "\" from: " + param + ".";
             free(param_copy);
             return -1;
         }
@@ -1125,13 +1121,12 @@ unsigned char is_netmask_v6(char *ip_strv6) {
 }
 
 
-int create_radix_tree(TreeRoot **rtree, char **error_msg)
+int create_radix_tree(TreeRoot **rtree, std::string *error_msg)
 {
     *rtree = reinterpret_cast<TreeRoot *>(malloc(sizeof(TreeRoot)));
     if (*rtree == NULL)
     {
-        //*error_msg = apr_psprintf(mp, "Failed allocating " \
-        //    "memory to TreeRoot.");
+        *error_msg = "IPmatch: failed allocating memory for the tree root.";
         goto root_node_failed;
     }
     memset(*rtree, 0, sizeof(TreeRoot));
@@ -1139,16 +1134,14 @@ int create_radix_tree(TreeRoot **rtree, char **error_msg)
     (*rtree)->ipv4_tree = CPTCreateRadixTree();
     if ((*rtree)->ipv4_tree == NULL)
     {
-        //*error_msg = apr_psprintf(mp, "IPmatch: Tree initialization " \
-        //    "failed.");
+        *error_msg = "IPmatch: tree initialization failed.";
         goto ipv4_tree_failed;
     }
 
     (*rtree)->ipv6_tree = CPTCreateRadixTree();
     if ((*rtree)->ipv6_tree == NULL)
     {
-        //*error_msg = apr_psprintf(mp, "IPmatch: Tree initialization " \
-        //    "failed.");
+        *error_msg = "IPmatch: tree initialization failed.";
         goto ipv6_tree_failed;
     }
 
