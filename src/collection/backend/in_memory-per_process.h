@@ -83,6 +83,8 @@ class InMemoryPerProcess :
     bool updateFirst(const std::string &key,
         const std::string &value) override;
 
+    int incrementFirst(const std::string &key, int delta) override;
+
     void del(const std::string& key) override;
 
     void delIfExpired(const std::string& key);

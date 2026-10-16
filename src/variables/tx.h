@@ -103,6 +103,11 @@ class Tx_DynamicElement : public Variable {
         t->m_collections.m_tx_collection->storeOrUpdateFirst(var, value);
     }
 
+    static int incrementFirst(Transaction *t, const std::string &var,
+        int delta) {
+        return t->m_collections.m_tx_collection->incrementFirst(var, delta);
+    }
+
     std::unique_ptr<RunTimeString> m_string;
 };
 

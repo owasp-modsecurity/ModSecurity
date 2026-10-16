@@ -355,6 +355,77 @@ end_txn:
 }
 
 
+int LMDB::incrementFirst(const std::string &key, int delta) {
+    int rc;
+    int value = 0;
+    MDB_txn *txn;
+    MDB_val mdb_key;
+    MDB_val mdb_value;
+    MDB_val mdb_value_ret;
+    CollectionData previous_data;
+    CollectionData new_data;
+    std::string serializedData;
+
+    string2val(key, &mdb_key);
+
+    /* A write transaction holds the LMDB writer lock, so the read, the
+     * add and the write below are one atomic step across threads and
+     * processes. */
+    rc = txn_begin(0, &txn);
+    lmdb_debug(rc, "txn", "incrementFirst");
+    if (rc != 0) {
+        goto end_txn;
+    }
+
+    rc = mdb_get(txn, m_dbi, &mdb_key, &mdb_value_ret);
+    lmdb_debug(rc, "get", "incrementFirst");
+    if (rc == 0) {
+        previous_data.setFromSerialized(reinterpret_cast<char *>(mdb_value_ret.mv_data), mdb_value_ret.mv_size);
+        if (previous_data.hasValue() && !previous_data.isExpired()) {
+            try {
+                value = std::stoi(previous_data.getValue());
+            } catch (...) {
+                value = 0;
+            }
+        }
+        rc = mdb_del(txn, m_dbi, &mdb_key, &mdb_value_ret);
+        lmdb_debug(rc, "del", "incrementFirst");
+        if (rc != 0) {
+            goto end_del;
+        }
+    }
+    value += delta;
+
+    if (previous_data.hasExpiry() && !previous_data.isExpired()) {
+        new_data = previous_data;
+    }
+    new_data.setValue(std::to_string(value));
+    serializedData = new_data.getSerialized();
+    string2val(serializedData, &mdb_value);
+
+    rc = mdb_put(txn, m_dbi, &mdb_key, &mdb_value, 0);
+    lmdb_debug(rc, "put", "incrementFirst");
+    if (rc != 0) {
+        goto end_put;
+    }
+
+    rc = mdb_txn_commit(txn);
+    lmdb_debug(rc, "commit", "incrementFirst");
+    if (rc != 0) {
+        goto end_commit;
+    }
+
+end_put:
+end_del:
+    if (rc != 0) {
+        mdb_txn_abort(txn);
+    }
+end_commit:
+end_txn:
+    return value;
+}
+
+
 void LMDB::resolveSingleMatch(const std::string& var,
     std::vector<const VariableValue *> *l) {
     int rc;
