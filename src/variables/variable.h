@@ -670,7 +670,7 @@ class Variables : public std::vector<Variable *> {
             [v](const Variable *m) {
                 const auto *r = dynamic_cast<const VariableRegex *>(m);
                 if (r) {
-                    return !r->m_r.searchAll(v->getKey()).empty();
+                    return r->m_r.search(v->getKey()) > 0;
                 }
                 return v->getKeyWithCollection() == *m->m_fullName.get();
             }) != end();
