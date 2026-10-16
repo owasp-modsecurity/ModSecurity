@@ -105,6 +105,7 @@ void actions(ModSecurityTestResults<RegressionTest> *r,
 	    it.url = nullptr;
         }
         if (it.log != nullptr) {
+            r->intervention_log_payload_present = true;
             *serverLog << it.log;
             free(it.log);
             it.log = nullptr;
@@ -161,6 +162,24 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
 
         modsecurity_test::ModSecurityTestContext context("ModSecurity-regression v0.0.1-alpha" \
             " (ModSecurity regression test utility)");
+
+        if (t->intervention_log_payload_enabled.has_value()) {
+            const int enabled = t->intervention_log_payload_enabled.value();
+            if (t->intervention_log_payload_api == "c") {
+                if (enabled != 0) {
+                    modsecurity::msc_set_intervention_log_payload_enabled(
+                        &context.m_modsec, 0);
+                }
+                modsecurity::msc_set_intervention_log_payload_enabled(
+                    &context.m_modsec, enabled);
+            } else {
+                if (enabled != 0) {
+                    context.m_modsec.setInterventionLogPayloadEnabled(false);
+                }
+                context.m_modsec.setInterventionLogPayloadEnabled(enabled != 0);
+            }
+            context.reset_server_log_callback();
+        }
 
         bool found = true;
         if (t->resource.empty() == false) {
@@ -353,6 +372,29 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
                 << "expected results." << std::endl;
             testRes->reason << KWHT << "Expecting: " << RESET \
                 << t->error_log + "";
+            testRes->passed = false;
+        } else if (!t->redirect_url.empty()
+            && r.location != t->redirect_url) {
+            if (test.m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << std::endl;
+            } else {
+                std::cout << KRED << "failed!" << RESET << std::endl;
+            }
+            testRes->reason << "Redirect URL mismatch. expecting: "
+                << t->redirect_url << " got: " << r.location << std::endl;
+            testRes->passed = false;
+        } else if (t->intervention_log_payload_present.has_value()
+            && static_cast<int>(r.intervention_log_payload_present)
+                != t->intervention_log_payload_present.value()) {
+            if (test.m_automake_output) {
+                std::cout << ":test-result: FAIL " << filename \
+                    << ":" << t->name << std::endl;
+            } else {
+                std::cout << KRED << "failed!" << RESET << std::endl;
+            }
+            testRes->reason << "Intervention log payload presence mismatch."
+                << std::endl;
             testRes->passed = false;
         } else if (!t->audit_log.empty() && !contains(getAuditLogContent(modsec_transaction.m_rules->m_auditLog->m_path1), t->audit_log)) {
             if (test.m_automake_output) {

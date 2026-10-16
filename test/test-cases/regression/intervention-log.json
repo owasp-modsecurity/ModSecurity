@@ -1,0 +1,433 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Intervention log payload is enabled by default",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "audit_log": "default intervention payload marker",
+      "debug_log": "Running action deny",
+      "error_log": "Access denied with code 451 \\(phase 1\\).*default intervention payload marker",
+      "http_code": 451,
+      "intervention_log_payload_present": 1
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAuditEngine On",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLogType Serial",
+      "SecAuditLog /tmp/modsecurity-intervention-log-test.log",
+      "SecAction \"id:100001,phase:1,deny,status:451,log,auditlog,msg:'default intervention payload marker'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "C API treats any nonzero value as payload enabled",
+    "intervention_log_payload_enabled": 7,
+    "intervention_log_payload_api": "c",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "http_code": 454,
+      "intervention_log_payload_present": 1,
+      "error_log": "Access denied with code 454 \\(phase 1\\).*C API nonzero payload marker"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:100015,phase:1,deny,status:454,nolog,msg:'C API nonzero payload marker'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "C++ API can re-enable the intervention log payload",
+    "intervention_log_payload_enabled": 1,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "http_code": 453,
+      "intervention_log_payload_present": 1,
+      "error_log": "re-enabled intervention payload marker"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:100014,phase:1,deny,status:453,nolog,msg:'re-enabled intervention payload marker'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "C++ API omits only the intervention log payload",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "audit_log": "C\\+\\+ intervention payload marker",
+      "debug_log": "Running action deny",
+      "error_log": "C\\+\\+ server callback marker",
+      "http_code": 451,
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAuditEngine On",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLogType Serial",
+      "SecAuditLog /tmp/modsecurity-intervention-log-test.log",
+      "SecAction \"id:100012,phase:1,pass,log,msg:'C++ server callback marker'\"",
+      "SecAction \"id:100002,phase:1,deny,status:451,log,auditlog,msg:'C++ intervention payload marker'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "C API omits only the intervention log payload",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "c",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "debug_log": "Running action deny",
+      "error_log": "C API server callback marker",
+      "http_code": 452,
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:100013,phase:1,pass,log,msg:'C API server callback marker'\"",
+      "SecAction \"id:100003,phase:1,deny,status:452,log,msg:'C API intervention payload marker'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Disabled intervention log payload preserves drop",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "debug_log": "Running action drop",
+      "http_code": 403,
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:100004,phase:1,drop,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Disabled intervention log payload preserves redirect",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "http_code": 302,
+      "redirect_url": "https://example.test/blocked",
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:100005,phase:1,redirect:'https://example.test/blocked',nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Disabled intervention log payload preserves request body-limit rejection",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "6"
+      },
+      "uri": "/",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "abcdef"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "http_code": 403,
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyLimit 5",
+      "SecRequestBodyLimitAction Reject"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Disabled intervention log payload preserves response body-limit rejection",
+    "intervention_log_payload_enabled": 0,
+    "intervention_log_payload_api": "cpp",
+    "client": {
+      "ip": "192.0.2.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.2",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "example.test",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "6"
+      },
+      "body": [
+        "abcdef"
+      ],
+      "protocol": "HTTP/1.1"
+    },
+    "expected": {
+      "http_code": 403,
+      "intervention_log_payload_present": 0
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecResponseBodyAccess On",
+      "SecResponseBodyMimeType text/plain",
+      "SecResponseBodyLimit 5",
+      "SecResponseBodyLimitAction Reject"
+    ]
+  }
+]
