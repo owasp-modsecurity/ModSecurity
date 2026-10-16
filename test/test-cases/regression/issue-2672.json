@@ -1,0 +1,105 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - chain with multiMatch does not mark the audit log relevant when the chain fails",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Return code `200' is not interesting to audit logs",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,log,deny,status:403,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/test/modsec_audit_issue_2672_1.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - chain with multiMatch still logs every match once the chain completes",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving this request as part of the audit logs",
+      "audit_log": "\\[msg \"chain starter\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,log,deny,status:403,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/test/modsec_audit_issue_2672_2.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  }
+]
