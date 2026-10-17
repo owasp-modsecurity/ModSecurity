@@ -14,6 +14,9 @@
 
 #include "msc_xml.h"
 
+#include <ctype.h>
+#include <string.h>
+
 static void msc_xml_on_start_elementns(
     void *ctx,
     const xmlChar *localname,
@@ -200,21 +203,44 @@ int xml_init(modsec_rec *msr, char **error_msg) {
     return 1;
 }
 
-#if 0
-static void xml_receive_sax_error(void *data, const char *msg, ...) {
-    modsec_rec *msr = (modsec_rec *)data;
-    char message[256];
+/**
+ * Build the error message from libxml2's last error on the context, so the
+ * actual reason ("Extra content at the end of the document", a tag mismatch,
+ * ...) reaches REQBODY_ERROR_MSG and the logs instead of a fixed string.
+ * Falls back to "XML: <what>." when libxml2 has no message.
+ * xmlCtxtGetLastError() keeps working under XML_PARSE_NOERROR.
+ */
+static char *xml_parse_error(modsec_rec *msr, xmlParserCtxtPtr ctx, const char *what) {
+    const xmlError *e = (ctx != NULL) ? xmlCtxtGetLastError(ctx) : NULL;
+    char *detail;
+    size_t len;
 
-    if (msr == NULL) return;
+    assert(msr != NULL);
+    assert(what != NULL);
 
-    apr_snprintf(message, sizeof(message), "%s (line %d offset %d)",
-        log_escape_nq(msr->mp, msr->xml->parsing_ctx->lastError.message),
-        msr->xml->parsing_ctx->lastError.line,
-        msr->xml->parsing_ctx->lastError.int2);
+    if (e == NULL || e->message == NULL || e->message[0] == '\0') {
+        return apr_psprintf(msr->mp, "XML: %s.", what);
+    }
 
-    msr_log(msr, 5, "XML: Parsing error: %s", message);
+    detail = apr_pstrdup(msr->mp, e->message);
+    len = strlen(detail);
+    while (len > 0 && isspace((unsigned char)detail[len - 1])) {
+        detail[--len] = '\0';
+    }
+
+    return apr_psprintf(msr->mp, "XML: %s: %s (line %d, column %d)",
+        what, log_escape_nq(msr->mp, detail), e->line, e->int2);
 }
-#endif
+
+/**
+ * Keep libxml2 from writing parser errors to stderr on its own; the reason
+ * is reported through xml_parse_error() instead. Must go through
+ * xmlCtxtUseOptions(): OR-ing ctx->options directly is a no-op before
+ * libxml2 2.13 (see v3 #3563).
+ */
+static void xml_silence_parser(xmlParserCtxtPtr ctx) {
+    xmlCtxtUseOptions(ctx, XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
+}
 
 /**
  * Feed one chunk of data to the XML parser.
@@ -252,6 +278,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context.");
                 return -1;
             }
+            xml_silence_parser(msr->xml->parsing_ctx);
         }
         if (msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_OFF) {
             msr->xml->parsing_ctx_arg = xmlCreatePushParserCtxt(
@@ -264,6 +291,7 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                 *error_msg = apr_psprintf(msr->mp, "XML: Failed to create parsing context for ARGS.");
                 return -1;
             }
+            xml_silence_parser(msr->xml->parsing_ctx_arg);
         }
     } else {
 
@@ -273,7 +301,8 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
             msr->txcfg->parse_xml_into_args != MSC_XML_ARGS_ONLYARGS) {
             xmlParseChunk(msr->xml->parsing_ctx, buf, size, 0);
             if (msr->xml->parsing_ctx->wellFormed != 1) {
-                *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
+                *error_msg = xml_parse_error(msr, msr->xml->parsing_ctx,
+                    "Failed to parse document");
                 return -1;
             }
         }
@@ -285,7 +314,8 @@ int xml_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char 
                     *error_msg = msr->xml->xml_error;
                 }
                 else {
-                    *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document for ARGS.");
+                    *error_msg = xml_parse_error(msr, msr->xml->parsing_ctx_arg,
+                        "Failed to parse document for ARGS");
                 }
                 return -1;
             }
@@ -317,6 +347,10 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
             /* Preserve the results for our reference. */
             msr->xml->well_formed = msr->xml->parsing_ctx->wellFormed;
             msr->xml->doc = msr->xml->parsing_ctx->myDoc;
+            if (msr->xml->well_formed != 1) {
+                *error_msg = xml_parse_error(msr, msr->xml->parsing_ctx,
+                    "Failed to parse document");
+            }
 
             /* Clean up everything else. */
             xmlFreeParserCtxt(msr->xml->parsing_ctx);
@@ -324,7 +358,6 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
             msr_log(msr, 4, "XML: Parsing complete (well_formed %u).", msr->xml->well_formed);
 
             if (msr->xml->well_formed != 1) {
-                *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document.");
                 return -1;
             }
         }
@@ -336,7 +369,8 @@ int xml_complete(modsec_rec *msr, char **error_msg) {
                     *error_msg = msr->xml->xml_error;
                 }
                 else {
-                    *error_msg = apr_psprintf(msr->mp, "XML: Failed to parse document for ARGS.");
+                    *error_msg = xml_parse_error(msr, msr->xml->parsing_ctx_arg,
+                        "Failed to parse document for ARGS");
                 }
                 xmlFreeParserCtxt(msr->xml->parsing_ctx_arg);
                 msr->xml->parsing_ctx_arg = NULL;
