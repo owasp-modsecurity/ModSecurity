@@ -27,7 +27,6 @@ namespace actions {
 
 bool XmlNS::init(std::string *error) {
     size_t pos;
-    std::string http = "http://";
 
     pos = m_parser_payload.find("=");
     if (pos == std::string::npos) {
@@ -48,12 +47,8 @@ bool XmlNS::init(std::string *error) {
         m_href.pop_back();
     }
 
-    if (m_href.compare(0, http.length(), http) != 0) {
-        error->assign("XMLS: Missing xmlns href for prefix: " \
-            "`" + m_href + "'.");
-        return false;
-    }
-
+    /* Any URI reference is a valid namespace name (https://, urn:, ...);
+     * do not insist on http:// (#2358). */
     return true;
 }
 
