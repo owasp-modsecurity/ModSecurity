@@ -1068,6 +1068,15 @@ CMyHttpModule::OnBeginRequest(
 	if(status != DECLINED)
 	{
 		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+
+		const char *location = apr_table_get(r->headers_out, "Location");
+
+		if(location != nullptr)
+		{
+			pHttpContext->GetResponse()->SetHeader(
+				HttpHeaderLocation, location, (USHORT)strlen(location), TRUE);
+		}
+
 		pHttpContext->SetRequestHandled();
 
 		hr = E_FAIL;
