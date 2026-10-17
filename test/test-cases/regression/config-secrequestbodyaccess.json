@@ -1,0 +1,182 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecRequestBodyAccess Off keeps phase 2 (1) - non-body phase 2 rule still runs",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?q=evil",
+      "method": "POST",
+      "body": [
+        "q=evilbody"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Request body processing is disabled",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess Off",
+      "SecRule REQUEST_URI \"@contains evil\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecRequestBodyAccess Off keeps phase 2 (2) - ctl:requestBodyAccess=Off keeps phase 2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?q=evil",
+      "method": "POST",
+      "body": [
+        "q=evilbody"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "disabled to this transaction due to ctl:requestBodyAccess",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_URI \"@contains evil\" \"id:1,phase:1,pass,ctl:requestBodyAccess=Off\"",
+      "SecRule REQUEST_URI \"@contains evil\" \"id:2,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecRequestBodyAccess Off keeps phase 2 (3) - body variables are not populated",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?q=evil",
+      "method": "POST",
+      "body": [
+        "q=evilbody"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Request body processing is disabled",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess Off",
+      "SecRule REQUEST_BODY|ARGS_POST \"@contains evilbody\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecRequestBodyAccess Off keeps phase 2 (4) - body variables populated when access is on",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?q=evil",
+      "method": "POST",
+      "body": [
+        "q=evilbody"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_BODY|ARGS_POST \"@contains evilbody\" \"id:1,phase:2,deny,status:403\""
+    ]
+  }
+]

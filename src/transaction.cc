@@ -684,6 +684,34 @@ int Transaction::processRequestBody() {
     }
 
     /*
+     * SecRequestBodyAccess (and ctl:requestBodyAccess) only controls whether
+     * the body is parsed and exposed through variables. Phase 2 rules must
+     * still run either way, otherwise every non-body rule in phase 2 is
+     * silently skipped (issue #2465).
+     */
+    bool requestBodyAccess = true;
+    if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
+        if (m_requestBodyAccess != RulesSetProperties::TrueConfigBoolean) {
+            ms_dbg(4, "Request body processing is disabled");
+            requestBodyAccess = false;
+        } else {
+            ms_dbg(4, "Request body processing is disabled, but " \
+                "enabled to this transaction due to ctl:requestBodyAccess " \
+                "action");
+        }
+    } else if (m_requestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
+        ms_dbg(4, "Request body processing is enabled, but " \
+            "disabled to this transaction due to ctl:requestBodyAccess " \
+            "action");
+        requestBodyAccess = false;
+    }
+
+    if (requestBodyAccess == false) {
+        this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
+        return true;
+    }
+
+    /*
      * Process the request body even if there is nothing to be done.
      *
      * if (m_requestBody.tellp() <= 0) {
@@ -822,24 +850,6 @@ int Transaction::processRequestBody() {
     } else {
         m_variableReqbodyError.set("0", m_variableOffset);
         m_variableReqbodyProcessorError.set("0", m_variableOffset);
-    }
-
-    if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
-        if (m_requestBodyAccess != RulesSetProperties::TrueConfigBoolean) {
-            ms_dbg(4, "Request body processing is disabled");
-            return true;
-        } else {
-            ms_dbg(4, "Request body processing is disabled, but " \
-                "enabled to this transaction due to ctl:requestBodyAccess " \
-                "action");
-        }
-    } else {
-        if (m_requestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
-            ms_dbg(4, "Request body processing is enabled, but " \
-                "disabled to this transaction due to ctl:requestBodyAccess " \
-                "action");
-            return true;
-        }
     }
 
     /**
