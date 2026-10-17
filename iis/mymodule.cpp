@@ -512,7 +512,7 @@ CMyHttpModule::OnSendResponse(
 
 	for(int i = 0; i < pRawHttpResponse->Headers.UnknownHeaderCount; i++)
 	{
-		apr_table_setn(r->headers_out, 
+		apr_table_addn(r->headers_out, 
 			ZeroTerminate(pRawHttpResponse->Headers.pUnknownHeaders[i].pName, pRawHttpResponse->Headers.pUnknownHeaders[i].NameLength, r->pool), 
 			ZeroTerminate(pRawHttpResponse->Headers.pUnknownHeaders[i].pRawValue, pRawHttpResponse->Headers.pUnknownHeaders[i].RawValueLength, r->pool));
 	}
@@ -921,7 +921,7 @@ CMyHttpModule::OnBeginRequest(
 
 	for(int i = 0; i < req->Headers.UnknownHeaderCount; i++)
 	{
-		apr_table_setn(r->headers_in, 
+		apr_table_addn(r->headers_in, 
 			ZeroTerminate(req->Headers.pUnknownHeaders[i].pName, req->Headers.pUnknownHeaders[i].NameLength, r->pool), 
 			ZeroTerminate(req->Headers.pUnknownHeaders[i].pRawValue, req->Headers.pUnknownHeaders[i].RawValueLength, r->pool));
 	}
