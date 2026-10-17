@@ -59,6 +59,9 @@ void GeoLookup::cleanUp() {
 
 bool GeoLookup::setDataBase(const std::string& filePath,
     std::string *err) {
+    // A database may already be open (SecGeoLookupDb seen again, e.g. on a
+    // reload): release it so the new path is really the one that is used.
+    cleanUp();
 #ifdef WITH_MAXMIND
     std::string intMax;
 #endif
