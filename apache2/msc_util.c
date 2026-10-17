@@ -120,7 +120,8 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
     data = rval = apr_palloc(mp, len);
     if (rval == NULL) return NULL;
 
-    for (i = 0; i < bytes_left;) {
+    for (i = 0; i < input_len;) {
+        bytes_left = input_len - i;
         unicode_len = 0; d = 0;
         utf = (unsigned char *)&input[i];
         c = *utf;
@@ -129,7 +130,7 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
         if ((c & 0x80) == 0) {
             if (c == 0) {
                 unicode_len = 2;
-                d = utf[1];
+                d = (bytes_left >= 2) ? utf[1] : 0;
             }
         }
         /* If first byte begins with binary 110 it is two byte encoding*/
@@ -178,6 +179,8 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
         }
         /* invalid UTF-8 character number range (RFC 3629) */
         if ((d >= 0xD800) && (d <= 0xDFFF)) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
+        /* restrict characters to UTF-8 range (U+0000 - U+10FFFF) */
+        if ((unicode_len == 4) && (d > 0x10FFFF)) unicode_len = UNICODE_ERROR_RESTRICTED_CHARACTER;
         /* check for overlong */
         if ((unicode_len == 4) && (d < 0x010000)) unicode_len = UNICODE_ERROR_OVERLONG_CHARACTER;
         /* three byte could be represented with less bytes */
@@ -187,8 +190,8 @@ char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int inp
 
         if (unicode_len > 0) {
             i += unicode_len;
-            sprintf(data, "%%u%04x", d);
-            data += 6;
+            /* code points above U+FFFF need five hex digits */
+            data += snprintf(data, len - (data - rval), "%%u%04x", d);
             *changed = 1;
         }
         else {
