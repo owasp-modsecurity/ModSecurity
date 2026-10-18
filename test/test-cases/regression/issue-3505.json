@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Issue 3505: ctl:ruleRemoveTargetById with regex - JSON array keys",
+    "title": "Issue 3505: ctl:ruleRemoveTargetById with regex - JSON array_N keys (body + processor)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -38,7 +38,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule REQUEST_URI \"@beginsWith /api/jobs\" \"id:100100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=932125;ARGS:/^json\\.\\d+\\.JobDescription$/\"",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:100100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=932125;ARGS:/^json[.]array_[0-9]+[.]JobDescription$/\"",
       "SecRule ARGS \"@rx (?i:script)\" \"id:932125,phase:2,deny,status:403,log,tag:'XSS'\""
     ]
   },
@@ -87,7 +88,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Issue 3505: ctl:ruleRemoveTargetByTag with regex - JSON array keys",
+    "title": "Issue 3505: ctl:ruleRemoveTargetByTag with regex - JSON array_N keys (body + processor)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -123,7 +124,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule REQUEST_URI \"@beginsWith /api/jobs\" \"id:100100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=XSS;ARGS:/^json\\.\\d+\\.JobDescription$/\"",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:100100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetByTag=XSS;ARGS:/^json[.]array_[0-9]+[.]JobDescription$/\"",
       "SecRule ARGS \"@rx (?i:script)\" \"id:932125,phase:2,deny,status:403,log,tag:'XSS'\""
     ]
   },

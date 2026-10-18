@@ -4,6 +4,10 @@ v3.0.18 - TBD
   - feat: Regex pattern for variable key in ctl:ruleRemoveTargetById and
     ctl:ruleRemoveTargetByTag (#3505)
     [PR #3526 - @etiennemunnich]
+  - feat: Slash-aware ctl:ruleRemoveTargetById/ByTag tokenization so commas
+    inside /…/ (e.g. {m,n}) are part of the pattern; commas outside still
+    split actions. Fail-closed for unclosed/empty regex. (#3505)
+    [@etiennemunnich]
 
 v3.0.17 - 2026-Sep-29
 ---------------------

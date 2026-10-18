@@ -59,8 +59,14 @@ bool RuleRemoveTargetById::init(std::string *error) {
     // Detect regex format: COLLECTION:/pattern/ (e.g. ARGS:/mixpanel$/)
     if (m_target.size() >= 4) {
         size_t colon = m_target.find(':');
-        if (colon != std::string::npos && colon + 2 < m_target.size() &&
-            m_target[colon + 1] == '/' && m_target[m_target.size() - 1] == '/') {
+        if (colon != std::string::npos && colon + 1 < m_target.size() &&
+            m_target[colon + 1] == '/') {
+            if (m_target[m_target.size() - 1] != '/' ||
+                m_target.size() < colon + 3) {
+                error->assign("Unclosed regex in ctl:ruleRemoveTargetById: " +
+                    m_target);
+                return false;
+            }
             size_t pattern_start = colon + 2;
             size_t pattern_end = m_target.size() - 1;
             if (pattern_end > pattern_start) {

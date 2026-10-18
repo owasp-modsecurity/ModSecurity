@@ -41,7 +41,7 @@ struct RuleRemoveTargetSpec {
 
 
 struct RuleRemoveTargetByIdEntry {
-    int id;
+    int id{};
     RuleRemoveTargetSpec target;
 };
 
