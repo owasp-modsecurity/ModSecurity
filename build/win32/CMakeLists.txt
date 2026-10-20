@@ -94,7 +94,7 @@ message("-- Detecting Mbed TLS version - ${MBEDTLS_VERSION}")
 
 project(libModSecurity
     VERSION
-        3.0.14
+        3.0.17
     LANGUAGES
         CXX
 )
@@ -292,3 +292,25 @@ setExampleTargetProperties(multithread)
 add_executable(rules_check ${BASE_DIR}/tools/rules-check/rules-check.cc)
 target_include_directories(rules_check PRIVATE ${BASE_DIR} ${BASE_DIR}/headers)
 target_link_libraries(rules_check PRIVATE libModSecurity)
+
+# install
+#
+# Layout used by the Windows release packages (see .github/workflows/release-windows.yml):
+#   bin/      libModSecurity.dll, rules_check.exe
+#   lib/      libModSecurity.lib (import library)
+#   include/  public headers
+#
+
+install(TARGETS libModSecurity
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+)
+install(TARGETS rules_check RUNTIME DESTINATION bin)
+install(DIRECTORY ${BASE_DIR}/headers/modsecurity DESTINATION include FILES_MATCHING PATTERN "*.h")
+install(FILES
+    ${BASE_DIR}/LICENSE
+    ${BASE_DIR}/README.md
+    ${BASE_DIR}/modsecurity.conf-recommended
+    ${BASE_DIR}/unicode.mapping
+    DESTINATION .
+)

@@ -1,0 +1,153 @@
+name: Windows release packages
+
+# Builds libModSecurity for Windows (x86 and x64), runs the test suite and
+# packages the DLL, import library and public headers into one zip per arch.
+# On a v3.* tag the zips are attached to the GitHub release of that tag.
+# See issue #3313.
+
+on:
+  push:
+    tags: ['v3.*']
+    # TEMPORARY: build on every push to the test branch, remove before upstreaming
+    branches: ['win-release']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Windows ${{ matrix.platform.label }}
+    runs-on: windows-2022
+    # x86 has no prebuilt Conan binaries, so every dependency builds from source
+    timeout-minutes: 150
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - { label: "x64", arch: "x86_64", msvc: "x64" }
+          - { label: "x86", arch: "x86",    msvc: "x86" }
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.platform.msvc }}
+
+      - name: Install Conan package manager
+        run: |
+          pip3 install conan --upgrade
+          conan profile detect --force
+
+      # ImageVersion is a runner env var, not visible to the env context
+      - name: Get runner image version
+        id: image
+        shell: pwsh
+        run: '"version=$env:ImageVersion" >> $env:GITHUB_OUTPUT'
+
+      - name: Restore Conan cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ hashFiles('build/win32/conanfile.txt') }}
+          restore-keys: |
+            conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-
+
+      - uses: ammaraskar/msvc-problem-matcher@master
+
+      - name: Build project
+        shell: cmd
+        run: vcbuild.bat Release ${{ matrix.platform.arch }} NO_ASAN
+
+      # Test steps below mirror the build-windows job in ci_new.yml
+      - name: Prepare test environment
+        working-directory: build\win32\build\Release
+        env:
+          BASE_DIR: ..\..\..\..
+        shell: cmd
+        run: |
+          copy unit_tests.exe %BASE_DIR%\test
+          copy regression_tests.exe %BASE_DIR%\test
+          copy libModSecurity.dll %BASE_DIR%\test
+          copy %BASE_DIR%\unicode.mapping %BASE_DIR%\test
+          md \tmp
+          md \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin\echo
+
+      - name: Disable unsupported tests on Windows
+        working-directory: test\test-cases\regression
+        shell: cmd
+        run: |
+          jq "map(if .title == \"Test match variable (1/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (2/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (3/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Variable offset - FILES_NAMES\" then .enabled = 0 else . end)" offset-variable.json > tmp.json && move /Y tmp.json offset-variable.json
+
+      - name: Run tests
+        working-directory: build\win32\build
+        run: ctest -C Release --output-on-failure
+
+      - name: Package
+        id: package
+        shell: pwsh
+        run: |
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $version = "${{ github.ref_name }}"
+          } else {
+            $version = (git describe --tags --always).Trim()
+          }
+          $name = "libmodsecurity-$version-windows-${{ matrix.platform.label }}"
+          cmake --install build\win32\build --config Release --prefix "dist\$name"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          # the DLL must not depend on anything beyond system DLLs and the VC++ runtime
+          dumpbin /nologo /dependents "dist\$name\bin\libModSecurity.dll"
+
+          Compress-Archive -Path "dist\$name" -DestinationPath "dist\$name.zip"
+          $hash = (Get-FileHash "dist\$name.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name.zip" | Out-File "dist\$name.zip.sha256" -Encoding ascii -NoNewline
+          Get-ChildItem -Recurse "dist\$name" | Select-Object -ExpandProperty FullName
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libmodsecurity-windows-${{ matrix.platform.label }}
+          path: |
+            dist/*.zip
+            dist/*.zip.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Attach packages to release
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: libmodsecurity-windows-*
+          merge-multiple: true
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          ls -l
+          # the release is normally created by hand with the source tarball;
+          # if it does not exist yet, create it as a draft
+          if ! gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --draft --verify-tag \
+              --title "$TAG" --notes "Windows packages built by the release-windows workflow."
+          fi
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber \
+            libmodsecurity-*-windows-*.zip libmodsecurity-*-windows-*.zip.sha256
