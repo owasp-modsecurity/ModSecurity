@@ -101,7 +101,7 @@ jobs:
           if ("${{ github.ref_type }}" -eq "tag") {
             $version = "${{ github.ref_name }}"
           } else {
-            $version = (git describe --tags --always).Trim()
+            $version = (git describe --tags --match "v3.*" --always).Trim()
           }
           $name = "libmodsecurity-$version-windows-${{ matrix.platform.label }}"
           cmake --install build\win32\build --config Release --prefix "dist\$name"
