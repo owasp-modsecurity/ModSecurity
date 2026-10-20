@@ -83,6 +83,14 @@ bool RuleRemoveTargetSpec::matchesFullName(const std::string &fullName) const {
         std::string keyPart = (fullColon != std::string::npos &&
                                fullColon + 1 < fullName.size())
             ? fullName.substr(fullColon + 1) : fullName;
+        // VariableRegex synthesizes fullName as "COLLECTION:regex(pattern)".
+        // Never match that synthetic text with a target regex — key matching
+        // happens at evaluate time via matchesKeyWithCollection.
+        if (keyPart.size() >= 7 &&
+            keyPart.compare(0, 6, "regex(") == 0 &&
+            keyPart.back() == ')') {
+            return false;
+        }
         return regex->search(keyPart) > 0;
     }
     if (literal.size() != fullName.size()) {
