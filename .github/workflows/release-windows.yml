@@ -1,7 +1,8 @@
 name: Windows release packages
 
-# Builds libModSecurity for Windows (x86 and x64), runs the test suite and
-# packages the DLL, import library and public headers into one zip per arch.
+# Builds libModSecurity for Windows (x86 and x64, Release and Debug), runs the
+# test suite and packages the DLL, import library and public headers into one
+# zip per arch and configuration. All builds use the dynamic CRT (/MD, /MDd).
 # On a v3.* tag the zips are attached to the GitHub release of that tag.
 # See issue #3313.
 
@@ -17,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    name: Windows ${{ matrix.platform.label }}
+    name: Windows ${{ matrix.platform.label }} ${{ matrix.configuration }}
     runs-on: windows-2022
     # x86 has no prebuilt Conan binaries, so every dependency builds from source
     timeout-minutes: 150
@@ -28,6 +29,7 @@ jobs:
         platform:
           - { label: "x64", arch: "x86_64", msvc: "x64" }
           - { label: "x86", arch: "x86",    msvc: "x86" }
+        configuration: [Release, Debug]
 
     steps:
       - uses: actions/checkout@v6
@@ -55,19 +57,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2/p
-          key: conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ hashFiles('build/win32/conanfile.txt') }}
+          key: conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-${{ hashFiles('build/win32/conanfile.txt') }}
           restore-keys: |
-            conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-
+            conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-
 
       - uses: ammaraskar/msvc-problem-matcher@master
 
       - name: Build project
         shell: cmd
-        run: vcbuild.bat Release ${{ matrix.platform.arch }} NO_ASAN
+        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform.arch }} NO_ASAN
 
       # Test steps below mirror the build-windows job in ci_new.yml
       - name: Prepare test environment
-        working-directory: build\win32\build\Release
+        working-directory: build\win32\build\${{ matrix.configuration }}
         env:
           BASE_DIR: ..\..\..\..
         shell: cmd
@@ -92,7 +94,7 @@ jobs:
 
       - name: Run tests
         working-directory: build\win32\build
-        run: ctest -C Release --output-on-failure
+        run: ctest -C ${{ matrix.configuration }} --output-on-failure
 
       - name: Package
         id: package
@@ -104,10 +106,12 @@ jobs:
             $version = (git describe --tags --match "v3.*" --always).Trim()
           }
           $name = "libmodsecurity-$version-windows-${{ matrix.platform.label }}"
-          cmake --install build\win32\build --config Release --prefix "dist\$name"
+          if ("${{ matrix.configuration }}" -eq "Debug") { $name += "-debug" }
+          cmake --install build\win32\build --config ${{ matrix.configuration }} --prefix "dist\$name"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
           # the DLL must not depend on anything beyond system DLLs and the VC++ runtime
+          # (the debug VC++ runtime for Debug builds)
           dumpbin /nologo /dependents "dist\$name\bin\libModSecurity.dll"
 
           Compress-Archive -Path "dist\$name" -DestinationPath "dist\$name.zip"
@@ -117,7 +121,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: libmodsecurity-windows-${{ matrix.platform.label }}
+          name: libmodsecurity-windows-${{ matrix.platform.label }}-${{ matrix.configuration }}
           path: |
             dist/*.zip
             dist/*.zip.sha256

@@ -296,7 +296,7 @@ target_link_libraries(rules_check PRIVATE libModSecurity)
 # install
 #
 # Layout used by the Windows release packages (see .github/workflows/release-windows.yml):
-#   bin/      libModSecurity.dll, rules_check.exe
+#   bin/      libModSecurity.dll (+ .pdb for Debug), rules_check.exe
 #   lib/      libModSecurity.lib (import library)
 #   include/  public headers
 #
@@ -305,6 +305,7 @@ install(TARGETS libModSecurity
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
 )
+install(FILES $<TARGET_PDB_FILE:libModSecurity> DESTINATION bin CONFIGURATIONS Debug RelWithDebInfo OPTIONAL)
 install(TARGETS rules_check RUNTIME DESTINATION bin)
 install(DIRECTORY ${BASE_DIR}/headers/modsecurity DESTINATION include FILES_MATCHING PATTERN "*.h")
 install(FILES
