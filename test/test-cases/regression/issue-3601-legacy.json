@@ -130,5 +130,205 @@
       "SecRuleEngine On",
       "SecRule REQUEST_METHOD \"@unconditionalMatch\" \"phase:1,id:10007,log,pass,msg:prefix%{REQUEST_METHOD}\\\"suffix\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Text and JSON match retains legacy output with fixed parameter",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "normal.example"
+    },
+    "request": {
+      "headers": {
+        "Host": "normal.example",
+        "X-Log": "alpha\"beta\\literal\\x22\r\nend",
+        "Content-Length": "0"
+      },
+      "uri": "/normal",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "audit_log": "\\Q\"match\":\"Matched \\\"Operator `Contains' with parameter `alpha' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\\\"beta\\\\literal\\\\x22\\\\x0d\\\\x0aend' )\",\\E",
+      "http_code": 200,
+      "error_log": "\\QModSecurity: Warning. Matched \"Operator `Contains' with parameter `alpha' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\"beta\\literal\\x22\\x0d\\x0aend' ) [file \"\\E"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Log \"@contains alpha\" \"id:3601100,phase:1,pass,log,auditlog,msg:'JSON match compatibility'\"",
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogType Serial",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLog /tmp/issue-3601-legacy-match.log"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Text and JSON match retains legacy output with macro-expanded parameter",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "normal.example"
+    },
+    "request": {
+      "headers": {
+        "Host": "normal.example",
+        "X-Log": "alpha\"beta\\literal\\x22\r\nend",
+        "Content-Length": "0"
+      },
+      "uri": "/normal",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "audit_log": "\\Q\"match\":\"Matched \\\"Operator `EndsWith' with parameter `alpha\\\"beta\\\\literal\\\\x22\\r\\nend' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\\\"beta\\\\literal\\\\x22\\\\x0d\\\\x0aend' )\",\\E",
+      "http_code": 200,
+      "error_log": "\\QModSecurity: Warning. Matched \"Operator `EndsWith' with parameter `alpha\"beta\\literal\\x22\\x0d\\x0aend' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\"beta\\literal\\x22\\x0d\\x0aend' ) [file \"\\E"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Log \"@endsWith %{REQUEST_HEADERS:X-Log}\" \"id:3601101,phase:1,pass,log,auditlog,msg:'JSON match compatibility'\"",
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogType Serial",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLog /tmp/issue-3601-legacy-match.log"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Text and JSON match retains legacy output with value truncation boundary",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "normal.example"
+    },
+    "request": {
+      "headers": {
+        "Host": "normal.example",
+        "X-Log": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\\tail",
+        "Content-Length": "0"
+      },
+      "uri": "/normal",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "audit_log": "\\Q\"match\":\"Matched \\\"Operator `Contains' with parameter `aaa' against variable `REQUEST_HEADERS:X-Log' (Value: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\\"\\\\ (4 characters omitted)' )\",\\E",
+      "http_code": 200,
+      "error_log": "\\QModSecurity: Warning. Matched \"Operator `Contains' with parameter `aaa' against variable `REQUEST_HEADERS:X-Log' (Value: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\\ (4 characters omitted)' ) [file \"\\E"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Log \"@contains aaa\" \"id:3601102,phase:1,pass,log,auditlog,msg:'JSON match compatibility'\"",
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogType Serial",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLog /tmp/issue-3601-legacy-match.log"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Text and JSON match retains legacy output with fixed backslash parameter",
+    "github_issue": 3601,
+    "client": {
+      "ip": "192.0.2.10",
+      "port": 12345
+    },
+    "server": {
+      "ip": "192.0.2.20",
+      "port": 80,
+      "hostname": "normal.example"
+    },
+    "request": {
+      "headers": {
+        "Host": "normal.example",
+        "X-Log": "alpha\"beta\\literal\\x22\r\nend",
+        "Content-Length": "0"
+      },
+      "uri": "/normal",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "audit_log": "\\Q\"match\":\"Matched \\\"Operator `Contains' with parameter `\\\\x22' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\\\"beta\\\\literal\\\\x22\\\\x0d\\\\x0aend' )\",\\E",
+      "http_code": 200,
+      "error_log": "\\QModSecurity: Warning. Matched \"Operator `Contains' with parameter `\\x22' against variable `REQUEST_HEADERS:X-Log' (Value: `alpha\"beta\\literal\\x22\\x0d\\x0aend' ) [file \"\\E"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Log \"@contains \\x22\" \"id:3601103,phase:1,pass,log,auditlog,msg:'JSON match compatibility'\"",
+      "SecAuditEngine On",
+      "SecAuditLogFormat JSON",
+      "SecAuditLogType Serial",
+      "SecAuditLogParts ABHZ",
+      "SecAuditLog /tmp/issue-3601-legacy-match.log"
+    ]
   }
 ]

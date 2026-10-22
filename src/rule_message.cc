@@ -98,6 +98,18 @@ std::string RuleMessage::_errorLogTail(const RuleMessage &rm) {
 }
 
 
+/**
+ * Formats a rule match for textual logs without changing its stored contents.
+ * With MSC_LOG_MESSAGE_ESCAPE, the legacy match description is escaped as a
+ * whole, including backslashes in existing control-character representations.
+ * No limit is applied after escaping, so generated escapes remain complete.
+ * Bracketed fields are formatted separately to preserve their delimiters.
+ *
+ * @param rm Rule match to format; its contents remain available for JSON logs.
+ * @param props LogMessageInfo flags selecting optional client and tail fields.
+ * @param code Response status, or -1 to leave a status placeholder.
+ * @return Textual log entry with non-printable characters escaped.
+ */
 std::string RuleMessage::log(const RuleMessage &rm, int props, int code) {
     std::string msg("");
     msg.reserve(2048);
@@ -119,7 +131,13 @@ std::string RuleMessage::log(const RuleMessage &rm, int props, int code) {
         msg.append("ModSecurity: Warning. ");
     }
 
-    msg.append(rm.m_match);
+    // Escape the stored match only for textual output. Its legacy contents
+    // must remain unchanged for JSON audit logs and connector callbacks.
+    if (kEscapeLogMessage) {
+        msg.append(utils::string::toHexIfNeeded(rm.m_match, true));
+    } else {
+        msg.append(rm.m_match);
+    }
     msg.append(_details(rm));
 
     if (props & ErrorLogTailLogMessageInfo) {

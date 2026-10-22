@@ -84,7 +84,7 @@
     },
     "expected": {
       "debug_log": "Executing operator \"Rx\" with param \"\\^0\\$\"",
-      "error_log": "Matched \"Operator `Rx' with parameter `\\^0\\$'",
+      "error_log": "Operator `Rx' with parameter `\\^0\\$'",
       "http_code": 200
     },
     "rules": [
@@ -177,7 +177,7 @@
     },
     "expected": {
       "debug_log": "rx: regex error 'MATCH_LIMIT' for pattern",
-      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_ERROR'",
+      "error_log": "Operator `StrEq' with parameter `1' against variable `MSC_PCRE_ERROR'",
       "http_code": 200
     },
     "rules": [
@@ -226,7 +226,7 @@
     },
     "expected": {
       "debug_log": "rx: regex error 'MATCH_LIMIT' for pattern",
-      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_LIMITS_EXCEEDED'",
+      "error_log": "Operator `StrEq' with parameter `1' against variable `MSC_PCRE_LIMITS_EXCEEDED'",
       "http_code": 200
     },
     "rules": [
@@ -275,7 +275,7 @@
     },
     "expected": {
       "debug_log": "rx: regex error 'MATCH_LIMIT' for pattern",
-      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `TX:MSC_PCRE_LIMITS_EXCEEDED'",
+      "error_log": "Operator `StrEq' with parameter `1' against variable `TX:MSC_PCRE_LIMITS_EXCEEDED'",
       "http_code": 200
     },
     "rules": [
