@@ -94,7 +94,7 @@ message("-- Detecting Mbed TLS version - ${MBEDTLS_VERSION}")
 
 project(libModSecurity
     VERSION
-        3.0.17
+        3.0.14
     LANGUAGES
         CXX
 )
@@ -161,6 +161,11 @@ add_library(libModSecurity SHARED ${libModSecuritySources})
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
 target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include ${TF_PSA_CRYPTO_DIR}/include ${TF_PSA_CRYPTO_DIR}/drivers/builtin/include)
 target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
+
+# generate a PDB for Release too, so crash dumps of the released DLL can be symbolized;
+# /DEBUG turns off /OPT:REF and /OPT:ICF, so turn them back on
+target_compile_options(libModSecurity PRIVATE $<$<CONFIG:Release>:/Zi>)
+target_link_options(libModSecurity PRIVATE $<$<CONFIG:Release>:/DEBUG /OPT:REF /OPT:ICF>)
 
 macro(add_package_dependency project compile_definition link_library flag)
   if(${flag})
@@ -296,7 +301,7 @@ target_link_libraries(rules_check PRIVATE libModSecurity)
 # install
 #
 # Layout used by the Windows release packages (see .github/workflows/release-windows.yml):
-#   bin/      libModSecurity.dll (+ .pdb for Debug), rules_check.exe
+#   bin/      libModSecurity.dll, libModSecurity.pdb, rules_check.exe
 #   lib/      libModSecurity.lib (import library)
 #   include/  public headers
 #
@@ -305,7 +310,7 @@ install(TARGETS libModSecurity
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
 )
-install(FILES $<TARGET_PDB_FILE:libModSecurity> DESTINATION bin CONFIGURATIONS Debug RelWithDebInfo OPTIONAL)
+install(FILES $<TARGET_PDB_FILE:libModSecurity> DESTINATION bin CONFIGURATIONS Debug Release RelWithDebInfo OPTIONAL)
 install(TARGETS rules_check RUNTIME DESTINATION bin)
 install(DIRECTORY ${BASE_DIR}/headers/modsecurity DESTINATION include FILES_MATCHING PATTERN "*.h")
 install(FILES
