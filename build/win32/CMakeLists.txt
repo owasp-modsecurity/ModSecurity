@@ -91,12 +91,42 @@ message("-- Detecting Mbed TLS version - ${MBEDTLS_VERSION}")
 #
 # libModSecurity
 #
+# Read the version from the public header, as configure.ac does.
+set(MODSECURITY_VERSION_HEADER
+    "${BASE_DIR}/headers/modsecurity/modsecurity.h"
+)
+
+# Re-run CMake when the version header changes.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${MODSECURITY_VERSION_HEADER}"
+)
+
+foreach(_part IN ITEMS MAJOR MINOR PATCHLEVEL)
+    file(STRINGS "${MODSECURITY_VERSION_HEADER}" _version_line
+        REGEX "^[ \t]*#[ \t]*define[ \t]+MODSECURITY_${_part}[ \t]+\"[0-9]+\"[ \t]*$"
+    )
+
+    list(LENGTH _version_line _version_count)
+    if(NOT _version_count EQUAL 1)
+        message(FATAL_ERROR
+            "Expected exactly one numeric MODSECURITY_${_part} "
+            "definition in ${MODSECURITY_VERSION_HEADER}"
+        )
+    endif()
+
+    string(REGEX REPLACE
+        ".*\"([0-9]+)\"[ \t]*$" "\\1"
+        "MODSECURITY_${_part}" "${_version_line}"
+    )
+endforeach()
+
+set(MODSECURITY_CMAKE_VERSION
+    "${MODSECURITY_MAJOR}.${MODSECURITY_MINOR}.${MODSECURITY_PATCHLEVEL}"
+)
 
 project(libModSecurity
-    VERSION
-        3.0.17
-    LANGUAGES
-        CXX
+    VERSION "${MODSECURITY_CMAKE_VERSION}"
+    LANGUAGES CXX
 )
 
 set(CMAKE_CXX_STANDARD 17)
