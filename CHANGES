@@ -12,6 +12,10 @@ v3.0.18 - TBD
     trailing actions (e.g. ,deny); skip VariableRegex synthetic fullName
     in regex matchesFullName (keep runtime key matching). (#3505)
     [@etiennemunnich]
+  - fix: anchor closed ctl ruleRemoveTarget regex at :/ so a slash in a
+    literal cannot swallow a later action that also contains '/'.
+    Prefix before :/ may still contain ':' and '/' ({m,n} kept). (#3505)
+    [@etiennemunnich]
 
 v3.0.17 - 2026-Sep-29
 ---------------------

@@ -425,5 +425,85 @@
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^[a-z]{3}$/\"",
       "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'test'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "T10: ByTag with colon in tag still excludes {m,n} key (200)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?x=xxx",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=my:tag;ARGS:/^x{1,3}$/\"",
+      "SecRule ARGS \"@contains xxx\" \"id:1,phase:2,deny,status:403,tag:'my:tag'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "T10b: colon tag {m,n} does not exclude a non-matching key (403)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?y=attack",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=my:tag;ARGS:/^x{1,3}$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'my:tag'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "T11: slash in tag plus {m,n} still excludes and leaves ,deny (403 on trigger)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetByTag=OWASP_CRS/ATTACK-LFI;ARGS:/^x{1,3}$/,deny,status:403\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "T11b: slash in tag plus {m,n} excludes the matching key (200)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?x=xx",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=OWASP_CRS/ATTACK-LFI;ARGS:/^x{1,3}$/\"",
+      "SecRule ARGS \"@contains xx\" \"id:1,phase:2,deny,status:403,tag:'OWASP_CRS/ATTACK-LFI'\""
+    ]
   }
 ]

@@ -477,20 +477,20 @@ FREE_TEXT                               ([^\"]|([^\\]\\\"))+
 /* REMOVE_RULE_BY: used by ctl:ruleRemoveById / ruleRemoveByTag (and historically
  * by ruleRemoveTarget*). Keep upstream character class (incl. @ = ( ) [ ] ').
  * REMOVE_RULE_TARGET_*: used by ctl:ruleRemoveTargetById AND ByTag.
- * Slash-aware closed /…/: commas inside the span are part of the pattern
- * (enables {m,n}). Outside /…/, commas still split chained actions.
- * Literals may contain "/" (e.g. ARGS:a/b) via REMOVE_RULE_TARGET_LIT.
- * Closed regex requires at least one /…/ span (VALUE uses + not *).
- * Unclosed only matches the :/… form so slash-bearing literals do not
- * greedily eat ",deny". Escaped \/ does not end a span. Empty :// fails
- * in action init(). See #3505 / #3526. */
+ * Closed regex is anchored at :/ (VALUE). A comma is part of the pattern
+ * only inside that span, so {m,n} works. A slash in a literal (ARGS:a/b)
+ * cannot pair with a later slash (tag:'x/y', a URL) and swallow ",deny".
+ * The prefix before :/ may contain '/' and ':' (OWASP_CRS/ATTACK-LFI, my:tag)
+ * but not a comma, so chained actions still split. Literals use LIT.
+ * Unclosed only matches the :/… form. Escaped \/ does not end a span.
+ * Empty :// fails in action init(). See #3505 / #3526. */
 REMOVE_RULE_BY                          [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\']+
 REMOVE_RULE_TARGET_NAME                 [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
 REMOVE_RULE_TARGET_LIT                  [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
 REMOVE_RULE_TARGET_ATOM                 [a-zA-Z0-9_\-\.\*\;\$@\=\(\)\[\]\'\^\+|?\\{}]
 REMOVE_RULE_TARGET_RECHAR               [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{},]
 REMOVE_RULE_TARGET_REBODY               (\\.|{REMOVE_RULE_TARGET_RECHAR})*
-REMOVE_RULE_TARGET_VALUE                {REMOVE_RULE_TARGET_NAME}+([/]{REMOVE_RULE_TARGET_REBODY}[/]{REMOVE_RULE_TARGET_NAME}*)+
+REMOVE_RULE_TARGET_VALUE                {REMOVE_RULE_TARGET_LIT}+[:]([/]{REMOVE_RULE_TARGET_REBODY}[/]{REMOVE_RULE_TARGET_NAME}*)+
 
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+
