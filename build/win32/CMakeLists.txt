@@ -165,7 +165,10 @@ target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypt
 # generate a PDB for Release too, so crash dumps of the released DLL can be symbolized;
 # /DEBUG turns off /OPT:REF and /OPT:ICF, so turn them back on
 target_compile_options(libModSecurity PRIVATE $<$<CONFIG:Release>:/Zi>)
-target_link_options(libModSecurity PRIVATE $<$<CONFIG:Release>:/DEBUG /OPT:REF /OPT:ICF>)
+target_link_options(libModSecurity PRIVATE
+  $<$<CONFIG:Release>:/DEBUG>
+  $<$<CONFIG:Release>:/OPT:REF>
+  $<$<CONFIG:Release>:/OPT:ICF>)
 
 macro(add_package_dependency project compile_definition link_library flag)
   if(${flag})
