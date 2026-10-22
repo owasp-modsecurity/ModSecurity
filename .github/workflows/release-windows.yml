@@ -46,6 +46,11 @@ jobs:
         run: |
           pip3 install conan==2.33.0
           conan profile detect --force
+          # without a cache, dependency sources are downloaded from their upstream
+          # hosts on every run, and some (git.openldap.org) rate limit with HTTP 429
+          $conf = Join-Path (conan config home) "global.conf"
+          Add-Content $conf "tools.files.download:retry=10"
+          Add-Content $conf "tools.files.download:retry_wait=30"
 
       # no Conan cache on purpose: these binaries are published, and a restored
       # cache could inject modified dependency packages into them
