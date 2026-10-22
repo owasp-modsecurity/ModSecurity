@@ -430,6 +430,9 @@ int main(int argc, char **argv)
 #ifdef WITH_LIBXML2
     resources.push_back("libxml2");
 #endif
+#ifdef MODSEC_REGEX_DOLLAR_ENDONLY
+    resources.push_back("regex-dollar-endonly");
+#endif
 
 #ifdef NO_LOGS
     std::cout << "Test utility cannot work without logging support." \

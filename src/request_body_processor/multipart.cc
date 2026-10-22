@@ -32,6 +32,7 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <array>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/collection/collections.h"
@@ -638,9 +639,11 @@ int Multipart::process_part_data(std::string *error, size_t offset) {
 
                 m_nfiles++;
 
+                std::array<char, 16> mode{};
+                snprintf(mode.data(), mode.size(), "0%o", m_transaction->m_rules->m_uploadFileMode.m_value);
                 ms_dbg_a(m_transaction, 4,
                     "Multipart: Created temporary file " \
-                    + std::to_string(m_nfiles) + " (mode o" + std::to_string(m_transaction->m_rules->m_uploadFileMode.m_value) + "): " \
+                    + std::to_string(m_nfiles) + " (mode " + mode.data() + "): " \
                     + m_mpp->m_tmp_file->getFilename());
             }
 
