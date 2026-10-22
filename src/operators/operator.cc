@@ -104,6 +104,17 @@ bool Operator::evaluateInternal(Transaction *transaction,
 }
 
 
+/**
+ * Returns the operator's custom match message, or builds the legacy message.
+ * Keep this representation independent of textual log escaping: it is also
+ * serialized as the JSON audit log's match value. RuleMessage::log applies
+ * optional quote and backslash escaping when producing textual output.
+ *
+ * @param t Transaction used to evaluate macro-expanded operator parameters.
+ * @param key Matched variable name, including its collection.
+ * @param value Matched variable value before transformations.
+ * @return Custom or generated match description in the legacy representation.
+ */
 std::string Operator::resolveMatchMessage(Transaction *t,
     std::string key, std::string value) {
     std::string ret = m_match_message;

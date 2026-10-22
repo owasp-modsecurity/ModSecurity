@@ -28,11 +28,16 @@ jobs:
           - {label: "wo ssdeep",  opt: "--without-ssdeep" }
           - {label: "with lmdb",  opt: "--with-lmdb" }
           - {label: "with pcre", opt: "--with-pcre" }
+          - {label: "with log message escape", opt: "--enable-log-message-escape" }
         exclude:
           - platform: {label: "x32"}
             configure: {label: "wo geoip"}
           - platform: {label: "x32"}
             configure: {label: "wo ssdeep"}
+          - platform: {label: "x32"}
+            configure: {label: "with log message escape"}
+          - compiler: {label: "clang"}
+            configure: {label: "with log message escape"}
     steps:
       - name: Detect latest Lua dev package
         id: detect_lua
@@ -99,7 +104,7 @@ jobs:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9
       - name: make
         run: make -j `nproc`
       - name: check
@@ -122,6 +127,7 @@ jobs:
           - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
           - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
           - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
+          - {label: "with log message escape", opt: "-DLOG_MESSAGE_ESCAPE=ON" }
     steps:
       - uses: actions/checkout@v6
         with:
@@ -131,7 +137,7 @@ jobs:
         run: |
           pip3 install conan --upgrade
           conan profile detect
-      - uses: ammaraskar/msvc-problem-matcher@master
+      - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a
       - name: Build ${{ matrix.configuration }} ${{ matrix.platform.arch }} ${{ matrix.configure.label }}
         shell: cmd
         run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform.arch }} NO_ASAN "${{ matrix.configure.opt }}"
