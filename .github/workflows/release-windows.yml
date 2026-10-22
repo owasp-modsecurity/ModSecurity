@@ -30,13 +30,14 @@ jobs:
         configuration: [Release, Debug]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
       - name: Set up MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
           arch: ${{ matrix.platform.msvc }}
 
@@ -52,14 +53,14 @@ jobs:
         run: '"version=$env:ImageVersion" >> $env:GITHUB_OUTPUT'
 
       - name: Restore Conan cache
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.conan2/p
           key: conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-${{ hashFiles('build/win32/conanfile.txt') }}
           restore-keys: |
             conan-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-
 
-      - uses: ammaraskar/msvc-problem-matcher@master
+      - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
 
       - name: Build project
         shell: cmd
@@ -97,9 +98,12 @@ jobs:
       - name: Package
         id: package
         shell: pwsh
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          if ("${{ github.ref_type }}" -eq "tag") {
-            $version = "${{ github.ref_name }}"
+          if ($env:REF_TYPE -eq "tag") {
+            $version = $env:REF_NAME
           } else {
             $version = (git describe --tags --match "v3.*" --always).Trim()
           }
@@ -117,7 +121,7 @@ jobs:
           "$hash  $name.zip" | Out-File "dist\$name.zip.sha256" -Encoding ascii -NoNewline
           Get-ChildItem -Recurse "dist\$name" | Select-Object -ExpandProperty FullName
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: libmodsecurity-windows-${{ matrix.platform.label }}-${{ matrix.configuration }}
           path: |
@@ -128,13 +132,14 @@ jobs:
   publish:
     name: Attach packages to release
     needs: build
-    if: github.ref_type == 'tag'
+    # a workflow_dispatch run on a tag ref only builds, it must not publish
+    if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: libmodsecurity-windows-*
           merge-multiple: true
