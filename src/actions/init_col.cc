@@ -28,7 +28,7 @@ namespace actions {
 
 
 bool InitCol::init(std::string *error) {
-    int posEquals = m_parser_payload.find("=");
+    const std::string::size_type posEquals = m_parser_payload.find("=");
 
     if (m_parser_payload.size() < 2) {
         error->assign("Something wrong with initcol format: too small");
