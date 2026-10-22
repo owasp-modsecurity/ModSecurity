@@ -9,8 +9,6 @@ name: Windows release packages
 on:
   push:
     tags: ['v3.*']
-    # TEMPORARY: build on every push to the test branch, remove before upstreaming
-    branches: ['win-release']
   workflow_dispatch:
 
 permissions:
