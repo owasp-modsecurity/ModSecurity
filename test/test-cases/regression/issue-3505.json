@@ -216,6 +216,126 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Issue 3505: ById literal ARGS:password does not exclude a sibling arg",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?password=ok&other=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ByTag literal ARGS:password does not exclude a sibling arg",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?password=ok&other=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ById literal key compare is case-sensitive (Password stays inspected)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?Password=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ByTag literal key compare is case-sensitive (Password stays inspected)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?Password=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 403},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ById literal full-name match is case-insensitive",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?Password=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
+      "SecRule ARGS:Password \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Issue 3505: ByTag literal full-name match is case-insensitive",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "uri": "/?Password=secret",
+      "method": "GET",
+      "body": [""]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
+      "SecRule ARGS:Password \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Issue 3505: regex exclusion ARGS:/pattern/ must NOT exclude REQUEST_HEADERS with same key name",
     "client": {
       "ip": "200.249.12.31",
