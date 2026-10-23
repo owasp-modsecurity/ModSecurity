@@ -13,10 +13,12 @@
  *
  */
 
+#include <memory>
 #include <string>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
+#include "src/utils/regex.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_ID_H_
@@ -39,6 +41,7 @@ class RuleRemoveTargetById : public Action {
 
     int m_id;
     std::string m_target;
+    std::shared_ptr<Utils::Regex> m_regex;  // pre-compiled at config load
 };
 
 

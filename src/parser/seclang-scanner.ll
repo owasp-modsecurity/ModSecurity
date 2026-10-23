@@ -474,7 +474,23 @@ FREE_TEXT_COMMA_QUOTE                   [^,\"\\n\\r]+
 NEW_LINE_FREE_TEXT                      [^, \t\"\n\r]+
 NOT !
 FREE_TEXT                               ([^\"]|([^\\]\\\"))+
+/* REMOVE_RULE_BY: used by ctl:ruleRemoveById / ruleRemoveByTag (and historically
+ * by ruleRemoveTarget*). Keep upstream character class (incl. @ = ( ) [ ] ').
+ * REMOVE_RULE_TARGET_*: used by ctl:ruleRemoveTargetById AND ByTag.
+ * Closed regex is anchored at :/ (VALUE). A comma is part of the pattern
+ * only inside that span, so {m,n} works. A slash in a literal (ARGS:a/b)
+ * cannot pair with a later slash (tag:'x/y', a URL) and swallow ",deny".
+ * The prefix before :/ may contain '/' and ':' (OWASP_CRS/ATTACK-LFI, my:tag)
+ * but not a comma, so chained actions still split. Literals use LIT.
+ * Unclosed only matches the :/… form. Escaped \/ does not end a span.
+ * Empty :// fails in action init(). See #3505 / #3526. */
 REMOVE_RULE_BY                          [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\']+
+REMOVE_RULE_TARGET_NAME                 [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
+REMOVE_RULE_TARGET_LIT                  [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
+REMOVE_RULE_TARGET_ATOM                 [a-zA-Z0-9_\-\.\*\;\$@\=\(\)\[\]\'\^\+|?\\{}]
+REMOVE_RULE_TARGET_RECHAR               [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{},]
+REMOVE_RULE_TARGET_REBODY               (\\.|{REMOVE_RULE_TARGET_RECHAR})*
+REMOVE_RULE_TARGET_VALUE                {REMOVE_RULE_TARGET_LIT}+[:]([/]{REMOVE_RULE_TARGET_REBODY}[/]{REMOVE_RULE_TARGET_NAME}*)+
 
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+
@@ -568,8 +584,12 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_CTL_RULE_ENGINE}=                                               { return p::make_ACTION_CTL_RULE_ENGINE(*driver.loc.back()); }
 {ACTION_CTL_RULE_REMOVE_BY_ID}[=]{REMOVE_RULE_BY}                       { return p::make_ACTION_CTL_RULE_REMOVE_BY_ID(yytext, *driver.loc.back()); }
 {ACTION_CTL_RULE_REMOVE_BY_TAG}[=]{REMOVE_RULE_BY}                      { return p::make_ACTION_CTL_RULE_REMOVE_BY_TAG(yytext, *driver.loc.back()); }
-{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_BY}                { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
-{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_BY}               { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_TARGET_VALUE}  { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_TARGET_VALUE} { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_TARGET_LIT}+  { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_TARGET_LIT}+ { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_ID}[=]{REMOVE_RULE_TARGET_ATOM}+[:][/]{REMOVE_RULE_TARGET_REBODY}  { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_ID(yytext, *driver.loc.back()); }
+{ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG}[=]{REMOVE_RULE_TARGET_ATOM}+[:][/]{REMOVE_RULE_TARGET_REBODY} { return p::make_ACTION_CTL_RULE_REMOVE_TARGET_BY_TAG(yytext, *driver.loc.back()); }
 {ACTION_EXEC}:'{VAR_FREE_TEXT_QUOTE}'                                   { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
 {ACTION_EXEC}:{VAR_FREE_TEXT_SPACE_COMMA}                               { return p::make_ACTION_EXEC(yytext, *driver.loc.back()); }
 {ACTION_EXPIRE_VAR}:                                                    { BEGIN(EXPECTING_ACTION_PREDICATE); return p::make_ACTION_EXPIRE_VAR(yytext, *driver.loc.back()); }
