@@ -83,7 +83,7 @@ github.com/libinjection/libinjection), the CRS's own detection logic
   need in a report**, or a unit test case for a single operator or transformation.
 - `mod_security2.so` is also installed into the system Apache
   (`/usr/lib/apache2/modules/`), so a full server can be started with
-  `modsecurity.conf-recommended` and the OWASP CRS v4 (latest release) from
+  `modsecurity.conf-recommended` and the OWASP CRS v4 (the latest release when the image was built: `git -C /opt/coreruleset describe --tags` shows which one; name it in any report whose result depends on the CRS) from
   `/opt/coreruleset` (`crs-setup.conf.example`, then `rules/*.conf`).
   `modsecurity.conf-recommended` is the configuration we expect in production, including the
   request body backstop rules 200002 and 200003. Score against it, not against a bare
