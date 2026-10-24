@@ -1,0 +1,171 @@
+name: Windows release packages
+
+# Builds libModSecurity for Windows (x86 and x64, Release and Debug), runs the
+# test suite and packages the DLL, import library and public headers into one
+# zip per arch and configuration. All builds use the dynamic CRT (/MD, /MDd).
+# On a release tag (v3.X.Y) the zips are attached to the GitHub release of that
+# tag, with a build provenance attestation. See issue #3313.
+
+on:
+  push:
+    # release tags only; test or pre-release tags (v3.X.Y-suffix) do not match
+    tags: ['v3.[0-9]+.[0-9]+']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Windows ${{ matrix.platform.label }} ${{ matrix.configuration }}
+    runs-on: windows-2022
+    # x86 has no prebuilt Conan binaries, so every dependency builds from source
+    timeout-minutes: 150
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - { label: "x64", arch: "x86_64", msvc: "x64" }
+          - { label: "x86", arch: "x86",    msvc: "x86" }
+        configuration: [Release, Debug]
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        with:
+          arch: ${{ matrix.platform.msvc }}
+
+      - name: Install Conan package manager
+        run: |
+          pip3 install conan==2.33.0
+          conan profile detect --force
+          # without a cache, dependency sources are downloaded from their upstream
+          # hosts on every run, and some (git.openldap.org) rate limit with HTTP 429
+          $conf = Join-Path (conan config home) "global.conf"
+          Add-Content $conf "tools.files.download:retry=10"
+          Add-Content $conf "tools.files.download:retry_wait=30"
+
+      # no Conan cache on purpose: these binaries are published, and a restored
+      # cache could inject modified dependency packages into them
+
+      - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
+
+      - name: Build project
+        shell: cmd
+        run: vcbuild.bat ${{ matrix.configuration }} ${{ matrix.platform.arch }} NO_ASAN
+
+      # Test steps below mirror the build-windows job in ci_new.yml
+      - name: Prepare test environment
+        working-directory: build\win32\build\${{ matrix.configuration }}
+        env:
+          BASE_DIR: ..\..\..\..
+        shell: cmd
+        run: |
+          copy unit_tests.exe %BASE_DIR%\test
+          copy regression_tests.exe %BASE_DIR%\test
+          copy libModSecurity.dll %BASE_DIR%\test
+          copy %BASE_DIR%\unicode.mapping %BASE_DIR%\test
+          md \tmp
+          md \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin
+          copy "C:\Program Files\Git\usr\bin\echo.exe" \bin\echo
+
+      - name: Disable unsupported tests on Windows
+        working-directory: test\test-cases\regression
+        shell: cmd
+        run: |
+          jq "map(if .title == \"Test match variable (1/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (2/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Test match variable (3/n)\" then .enabled = 0 else . end)" issue-2423-msg-in-chain.json > tmp.json && move /Y tmp.json issue-2423-msg-in-chain.json
+          jq "map(if .title == \"Variable offset - FILES_NAMES\" then .enabled = 0 else . end)" offset-variable.json > tmp.json && move /Y tmp.json offset-variable.json
+
+      - name: Run tests
+        working-directory: build\win32\build
+        run: ctest -C ${{ matrix.configuration }} --output-on-failure
+
+      - name: Package
+        id: package
+        shell: pwsh
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if ($env:REF_TYPE -eq "tag") {
+            $version = $env:REF_NAME
+          } else {
+            $version = (git describe --tags --match "v3.*" --always).Trim()
+          }
+          $name = "libmodsecurity-$version-windows-${{ matrix.platform.label }}"
+          if ("${{ matrix.configuration }}" -eq "Debug") { $name += "-debug" }
+          cmake --install build\win32\build --config ${{ matrix.configuration }} --prefix "dist\$name"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          # the DLL must not depend on anything beyond system DLLs and the VC++ runtime
+          # (the debug VC++ runtime for Debug builds); a dependency that became shared
+          # would pass the tests in the build tree but fail to load for users
+          $allowed = '^(kernel32|advapi32|user32|ws2_32|iphlpapi|crypt32|bcrypt|msvcp140d?|vcruntime140(_1)?d?|ucrtbased?|api-ms-win-crt-[a-z0-9-]+)\.dll$'
+          $deps = dumpbin /nologo /dependents "dist\$name\bin\libModSecurity.dll" |
+            ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^[^\s\\]+\.dll$' }
+          $deps
+          $unexpected = $deps | Where-Object { $_ -notmatch $allowed }
+          if (-not $deps -or $unexpected) {
+            Write-Error "Unexpected DLL dependencies: $($unexpected -join ', ')"
+            exit 1
+          }
+
+          Compress-Archive -Path "dist\$name" -DestinationPath "dist\$name.zip"
+          $hash = (Get-FileHash "dist\$name.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name.zip" | Out-File "dist\$name.zip.sha256" -Encoding ascii -NoNewline
+          Get-ChildItem -Recurse "dist\$name" | Select-Object -ExpandProperty FullName
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: libmodsecurity-windows-${{ matrix.platform.label }}-${{ matrix.configuration }}
+          path: |
+            dist/*.zip
+            dist/*.zip.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Attach packages to release
+    needs: build
+    # a workflow_dispatch run on a tag ref only builds, it must not publish
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          pattern: libmodsecurity-windows-*
+          merge-multiple: true
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: libmodsecurity-*-windows-*.zip
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          ls -l
+          # the release is normally created by hand with the source tarball;
+          # if it does not exist yet, create it as a draft
+          if ! gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --draft --verify-tag \
+              --title "$TAG" --notes "Windows packages built by the release-windows workflow."
+          fi
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" --clobber \
+            libmodsecurity-*-windows-*.zip libmodsecurity-*-windows-*.zip.sha256
