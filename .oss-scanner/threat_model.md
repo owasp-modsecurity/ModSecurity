@@ -106,7 +106,7 @@ branch, enrolled separately).
   `using_bodies_in_chunks`, `multithread`, ...).
 - `modsecurity.conf-recommended` is the configuration we expect in production, including
   the limits and the request body backstop rules 200002 and 200007. Score against it, not
-  against a bare `SecRuleEngine On`. The OWASP CRS v4 (latest release) is in
+  against a bare `SecRuleEngine On`. The OWASP CRS v4 (the latest release when the image was built: `git -C /opt/coreruleset describe --tags` shows which one; name it in any report whose result depends on the CRS) is in
   `/opt/coreruleset`: include `crs-setup.conf.example` and `rules/*.conf` after
   `modsecurity.conf-recommended` to check a finding against a default CRS deployment.
 - The image is built without sanitizers. Every dependency is installed, so an ASan build
