@@ -78,6 +78,24 @@ environment bounded. Keep credentials, private data, and sensitive logs out of
 versioned files and public output. Parallelize only independent work with clear
 file ownership; sequence operations that share mutable state.
 
+## Keep context and command output focused
+
+Read the context relevant to the task, use scoped searches, and request bounded
+source ranges. Avoid repeatedly loading entire guides or command logs.
+
+When [RTK](https://github.com/rtk-ai/rtk) is available and its installed version
+supports the intended command, prefer it for routine human-readable summaries.
+Check its help and any applicable project guidance. If unavailable or unsuitable,
+continue with native tools; installation or initialization is not a startup step.
+Treat filtered output as a summary. Use unfiltered source, diagnostics, complete
+diffs, and actual exit statuses for exact evidence and final validation. Do not
+feed summaries into scripts or claim measured token/cost savings without evidence.
+
+For Codex discovery, configuration, or hooks, follow the current official OpenAI
+documentation; use RTK's own sources for RTK commands. Do not assume a hook,
+automatic import, or integration exists in the active client. Keep installation,
+hooks, proxies, and personal configuration changes within the user's task.
+
 ## Version control and delivery
 
 Use the repository's established workflow and the user's authorized destination.

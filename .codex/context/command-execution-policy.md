@@ -7,10 +7,19 @@ repository. Existing user authorization remains effective. A tool, command
 example, or policy file does not expand that authorization to another repository,
 external destination, system installation, release, or service.
 
-Use the command interface available in the current environment. This policy
-does not introduce an RTK requirement, a fixed wrapper path, or a mandatory
-assistant skill. If the current environment imposes an execution or authentication
-wrapper, use its documented interface rather than inventing flags or bypassing it.
+Use the command interface available in the current environment. Prefer supported
+RTK summaries for routine exploration when RTK is available, following the
+[RTK guide](rtk.md). Its absence does not block work or authorize installation.
+No fixed wrapper path or mandatory assistant skill is assumed. If the current
+environment imposes an execution or authentication wrapper, use its documented
+interface rather than inventing flags or bypassing it.
+
+Use native output for exact source reading, machine-readable input, final diff
+review, and validation evidence. Keep the documented build/test commands and the
+context validators unchanged; do not prefix arbitrary commands with `rtk` or
+silently change their arguments, working directory, permissions, or offline
+requirements. Record the actual command and exit status. Output compression
+does not establish a successful check or a measured billing reduction.
 
 ## Establish the working context
 

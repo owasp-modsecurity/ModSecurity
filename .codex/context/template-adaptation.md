@@ -54,6 +54,11 @@ The setup prescribes no chat language; each person chooses.
 - The template's `3.2` policy version is not a ModSecurity release or a version of
   this new local schema. The adapted manifests use their own schema version.
 
+The owner subsequently requested RTK guidance. The [RTK guide](rtk.md) adds
+conditional use based on RTK's own pinned source and official Codex documentation.
+It does not import the template's machine-specific wrappers or make installation
+mandatory. The reusable root agreement retains native-tool fallback.
+
 The four upstream submodule gitlinks remain unchanged. No policies are installed
 inside them. A future task must inspect and authorize its own repository boundary
 before adopting shared instructions there.

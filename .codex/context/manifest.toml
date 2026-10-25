@@ -90,6 +90,7 @@ prompts_end_session = ".codex/context/prompts/end-session.md"
 
 [supporting_context]
 repository_context = ".codex/context/repository-context.md"
+rtk = ".codex/context/rtk.md"
 index = ".codex/context/index.md"
 template_adaptation = ".codex/context/template-adaptation.md"
 profiles_index = ".codex/context/profiles/README.md"

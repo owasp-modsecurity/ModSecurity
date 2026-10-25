@@ -22,6 +22,7 @@ Working instructions and context files are identified as additions for this proj
 | [Feature map](.codex/context/feature-map.md) | Where features are implemented and relevant tests are defined |
 | [Configuration and rules](.codex/context/configuration-and-rules.md) | SecRules, configuration, operators, and actual limitations |
 | [Build and test guide](.codex/context/build-and-test.md) | Source-backed preparation, build paths, and meaningful checks |
+| [RTK guide](.codex/context/rtk.md) | Optional command-output reduction, source-checked examples, and Codex integration boundaries |
 | [Current state](.codex/context/current-state.md) | Completed work, verification, open questions, and blockers |
 | [Provenance](.codex/context/provenance.md) | Upstream revision, fork comparison, submodules, and evidence rules |
 
@@ -58,7 +59,7 @@ person chooses the language of their conversation.
 uses these files along its project instruction path. The longer chapters are
 stored in `.codex/`, and the startup instructions direct the assistant to the
 relevant files. The official
-[AGENTS.md guide](https://developers.openai.com/codex/agent-configuration/agents-md)
+[AGENTS.md guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 describes instruction discovery.
 
 In this repository, `.codex/` is a versioned documentation directory. Names such
@@ -70,6 +71,16 @@ A new chat can continue from these files when it has access to them and reads
 them. For ordinary ChatGPT use, provide repository access or the current files.
 Decisions that exist only in a previous conversation are not present in this
 system. Updating the saved working state is therefore part of finishing a session.
+
+## Reduce routine command output with RTK
+
+The root agreement prefers supported RTK summaries when the tool is available,
+with native commands available when it is absent or exact output is needed.
+Read the [RTK guide](.codex/context/rtk.md) when using or configuring it. This
+addition supplies instructions and examples; it does not install RTK or activate
+hooks. Codex behavior is checked against official OpenAI documentation, and RTK
+behavior against its own pinned source. No session token or billing reduction
+has been measured for this documentation change.
 
 ## Starting a new chat
 

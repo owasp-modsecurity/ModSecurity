@@ -110,10 +110,17 @@ at the revision recorded in [template-adaptation.md](template-adaptation.md). It
 policies are structural references, not evidence for libmodsecurity behavior.
 The local manifest schemas and validators are explicitly added working conventions.
 
-The [official OpenAI documentation](https://developers.openai.com/codex/agent-configuration/agents-md)
-was also read to establish the meaning and discovery of `AGENTS.md`.
-It is a source only for that Codex behavior.
-**No ModSecurity facts are derived from it.**
+The official OpenAI [AGENTS.md guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+and [hooks reference](https://learn.chatgpt.com/docs/hooks) were read on 2026-10-25
+for Codex instruction discovery and supported integration behavior. Their scope
+is Codex; they do not establish OpenAI endorsement of RTK.
+
+The optional [RTK guide](rtk.md) separately uses `rtk-ai/rtk` tag `v1.0.1`, commit
+`4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`. Its documentation and selected command,
+tracking, and Codex initialization implementations were inspected. This is a
+reference revision, not an installed dependency or a comprehensive RTK review.
+The example commands were not executed with RTK in this environment.
+**Neither external source is authority for ModSecurity behavior.**
 
 This documentation approach requires no particular model version,
 API key or adoption of personal settings. The files must actually be

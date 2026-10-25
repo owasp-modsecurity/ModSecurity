@@ -25,7 +25,7 @@ inheritable = true
 [[policies]]
 id = "MODSECURITY-COMMAND-EXECUTION-POLICY"
 source = ".codex/context/command-execution-policy.md"
-sha256 = "83cefab82832a9c4bdd1e074a04eb2766f08c4042990aa66c0a6c0ba70aecdc1"
+sha256 = "cc367f7a9db73fe7a3a2f02147cc427383c158972c34cdfcb0a4ad11efd30074"
 inheritable = true
 
 [[policies]]

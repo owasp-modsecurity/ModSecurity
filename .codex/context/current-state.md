@@ -16,9 +16,16 @@ mechanism are prepared. Following the owner's clarification, the root `AGENTS.md
 is now reusable unchanged across repositories. Concrete ModSecurity constraints
 and startup checks are in [repository-context.md](repository-context.md).
 Maintained files are English. No chat language is prescribed; each person chooses
-their conversation language. The index and startup prompt preserve that distinction. The [index](index.md) is the entry point. The
-[adaptation record](template-adaptation.md) explains the template mapping and the
-reference-specific assumptions that were omitted.
+their conversation language. The index and startup prompt preserve that distinction.
+The [index](index.md) is the entry point. The [adaptation record](template-adaptation.md)
+explains the template mapping and the reference-specific assumptions that were omitted.
+
+At the owner's request, [rtk.md](rtk.md) now documents optional RTK output summaries.
+The reusable root prefers supported summaries when RTK is available, with native
+output for exact evidence and final validation. Official OpenAI documentation
+governs Codex integration; pinned RTK source governs its examples. This addition
+does not install RTK, run its initializer, activate hooks/proxies, or change
+personal settings. No runtime token or billing savings have been measured.
 
 ## Verified source boundaries
 
@@ -29,6 +36,8 @@ reference-specific assumptions that were omitted.
 | Structure template | `Easton97-Jens/ModSecurity-conector:master`, `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` |
 | Main-source inventory | 850 entries: 846 blobs and 4 gitlinks |
 | Reference inventory | 72 tracked `.codex` files plus root `AGENTS.md`, `README.md`, `.gitignore`, and `Makefile` |
+| Optional RTK reference | `rtk-ai/rtk` tag `v1.0.1`, commit `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`; separate from ModSecurity source |
+| Codex integration reference | Official OpenAI AGENTS.md and hooks documentation, read on 2026-10-25; see [provenance](provenance.md) |
 | Product changes | None outside `AGENTS.md`, `CODEX_START.md`, and `.codex/` |
 
 The first fork observation was 22 commits behind upstream; the subsequent target
@@ -45,10 +54,12 @@ because later handover updates can add Markdown and links.
 | Check | Observed result |
 | --- | --- |
 | `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; pinned tree, complete source inventory, local document targets, 487 unique pinned ModSecurity source links and line ranges, and unchanged product-source boundary |
-| `python3 .codex/bin/validate-structure.py` | Exit 0; 94 routed files, required layout, identity, and manifest consistency |
+| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 routed files, required layout, identity, and manifest consistency |
 | `python3 .codex/bin/validate-codex-inheritance.py --check` | Exit 0; 23 local policy digests, no active child inheritance |
+| `git diff --check` | Exit 0; no whitespace errors in the RTK documentation follow-up |
+| RTK source-reference check | Tag resolved to the recorded commit; 19 cited source paths/line ranges checked against the local reference clone; separate from the ModSecurity validator |
 | Pinned template-link verification | Valid local Git objects and line ranges at the reference commit |
-| Independent documentation/source review | Foundation review completed; the portable root and local-context separation were reviewed for remaining project assumptions |
+| Independent documentation/source review | Foundation and portability reviews completed; RTK examples/source mapping and official Codex documentation checked. The separate scope of proxy statistics was clarified after review. |
 | Independent helper probes in an isolated copy | Missing/bad/outside-root links, stale digests, duplicate IDs, and invalid paths rejected; historical evidence and fenced examples handled as documented |
 | Helper fixes rechecked | Dated session records need no active route; colliding derived policy IDs are rejected before writes; catalog symlinks are rejected without changing an outside sentinel file |
 
@@ -60,22 +71,24 @@ scope and verification details.
 build, parser regeneration, library installation, connector integration, or a
 security scan. The task changes context and local documentation helpers only.
 Submodule implementations were not initialized or comprehensively reviewed.
+RTK and Codex executables were not available in the task environment; their
+example commands, initializer, hook behavior, and actual savings were not tested
+here. Source/documentation inspection does not establish runtime integration.
 
 ## Delivery state
 
 Working branch: `codex/kontext-v3` in `Easton97-Jens/ModSecurity`.
 The English adaptation is published in the existing fork, with
 [draft pull request #120](https://github.com/Easton97-Jens/ModSecurity/pull/120)
-open against `v3/master`. With the reusable-root clarification, its comparison contains 99 context additions and no
-product-source changes. No merge has been performed.
+open against `v3/master`. Including the RTK follow-up, the context consists of
+100 added files and no product-source changes. No merge has been performed.
 
 The published adaptation commit `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` had tree
 `9a884e6e02525a469bfa531e8aaa767cf915e856`, matching the reviewed local tree. It was
 cloned separately from the fork; all three validators passed and the checkout
-was clean. Later context-only updates record delivery facts and the reusable-root
-clarification. The latter adds one repository-specific context file, keeps the
-validator implementations unchanged, and preserves the 487 unique pinned source
-links. Use
+was clean. Later context-only updates record delivery facts, the reusable-root
+clarification, and optional RTK guidance. Validator implementations remain
+unchanged; the 487 unique pinned ModSecurity source links are preserved. Use
 `git rev-parse HEAD` or the PR head for the latest working commit.
 
 The PR-triggered workflow query returned no runs for the adaptation commit at

@@ -136,3 +136,23 @@ the language of their conversation.
 **Reason:** The owner explicitly clarified that chat language is an individual
 choice. A language requested in one conversation must not become a repository-wide
 default. D003 continues to govern maintained files.
+
+## D011 — Use optional RTK summaries with official Codex integration guidance
+
+**Date:** 2026-10-25.
+
+**Decision:** Prefer supported RTK commands for routine summaries when the tool is
+available, with native-tool fallback. Keep the root rule portable and route the
+source-checked examples and setup boundaries through [rtk.md](rtk.md). Codex
+mechanisms follow official OpenAI documentation; RTK commands follow the inspected
+RTK `v1.0.1` source at `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`.
+
+**Reason:** The owner requested RTK to reduce token usage and explicitly required
+compliance with official Codex documentation. Reading fewer routine output bytes
+is useful, but a filtered summary cannot replace exact evidence.
+
+**Consequence:** Source inspection, complete diffs, diagnostics, machine-readable
+data, and final validation use suitable unfiltered output. ModSecurity build/test
+commands and context-validator implementations stay unchanged. This task adds
+guidance without installing RTK, running its initializer, enabling hooks/proxies,
+or changing personal Codex settings. No actual token or billing saving is claimed.

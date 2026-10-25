@@ -38,6 +38,7 @@ before changing it.
 | Core, connectors, dependencies, and source ownership | [Architecture and boundaries](architecture-and-boundaries.md) |
 | Feature, fix, refactor, behavior change | [Change workflow](change-workflow.md) |
 | Commands and actual tool availability | [Command execution](command-execution-policy.md) |
+| Optional RTK summaries and Codex setup | [RTK guide](rtk.md), supporting the command policy |
 | Checks, test selection, execution evidence | [Testing and evidence](testing-and-evidence.md) |
 | CPU, memory, build output, and storage | [Resources and storage](resources-and-storage.md) |
 | Languages, native build files, generated inputs | [Tooling and language](tooling-and-language.md) |

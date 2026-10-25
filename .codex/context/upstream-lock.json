@@ -55,8 +55,13 @@
   ],
   "external_product_documentation": [
     {
-      "topic": "AGENTS.md discovery only; not a source for ModSecurity behavior",
-      "url": "https://developers.openai.com/codex/agent-configuration/agents-md",
+      "topic": "Codex AGENTS.md discovery; not a source for ModSecurity behavior",
+      "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "observed_on": "2026-10-25"
+    },
+    {
+      "topic": "Codex hook support, trust, input rewriting, and environment limitations; not RTK endorsement or ModSecurity evidence",
+      "url": "https://learn.chatgpt.com/docs/hooks",
       "observed_on": "2026-10-25"
     }
   ],
@@ -77,5 +82,18 @@
     "observed_on": "2026-10-25",
     "scope": "Tracked .codex files plus root AGENTS.md, README.md, .gitignore and Makefile; organization/workflow reference only, not authority for ModSecurity product behavior.",
     "inventoried_entry_count": 76
-  }
+  },
+  "external_tool_references": [
+    {
+      "name": "RTK",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "tag": "v1.0.1",
+      "commit": "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100",
+      "observed_on": "2026-10-25",
+      "scope": "Selected documentation, CLI, Git summary, test-runner, token-estimation, and Codex initializer code; optional command-output guidance only.",
+      "guide": ".codex/context/rtk.md",
+      "installed_or_executed_for_this_task": false,
+      "modsecurity_dependency": false
+    }
+  ]
 }
