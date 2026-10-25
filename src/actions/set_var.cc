@@ -90,36 +90,37 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
         }
         goto end;
     } else {
-        int pre = 0;
+        /* =+N / =-N: the backend reads, adds and writes in one atomic step */
+        int delta = 0;
         int value = 0;
 
         try {
-            pre = stoi(resolvedPre);
+            delta = stoi(resolvedPre);
         } catch (...) {
-            pre = 0;
+            delta = 0;
+        }
+        if (m_operation == substractAndSetOperation) {
+            delta = -delta;
         }
 
-        try {
-            std::vector<const VariableValue *> l;
-            RuleWithOperator *rr = dynamic_cast<RuleWithOperator *>(rule);
-            m_variable->evaluate(t, rr, &l);
-            if (l.size() == 0) {
-                value = 0;
-            } else {
-                value = stoi(l[0]->getValue());
-                for (auto &i : l) {
-                    delete i;
-                }
-            }
-        } catch (...) {
-            value = 0;
+        if (tx) {
+            value = tx->incrementFirst(t, m_variableNameExpanded, delta);
+        } else if (session) {
+            value = session->incrementFirst(t, m_variableNameExpanded, delta);
+        } else if (ip) {
+            value = ip->incrementFirst(t, m_variableNameExpanded, delta);
+        } else if (resource) {
+            value = resource->incrementFirst(t, m_variableNameExpanded, delta);
+        } else if (global) {
+            value = global->incrementFirst(t, m_variableNameExpanded, delta);
+        } else if (user) {
+            value = user->incrementFirst(t, m_variableNameExpanded, delta);
         }
 
-        if (m_operation == sumAndSetOperation) {
-            targetValue = std::to_string(value + pre);
-        } else if (m_operation == substractAndSetOperation) {
-            targetValue = std::to_string(value - pre);
-        }
+        ms_dbg_a(t, 8, "Saving variable: " + m_variable->m_collectionName \
+            + ":" + m_variableNameExpanded + " with value: " \
+            + std::to_string(value));
+        goto end;
     }
 
     ms_dbg_a(t, 8, "Saving variable: " + m_variable->m_collectionName \
