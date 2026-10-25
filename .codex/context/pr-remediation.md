@@ -2,8 +2,10 @@
 
 Use this policy when an actual pull request and its feedback are part of the
 authorized task. Verify the repository, PR number, head SHA, and target branch
-before acting. For this context work, the intended destination is the existing
-`Easton97-Jens/ModSecurity` fork with target `v3/master`.
+before acting. Resolve the live head repository/branch and base repository/branch
+from that PR. The canonical project is `owasp-modsecurity/ModSecurity`; a
+contributor fork can be the authorized head without being the integration target.
+A historical fork PR or saved branch name is not the current delivery destination.
 
 Continue fixes and delivery already authorized by the user. Do not assume that
 reading a review comment authorizes an unrelated change, a message to another

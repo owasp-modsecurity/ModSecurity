@@ -1,15 +1,17 @@
 # Architecture and repository boundaries
 
 This policy assigns work to the correct source and evidence boundary. It is a
-working convention for this fork. Read [project-context.md](project-context.md),
+working convention for this repository. Read [project-context.md](project-context.md),
 [architecture.md](architecture.md), and [repository-map.md](repository-map.md)
 for the source-backed technical explanation.
 
 ## Repository identity
 
-The working repository is `Easton97-Jens/ModSecurity`. Its context branch is
-`codex/kontext-v3`, with integration targeting the fork's `v3/master`.
-The official source is `owasp-modsecurity/ModSecurity`, branch `v3/master`.
+The canonical project is `owasp-modsecurity/ModSecurity`, branch `v3/master`.
+The actual working checkout may be upstream or a contributor fork. Discover its
+repository, branch, and authorized delivery destination from the current task;
+for PR work, resolve the live head and base metadata before choosing a checkout.
+The canonical identity in the manifests does not authorize a push to upstream.
 Use [upstream-lock.json](upstream-lock.json) for the documented source revision
 and [current-state.md](current-state.md) for the observed working state.
 Read the actual branch and commit before acting; branch names are moving refs.

@@ -6,7 +6,7 @@ source constraints, startup checks, and file-language requirements. Then read
 [current-state.md](current-state.md), [decisions.md](decisions.md), and
 [upstream-lock.json](upstream-lock.json), followed by only the guides and policies
 relevant to the task. The routing is recorded in [manifest.toml](manifest.toml).
-These `.codex` files remain specific to this fork.
+These `.codex` files remain specific to the ModSecurity core project.
 
 ## Technical guides: learn the actual repository
 
@@ -22,7 +22,7 @@ These `.codex` files remain specific to this fork.
 | Which comments/examples or apparent features need caution? | [Fact check](fact-check.md) |
 | Which source revisions and limits support these explanations? | [Provenance](provenance.md) |
 | How do I adopt a newer upstream revision? | [Upstream sync](upstream-sync.md) |
-| How do I open this work in the existing fork? | [Using this fork](using-this-fork.md) |
+| How do I select the right checkout or pull-request head? | [Working with this repository](using-this-fork.md) |
 
 The technical guides cite immutable official ModSecurity source. An inventory
 entry is not a claim that every function was reviewed. Read actual affected code

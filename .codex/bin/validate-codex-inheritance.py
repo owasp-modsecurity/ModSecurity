@@ -19,15 +19,21 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / ".codex/inheritance-manifest.toml"
+PROJECT_REPOSITORY = "owasp-modsecurity/ModSecurity"
 
 
 def load(path):
+    """Parse and return the TOML document at the supplied Path."""
     with path.open("rb") as handle:
         return tomllib.load(handle)
 
 
-def expected_rows():
-    routes = load(ROOT / ".codex/context/manifest.toml")
+def expected_rows(routes):
+    """Build sorted policy records and content digests from the routing manifest.
+
+    Reject invalid keys, duplicate derived IDs or sources, and policy files
+    that are missing or resolve outside ROOT before returning any records.
+    """
     policies = routes["primary_policies"]
     if not isinstance(policies, dict) or not policies:
         raise ValueError("No primary policies are routed")
@@ -59,6 +65,7 @@ def expected_rows():
 
 
 def validate_catalog_location():
+    """Reject a catalog symlink or a catalog path that resolves outside ROOT."""
     if CATALOG.is_symlink():
         raise ValueError("The local policy catalog must not be a symbolic link")
     if not CATALOG.resolve().is_relative_to(ROOT):
@@ -66,11 +73,15 @@ def validate_catalog_location():
 
 
 def refresh(rows):
+    """Write the supplied policy records to the canonical project's local catalog.
+
+    Recheck the destination boundary before replacing the catalog's contents.
+    """
     validate_catalog_location()
     lines = [
         "# Local policy catalog. Generated deliberately with --refresh.",
         "# Digests record content, not correctness. No child inheritance is active.",
-        "schema_version = 1", 'repository = "Easton97-Jens/ModSecurity"',
+        "schema_version = 1", f"repository = {json.dumps(PROJECT_REPOSITORY)}",
         "children = []", "",
     ]
     for row in rows:
@@ -82,6 +93,11 @@ def refresh(rows):
 
 
 def main():
+    """Check or refresh the catalog, returning 0 on a match and 1 on mismatches.
+
+    Refuse catalog refresh when routing metadata names another project. Input
+    failures propagate to the command-line handler for exit 2.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="Read-only catalog validation.")
@@ -89,15 +105,22 @@ def main():
     parser.add_argument("--json", action="store_true", help="Emit machine-readable results.")
     args = parser.parse_args()
     validate_catalog_location()
-    expected = expected_rows()
-    if args.refresh:
-        refresh(expected)
-    catalog = load(CATALOG)
+    routes = load(ROOT / ".codex/context/manifest.toml")
     errors = []
+    if routes.get("repository") != PROJECT_REPOSITORY:
+        errors.append(f"Context repository must identify {PROJECT_REPOSITORY}")
+    expected = expected_rows(routes)
+    refreshed = False
+    if args.refresh and not errors:
+        refresh(expected)
+        refreshed = True
+    catalog = load(CATALOG)
     if catalog.get("schema_version") != 1:
         errors.append("Unsupported catalog schema_version")
-    if catalog.get("repository") != "Easton97-Jens/ModSecurity":
-        errors.append("Unexpected catalog repository identity")
+    if catalog.get("repository") != PROJECT_REPOSITORY:
+        errors.append(f"Catalog repository must identify {PROJECT_REPOSITORY}")
+    if catalog.get("repository") != routes.get("repository"):
+        errors.append("Repository identity differs between context manifest and catalog")
     if catalog.get("children") != []:
         errors.append("Active child inheritance is not supported by this schema")
     actual = catalog.get("policies", [])
@@ -121,7 +144,7 @@ def main():
             errors.append(f"Policy path, digest, or metadata is stale: {identifier}")
     result = {
         "ok": not errors, "policies": len(expected),
-        "active_child_repositories": 0, "refreshed": args.refresh, "errors": errors,
+        "active_child_repositories": 0, "refreshed": refreshed, "errors": errors,
     }
     if args.json:
         print(json.dumps(result, indent=2))

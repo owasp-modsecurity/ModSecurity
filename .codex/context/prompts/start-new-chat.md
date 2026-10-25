@@ -4,8 +4,11 @@ This is a template. First ensure that the chat has access to the correct
 repository and current branch or files. Replace the last line with your task.
 
 ```text
-Work on Easton97-Jens/ModSecurity in the selected current branch.
-If this context is still in a pull request, select codex/kontext-v3.
+Work on the selected ModSecurity checkout and the task's actual branch.
+The canonical project is owasp-modsecurity/ModSecurity; a contributor fork is valid.
+For a pull request, resolve its current head repository, branch, and full commit
+before selecting the checkout. Verify the local HEAD against that revision.
+Do not choose a branch or delivery destination from historical session notes.
 
 First read AGENTS.md, .codex/context/index.md, .codex/context/repository-context.md,
 .codex/context/current-state.md, .codex/context/decisions.md, and

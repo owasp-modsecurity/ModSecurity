@@ -3,7 +3,8 @@
 
 This project-local helper reads files and invokes read-only Git commands. It
 does not fetch, build, install, modify source, or establish semantic correctness.
-Python standard library only; Git must be available on PATH.
+Python standard library only; Git 2.45 or later must be available on PATH
+for the --no-lazy-fetch option.
 """
 
 import argparse
@@ -28,6 +29,11 @@ HEX40 = re.compile(r"[0-9a-f]{40}\Z")
 
 
 def git(*args):
+    """Return stdout bytes for Git arguments run in ROOT, or raise on failure.
+
+    Git is resolved through PATH and invoked without a shell. Lazy fetching,
+    optional lock writes, and the filesystem monitor are disabled.
+    """
     completed = subprocess.run(
         ["git", "--no-lazy-fetch", "--no-optional-locks", "-c", "core.fsmonitor=false", *args],
         cwd=ROOT,
@@ -41,11 +47,12 @@ def git(*args):
 
 
 def context_path(path):
+    """Return whether a repository-relative path belongs to the context addition."""
     return path in {"AGENTS.md", "CODEX_START.md"} or path.startswith(".codex/")
 
 
 def markdown_prose(content):
-    """Exclude fenced examples from Markdown-link syntax checks."""
+    """Return text outside fenced examples and whether a fence remains unclosed."""
     lines = []
     fence = None
     for line in content.splitlines(keepends=True):
@@ -67,6 +74,11 @@ def markdown_prose(content):
 
 
 def main():
+    """Check the pinned source and document links, returning 0 or 1 for the result.
+
+    Report product-source drift, treating it as an error with --strict-source.
+    Input or Git failures propagate to the command-line handler for exit 2.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--strict-source",

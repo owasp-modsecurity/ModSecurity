@@ -2,7 +2,7 @@
 
 ## Requested template and inspected revision
 
-The owner requested the `.codex` structure from
+The original contributor requested the `.codex` structure from
 [`Easton97-Jens/ModSecurity-conector`](https://github.com/Easton97-Jens/ModSecurity-conector/tree/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex),
 branch `master`, inspected at commit
 `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` on 2026-10-25.
@@ -33,7 +33,7 @@ reports, and runtime claims are not evidence of core library behavior.
 | Historical reports outside normal policy routing | Session/audit records separated from current state and policy owners |
 
 Detailed repository and C++ guides, source provenance, start/end prompts, and
-current-state/decision/backlog files supplement the template to meet the owner's
+current-state/decision/backlog files supplement the template to meet the original contributor's
 request for reusable context across chats. All new content is English; the
 reference repository's English/German companion convention is not adopted.
 The root agreement is portable; the `.codex` context remains core-specific.
@@ -54,7 +54,7 @@ The setup prescribes no chat language; each person chooses.
 - The template's `3.2` policy version is not a ModSecurity release or a version of
   this new local schema. The adapted manifests use their own schema version.
 
-The owner subsequently requested RTK guidance. The [RTK guide](rtk.md) adds
+The original contributor subsequently requested RTK guidance. The [RTK guide](rtk.md) adds
 conditional use based on RTK's own pinned source and official Codex documentation.
 It does not import the template's machine-specific wrappers or make installation
 mandatory. The reusable root agreement retains native-tool fallback.

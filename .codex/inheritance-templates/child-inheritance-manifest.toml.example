@@ -3,7 +3,7 @@
 schema_version = 1
 active = false
 repository = "REPLACE_WITH_SELECTED_REPOSITORY"
-parent_repository = "Easton97-Jens/ModSecurity"
+parent_repository = "owasp-modsecurity/ModSecurity"
 parent_commit = "REPLACE_WITH_REVIEWED_FULL_COMMIT"
 parent_catalog = "REPLACE_WITH_VERIFIED_RELATIVE_PATH"
 

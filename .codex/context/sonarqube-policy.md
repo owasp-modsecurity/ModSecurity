@@ -3,7 +3,7 @@
 ## Conditional scope
 
 This is a working policy for tasks that actually use SonarQube. It does not
-assert that this fork has a SonarQube server, project key, scanner, connected
+assert that the selected checkout has a SonarQube server, project key, scanner, connected
 account, wrapper, CI analysis, or mandatory quality gate configured.
 
 Establish applicability from the current task and actual repository, PR,

@@ -32,7 +32,7 @@ shared history, merge, or publish a release as an incidental delivery step.
 ## What the pinned workflow files establish
 
 The upstream files below define CI procedures at the pinned source revision.
-They do not establish that Actions are enabled in this fork, that a run passed,
+They do not establish that Actions are enabled in the selected repository, that a run passed,
 or that a particular job is required by current branch protection.
 
 | Workflow | Source-backed role |

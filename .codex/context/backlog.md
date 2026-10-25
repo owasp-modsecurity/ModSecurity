@@ -1,18 +1,19 @@
 # Backlog and open questions
 
-The English context adaptation is published through
-[draft PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120).
-This list records actual remaining work. It is not a claim that the repository
-already has a defect or that any optional assessment has been performed.
+The current contribution is [upstream PR #3706](https://github.com/owasp-modsecurity/ModSecurity/pull/3706).
+Resolve its live head and base before acting. This list records actual remaining
+work; it does not assert a product defect or a completed optional assessment.
+Historical contributor-fork PRs do not select the current integration target.
 
 | Item | Current state | Next concrete action |
 | --- | --- | --- |
-| Integrate context into `v3/master` | Not merged | Review the concrete PR and integrate when authorized; use `codex/kontext-v3` meanwhile |
+| Review correction for upstream PR #3706 | Confirmed findings corrected and integrated checks passed; publication pending | Publish to the verified existing head branch and record that head's remote state |
+| Integrate context into the selected base | Not merged by this task | Review the actual current PR and integrate only when authorized |
 | First product-code task | No behavior change selected in this context task | Specify the intended change; inspect the relevant implementation and tests |
 | Actual target development environment | No user deployment/build environment established | For a build task, identify OS/compiler/dependencies and initialize the pinned submodules |
-| First C++ build and executed product tests | Not run in this documentation task | Follow `build-and-test.md`; record configured features, commands, executed/skipped tests, and results |
-| Future upstream updates | Baseline pinned and current at inspection | Use `upstream-sync.md`, reread changed behavior, and refresh evidence deliberately |
+| First local C++ build and executed product tests | Not run in this documentation task | Follow `build-and-test.md`; record configured features, commands, counts, logs, executed/skipped tests, and results |
+| Future upstream updates | Baseline pinned and current at its inspection | Use `upstream-sync.md`, reread changed behavior, and refresh evidence deliberately |
 
-Do not replace unknowns with plausible defaults. Add a new task only when it is
-requested or follows from a verified issue within the authorized scope. Remove
-or update completed entries instead of carrying stale plans into future chats.
+Do not replace unknowns with plausible defaults. Add a task only when requested
+or when it follows from a verified issue within the authorized scope. Remove or
+update completed entries instead of carrying stale plans into future chats.

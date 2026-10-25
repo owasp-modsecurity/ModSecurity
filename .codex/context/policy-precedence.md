@@ -1,6 +1,6 @@
 # Policy precedence and source authority
 
-These files define working conventions for this fork. They are not official
+These files define working conventions for this repository. They are not official
 ModSecurity features, and their wording does not change the implementation.
 
 ## Instruction precedence

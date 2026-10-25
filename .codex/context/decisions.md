@@ -83,9 +83,11 @@ comparison before the pull request found that its `v3/master` already matched
 the documented official baseline. The pull request therefore contains only the
 context additions; the earlier lag is retained as a historical observation.
 
-**Consequence:** Read and work on the context branch before integration into
-`v3/master`. Merging is a separate action. Actual branch and pull-request state
-is recorded in [current-state.md](current-state.md).
+**Consequence at that stage:** Read and work on the context branch before
+integration into the fork's `v3/master`; merging remains a separate action.
+This records the original contributor-fork task, not a default for upstream
+contributors. D013 supersedes its active checkout and delivery guidance.
+Observed task state is recorded in [current-state.md](current-state.md).
 
 ## D008 — Adapt the selected connector context layout
 
@@ -156,3 +158,26 @@ data, and final validation use suitable unfiltered output. ModSecurity build/tes
 commands and context-validator implementations stay unchanged. This task adds
 guidance without installing RTK, running its initializer, enabling hooks/proxies,
 or changing personal Codex settings. No actual token or billing saving is claimed.
+
+## D013 — Use canonical project identity and resolve the actual PR head
+
+**Date:** 2026-10-25.
+
+**Decision:** For the upstream contribution, the routing, structure, and local
+policy-catalog manifests identify `owasp-modsecurity/ModSecurity`. Validators
+check that canonical identity consistently. The actual working checkout may be
+a contributor fork; discover its repository, branch, and authorized destination
+from the current task and live PR head/base metadata.
+
+**Reason:** Review of [upstream PR #3706](https://github.com/owasp-modsecurity/ModSecurity/pull/3706)
+showed that the original fork-specific entry points could direct upstream readers
+to a contributor's branch and fork PR #120. Canonical project identity must not
+be confused with a checkout owner or permission to publish.
+
+**Consequence:** Startup and delivery guidance no longer select that historical
+fork or branch. Historical observations remain evidence for their stated dates.
+The English PR head is corrected independently of the separately requested
+German branch. No new PR, merge, direct upstream push, or global installation is
+part of this correction. Review claims are verified individually; the alleged
+duplicate rule-evaluation reference was not changed because its singular/plural
+labels are already distinct. See the [review record](../audit/sessions/2026-10-25-upstream-pr-review.md).

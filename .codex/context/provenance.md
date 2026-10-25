@@ -23,7 +23,7 @@ are the baseline. The values were read using `git show`, `git rev-parse` and
 functions or a comprehensive code review. A blob can also be an image file,
 for example. A gitlink refers to a commit in a separate repository.
 
-## 2. Relationship to the specified user fork
+## 2. Historical origin in the contributor fork
 
 At the first comparison on the inspection date, `Easton97-Jens/ModSecurity`, also on branch `v3/master`,
 pointed to `2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641`. This commit is an ancestor
@@ -47,7 +47,7 @@ git rev-list --count \
 ```
 
 Results in that order: exit code `0`, count `22`, count `0`.
-**Fresh comparison before the pull request:** The fork's `v3/master` branch
+**Historical recheck before the original fork pull request:** The fork's `v3/master` branch
 had meanwhile also reached
 `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`. Comparing it with the first
 context commit, `fbf883634454ba39e4c49aa2f87483b9c4610902`, showed one additional
@@ -55,10 +55,13 @@ documentation commit and 25 changed files. The branch tips were
 also read using `git ls-remote`. No assumption is made here about who
 updated the target branch.
 
-The pull request against this updated fork baseline therefore contains only
+The original fork pull request against that updated baseline therefore contained only
 the context additions. The original 22-commit difference is historical
-provenance information, not an additional product-code diff in this pull
-request. Both observations are preserved separately in the lockfile.
+provenance information, not an additional product-code diff in the context change. Both observations are
+preserved separately in the lockfile. They do not configure the current checkout
+or delivery destination. The canonical project identity is
+`owasp-modsecurity/ModSecurity`; discover the actual working repository and, for
+PR work, the live head and base from the selected task.
 
 ## 3. Submodules are separate sources
 

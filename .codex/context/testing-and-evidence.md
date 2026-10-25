@@ -61,6 +61,7 @@ CI job is not exempt from truthful reporting because the local task was smaller.
 | --- | --- | --- |
 | Unix configuration succeeds | Confirm `TEST_UTILITIES` is enabled before claiming unit/regression binaries were built; activation depends on `YAJL_FOUND=1`. | [Test activation][activation], [conditional subdirectory][subdir]. |
 | `regression_tests` exits `0` | Inspect output and counts: its `NO_LOGS` branch returns `0` without running the regressions. | [Runner branch][nologs]. |
+| `make check` exits `0` | Inspect the reported failure-marker counts and test `.log`/`.trs` output before recording a pass. The suite script and custom driver can suppress failing case exit statuses; the build guide explains the path. | [Test-result guidance](build-and-test.md#what-a-test-result-establishes), [suite script][driver], [custom driver][custom-test-driver]. |
 | A case is skipped | Record it separately from executed passes; capability/resource selection matters. | [Regression resource check][resources], [suite driver][driver]. |
 | A rule file loads | This demonstrates loading, not a complete HTTP transaction. `modsec-rules-check` loads through `RulesSet` and does not create a transaction. | [Rule checker][rules-check]. |
 | A test JSON contains an expected result | It describes a test expectation, not a recorded execution. | Working evidence rule. |
@@ -109,5 +110,6 @@ open without inventing a previous result.
 [nologs]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/regression/regression.cc#L437-L440
 [resources]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/regression/regression.cc#L151-L183
 [driver]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/test-suite.sh#L1-L40
+[custom-test-driver]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/custom-test-driver#L107-L123
 [rules-check]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/tools/rules-check/rules-check.cc#L32-L93
 [connectors]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L40-L46

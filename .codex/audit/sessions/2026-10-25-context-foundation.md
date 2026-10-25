@@ -68,11 +68,13 @@ A source-linked explanation and structural checks are not those execution result
 
 ## Repository boundary and continuation
 
-The original main-source tree and all gitlinks remain unchanged relative to the
+The original main source tree and all gitlinks remain unchanged relative to the
 pinned baseline. Only `AGENTS.md`, `CODEX_START.md`, and `.codex/` are additions.
 The delivery branch is `codex/kontext-v3` in the existing fork.
-[Draft PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) is open against
-`v3/master`; it has not been merged. The published adaptation at
+At this recorded foundation stage,
+[draft PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) was open against
+`v3/master` and had not been merged. This historical delivery record does not select
+a repository or branch for a later task. The published adaptation at
 `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` was cloned from the fork and all three
 validators passed there. Its tree `9a884e6e02525a469bfa531e8aaa767cf915e856`
 matched the reviewed local tree. The observed comparison contained 98 added

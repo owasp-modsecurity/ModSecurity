@@ -1,13 +1,15 @@
-# Integration into the fork's v3/master
+# Integration into the selected target branch
 
-This filename follows the chosen policy layout. The target described here is
-`Easton97-Jens/ModSecurity:v3/master`, not an assumed branch named `master`.
-The context work is prepared on `codex/kontext-v3`. Check the actual branch and
-PR state before acting.
+This filename follows the chosen policy layout. The canonical development line
+is `owasp-modsecurity/ModSecurity:v3/master`, not a branch assumed to be named
+`master`. For an actual integration task, resolve the selected PR's current head
+repository/branch and base repository/branch. A contributor's fork can be the
+head without being the integration target. Do not select a saved contributor
+branch or historical fork PR as the default.
 
 ## Authorization
 
-Merging into the fork's `v3/master` must be within the user's authorized task.
+Merging into the selected target must be within the user's authorized task.
 An explicit merge instruction already given in the conversation remains valid
 for that scope unless the user changes or revokes it. Do not ask for the same
 authorization again at each phase.
@@ -18,14 +20,15 @@ finish the concrete changes, review, and validation first so the user can
 decide on a reviewable result. State the specific remaining action and why
 confirmation is needed.
 
-Authorization for this fork does not authorize writes or integration into the
-official upstream repository or a submodule repository.
+Authorization for a contributor fork does not authorize writes or integration
+into the official upstream repository or a submodule repository. Authorization
+to correct a PR head is not authorization to merge that PR.
 
 ## Before an authorized merge
 
 Verify the conditions applicable to the actual repository and current PR:
 
-1. The repository, selected PR, head branch, and `v3/master` target are correct.
+1. The repository, selected PR, head branch, and actual base branch are correct.
 2. The final diff and PR description reflect the intended scope and current code.
 3. Required local and remote checks have meaningful results for the current
    head; outstanding required failures or missing evidence are resolved.

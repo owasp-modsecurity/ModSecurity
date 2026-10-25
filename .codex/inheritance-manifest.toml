@@ -1,13 +1,13 @@
 # Local policy catalog. Generated deliberately with --refresh.
 # Digests record content, not correctness. No child inheritance is active.
 schema_version = 1
-repository = "Easton97-Jens/ModSecurity"
+repository = "owasp-modsecurity/ModSecurity"
 children = []
 
 [[policies]]
 id = "MODSECURITY-ARCHITECTURE-AND-BOUNDARIES"
 source = ".codex/context/architecture-and-boundaries.md"
-sha256 = "8bb24d60347813f4dc558503d470231a77b8b0a54c82fdd19d3924cc246db062"
+sha256 = "fb5f5955862618cd1045b0e9646d863d4db4a347b79ba166f7a49998ee93bc20"
 inheritable = true
 
 [[policies]]
@@ -37,7 +37,7 @@ inheritable = true
 [[policies]]
 id = "MODSECURITY-DELIVERY-AND-CI"
 source = ".codex/context/delivery-and-ci.md"
-sha256 = "b439bd2b815612e3c2d870088995817822777948fa8ea56f3fd5ca54d718a3c3"
+sha256 = "49b6e6fd854f1d24653e09c1070b2c77963d276c3727d182e51ea57474367ee9"
 inheritable = true
 
 [[policies]]
@@ -61,25 +61,25 @@ inheritable = true
 [[policies]]
 id = "MODSECURITY-GIT-POLICY"
 source = ".codex/context/git-policy.md"
-sha256 = "16f3397612f8a7e867696fc63f446e1ef9ed0b2eb8e44adcf0d048a9ee0c87fa"
+sha256 = "2d21c29928b9c2a71213c4536002b2dba8dc53ef8ac7f10fd7e4c5323a516b83"
 inheritable = true
 
 [[policies]]
 id = "MODSECURITY-MASTER-INTEGRATION"
 source = ".codex/context/master-integration.md"
-sha256 = "e59fea375b24c0891b4d4bbd33c2505f6ef0d177e63f834cd3f46f1a9002f868"
+sha256 = "4915d57172f24bb53dfc3f0cec2d0becbacffc142b0807b0f99982937869e87f"
 inheritable = true
 
 [[policies]]
 id = "MODSECURITY-POLICY-PRECEDENCE"
 source = ".codex/context/policy-precedence.md"
-sha256 = "fe07eae7b8ea29fbc1067d127d89e295c99b9dae748d700053d97bb70ecabdc2"
+sha256 = "57fbeeac92975b141a311767941eebf4268c80ec9871cd1fd7950c61591f3832"
 inheritable = true
 
 [[policies]]
 id = "MODSECURITY-PR-REMEDIATION"
 source = ".codex/context/pr-remediation.md"
-sha256 = "bffb670164adc108e58aca778ff0053b98aefca28af26b4bf435da6fa20a7e11"
+sha256 = "26700902ffc1410f5a351a983d3257915b7475b4de91b3358dde3d4310296405"
 inheritable = true
 
 [[policies]]
@@ -115,7 +115,7 @@ inheritable = true
 [[policies]]
 id = "MODSECURITY-SONARQUBE-POLICY"
 source = ".codex/context/sonarqube-policy.md"
-sha256 = "12c3dfd326d13f67c09089c9b92235341247bf8cb2da3ceb44fc6b66dbb7398d"
+sha256 = "79486960e3128c02c387e558ede2cff4f798e881f8fea785b9564e5152575c66"
 inheritable = true
 
 [[policies]]
@@ -133,7 +133,7 @@ inheritable = true
 [[policies]]
 id = "MODSECURITY-TESTING-AND-EVIDENCE"
 source = ".codex/context/testing-and-evidence.md"
-sha256 = "d467044cc1c9b41b047a2f198bf82edd157de6f5a4b50961ae63521a333ed557"
+sha256 = "21e8f83b4a7ffecb41bd76681800ac174f687156b0bf9bdbce3d8d482a020864"
 inheritable = true
 
 [[policies]]

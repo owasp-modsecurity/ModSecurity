@@ -1,6 +1,6 @@
-# Fork-local routing. This is not a built-in Codex configuration format.
+# Repository-local routing. This is not a built-in Codex configuration format.
 schema_version = 1
-repository = "Easton97-Jens/ModSecurity"
+repository = "owasp-modsecurity/ModSecurity"
 root_instruction = "AGENTS.md"
 index = ".codex/context/index.md"
 

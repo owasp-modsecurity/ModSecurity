@@ -220,6 +220,17 @@ Sources: [default unit-test path][unit-default], [additional load path][unit-mai
   failure counts; exit code `0` therefore does not establish that all
   possible capabilities were exercised. [Unit result calculation][unit-main],
   [regression result calculation][regression-main].
+- At this revision, `make check` can return `0` even when test cases fail.
+  The top-level Makefile selects `test/test-suite.sh` and
+  `test/custom-test-driver`. The suite script reports failures but normally
+  returns the status of its final `cd -`. The custom driver stores the invoked
+  command's status in `estatus` and counts `:test-result: FAIL` markers, but
+  does not return that status or a failure status based on the count; its
+  normal path ends with a reporting `echo`. Inspect the reported failure-marker
+  counts and the test `.log`/`.trs` output before recording a pass. Marker
+  counts are not necessarily distinct failed-case counts. Sources:
+  [Makefile integration][test-integration], [suite script][test-driver],
+  [custom driver][custom-test-driver].
 - When adding a regression test, also check whether it is listed in
   `test/test-suite.in`. The suite is included through that file.
   [Makefile integration][test-integration], [test list][test-list].
@@ -337,6 +348,7 @@ checked against the build and test sources linked above.
 [configure-summary]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L479-L498
 [regression-main]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/regression/regression.cc#L395-L561
 [test-driver]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/test-suite.sh#L1-L40
+[custom-test-driver]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/custom-test-driver#L107-L123
 [linux-ci]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.github/workflows/ci.yml#L8-L106
 [new-ci]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.github/workflows/ci_new.yml#L75-L171
 [pcre2]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build/pcre2.m4#L11-L13

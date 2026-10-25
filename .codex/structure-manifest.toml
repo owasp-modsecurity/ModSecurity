@@ -1,6 +1,6 @@
 # Adapted local schema; no Framework/MRTS repositories are configured.
 schema_version = 1
-repository = "Easton97-Jens/ModSecurity"
+repository = "owasp-modsecurity/ModSecurity"
 routing_marker = "codex-control-plane-routing:repository"
 template_repository = "https://github.com/Easton97-Jens/ModSecurity-conector"
 template_commit = "42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3"

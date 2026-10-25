@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate this fork's routed context layout without changing files."""
+"""Validate ModSecurity's routed context layout without changing files."""
 
 import json
 import sys
@@ -12,6 +12,7 @@ except ImportError:
     sys.exit(2)
 
 ROOT = Path(__file__).resolve().parents[2]
+PROJECT_REPOSITORY = "owasp-modsecurity/ModSecurity"
 GROUPS = (
     "technical_guides", "primary_policies", "profiles", "components",
     "security_checks", "session_context", "supporting_context", "tools",
@@ -19,11 +20,13 @@ GROUPS = (
 
 
 def load(relative):
+    """Parse and return the TOML document at a path relative to ROOT."""
     with (ROOT / relative).open("rb") as handle:
         return tomllib.load(handle)
 
 
 def local_path(relative):
+    """Resolve a nonempty relative path, rejecting absolute or outside-root paths."""
     if not isinstance(relative, str) or not relative or Path(relative).is_absolute():
         raise ValueError(f"Expected a nonempty repository-relative path: {relative!r}")
     path = (ROOT / relative).resolve()
@@ -33,14 +36,21 @@ def local_path(relative):
 
 
 def main():
+    """Check project identity, routing, and layout, returning 0 or 1 with diagnostics.
+
+    Both manifests must name the canonical project, independently of checkout
+    ownership or Git remotes. Input failures propagate to the exit-2 handler.
+    """
     manifest = load(".codex/context/manifest.toml")
     structure = load(".codex/structure-manifest.toml")
     errors = []
     for name, data in (("context", manifest), ("structure", structure)):
         if data.get("schema_version") != 1:
             errors.append(f"{name}: unsupported schema_version")
-    if structure.get("repository") != "Easton97-Jens/ModSecurity":
-        errors.append("Structure repository identity is unexpected")
+        if data.get("repository") != PROJECT_REPOSITORY:
+            errors.append(f"{name}: repository must identify {PROJECT_REPOSITORY}")
+    if manifest.get("repository") != structure.get("repository"):
+        errors.append("Repository identity differs between context and structure manifests")
     if structure.get("children") != []:
         errors.append("Active child inheritance is not supported by this schema")
     for relative in structure.get("required_files", []):

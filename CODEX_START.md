@@ -13,7 +13,7 @@ Working instructions and context files are identified as additions for this proj
 | Entry point | Content |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Reusable, repository-independent working agreement |
-| [Repository context](.codex/context/repository-context.md) | This fork's identity, source constraints, checks, and file-language requirements |
+| [Repository context](.codex/context/repository-context.md) | Canonical project identity, checkout-specific work, source constraints, checks, and file-language requirements |
 | [.codex/context/index.md](.codex/context/index.md) | Technical guides, policy owners, task profiles, and reading paths |
 | [Project context](.codex/context/project-context.md) | What libmodsecurity provides and the scope of this repository |
 | [Repository map](.codex/context/repository-map.md) | Directories, languages, build files, and useful entry points |
@@ -26,7 +26,7 @@ Working instructions and context files are identified as additions for this proj
 | [Current state](.codex/context/current-state.md) | Completed work, verification, open questions, and blockers |
 | [Provenance](.codex/context/provenance.md) | Upstream revision, fork comparison, submodules, and evidence rules |
 
-## Layout adapted to your connector repository
+## Layout adapted from the connector reference
 
 The structure follows the inspected `.codex` layout of
 [`Easton97-Jens/ModSecurity-conector`](https://github.com/Easton97-Jens/ModSecurity-conector/tree/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex):
@@ -45,7 +45,7 @@ on having Git and an actual checkout.
 
 You can reuse that file unchanged in another repository. Each repository keeps
 its own identity, commands, versions, technical guides, and saved state. For this
-fork, those details start in
+project, those details start in
 [repository-context.md](.codex/context/repository-context.md). Copying the root file
 does not automatically distribute it, activate a global setting, or copy this
 ModSecurity-specific context into other projects.
@@ -99,9 +99,11 @@ A longer ready-to-copy prompt is in
 [start-new-chat.md](.codex/context/prompts/start-new-chat.md). Use
 [end-session.md](.codex/context/prompts/end-session.md) when handing work over.
 
-These files belong in the existing `Easton97-Jens/ModSecurity` fork.
-[using-this-fork.md](.codex/context/using-this-fork.md) explains how to open the
-`codex/kontext-v3` working branch and use it in new chats.
+These files describe `owasp-modsecurity/ModSecurity` and can also be used in a
+contributor's checkout or fork. [Working with a checkout](.codex/context/using-this-fork.md)
+explains how to identify the actual repository, branch, and revision. For a pull
+request, resolve its current head repository, branch, and commit before selecting
+files; saved contributor branches and historical PRs are not checkout defaults.
 
 ## Checking context consistency
 
@@ -120,7 +122,7 @@ python3 .codex/bin/verify-context.py --strict-source
 ```
 
 The structure and catalog validators require Python 3.11 or later. The source
-checker requires Python 3 and Git with `--no-lazy-fetch`,
+checker requires Python 3 and Git 2.45 or later with `--no-lazy-fetch`,
 which prevents automatic object downloads in partial clones. It checks the
 pinned commit, source inventory, local document links, and the existence and
 line ranges of commit-pinned ModSecurity references. It reports worktree

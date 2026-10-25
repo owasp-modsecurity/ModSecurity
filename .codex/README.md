@@ -17,7 +17,7 @@ from the owner's connector repository.
 | [inheritance-templates/README.md](inheritance-templates/README.md) | Explicit, optional reuse; no automatic submodule inheritance |
 
 The root agreement can be reused unchanged in other repositories; these `.codex`
-files remain tailored to this fork. Maintained files remain English; no chat
+files remain tailored to the ModSecurity core project. Maintained files remain English; no chat
 language is prescribed by this setup.
 
 These files are versioned project context. They do not change library behavior,

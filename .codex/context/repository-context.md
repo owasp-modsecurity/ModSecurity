@@ -9,16 +9,20 @@ linked guides so the root agreement can be reused without modification.
 
 | Role | This repository's value |
 | --- | --- |
-| Working repository | `Easton97-Jens/ModSecurity`, the existing public fork |
-| Official product source | `owasp-modsecurity/ModSecurity`, branch `v3/master` |
+| Canonical project and product source | `owasp-modsecurity/ModSecurity`, branch `v3/master` |
 | Documented source commit | `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
-| Context working branch | `codex/kontext-v3` |
-| Integration target | The fork's `v3/master`, through [PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) |
+| Working repository and branch | Discover the actual checkout selected by the current task; contributor forks are valid |
+| Pull-request head | Resolve the current head repository, branch, and full commit from the selected PR before checkout |
+| Delivery and integration target | The destination authorized for this task; verify the PR base when a PR is involved |
 | Maintained files | English; preserve actual identifiers and diagnostics |
 
-Recheck the current branch, commit, worktree, and PR state before acting. Source
-metadata and the two separately recorded fork observations are in
-[upstream-lock.json](upstream-lock.json) and [provenance.md](provenance.md).
+Recheck the current branch, commit, worktree, and PR state before acting. The
+`repository` fields in the routing, structure, and policy-catalog manifests name
+the canonical ModSecurity project. They are not a remote URL or a push target;
+the validators do not require a contributor's `origin` to point to upstream.
+Source metadata and the two separately recorded historical fork observations are
+in [upstream-lock.json](upstream-lock.json) and [provenance.md](provenance.md).
+Historical contributor branches and PRs do not select the current checkout.
 
 The `.codex` layout is adapted from the owner's connector repository as described
 in [template-adaptation.md](template-adaptation.md). This is a working convention;
@@ -49,7 +53,7 @@ python3 .codex/bin/validate-codex-inheritance.py --check
 ```
 
 Use `--strict-source` on the source verifier when upstream product files are
-expected to be unchanged. The source verifier needs Python 3 and Git supporting
+expected to be unchanged. The source verifier needs Python 3 and Git 2.45 or later supporting
 `--no-lazy-fetch`; the TOML validators need Python 3.11 or later. These requirements
 belong to these helpers, not to the reusable root agreement. Do not infer a
 successful library build or product test run from their results.
@@ -79,11 +83,13 @@ Make targets do not establish commands for this core checkout.
 
 ## Delivery and continuation
 
-Keep the existing fork as the authorized destination. Do not create a replacement
-repository. Follow [git-policy.md](git-policy.md),
+Follow the user's authorized repository and branch rather than a destination
+copied from a historical handover. Updating an upstream PR normally changes its
+verified head branch, which can be in a contributor fork; it does not authorize
+a direct upstream push or merge. Follow [git-policy.md](git-policy.md),
 [delivery-and-ci.md](delivery-and-ci.md), and
 [master-integration.md](master-integration.md) for their respective operations.
-Preparing or updating the context PR does not itself merge it into `v3/master`.
+Preparing or updating a PR does not itself merge it into its base branch.
 
 Update current state, justified decisions, and the real backlog when they change.
 For a useful longer handover, use [handoff-template.md](handoff-template.md) and

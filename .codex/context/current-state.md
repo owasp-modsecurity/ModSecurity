@@ -1,105 +1,118 @@
 # Current working state
 
-Recorded on **2026-10-25**. Recheck the actual branch, commit, and remote state
-when resuming; branch names and PR status can change.
+Recorded on **2026-10-25**, Europe/Berlin. This is a dated task record, not a
+checkout instruction. Resolve the actual repository, branch, commit, worktree,
+and live PR head/base before resuming.
 
-## Goal and completed content
+## Current task and repository identity
 
-Add English `AGENTS.md` and comprehensive reusable `.codex` context to the existing
-**Easton97-Jens/ModSecurity** fork. Explain the repository, central functionality,
-C++/C interfaces, configuration, builds, and tests from official v3 source. Follow
-the owner-selected connector repository's context structure, tailored to the core.
+Review and correct [upstream PR #3706](https://github.com/owasp-modsecurity/ModSecurity/pull/3706).
+The canonical project is `owasp-modsecurity/ModSecurity`, development branch
+`v3/master`. The PR metadata observed at the start of this correction was:
 
-The routed layout, technical guides, working policies, optional assessment
-profiles, component/check guides, manifests, validators, prompts, and handover
-mechanism are prepared. Following the owner's clarification, the root `AGENTS.md`
-is now reusable unchanged across repositories. Concrete ModSecurity constraints
-and startup checks are in [repository-context.md](repository-context.md).
-Maintained files are English. No chat language is prescribed; each person chooses
-their conversation language. The index and startup prompt preserve that distinction.
-The [index](index.md) is the entry point. The [adaptation record](template-adaptation.md)
-explains the template mapping and the reference-specific assumptions that were omitted.
-
-At the owner's request, [rtk.md](rtk.md) now documents optional RTK output summaries.
-The reusable root prefers supported summaries when RTK is available, with native
-output for exact evidence and final validation. Official OpenAI documentation
-governs Codex integration; pinned RTK source governs its examples. This addition
-does not install RTK, run its initializer, activate hooks/proxies, or change
-personal settings. No runtime token or billing savings have been measured.
-
-## Verified source boundaries
-
-| Item | Recorded revision or scope |
+| Field | Observed value before correction |
 | --- | --- |
-| Official product source | `owasp-modsecurity/ModSecurity`, `v3/master`, `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
-| Existing fork target, latest observed comparison | `Easton97-Jens/ModSecurity:v3/master`, same `effb6c0...` commit |
-| Structure template | `Easton97-Jens/ModSecurity-conector:master`, `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` |
-| Main-source inventory | 850 entries: 846 blobs and 4 gitlinks |
-| Reference inventory | 72 tracked `.codex` files plus root `AGENTS.md`, `README.md`, `.gitignore`, and `Makefile` |
-| Optional RTK reference | `rtk-ai/rtk` tag `v1.0.1`, commit `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`; separate from ModSecurity source |
-| Codex integration reference | Official OpenAI AGENTS.md and hooks documentation, read on 2026-10-25; see [provenance](provenance.md) |
-| Product changes | None outside `AGENTS.md`, `CODEX_START.md`, and `.codex/` |
+| Base repository and branch | `owasp-modsecurity/ModSecurity:v3/master` |
+| Base commit | `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
+| Head repository and branch | `Easton97-Jens/ModSecurity:codex/kontext-v3` |
+| Head commit | `a35e8c3a1116a763f286f965f718f36d5f8876cc` |
+| PR state | Open, not a draft, not merged |
 
-The first fork observation was 22 commits behind upstream; the subsequent target
-observation matched the baseline. These are separately retained historical facts,
-not a 22-commit product delta in this context delivery. See [provenance](provenance.md)
-and [upstream-lock.json](upstream-lock.json).
+The fixes belong on the verified head branch of this existing PR. The separately
+requested German branch is outside this correction. No new PR, merge, or direct
+push to the upstream base branch is part of the task. Historical fork PR #120
+is not the integration target of upstream PR #3706.
 
-## Verification actually completed
+The manifests declare canonical project identity, not a push destination.
+Contributor forks remain valid checkouts. The portable root `AGENTS.md` remains
+repository-independent; [repository-context.md](repository-context.md) supplies
+project facts. Files in this English contribution remain English. No chat
+language is prescribed; each person chooses their conversation language.
 
-All commands below were run from the repository root with Python 3.12.14 and Git
-supporting `--no-lazy-fetch`. Final document counts are reported by the verifier
-because later handover updates can add Markdown and links.
+## Content and source boundaries
 
-| Check | Observed result |
+The context covers repository layout, architecture, C++17/C APIs, ownership,
+transaction processing, rules/configuration, builds/tests, optional RTK use,
+working policies, assessment profiles, and session handovers. The [index](index.md)
+routes to the relevant material. These are documented project conventions,
+not automatic memory, inherited submodule policies, or built-in Codex manifests.
+
+| Evidence | Recorded revision or scope |
 | --- | --- |
-| `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; pinned tree, complete source inventory, local document targets, 487 unique pinned ModSecurity source links and line ranges, and unchanged product-source boundary |
-| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 routed files, required layout, identity, and manifest consistency |
-| `python3 .codex/bin/validate-codex-inheritance.py --check` | Exit 0; 23 local policy digests, no active child inheritance |
-| `git diff --check` | Exit 0; no whitespace errors in the RTK documentation follow-up |
-| RTK source-reference check | Tag resolved to the recorded commit; 19 cited source paths/line ranges checked against the local reference clone; separate from the ModSecurity validator |
-| Pinned template-link verification | Valid local Git objects and line ranges at the reference commit |
-| Independent documentation/source review | Foundation and portability reviews completed; RTK examples/source mapping and official Codex documentation checked. The separate scope of proxy statistics was clarified after review. |
-| Independent helper probes in an isolated copy | Missing/bad/outside-root links, stale digests, duplicate IDs, and invalid paths rejected; historical evidence and fenced examples handled as documented |
-| Helper fixes rechecked | Dated session records need no active route; colliding derived policy IDs are rejected before writes; catalog symlinks are rejected without changing an outside sentinel file |
+| Official ModSecurity source | `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`; 850 entries, 846 blobs and four gitlinks |
+| Structure reference | `Easton97-Jens/ModSecurity-conector`, `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3`; selected layout files only |
+| RTK reference | `rtk-ai/rtk` tag `v1.0.1`, `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`; documentation/source inspection, no installation or measured savings |
+| Codex reference | Official OpenAI AGENTS.md and hooks documentation read on 2026-10-25; see [provenance](provenance.md) |
+| Product changes | Strict source validation found no differences outside `AGENTS.md`, `CODEX_START.md`, and `.codex/` |
 
-No semantic completeness or security guarantee follows from these checks. The
-[foundation handover](../audit/sessions/2026-10-25-context-foundation.md) records
-scope and verification details.
+The initial and subsequent contributor-fork comparisons remain separate
+historical observations in [provenance.md](provenance.md) and
+[upstream-lock.json](upstream-lock.json). They do not configure the working
+repository. The [foundation record](../audit/sessions/2026-10-25-context-foundation.md)
+and the [pre-correction state](https://github.com/Easton97-Jens/ModSecurity/blob/a35e8c3a1116a763f286f965f718f36d5f8876cc/.codex/context/current-state.md)
+preserve earlier preparation, RTK, portability, and verification history.
 
-**Not executed:** C++ compilation, ModSecurity unit/regression execution, Windows
-build, parser regeneration, library installation, connector integration, or a
-security scan. The task changes context and local documentation helpers only.
-Submodule implementations were not initialized or comprehensively reviewed.
-RTK and Codex executables were not available in the task environment; their
-example commands, initializer, hook behavior, and actual savings were not tested
-here. Source/documentation inspection does not establish runtime integration.
+## Review outcome
 
-## Delivery state
+Seven of the eight inline review findings were confirmed and addressed:
 
-Working branch: `codex/kontext-v3` in `Easton97-Jens/ModSecurity`.
-The English adaptation is published in the existing fork, with
-[draft pull request #120](https://github.com/Easton97-Jens/ModSecurity/pull/120)
-open against `v3/master`. Including the RTK follow-up, the context consists of
-100 added files and no product-source changes. No merge has been performed.
+- Document Git 2.45 or later for `--no-lazy-fetch`.
+- Explain that the pinned `make check` driver path can return zero despite
+  failure markers; require inspection of counts and `.log`/`.trs` output.
+- Replace raw remote URL output with redacted identity inspection.
+- Resolve the current PR head before choosing a checkout.
+- Make project identity consistent across entry points, manifests, and validators.
+- Link the engine and rule guides separately in the response-intervention check.
+- Protect the source inventory from overwriting existing uncommitted work.
 
-The published adaptation commit `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` had tree
-`9a884e6e02525a469bfa531e8aaa767cf915e856`, matching the reviewed local tree. It was
-cloned separately from the fork; all three validators passed and the checkout
-was clean. Later context-only updates record delivery facts, the reusable-root
-clarification, and optional RTK guidance. Validator implementations remain
-unchanged; the 487 unique pinned ModSecurity source links are preserved. Use
-`git rev-parse HEAD` or the PR head for the latest working commit.
+The alleged duplicate Markdown reference is a false positive at the reviewed
+head: `[rules-evaluate]` points to `RulesSet::evaluate()`, whereas `[rule-evaluate]`
+points to `RuleWithOperator::evaluate()`. The existing references remain intact.
+All 12 Python-helper functions now have explanatory docstrings; the local AST
+count is separate from a future external CodeRabbit coverage result. The minor
+historical wording correction was also applied. Details and evidence are in the
+[review record](../audit/sessions/2026-10-25-upstream-pr-review.md).
 
-The PR-triggered workflow query returned no runs for the adaptation commit at
-the time checked. This is not a passing CI result or evidence that no workflow
-can run later. No runtime/build success is claimed.
+## Verification and limits
 
-## Next concrete step
+The integrated working tree passed these checks from the repository root:
 
-Open PR #120 for review and use `codex/kontext-v3` in new chats until the
-context change is merged. Recheck the actual remote state when resuming. The
-root agreement can be reused elsewhere, but other repositories and global user
-configuration have not been changed. For a later product task, read the relevant
-guides and actual source, establish the intended behavior and environment, and select
-proportionate verification. The first real C++ build remains future task evidence.
+| Executed check | Result |
+| --- | --- |
+| `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; 91 Markdown files, 508 local link targets, 488 unique pinned ModSecurity source links; unchanged product source and gitlinks |
+| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 routed files consistent |
+| `python3 .codex/bin/validate-codex-inheritance.py --refresh` then `--check --json` | Exit 0; 23 policy digests regenerated deliberately and checked; no active child inheritance |
+| `git diff --check` | Exit 0 |
+| Python parsing, docstring count, and source-verifier AST comparison | All helpers parsed; 12/12 functions documented; source-verifier executable AST unchanged |
+| Isolated helper error-path probes | Wrong identities rejected; denied refresh preserved catalog bytes and mtime; explicit canonical refresh migrated a stale identity |
+| Independent reviews | No concrete defect found in the corrected helpers, project/checkout guidance, or remote/inventory examples |
+
+The [review record](../audit/sessions/2026-10-25-upstream-pr-review.md) describes
+additional targeted probes and their limits. The source inventory, upstream lock,
+portable root agreement, and correctly distinct rule-reference labels remain
+unchanged by this correction.
+
+At the pre-correction head `a35e8c3a`, the upstream workflow API returned completed,
+successful `Quality Assurance` run `40190804854` and `Quality Assurance new` run
+`40190804889`. The combined status contained `CodeRabbit: success`; the observed
+SonarQube Cloud comment reported its quality gate passed. These observations
+apply to that old head only and are not results for a later correction commit.
+
+No full ModSecurity C++ build, product unit/regression suite, Windows build,
+connector integration, security scan, or Codex/RTK runtime integration is executed
+as part of this correction. The small shell-driver reproduction uses failing
+stubs and is not a product test pass. Submodule contents remain separate and
+were not comprehensively reviewed. Structural checks do not prove semantic
+completeness or security.
+
+## Delivery and continuation
+
+The local correction is validated and prepared for the verified existing PR head.
+Remote publication has not yet been observed when this validation record is
+written. After publication, record the delivered commit and inspect that head's
+own checks. No remote review replies or thread-resolution actions are required
+to record the code correction in this task.
+
+For a later session, select the live task/PR revision, read the relevant guides
+and source, and choose proportionate verification. Use [backlog.md](backlog.md)
+for real remaining work. The first local full C++ build remains a separate task.
