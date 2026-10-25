@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "upstream": {
+    "repository": "https://github.com/owasp-modsecurity/ModSecurity",
+    "branch": "v3/master",
+    "commit": "effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729",
+    "tree": "d626de814f96ceea7fd717d6176b30a17a86f08e",
+    "commit_date": "2026-10-24T18:06:05+02:00",
+    "observed_on": "2026-10-25",
+    "observation_timezone": "Europe/Berlin"
+  },
+  "user_fork_observation": {
+    "repository": "https://github.com/Easton97-Jens/ModSecurity",
+    "branch": "v3/master",
+    "commit": "2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641",
+    "observed_on": "2026-10-25",
+    "upstream_commits_ahead_of_fork": 22,
+    "fork_commits_not_in_upstream": 0,
+    "fork_is_ancestor_of_upstream": true
+  },
+  "scope": "Main repository source at the pinned commit. Gitlinks record submodule commits; submodule contents are not audited.",
+  "tracked_entry_count": 850,
+  "tracked_blob_count": 846,
+  "submodules": [
+    {
+      "path": "bindings/python",
+      "commit": "bc625d5bb0bac6a64bcce8dc9902208612399348",
+      "url": "https://github.com/owasp-modsecurity/ModSecurity-Python-bindings.git",
+      "contents_reviewed": false
+    },
+    {
+      "path": "others/libinjection",
+      "commit": "211782219663f889f471650150df12b623c5766e",
+      "url": "https://github.com/libinjection/libinjection.git",
+      "contents_reviewed": false
+    },
+    {
+      "path": "others/mbedtls",
+      "commit": "0fe989b6b514192783c469039edd325fd0989806",
+      "url": "https://github.com/Mbed-TLS/mbedtls.git",
+      "contents_reviewed": false
+    },
+    {
+      "path": "test/test-cases/secrules-language-tests",
+      "commit": "f73c73027ef49ccf99c7911744929a71d15ff419",
+      "url": "https://github.com/owasp-modsecurity/secrules-language-tests",
+      "contents_reviewed": false
+    }
+  ],
+  "context_additions": [
+    "AGENTS.md",
+    "CODEX_START.md",
+    ".codex/"
+  ],
+  "external_product_documentation": [
+    {
+      "topic": "AGENTS.md discovery only; not a source for ModSecurity behavior",
+      "url": "https://developers.openai.com/codex/agent-configuration/agents-md",
+      "observed_on": "2026-10-25"
+    }
+  ]
+}
