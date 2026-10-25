@@ -3,6 +3,8 @@
 This working context targets the existing fork
 [`Easton97-Jens/ModSecurity`](https://github.com/Easton97-Jens/ModSecurity).
 The context files are provided on the working branch `codex/kontext-v3`.
+Review [draft PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120)
+for integration into the existing fork's `v3/master`.
 The pull request targeting `v3/master` makes the proposed changes
 reviewable; its actual status is recorded in
 [current-state.md](current-state.md).

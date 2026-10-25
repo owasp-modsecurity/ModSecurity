@@ -60,13 +60,24 @@ Submodule implementations were not initialized or comprehensively reviewed.
 ## Delivery state
 
 Working branch: `codex/kontext-v3` in `Easton97-Jens/ModSecurity`.
-The final English adaptation is ready for branch publication and a draft PR
-against `v3/master`. Remote delivery details will be recorded after verification.
-No merge has been performed as part of this context preparation.
+The English adaptation is published in the existing fork, with
+[draft pull request #120](https://github.com/Easton97-Jens/ModSecurity/pull/120)
+open against `v3/master`. Its comparison contains 98 context additions and no
+product-source changes. No merge has been performed.
+
+The published adaptation commit `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` had tree
+`9a884e6e02525a469bfa531e8aaa767cf915e856`, matching the reviewed local tree. It was
+cloned separately from the fork; all three validators passed and the checkout
+was clean. A subsequent context-only update records these delivery facts. Use
+`git rev-parse HEAD` or the PR head for the latest working commit.
+
+The PR-triggered workflow query returned no runs for the adaptation commit at
+the time checked. This is not a passing CI result or evidence that no workflow
+can run later. No runtime/build success is claimed.
 
 ## Next concrete step
 
-Verify the published branch/PR state and use that branch in new chats until the
-context change is merged. For a later product task, read the relevant guides and
+Open PR #120 for review and use `codex/kontext-v3` in new chats until the
+context change is merged. Recheck the actual remote state when resuming. For a later product task, read the relevant guides and
 actual source, establish the intended behavior and environment, and select
 proportionate verification. The first real C++ build remains future task evidence.
