@@ -1,127 +1,90 @@
-# Arbeitsanweisungen für Codex und andere Code-Assistenten
+# ModSecurity v3 working agreement
 
-## Auftrag und Sprache
+<!-- codex-control-plane-routing:modsecurity-core -->
 
-Dieses Repository enthält den offiziellen ModSecurity-v3-Quellcode sowie eine
-zusätzliche, deutschsprachige Arbeitsdokumentation. Erkläre auf Deutsch; lasse
-Symbole, Dateinamen und Befehle unverändert. Die Ergänzungen in `AGENTS.md`,
-`CODEX_START.md` und `.codex/` sind Projektkonventionen für diese Arbeitskopie,
-keine offiziellen Vorgaben des ModSecurity-Projekts.
+## Scope and language
 
-Die wichtigste Anforderung des Eigentümers lautet: **Nichts erfinden.**
-Technische Aussagen über ModSecurity müssen aus dem tatsächlich gelesenen
-Quellcode des festgehaltenen Upstream-Stands oder aus einem ausdrücklich
-benannten, überprüften neueren Stand hervorgehen.
+This agreement applies to work in **Easton97-Jens/ModSecurity**. The upstream
+product is `owasp-modsecurity/ModSecurity`, branch `v3/master`. All new context,
+explanations, prompts, and handovers are **English**. Preserve actual identifiers,
+commands, filenames, and quoted diagnostics.
 
-## Start jeder neuen Sitzung
+`AGENTS.md`, `CODEX_START.md`, and `.codex/` are additions for this fork. They are
+working conventions, not upstream product functionality. Their routed layout is
+adapted from the owner's connector repository; see the
+[adaptation record](.codex/context/template-adaptation.md).
 
-1. Lies diese Datei, [`.codex/README.md`](.codex/README.md),
-   [`.codex/CURRENT_STATE.md`](.codex/CURRENT_STATE.md) und
-   [`.codex/DECISIONS.md`](.codex/DECISIONS.md).
-2. Prüfe Arbeitsverzeichnis, aktuellen Branch, `git status --short` und
-   `git rev-parse HEAD`. Erhalte fremde oder noch nicht eingecheckte Änderungen.
-3. Lies [`.codex/upstream-lock.json`](.codex/upstream-lock.json). Unterscheide
-   den dort fixierten Upstream-Commit vom aktuellen Arbeitscommit.
-4. Führe bei vorhandenem Python 3 und Git
-   `python3 .codex/scripts/verify_context.py` aus. Die Prüfung belegt Pfade,
-   Referenzen und Abweichungen; sie beweist keine inhaltliche Fehlerfreiheit.
-5. Wähle anhand des Dokumentationsindex nur die zum Auftrag passenden Kapitel.
-   Öffne anschließend die betroffenen Implementierungen, Aufrufer und Tests.
-6. Fasse knapp zusammen: Auftrag, geprüfter Stand, relevante Vorarbeit,
-   offene Fragen und nächster Schritt. Eine fehlende Information wird als
-   fehlend benannt, nicht durch eine plausible Geschichte ersetzt.
+## Start a session
 
-Bei reinem Chat-Zugriff ohne Checkout: dieselben Dateien über den tatsächlich
-verfügbaren Repository-Zugang lesen. Ist eine Datei nicht zugänglich, benenne
-die Lücke und fordere genau diese Datei an. Behaupte niemals, sie gelesen zu
-haben. Ein Link allein überträgt weder Dateien noch vorherige Chatverläufe.
+1. Read [context/index.md](.codex/context/index.md),
+   [current-state.md](.codex/context/current-state.md),
+   [decisions.md](.codex/context/decisions.md), and
+   [upstream-lock.json](.codex/context/upstream-lock.json).
+2. Establish the actual repository, branch, `git rev-parse HEAD`, and
+   `git status --short`. Preserve unrelated and uncommitted work.
+3. Identify the current request and existing authorization. Load only the
+   relevant policies, technical guides, and assessment profile from the index.
+4. Read affected source, declarations, callers, build switches, and tests.
+   State the verified revision, unresolved questions, and next concrete action.
+5. When available, run `python3 .codex/bin/verify-context.py` to detect context
+   drift. This read-only helper requires Python 3 and Git with `--no-lazy-fetch`.
 
-## Quellen und Belegpflicht
+With chat-only repository access, read the same files through that access. If a
+file cannot be read, identify the exact gap. A URL does not transfer a checkout
+or previous conversations. Saved context helps only when it is read and kept current.
 
-- Maßgeblich sind Implementierung, öffentliche Header, Builddefinitionen,
-  Parsergrammatik und tatsächlich vorhandene Tests am genannten Commit.
-- Zitiere bei technischen Feststellungen `Pfad + Symbol` und möglichst einen
-  GitHub-Link mit vollständiger Commit-ID und passenden Zeilen.
-- Trenne **belegt**, **abgeleitet**, **Vorschlag** und **ungeprüft**. Ein Testfall
-  beschreibt erwartetes Verhalten; erst ein dokumentierter Lauf belegt, dass
-  er in der geprüften Umgebung bestanden wurde.
-- Prüfe bei widersprüchlichen Kommentaren oder README-Beispielen den Code.
-  Vermerke Abweichungen in [`.codex/FACT_CHECK.md`](.codex/FACT_CHECK.md).
-- Aus einer vorhandenen Datei folgt keine nutzbare Funktion. Prüfe auch
-  Parserzulassung, Buildschalter, Abhängigkeiten, Implementierung und Tests.
-- Vermische `v2/master`, `v3/master`, externe Connectoren, das Core Rule Set
-  und den eigenen Fork nicht. Untersuche externe Projekte nur, wenn der
-  Auftrag sie umfasst, und kennzeichne deren eigenständigen Quellenstand.
-- Erfinde weder CVEs, Sicherheitsgarantien, Benchmarks, API-Signaturen,
-  Plattformunterstützung noch erfolgreiche Build- oder Testergebnisse.
-- Bei jeder Upstream-Aktualisierung sind die betroffenen Dokumente und Belege
-  neu zu prüfen. Eine neue Commit-ID allein macht alte Erklärungen nicht aktuell.
+## Evidence and product authority
 
-## Orientierung im Code
+The owner requires **no invented facts**. Use this order for ModSecurity claims:
 
-Die folgenden Einstiegspunkte sind am fixierten Stand vorhanden; ihre
-detaillierten Belege stehen in den verlinkten Kapiteln.
+1. Current implementations, public headers, parser grammar, and build definitions.
+2. Actual tests and CI definitions, distinguished from their execution results.
+3. Versioned upstream documentation and comments, checked against implementation.
+4. These derived guides and historical notes, at their explicitly stated revisions.
 
-| Aufgabe | Zuerst lesen |
-| --- | --- |
-| Gesamtaufbau und Dateisystem | [Repositorykarte](.codex/REPOSITORY_MAP.md), [Funktionskarte](.codex/FEATURE_MAP.md) |
-| HTTP-Ablauf, Regeln, Intervention | [Architektur](.codex/ARCHITECTURE.md), `src/transaction.cc`, `src/rules_set.cc` |
-| C++/C-API, Besitz und Lebensdauer | [C++-Leitfaden](.codex/CPP_GUIDE.md), `headers/modsecurity/` und passende Implementierung |
-| SecRules und Konfiguration | [Regeln und Konfiguration](.codex/CONFIG_AND_RULES.md), `src/parser/seclang-parser.yy`, `src/parser/seclang-scanner.ll` |
-| Kompilierung und Tests | [Build und Tests](.codex/BUILD_AND_TEST.md), `configure.ac`, `Makefile.am`, `test/Makefile.am` |
-| Neue Sitzung oder Übergabe | [Sitzungsablauf](.codex/WORKFLOW.md), [Übergabevorlage](.codex/HANDOFF_TEMPLATE.md) |
+Cite `path + symbol` and, where useful, a full-commit GitHub source link. Label
+statements **verified**, **inferred**, **proposed**, or **unverified** as appropriate.
+Record discrepancies in [fact-check.md](.codex/context/fact-check.md). File
+existence, parser recognition, compilation, and runtime support are separate claims.
 
-## Regeln für Änderungen
+Never invent API signatures, CVEs, benchmarks, compatibility, thread safety,
+security guarantees, or successful tests. Keep core library, external connectors,
+Core Rule Set, `v2/master`, and `v3/master` distinct. Submodule gitlinks identify
+separate sources; their internals require separate inspection.
 
-Arbeite innerhalb des konkreten Auftrags eigenständig weiter. Frage nach,
-wenn eine offene Entscheidung Verhalten, öffentliche Schnittstellen,
-Zielrepository oder Umfang wesentlich verändern würde. Eine vorgeschlagene
-Änderung ist noch keine abgeschlossene Änderung.
+## Commands, changes, and ownership
 
-Halte Änderungen klein und thematisch zusammenhängend. Beachte
-[`.editorconfig`](.editorconfig) und den vorhandenen Stil. Formatiere keine
-unbeteiligten Dateien um. Beachte das im Build festgelegte C++17-Niveau;
-prüfe Header und Implementierung zusammen. Übernimm keine alten
-README-Codebeispiele ungeprüft.
+Use the [task workflow](.codex/context/task-workflow.md) and
+[command policy](.codex/context/command-execution-policy.md). Continue routine
+work within the user's authorized scope. Ask only about a consequential unresolved
+choice, missing required access, or an action outside that scope.
 
-Unterscheide generierten Parsercode von seinen Quellen `.ll` und `.yy`.
-Ändere Submodule nicht beiläufig und führe kein `git submodule update --remote`
-als gewöhnlichen Vorbereitungsschritt aus. Verwende die vom Hauptrepository
-festgelegten Submodule-Commits.
+Discover commands from the current checkout. The [build guide](.codex/context/build-and-test.md)
+explains its Autotools and Windows paths and conditional tests. Do not assume
+connector-specific targets, a global skill, a command wrapper, a scan service,
+or a local configuration file exists.
 
-Bei Codeänderungen prüfe besonders Lebensdauer von `ModSecurity`, `RulesSet`
-und `Transaction`, C/C++-Schnittstellen, explizite Datenlängen, Phasenfolge,
-Interventionen, Feature-Schalter und Fehlerpfade. Leite konkrete Anforderungen
-aus der betroffenen Implementierung ab; unterstelle keine globale
-Threadsicherheit oder vollständige C/C++-API-Gleichheit.
+Follow `.editorconfig` and neighboring style. Read declarations and definitions
+together; preserve C++17 compatibility. Consider object lifetimes, explicit
+lengths, C/C++ interface differences, phase order, intervention handling, error
+paths, and feature switches. Distinguish parser inputs from generated code.
+Do not change dependency pins, generated files, or unrelated formatting incidentally.
 
-## Prüfung und Abschluss
+## Git, validation, and delivery
 
-Für einen vorbereiteten Unix-Checkout nennt das Projekt den Ablauf
-`git submodule update --init --recursive`, `./build.sh`, `./configure`, `make`
-und `make check`. Voraussetzungen, gezielte Tests und Plattformunterschiede
-stehen in [Build und Tests](.codex/BUILD_AND_TEST.md). Eine Installation ins
-System ist für eine Dokumentationsaufgabe nicht nötig.
+Preserve user work. Stage only the task's files. Do not force-push, rewrite shared
+history, remove unknown work, or change repository visibility. Target this existing
+fork. A feature branch and PR are the normal review route; commit/push permission
+does not by itself authorize merging into `v3/master`.
 
-Verwende die zum Auftrag passenden vorhandenen Prüfungen. Bei einer
-Dokumentationsänderung sind Quellen-, Link- und Diff-Prüfungen sinnvoll;
-behaupte dadurch keinen erfolgreichen C++-Build. Bei Verhaltensänderungen
-prüfe gezielt das betroffene Verhalten und die relevanten Regressionen.
-Beachte insbesondere deaktivierte Tests bei fehlendem YAJL.
+Use [testing-and-evidence.md](.codex/context/testing-and-evidence.md) for checks
+proportionate to the change. Documentation consistency is not a C++ test result.
+Record command, working directory, revision, outcome, skips, and limits. A
+security profile is a review workflow, not evidence that an assessment occurred.
 
-Notiere bei jedem tatsächlich ausgeführten Prüflauf Befehl, Arbeitsverzeichnis,
-Ergebnis/Exitcode und relevante Einschränkungen. Unterscheide Fehler,
-übersprungene Tests und nicht ausgeführte Prüfungen.
-
-Vor der Übergabe:
-
-1. Aktualisiere [`.codex/CURRENT_STATE.md`](.codex/CURRENT_STATE.md) mit dem
-   tatsächlichen Stand, den Änderungen und dem nächsten konkreten Schritt.
-2. Trage neue begründete Entscheidungen in
-   [`.codex/DECISIONS.md`](.codex/DECISIONS.md) ein; keine erfundene Vorgeschichte.
-3. Pflege [`.codex/BACKLOG.md`](.codex/BACKLOG.md) nur mit echten offenen Aufgaben.
-4. Dokumentiere eine Sitzung bei Bedarf anhand der Übergabevorlage unter
-   `.codex/sessions/`. Halte sensible Anfragen, Zugangsdaten und private Logs
-   aus der versionierten Dokumentation heraus.
-5. Prüfe den Diff und melde Ergebnis, Belege, Prüfungen und verbleibende Lücken.
-   Lade Änderungen nur in das vom Nutzer beauftragte Ziel hoch.
+Before handover, apply [definition-of-done.md](.codex/context/definition-of-done.md):
+update current state, justified decisions, and the real backlog; record a useful
+session under `.codex/audit/sessions/` using the
+[handoff template](.codex/context/handoff-template.md). Keep credentials and private
+traffic out of versioned notes. Report what changed, what was checked, and the
+next concrete step. Do not claim automatic memory or automatic policy inheritance.

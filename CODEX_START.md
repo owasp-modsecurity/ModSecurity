@@ -1,88 +1,101 @@
-# ModSecurity mit Codex und ChatGPT bearbeiten
+# Working on ModSecurity with Codex and ChatGPT
 
-Hier beginnt die zusätzliche deutschsprachige Arbeitsdokumentation.
+Start here for the additional English project documentation.
 
-**Technische Grundlage:** offizielles
-[`owasp-modsecurity/ModSecurity`, Branch `v3/master`](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
-Commit `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`, geprüft am 25.10.2026.
-Die Originaldateien dieses Standes bilden die Grundlage der Erklärungen.
-Neue Arbeitsanweisungen und Kontextdateien sind als eigene Ergänzungen erkennbar.
+**Technical baseline:** the official
+[`owasp-modsecurity/ModSecurity` repository, `v3/master`](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
+commit `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`, inspected on 2026-10-25.
+The original files at that revision are the foundation of the explanations.
+Working instructions and context files are identified as additions for this project.
 
-## Was du hier bekommst
+## What is included
 
-| Einstieg | Inhalt |
+| Entry point | Content |
 | --- | --- |
-| [AGENTS.md](AGENTS.md) | Arbeitsanweisungen für Code-Assistenten, Belegpflicht und Ablauf neuer Sitzungen |
-| [.codex/README.md](.codex/README.md) | Inhaltsverzeichnis und Lesepfade |
-| [Projektüberblick](.codex/PROJECT_CONTEXT.md) | Was libmodsecurity ist und wie dieses Repository abgegrenzt ist |
-| [Repositorykarte](.codex/REPOSITORY_MAP.md) | Verzeichnisse, Sprachen, Builddateien und wichtige Einstiegspunkte |
-| [Architektur](.codex/ARCHITECTURE.md) | Datenfluss einer HTTP-Transaktion, zentrale Klassen und Verarbeitung |
-| [C++-Leitfaden](.codex/CPP_GUIDE.md) | C++17, C-Schnittstelle, Speicherbesitz und Lesen des vorhandenen Codes |
-| [Funktionskarte](.codex/FEATURE_MAP.md) | Wo konkrete Funktionen implementiert und geprüft werden |
-| [Regeln und Konfiguration](.codex/CONFIG_AND_RULES.md) | SecRules, Konfiguration, Operatoren und tatsächliche Grenzen |
-| [Build und Tests](.codex/BUILD_AND_TEST.md) | Quellbelegte Vorbereitung, Buildwege und Testausführung |
-| [Aktueller Arbeitsstand](.codex/CURRENT_STATE.md) | Was erledigt, geprüft, offen oder blockiert ist |
-| [Quellen und Herkunft](.codex/PROVENANCE.md) | Upstream-Commit, Fork-Abgleich, Submodule und Belegregeln |
+| [AGENTS.md](AGENTS.md) | Assistant instructions, evidence requirements, and session startup |
+| [.codex/context/index.md](.codex/context/index.md) | Technical guides, policy owners, task profiles, and reading paths |
+| [Project context](.codex/context/project-context.md) | What libmodsecurity provides and the scope of this repository |
+| [Repository map](.codex/context/repository-map.md) | Directories, languages, build files, and useful entry points |
+| [Architecture](.codex/context/architecture.md) | HTTP transaction data flow, central classes, and processing |
+| [C++ guide](.codex/context/cpp-guide.md) | C++17, the C interface, ownership, and reading the existing code |
+| [Feature map](.codex/context/feature-map.md) | Where features are implemented and relevant tests are defined |
+| [Configuration and rules](.codex/context/configuration-and-rules.md) | SecRules, configuration, operators, and actual limitations |
+| [Build and test guide](.codex/context/build-and-test.md) | Source-backed preparation, build paths, and meaningful checks |
+| [Current state](.codex/context/current-state.md) | Completed work, verification, open questions, and blockers |
+| [Provenance](.codex/context/provenance.md) | Upstream revision, fork comparison, submodules, and evidence rules |
 
-## Warum AGENTS.md und .codex?
+## Layout adapted to your connector repository
 
-`AGENTS.md` ist die kurze Anweisung am Repository-Einstieg. Codex berücksichtigt
-solche Dateien entlang der Projektverzeichnisse. Die ausführlichen Kapitel
-liegen hier in `.codex/`; die Startanweisung fordert gezielt zum Lesen auf.
-Diese Aufteilung folgt der offiziellen
-[Beschreibung von AGENTS.md](https://developers.openai.com/codex/agent-configuration/agents-md).
+The structure follows the inspected `.codex` layout of
+[`Easton97-Jens/ModSecurity-conector`](https://github.com/Easton97-Jens/ModSecurity-conector/tree/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex):
+`context/`, `context/profiles/`, `context/security/`, `bin/`, `audit/`, and
+explicit manifests. Core component guides replace connector-specific guides.
+The [adaptation record](.codex/context/template-adaptation.md) explains the mapping
+and distinguishes reusable workflow from machine- or connector-specific rules.
 
-Der Ordner `.codex/` dient in diesem Repository als versionierte Dokumentation.
-Die hier gewählten Dateinamen wie `CURRENT_STATE.md` sind eigene Konventionen.
-Sie sind kein Versprechen, dass jedes Produkt alle Dateien automatisch lädt.
-Es wird weder ein Modell fest eingestellt noch eine persönliche
-Codex-Konfiguration überschrieben.
+## Why AGENTS.md and .codex?
 
-Ein neuer Chat kann weiterarbeiten, wenn er Zugriff auf diese Dateien hat und
-sie liest. Bei normalem ChatGPT gibst du den Repository-Zugang oder die aktuellen
-Dateien mit. Nicht gespeicherte Entscheidungen aus einem früheren Chat sind in
-diesem System nicht vorhanden. Deshalb gehört die Aktualisierung des
-Arbeitsstands zu jeder abgeschlossenen Sitzung.
+`AGENTS.md` supplies concise instructions at the repository entry point. Codex
+uses these files along its project instruction path. The longer chapters are
+stored in `.codex/`, and the startup instructions direct the assistant to the
+relevant files. The official
+[AGENTS.md guide](https://developers.openai.com/codex/agent-configuration/agents-md)
+describes instruction discovery.
 
-## So startest du einen neuen Chat
+In this repository, `.codex/` is a versioned documentation directory. Names such
+as `current-state.md` are project conventions. They do not promise that every
+product automatically loads every file. This setup does not select a model or
+overwrite personal Codex configuration.
 
-Öffne das Repository in deiner Arbeitsumgebung beziehungsweise stelle die
-Dateien im Chat bereit. Verwende dann zum Beispiel:
+A new chat can continue from these files when it has access to them and reads
+them. For ordinary ChatGPT use, provide repository access or the current files.
+Decisions that exist only in a previous conversation are not present in this
+system. Updating the saved working state is therefore part of finishing a session.
 
-> Arbeite mit diesem ModSecurity-Repository. Lies zuerst AGENTS.md,
-> .codex/README.md, .codex/CURRENT_STATE.md und .codex/DECISIONS.md.
-> Prüfe den tatsächlichen Checkout gegen .codex/upstream-lock.json.
-> Fasse den belegten Arbeitsstand und offene Punkte zusammen. Erfinde keine
-> fehlenden Informationen. Meine nächste Aufgabe lautet: …
+## Starting a new chat
 
-Eine ausführlichere, kopierfertige Fassung steht in
-[START_NEW_CHAT.md](.codex/prompts/START_NEW_CHAT.md). Zum Ende der Arbeit gibt es
-[END_SESSION.md](.codex/prompts/END_SESSION.md).
+Open the repository in your working environment, or provide the relevant files
+in the chat. Then use a prompt such as:
 
-Die Dateien gehören zum vorhandenen Fork `Easton97-Jens/ModSecurity`.
-[USING_THIS_FORK.md](.codex/USING_THIS_FORK.md) erklärt, wie du den Arbeitsbranch
-`codex/kontext-v3` öffnest und für neue Chats verwendest.
+> Work on this ModSecurity repository. First read AGENTS.md,
+> .codex/context/index.md, .codex/context/current-state.md, and
+> .codex/context/decisions.md.
+> Check the actual checkout against .codex/context/upstream-lock.json.
+> Summarize the verified working state and open questions. Do not invent
+> missing information. My next task is: ...
 
-## Kontext auf technische Konsistenz prüfen
+A longer ready-to-copy prompt is in
+[start-new-chat.md](.codex/context/prompts/start-new-chat.md). Use
+[end-session.md](.codex/context/prompts/end-session.md) when handing work over.
 
-Im Repository-Hauptverzeichnis:
+These files belong in the existing `Easton97-Jens/ModSecurity` fork.
+[using-this-fork.md](.codex/context/using-this-fork.md) explains how to open the
+`codex/kontext-v3` working branch and use it in new chats.
+
+## Checking context consistency
+
+From the repository root:
 
 ```sh
-python3 .codex/scripts/verify_context.py
+python3 .codex/bin/verify-context.py
+python3 .codex/bin/validate-structure.py
+python3 .codex/bin/validate-codex-inheritance.py --check
 ```
 
-Für eine unveränderte Upstream-Quellbasis zusätzlich:
+When the upstream source is expected to be unchanged, also use:
 
 ```sh
-python3 .codex/scripts/verify_context.py --strict-source
+python3 .codex/bin/verify-context.py --strict-source
 ```
 
-Die eigene Prüfung benötigt Python 3 und Git mit dem Schalter `--no-lazy-fetch`.
-Dieser verhindert automatisches Nachladen in Partial Clones. Sie kontrolliert den fixierten
-Commit, das Quellinventar, lokale Dokumentlinks und die Existenz sowie
-Zeilenbereiche der commitgebundenen ModSecurity-Belege. Sie meldet Abweichungen
-des Arbeitsbaums. Sie ersetzt weder das Lesen des Codes noch Build- oder Tests.
+The structure and catalog validators require Python 3.11 or later. The source
+checker requires Python 3 and Git with `--no-lazy-fetch`,
+which prevents automatic object downloads in partial clones. It checks the
+pinned commit, source inventory, local document links, and the existence and
+line ranges of commit-pinned ModSecurity references. It reports worktree
+differences. It does not replace reading the code, building, or testing.
+See [validator instructions](.codex/bin/README.md) for scope and policy-digest maintenance.
 
-Die ehrliche Grenze dieser Dokumentation: Sie erklärt den Repositoryaufbau und
-zentrale Abläufe ausführlich. Sie ist keine geprüfte Beschreibung jeder einzelnen
-C++-Funktion und kein Nachweis für die Sicherheit einer Installation.
+This documentation explains repository structure and central behavior in detail.
+It is not a verified description of every C++ function or evidence that a
+particular installation is secure.

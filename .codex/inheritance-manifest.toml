@@ -1,0 +1,143 @@
+# Local policy catalog. Generated deliberately with --refresh.
+# Digests record content, not correctness. No child inheritance is active.
+schema_version = 1
+repository = "Easton97-Jens/ModSecurity"
+children = []
+
+[[policies]]
+id = "MODSECURITY-ARCHITECTURE-AND-BOUNDARIES"
+source = ".codex/context/architecture-and-boundaries.md"
+sha256 = "8bb24d60347813f4dc558503d470231a77b8b0a54c82fdd19d3924cc246db062"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-CHANGE-WORKFLOW"
+source = ".codex/context/change-workflow.md"
+sha256 = "0d8e62b6a26898f882be71ba589eb9e38a5481cf745964c9d9451dbf11b81e9d"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-CLEANUP-AND-RESTORATION"
+source = ".codex/context/cleanup-and-restoration.md"
+sha256 = "5efcda96db769c27dc967fa74d58081f5ae743c1f03cf2b16846155b8a5815bd"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-COMMAND-EXECUTION-POLICY"
+source = ".codex/context/command-execution-policy.md"
+sha256 = "83cefab82832a9c4bdd1e074a04eb2766f08c4042990aa66c0a6c0ba70aecdc1"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-DEFINITION-OF-DONE"
+source = ".codex/context/definition-of-done.md"
+sha256 = "86757c788ae730207b403fd371d5fff23a48fb1ff224516e899315b3798cbb47"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-DELIVERY-AND-CI"
+source = ".codex/context/delivery-and-ci.md"
+sha256 = "b439bd2b815612e3c2d870088995817822777948fa8ea56f3fd5ca54d718a3c3"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-DOCUMENTATION-AND-TRACEABILITY"
+source = ".codex/context/documentation-and-traceability.md"
+sha256 = "81e9a561c093ffddc41cab782ca9f409c8c38c0f6c0064c1948969134924b53e"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-FEASIBILITY-POLICY"
+source = ".codex/context/feasibility-policy.md"
+sha256 = "860679e6fe0f0743941c47dfdb005c199749a9a8a5e4595424d65a666debbd14"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-FINDINGS-POLICY"
+source = ".codex/context/findings-policy.md"
+sha256 = "4cec743698335d9630306421d89d3c792b054ef1c350a156155df21e5bec755a"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-GIT-POLICY"
+source = ".codex/context/git-policy.md"
+sha256 = "16f3397612f8a7e867696fc63f446e1ef9ed0b2eb8e44adcf0d048a9ee0c87fa"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-MASTER-INTEGRATION"
+source = ".codex/context/master-integration.md"
+sha256 = "e59fea375b24c0891b4d4bbd33c2505f6ef0d177e63f834cd3f46f1a9002f868"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-POLICY-PRECEDENCE"
+source = ".codex/context/policy-precedence.md"
+sha256 = "fe07eae7b8ea29fbc1067d127d89e295c99b9dae748d700053d97bb70ecabdc2"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-PR-REMEDIATION"
+source = ".codex/context/pr-remediation.md"
+sha256 = "bffb670164adc108e58aca778ff0053b98aefca28af26b4bf435da6fa20a7e11"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-PROTOCOL-AND-HARDENING"
+source = ".codex/context/protocol-and-hardening.md"
+sha256 = "ca9bdc2bf8f6929fe7ded888eb22027e51210015494537ab6965cf0756ffa80f"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-PYTHON-POLICY"
+source = ".codex/context/python-policy.md"
+sha256 = "27f65a29246da29bf97385275cb60bc0253dbc275b0fd34bac71d409e63dbc7d"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-RESOURCES-AND-STORAGE"
+source = ".codex/context/resources-and-storage.md"
+sha256 = "342e7272c3164ba32c899be63ae541d588da3d544956e9cbe454805451dcf17b"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-SECURITY-POLICY"
+source = ".codex/context/security-policy.md"
+sha256 = "4b5777b6ee3606ea0f6f7952ac1f273b1646abc7dada6a2143ed13c21817dd66"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-SECURITY-RUNTIME-PREFLIGHT"
+source = ".codex/context/security-runtime-preflight.md"
+sha256 = "7ef149338fbc54c31df5dde6772091303b3ef88f56beaa84630b3334869a9707"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-SONARQUBE-POLICY"
+source = ".codex/context/sonarqube-policy.md"
+sha256 = "12c3dfd326d13f67c09089c9b92235341247bf8cb2da3ceb44fc6b66dbb7398d"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-SUBAGENTS-AND-BACKGROUND"
+source = ".codex/context/subagents-and-background.md"
+sha256 = "fb2d8f8baa493d486f56cc48b726038222dc4a80f8774c3218088aa82c805bdd"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-TASK-WORKFLOW"
+source = ".codex/context/task-workflow.md"
+sha256 = "f18ee00ec26c5455acc962038fedb33aa303fdef4a5bb83875e5ef863ced3788"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-TESTING-AND-EVIDENCE"
+source = ".codex/context/testing-and-evidence.md"
+sha256 = "d467044cc1c9b41b047a2f198bf82edd157de6f5a4b50961ae63521a333ed557"
+inheritable = true
+
+[[policies]]
+id = "MODSECURITY-TOOLING-AND-LANGUAGE"
+source = ".codex/context/tooling-and-language.md"
+sha256 = "5162cbd086d906efea1016fb5c176c5a6dafd0c8ac46e30aebd2c1d6f1bf5b39"
+inheritable = true
