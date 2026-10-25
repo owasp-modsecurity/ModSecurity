@@ -7,7 +7,7 @@ Historical contributor-fork PRs do not select the current integration target.
 
 | Item | Current state | Next concrete action |
 | --- | --- | --- |
-| Review correction for upstream PR #3706 | Confirmed findings corrected and integrated checks passed; publication pending | Publish to the verified existing head branch and record that head's remote state |
+| Review correction for upstream PR #3706 | Published in `acb380ac`; integrated checks passed and upstream PR head verified | Inspect the current head's own CI and any subsequent review; recorded earlier-head results are not current-head results |
 | Integrate context into the selected base | Not merged by this task | Review the actual current PR and integrate only when authorized |
 | First product-code task | No behavior change selected in this context task | Specify the intended change; inspect the relevant implementation and tests |
 | Actual target development environment | No user deployment/build environment established | For a build task, identify OS/compiler/dependencies and initialize the pinned submodules |

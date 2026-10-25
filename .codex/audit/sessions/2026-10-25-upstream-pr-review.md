@@ -89,7 +89,8 @@ checkout distinction consistent.
 ## Integrated validation and delivery
 
 From the repository root, after all policy edits and the deliberate catalog
-refresh, the integrated working tree passed:
+refresh, the correction tree delivered in `acb380ac1ade0e111db36edfceaccac49d05a30e`
+passed:
 
 | Command or check | Observed result |
 | --- | --- |
@@ -106,10 +107,27 @@ base `effb6c0f` were unchanged. A fresh `git ls-remote` confirmed the English he
 and the separate German branch at `4a483fe21be6c30f1e0880fcbee7c358528db2f2`.
 The local German checkout was clean at that revision.
 
-Remote publication of the correction is not yet claimed in this validation
-record. Its receipt must identify the actually observed commit and PR head.
+### Observed delivery receipt
+
+The following publication facts were verified before this follow-up receipt was
+written on 2026-10-25 (18:29 UTC):
+
+| Field | Observed result |
+| --- | --- |
+| Published correction | `acb380ac1ade0e111db36edfceaccac49d05a30e` |
+| Parent | `a35e8c3a1116a763f286f965f718f36d5f8876cc` |
+| Published tree | `51c3975b22895100e9731882883de5fae2444242`, identical to the validated local index |
+| Destination | Existing `Easton97-Jens/ModSecurity:codex/kontext-v3` head, updated with an expected-head guard and without force |
+| Upstream PR | #3706 reported the published commit as its head; still open and unmerged; base unchanged |
+| Read-back | A fresh fetch returned the published commit and tree; guarded local fast-forward left a clean worktree |
+| Changed files | 32 context/helper files; none outside `.codex/` and `CODEX_START.md` |
+| Checks for `acb380ac` at observation | `Quality Assurance` run `40221460086` queued; `Quality Assurance new` run `40221460043` in progress; `CodeRabbit` pending |
+
+This receipt adds documentation after the observed correction commit. A later
+head, including the receipt's own commit, needs its own remote check query.
 Old-head CI is recorded separately in [current-state.md](../../context/current-state.md);
-it is not evidence for a later correction head.
+it is not evidence for a later correction head. No new PR, merge, review reply,
+or thread-resolution action was performed.
 
 No full local C++ build, product test suite, connector/host test, security scan,
 or Codex/RTK runtime integration was executed in this correction. Source inventory

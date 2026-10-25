@@ -75,7 +75,8 @@ historical wording correction was also applied. Details and evidence are in the
 
 ## Verification and limits
 
-The integrated working tree passed these checks from the repository root:
+The correction tree delivered in `acb380ac1ade0e111db36edfceaccac49d05a30e`
+passed these checks from the repository root:
 
 | Executed check | Result |
 | --- | --- |
@@ -107,11 +108,21 @@ completeness or security.
 
 ## Delivery and continuation
 
-The local correction is validated and prepared for the verified existing PR head.
-Remote publication has not yet been observed when this validation record is
-written. After publication, record the delivered commit and inspect that head's
-own checks. No remote review replies or thread-resolution actions are required
-to record the code correction in this task.
+The correction was published as `acb380ac1ade0e111db36edfceaccac49d05a30e`
+on the verified existing head branch. The GitHub API then showed that exact head
+on upstream PR #3706, with base `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`;
+the PR remained open and unmerged. A fresh fetch returned the same commit.
+Its tree `51c3975b22895100e9731882883de5fae2444242` matched the validated local
+index exactly, and the local checkout was clean after the guarded fast-forward.
+The correction changed 32 context/helper files.
+
+At the delivery observation, `Quality Assurance` run `40221460086` was queued,
+`Quality Assurance new` run `40221460043` was in progress, and `CodeRabbit` was
+pending for `acb380ac`. No successful result for that head is claimed here.
+This receipt is a documentation-only follow-up to that observed commit. For any
+later head, including a commit containing this receipt, query its own checks
+again. Recorded old-head results never substitute for current-head evidence.
+No new PR, merge, remote review reply, or thread-resolution action was performed.
 
 For a later session, select the live task/PR revision, read the relevant guides
 and source, and choose proportionate verification. Use [backlog.md](backlog.md)
