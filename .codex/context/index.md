@@ -1,9 +1,12 @@
 # ModSecurity context index
 
-`AGENTS.md` is the concise entry point. Read [current-state.md](current-state.md),
-[decisions.md](decisions.md), and [upstream-lock.json](upstream-lock.json), then load
-only the guides and policies relevant to the current task. The routing is recorded
-in [manifest.toml](manifest.toml). These are fork-specific conventions.
+The root `AGENTS.md` is a reusable agreement for any repository. First read
+[repository-context.md](repository-context.md) for this checkout's identity,
+source constraints, startup checks, and file-language requirements. Then read
+[current-state.md](current-state.md), [decisions.md](decisions.md), and
+[upstream-lock.json](upstream-lock.json), followed by only the guides and policies
+relevant to the task. The routing is recorded in [manifest.toml](manifest.toml).
+These `.codex` files remain specific to this fork.
 
 ## Technical guides: learn the actual repository
 

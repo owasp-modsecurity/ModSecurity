@@ -5,8 +5,9 @@ repository. It is not a feature implemented by ModSecurity.
 
 ## 1. Establish the task and starting point
 
-Read the startup files listed in [AGENTS.md](../../AGENTS.md), check the branch and
-status, and identify the task. Compare the checkout with
+Read the reusable [AGENTS.md](../../AGENTS.md) and this checkout's startup
+instructions in [repository-context.md](repository-context.md). Check the branch
+and status, and identify the task. Compare the checkout with
 [upstream-lock.json](upstream-lock.json). Older notes apply to their stated
 revisions. Check whether relevant files have changed since those notes were made.
 

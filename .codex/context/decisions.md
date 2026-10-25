@@ -105,3 +105,34 @@ connector outcomes, or bilingual requirement is imported.
 scope and changes. The local catalog checks primary-policy digests; it does not
 activate policy inheritance in submodules. ModSecurity product facts continue to
 come exclusively from the pinned official core source.
+
+## D009 — Make the root agreement reusable across repositories
+
+**Date:** 2026-10-25.
+
+**Decision:** Keep `AGENTS.md` independent of a particular project, account,
+branch, implementation language, build system, or installed helper. Discover
+available project context conditionally. Place this fork's concrete constraints
+and startup procedure in [repository-context.md](repository-context.md), routed
+from the index. The `.codex` guides and validators remain specific to this core.
+
+**Reason:** The owner clarified that the agreement must be valid for all
+repositories. A reusable root must also be usable without this `.codex` layout,
+Python helpers, or a Git checkout.
+
+**Consequence:** The same root file can be reused unchanged elsewhere. This change
+does not distribute it to other repositories or install global instructions.
+It preserves project-specific source authority and verification through the local
+context instead of embedding those assumptions in the portable agreement.
+
+## D010 — Leave chat language to each person
+
+**Date:** 2026-10-25.
+
+**Decision:** Maintained repository files remain English. The repository agreement,
+local context, and startup prompts prescribe no chat language. Each person chooses
+the language of their conversation.
+
+**Reason:** The owner explicitly clarified that chat language is an individual
+choice. A language requested in one conversation must not become a repository-wide
+default. D003 continues to govern maintained files.

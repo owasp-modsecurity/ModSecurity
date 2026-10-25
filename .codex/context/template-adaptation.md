@@ -20,7 +20,7 @@ reports, and runtime claims are not evidence of core library behavior.
 
 | Connector template | ModSecurity adaptation |
 | --- | --- |
-| Concise root `AGENTS.md` | Concise English agreement for the existing core fork |
+| Concise root `AGENTS.md` | Reusable English agreement for any repository; core-specific rules are in `context/repository-context.md` |
 | `.codex/context/index.md` and `manifest.toml` | Routed technical guides, policy owners, profiles, and saved state |
 | Core operational policies | Same domains, adapted to Autotools, C++/C APIs, `test/`, and `v3/master` |
 | `context/profiles/` | Core-library, component, build/CI, response-phase, and evidence assessment workflows |
@@ -36,6 +36,8 @@ Detailed repository and C++ guides, source provenance, start/end prompts, and
 current-state/decision/backlog files supplement the template to meet the owner's
 request for reusable context across chats. All new content is English; the
 reference repository's English/German companion convention is not adopted.
+The root agreement is portable; the `.codex` context remains core-specific.
+The setup prescribes no chat language; each person chooses.
 
 ## Repository-specific rules that were not copied
 

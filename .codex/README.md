@@ -1,7 +1,8 @@
 # Codex and ChatGPT context for ModSecurity v3
 
-Start with [AGENTS.md](../AGENTS.md), then the
-[context routing index](context/index.md). The detailed guides, working policies,
+Start with the reusable [AGENTS.md](../AGENTS.md), then the
+[context routing index](context/index.md) and
+[repository-specific context](context/repository-context.md). The detailed guides, working policies,
 profiles, and current state live under `context/`, following the layout requested
 from the owner's connector repository.
 
@@ -14,6 +15,10 @@ from the owner's connector repository.
 | [audit/README.md](audit/README.md) | Source inventory and dated handover evidence |
 | [bin/README.md](bin/README.md) | Read-only consistency validators and their limits |
 | [inheritance-templates/README.md](inheritance-templates/README.md) | Explicit, optional reuse; no automatic submodule inheritance |
+
+The root agreement can be reused unchanged in other repositories; these `.codex`
+files remain tailored to this fork. Maintained files remain English; no chat
+language is prescribed by this setup.
 
 These files are versioned project context. They do not change library behavior,
 select a model, configure an account, or make old chats accessible. New sessions

@@ -12,7 +12,8 @@ Working instructions and context files are identified as additions for this proj
 
 | Entry point | Content |
 | --- | --- |
-| [AGENTS.md](AGENTS.md) | Assistant instructions, evidence requirements, and session startup |
+| [AGENTS.md](AGENTS.md) | Reusable, repository-independent working agreement |
+| [Repository context](.codex/context/repository-context.md) | This fork's identity, source constraints, checks, and file-language requirements |
 | [.codex/context/index.md](.codex/context/index.md) | Technical guides, policy owners, task profiles, and reading paths |
 | [Project context](.codex/context/project-context.md) | What libmodsecurity provides and the scope of this repository |
 | [Repository map](.codex/context/repository-map.md) | Directories, languages, build files, and useful entry points |
@@ -32,6 +33,24 @@ The structure follows the inspected `.codex` layout of
 explicit manifests. Core component guides replace connector-specific guides.
 The [adaptation record](.codex/context/template-adaptation.md) explains the mapping
 and distinguishes reusable workflow from machine- or connector-specific rules.
+
+## Reuse the same AGENTS.md in other repositories
+
+The root `AGENTS.md` is deliberately repository-independent. It contains no fixed
+project name, branch, language version, build command, or required Python helper.
+Its `.codex` routing is conditional: a repository without that layout uses its
+own available instructions and documentation. Git-specific checks are conditional
+on having Git and an actual checkout.
+
+You can reuse that file unchanged in another repository. Each repository keeps
+its own identity, commands, versions, technical guides, and saved state. For this
+fork, those details start in
+[repository-context.md](.codex/context/repository-context.md). Copying the root file
+does not automatically distribute it, activate a global setting, or copy this
+ModSecurity-specific context into other projects.
+
+Repository files remain English. These files prescribe no chat language; each
+person chooses the language of their conversation.
 
 ## Why AGENTS.md and .codex?
 
@@ -58,11 +77,12 @@ Open the repository in your working environment, or provide the relevant files
 in the chat. Then use a prompt such as:
 
 > Work on this ModSecurity repository. First read AGENTS.md,
-> .codex/context/index.md, .codex/context/current-state.md, and
-> .codex/context/decisions.md.
+> .codex/context/index.md, .codex/context/repository-context.md,
+> .codex/context/current-state.md, and .codex/context/decisions.md.
 > Check the actual checkout against .codex/context/upstream-lock.json.
 > Summarize the verified working state and open questions. Do not invent
-> missing information. My next task is: ...
+> missing information. Maintain repository files in English.
+> My next task is: ...
 
 A longer ready-to-copy prompt is in
 [start-new-chat.md](.codex/context/prompts/start-new-chat.md). Use

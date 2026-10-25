@@ -7,8 +7,9 @@ repository and current branch or files. Replace the last line with your task.
 Work on Easton97-Jens/ModSecurity in the selected current branch.
 If this context is still in a pull request, select codex/kontext-v3.
 
-First read AGENTS.md, .codex/context/index.md, .codex/context/current-state.md,
-.codex/context/decisions.md, and .codex/context/upstream-lock.json.
+First read AGENTS.md, .codex/context/index.md, .codex/context/repository-context.md,
+.codex/context/current-state.md, .codex/context/decisions.md, and
+.codex/context/upstream-lock.json.
 Check the actual branch, commit, and worktree where your tools allow it.
 For a checkout, run the available local context checks described in .codex/bin/README.md.
 Load only the relevant technical guides, policies, and task profile from the index.
@@ -18,7 +19,7 @@ revision. Read the implementations and tests relevant to the task.
 For technical findings, provide the path, symbol, and commit-pinned evidence.
 Distinguish verified facts, inferences, proposals, and unverified points.
 Do not invent earlier decisions, API signatures, or test results.
-Use English for explanations and maintained project context.
+Maintain repository files, documentation, prompts, and handovers in English.
 
 Start with a brief summary of:
 - the source baseline and current working state;
