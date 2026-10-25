@@ -118,7 +118,8 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id, void 
 
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
     void *logCbData, const time_t timestamp)
-    : m_creationTimeStamp(utils::cpu_seconds()),
+    : TransactionAnchoredVariables(this),
+    m_creationTimeStamp(utils::cpu_seconds()),
     m_ARGScombinedSizeDouble(0),
     m_clientPort(0),
     m_highestSeverityAction(255),
@@ -149,8 +150,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
 #endif
     m_secRuleEngine(RulesSetProperties::PropertyNotSetRuleEngine),
     m_secXMLParseXmlIntoArgs(rules->m_secXMLParseXmlIntoArgs),
-    m_logCbData(logCbData),
-    TransactionAnchoredVariables(this) {
+    m_logCbData(logCbData) {
     m_variableUrlEncodedError.set("0", 0);
     m_variableMscPcreError.set("0", 0);
     m_variableMscPcreLimitsExceeded.set("0", 0);
@@ -770,7 +770,7 @@ int Transaction::processRequestBody() {
     if (m_requestBodyType == MultiPartRequestBody) {
 #endif
         std::string error;
-        int reqbodyNoFilesLength = 0;
+        uint64_t reqbodyNoFilesLength = 0;
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {

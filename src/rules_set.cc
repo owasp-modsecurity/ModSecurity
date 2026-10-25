@@ -144,7 +144,7 @@ int RulesSet::evaluate(int phase, Transaction *t) {
     t->m_allowType = actions::disruptive::NoneAllowType;
     //}
 
-    for (int i = 0; i < rules->size(); i++) {
+    for (size_t i = 0; i < rules->size(); i++) {
         // FIXME: This is not meant to be here. At the end of this refactoring,
         //        the shared pointer won't be used.
         auto rule = rules->at(i);
