@@ -108,6 +108,7 @@ SecPcreMatchLimitRecursion 1000
 # All of these are prefixed with "MSC_".  The following flags currently exist:
 #
 # MSC_PCRE_LIMITS_EXCEEDED: PCRE match limits were exceeded.
+# MSC_PCRE_ERROR: a regular expression failed to compile or execute.
 #
 SecRule TX:/^MSC_/ "!@streq 0" \
     "id:'200005',phase:2,t:none,log,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
