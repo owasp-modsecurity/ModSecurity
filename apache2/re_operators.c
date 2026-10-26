@@ -1050,6 +1050,22 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     return 1; /* OK */
 }
 
+/* Flags a regex error in TX:MSC_PCRE_ERROR, where TX:/^MSC_/ rules see it. */
+static int msre_op_rx_set_error_flag(modsec_rec *msr) {
+    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+    if (s == NULL) return -1;
+    s->name = apr_pstrdup(msr->mp, "MSC_PCRE_ERROR");
+    if (s->name == NULL) return -1;
+    s->name_len = strlen(s->name);
+    s->value = apr_pstrdup(msr->mp, "1");
+    if (s->value == NULL) return -1;
+    s->value_len = 1;
+    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+    return 1;
+}
+
 static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     assert(msr != NULL);
     assert(rule != NULL);
@@ -1114,7 +1130,12 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
             if (regex == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
-                return 0;
+                msr_log(msr, 3, "%s.", *error_msg);
+                if (msre_op_rx_set_error_flag(msr) < 0) return -1;
+
+                /* A regex error is neither a match nor a mismatch: return
+                 * what the negation in re.c turns into "no match". */
+                return rule->op_negated;
             }
 
             #ifdef WITH_PCRE_STUDY
@@ -1214,11 +1235,14 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
 
         msr_log(msr, 3, "%s.", *error_msg);
 
-        return 0; /* No match. */
+        /* A regex error is neither a match nor a mismatch: return
+         * what the negation in re.c turns into "no match". */
+        return rule->op_negated;
     }
     else if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                 rc, my_error_msg);
+        msre_op_rx_set_error_flag(msr);
         return -1;
     }
 
