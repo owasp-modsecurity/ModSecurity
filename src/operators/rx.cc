@@ -68,6 +68,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
         if (transaction) {
             ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
             transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+            transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
+            ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
         }
         /* A regex failure is neither a match nor a mismatch. Return the
          * value that the negation in Operator::evaluateInternal turns
@@ -90,6 +92,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
     if (regex_result != Utils::RegexResult::Ok) {
         if (transaction) {
             transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+            transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
+            ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
 
             std::string regex_error_str = "OTHER";
             if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
