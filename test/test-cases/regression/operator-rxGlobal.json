@@ -313,6 +313,7 @@
     },
     "expected": {
       "debug_log": "rxGlobal: regex error 'MATCH_LIMIT' for pattern",
+      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_LIMITS_EXCEEDED'",
       "http_code": 200
     },
     "rules": [
@@ -320,6 +321,55 @@
       "SecPcreMatchLimit 2",
       "SecRule ARGS:rxtest \"!@rxGlobal (w+)+$\" \"id:1,phase:1,deny,status:403,t:trim\"",
       "SecRule MSC_PCRE_LIMITS_EXCEEDED \"@streq 1\" \"id:2,phase:1,pass,t:trim,block\""
+    ]
+  }
+,
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: !@rxGlobal with invalid macro-expanded pattern does not match (issue #3123)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?patt=%28",
+      "method": "POST",
+      "body": [
+        "subject=wwww"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Error with regular expression: \"\\(\"",
+      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_ERROR'",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:subject \"!@rxGlobal %{ARGS:patt}\" \"id:4001,phase:2,deny,status:403\"",
+      "SecRule MSC_PCRE_ERROR \"@streq 1\" \"id:4002,phase:2,pass,log\""
     ]
   }
 ]
