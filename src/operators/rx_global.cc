@@ -65,12 +65,7 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     if (re->hasError()) {
-        if (transaction) {
-            ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
-            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
-            transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
-            ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
-        }
+        reportRegexCompileError(transaction, *re);
         /* A regex failure is neither a match nor a mismatch. Return the
          * value that the negation in Operator::evaluateInternal turns
          * into "no match", so that the negated form does not fire on
@@ -87,23 +82,8 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
         regex_result = re->searchGlobal(input, captures);
     }
 
-    // FIXME: DRY regex error reporting. This logic is currently duplicated in other operators.
     if (regex_result != Utils::RegexResult::Ok) {
-        if (transaction) {
-            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
-            transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
-            ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
-
-            std::string regex_error_str = "OTHER";
-            if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
-                regex_error_str = "MATCH_LIMIT";
-                transaction->m_variableMscPcreLimitsExceeded.set("1", transaction->m_variableOffset);
-                transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_LIMITS_EXCEEDED", "1");
-                ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_LIMITS_EXCEEDED to 1");
-            }
-
-            ms_dbg_a(transaction, 1, "rxGlobal: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
-        }
+        reportRegexSearchError(transaction, *re, regex_result, "rxGlobal");
 
         /* A regex failure is neither a match nor a mismatch. Return the
          * value that the negation in Operator::evaluateInternal turns
