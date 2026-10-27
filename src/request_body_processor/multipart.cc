@@ -52,7 +52,7 @@ MultipartPartTmpFile::~MultipartPartTmpFile() {
         Close();
     }
 
-    if (!m_tmp_file_name.empty() && m_delete) {
+    if (m_tmp_file_created && m_delete) {
         const int unlink_rc = unlink(m_tmp_file_name.c_str());
         if (unlink_rc < 0) {
             ms_dbg_a(m_transaction, 1, "Multipart: Failed to delete file (part) \"" \
@@ -87,6 +87,7 @@ void MultipartPartTmpFile::Open() {
     m_tmp_file_fd = _open(path.c_str(), _O_CREAT | _O_EXCL | _O_RDWR);
 #endif
     m_tmp_file_name = path;
+    m_tmp_file_created = (m_tmp_file_fd != -1);
     ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= " + m_tmp_file_name);
 
     int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
