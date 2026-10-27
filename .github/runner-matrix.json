@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "trusted_announcement_authors": [
+    "v-AndriiKhyliuk"
+  ],
+  "coverage": {
+    "linux": {
+      "family": "ubuntu",
+      "architecture": "x64",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "pcre1_labels": [
+        "ubuntu-24.04"
+      ],
+      "ignored": {}
+    },
+    "macos": {
+      "family": "macos",
+      "architecture": "arm64",
+      "labels": [
+        "macos-15",
+        "macos-26"
+      ],
+      "ignored": {}
+    },
+    "windows": {
+      "family": "windows",
+      "architecture": "x64",
+      "labels": [
+        "windows-2022"
+      ],
+      "ignored": {
+        "windows-2025": "Requires the Windows toolchain migration tracked in #3715. Remove this exclusion after that migration is integrated."
+      }
+    }
+  },
+  "pinned": {
+    "ubuntu-22.04": "Legacy Linux x32/x64 coverage in ci.yml; keep this runner until a replacement for the 32-bit build is reviewed."
+  },
+  "lifecycle": {
+    "macos-15": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    },
+    "macos-26": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    },
+    "ubuntu-22.04": {
+      "status": "deprecated",
+      "retirement": "2027-04-17",
+      "source": "https://github.com/actions/runner-images/issues/14254",
+      "needs_review": false
+    },
+    "ubuntu-24.04": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    },
+    "windows-2022": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    }
+  },
+  "review_notes": [
+    "https://github.com/actions/runner-images/issues/10721",
+    "https://github.com/actions/runner-images/issues/13518",
+    "https://github.com/actions/runner-images/issues/5583",
+    "https://github.com/actions/runner-images/issues/6002"
+  ]
+}

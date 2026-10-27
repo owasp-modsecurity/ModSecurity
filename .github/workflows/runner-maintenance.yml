@@ -1,0 +1,76 @@
+name: Runner maintenance
+
+on:
+  schedule:
+    - cron: '17 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report proposed runner changes without opening a PR
+        type: boolean
+        default: true
+  push:
+    paths:
+      - 'tools/ci/**'
+      - 'test/ci/**'
+      - '.github/runner-matrix.json'
+      - '.github/workflows/runner-maintenance.yml'
+  pull_request:
+    paths:
+      - 'tools/ci/**'
+      - 'test/ci/**'
+      - '.github/runner-matrix.json'
+      - '.github/workflows/runner-maintenance.yml'
+      - '.github/workflows/ci_new.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runner-maintenance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test runner maintenance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Run offline tests
+        run: python3 -B -m unittest discover -s test/ci -p 'test_*.py' -v
+      - name: Validate runner matrix outputs
+        run: python3 -B tools/ci/runner_matrix.py outputs
+
+  update:
+    name: Propose runner updates
+    needs: test
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Read official runner sources and update data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B tools/ci/runner_matrix.py update --summary "$GITHUB_STEP_SUMMARY"
+      - name: Open or update the runner PR
+        if: github.ref_name == github.event.repository.default_branch && (github.event_name == 'schedule' || !inputs.dry_run)
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          base: ${{ github.event.repository.default_branch }}
+          branch: codex/runner-matrix-updates
+          add-paths: |
+            .github/runner-matrix.json
+            .github/runner-lifecycle.md
+          commit-message: 'ci: update runner coverage and lifecycle'
+          title: 'ci: update runner coverage and lifecycle'
+          body: |
+            Update runner coverage and lifecycle data from GitHub's official runner catalog and announcements.
+
+            Review the proposed additions and retirement dates in `.github/runner-lifecycle.md`. Existing runner coverage is retained. The manifest exclusions document additions that need a separate build-system change.
+
+            GitHub may require a maintainer to approve CI runs on this automated PR.

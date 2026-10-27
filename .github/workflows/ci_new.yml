@@ -4,17 +4,39 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  runner-matrix:
+    name: Read runner matrix
+    runs-on: ubuntu-latest
+    outputs:
+      linux: ${{ steps.runners.outputs.linux }}
+      macos: ${{ steps.runners.outputs.macos }}
+      windows: ${{ steps.runners.outputs.windows }}
+      pcre1: ${{ steps.runners.outputs.pcre1 }}
+      linux_exclude: ${{ steps.runners.outputs.linux_exclude }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Load reviewed runner data
+        id: runners
+        run: python3 -B tools/ci/runner_matrix.py outputs --github-output "$GITHUB_OUTPUT"
+
   build-linux:
-    name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    name: Linux (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
 
     # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
     # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: ${{ fromJSON(needs.runner-matrix.outputs.linux) }}
         platform:
           - { label: "x64", arch: "amd64", configure: "" }
 
@@ -33,6 +55,7 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
+        exclude: ${{ fromJSON(needs.runner-matrix.outputs.linux_exclude) }}
 
     steps:
       - uses: actions/checkout@v6
@@ -84,12 +107,15 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
-            libpcre3-dev \
             bison \
             flex \
             pkg-config \
             python3 \
             python3-venv
+
+      - name: Install PCRE1 development package
+        if: contains(fromJSON(needs.runner-matrix.outputs.pcre1), matrix.os)
+        run: sudo apt-get install -y libpcre3-dev
 
       - name: Show Lua installation
         run: |
@@ -115,13 +141,14 @@ jobs:
         run: make check
 
   build-macos:
-    name: macOS (${{ matrix.configure.label }})
+    name: macOS (${{ matrix.os }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
+        os: ${{ fromJSON(needs.runner-matrix.outputs.macos) }}
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -171,12 +198,14 @@ jobs:
         run: make check
 
   build-windows:
-    name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2022
+    name: Windows (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: ${{ fromJSON(needs.runner-matrix.outputs.windows) }}
         platform:
           - { label: "x64", arch: "x86_64" }
         configuration: [Release]
