@@ -124,8 +124,3 @@ Keep each PR to one logical change and each commit to one fix or feature.
 Include tests with behavior changes and explain the change in the commit
 message. Follow the README's contribution and testing guidance; avoid unrelated
 formatting or dependency/submodule updates.
-
-## Optional command-output summaries
-
-[README.RTK.md](README.RTK.md) describes optional RTK usage. The native build,
-test, and verification commands above remain usable without it.
