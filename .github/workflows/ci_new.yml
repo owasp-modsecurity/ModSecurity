@@ -198,6 +198,9 @@ jobs:
       - name: Install Conan package manager
         run: |
           python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"
+          Get-Command conan, cmake | Select-Object Name, Source
+          conan --version
+          cmake --version
           conan profile detect --force
           $conf = Join-Path (conan config home) "global.conf"
           Add-Content $conf "tools.files.download:retry=10"

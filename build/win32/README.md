@@ -40,7 +40,7 @@ vcbuild.bat [build_configuration] [arch] [USE_ASAN]
 
 where `[build_configuration]` can be: `Release` (default), `RelWithDebInfo`, `MinSizeRel` or `Debug`, and `[arch]` can be: `x86_64` (default) or `x86`.
 
-`build/win32/conanfile.py` uses the Conan 2 `CMakeDeps`, `CMakeToolchain` and `cmake_layout` APIs. Generated files are placed in `build/win32/build/generators`. The build script first exports the local YAJL recipe as `yajl/2.1.0@modsecurity/ci`; this recipe fixes the CMake 4 policy and target-path incompatibilities without changing the Conan Center cache recipe.
+`build/win32/conanfile.py` uses the Conan 2 `CMakeDeps`, `CMakeToolchain` and `cmake_layout` APIs. Generated files are placed in `build/win32/build/generators`. The build script first exports the local YAJL recipe as `yajl/2.1.0@modsecurity/ci`; this recipe fixes the CMake 4 policy and target-path incompatibilities without changing the Conan Center cache recipe. See the [local YAJL recipe notes](conan/yajl/README.md) for patch provenance and the conditions for removing this copy. Windows CI and release builds log the selected Conan/CMake executable paths and versions.
 
 Built files will be located in the directory: `build\win32\build\[build_configuration]` and include:
 
