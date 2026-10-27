@@ -69,7 +69,11 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
             ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re->pattern + "\"");
             transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
         }
-        return false;
+        /* A regex failure is neither a match nor a mismatch. Return the
+         * value that the negation in Operator::evaluateInternal turns
+         * into "no match", so that the negated form does not fire on
+         * errors either (#3123). */
+        return m_negation;
     }
 
     Utils::RegexResult regex_result;
@@ -97,7 +101,11 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
             ms_dbg_a(transaction, 1, "rxGlobal: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
         }
 
-        return false;
+        /* A regex failure is neither a match nor a mismatch. Return the
+         * value that the negation in Operator::evaluateInternal turns
+         * into "no match", so that the negated form does not fire on
+         * errors either (#3123). */
+        return m_negation;
     }
 
 
