@@ -44,7 +44,7 @@ jobs:
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan==2.33.0
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"
           conan profile detect --force
           # without a cache, dependency sources are downloaded from their upstream
           # hosts on every run, and some (git.openldap.org) rate limit with HTTP 429

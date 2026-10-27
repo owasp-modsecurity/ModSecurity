@@ -171,12 +171,13 @@ jobs:
         run: make check
 
   build-windows:
-    name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2022
+    name: Windows (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.configure.label }})
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-2022, windows-2025-vs2026]
         platform:
           - { label: "x64", arch: "x86_64" }
         configuration: [Release]
@@ -196,8 +197,11 @@ jobs:
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan --upgrade
-          conan profile detect
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"
+          conan profile detect --force
+          $conf = Join-Path (conan config home) "global.conf"
+          Add-Content $conf "tools.files.download:retry=10"
+          Add-Content $conf "tools.files.download:retry_wait=30"
 
       - uses: ammaraskar/msvc-problem-matcher@master
 
