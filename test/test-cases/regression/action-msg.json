@@ -160,5 +160,47 @@
       "SecRuleEngine On",
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,phase:2,pass,msg:'the first message',msg:'the second message'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing action :: logdata and severity - informed twice, last one wins",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=   test   &param2=test2",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "error_log": "\\[data \"the second data\"\\] \\[severity \"2\"\\]",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,phase:2,pass,log,logdata:'the first data',logdata:'the second data',severity:5,severity:2\""
+    ]
   }
 ]
