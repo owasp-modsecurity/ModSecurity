@@ -217,16 +217,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ById literal ARGS:password does not exclude a sibling arg",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?password=ok&other=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 403},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
@@ -237,16 +259,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ByTag literal ARGS:password does not exclude a sibling arg",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?password=ok&other=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 403},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
@@ -257,16 +301,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ById literal key compare is case-sensitive (Password stays inspected)",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?Password=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 403},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
@@ -277,16 +343,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ByTag literal key compare is case-sensitive (Password stays inspected)",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?Password=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 403},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
@@ -297,16 +385,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ById literal full-name match is case-insensitive",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?Password=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 200},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:password\"",
@@ -317,16 +427,38 @@
     "enabled": 1,
     "version_min": 300000,
     "title": "Issue 3505: ByTag literal full-name match is case-insensitive",
-    "client": {"ip": "200.249.12.31", "port": 123},
-    "server": {"ip": "200.249.12.31", "port": 80},
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
     "request": {
-      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Length": "0"},
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
       "uri": "/?Password=secret",
       "method": "GET",
-      "body": [""]
+      "body": [
+        ""
+      ]
     },
-    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
-    "expected": {"http_code": 200},
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
     "rules": [
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:password\"",
@@ -460,6 +592,219 @@
       "SecRuleEngine On",
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS://\"",
       "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?=evil&skip=ok",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "Empty-key: regex exclude ARGS:/^skip$/ must NOT wipe empty-named ARGS (still 403 on ?=evil)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^skip$/\"",
+      "SecRule ARGS \"@contains evil\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?skip=evil",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "Empty-key-control: same ctl excludes skip key (200)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^skip$/\"",
+      "SecRule ARGS \"@contains evil\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?skip=attack&other=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "Chain-child ById: ctl excludes skip on chained id:1; sibling other still 403",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^skip$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?skip=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "Chain-child ById-control: only skip present \u2192 excluded (200)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^skip$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?skip=attack&other=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "Chain-child ByTag: ctl excludes skip; sibling other still 403",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=chaintest;ARGS:/^skip$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'chaintest',chain\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2\""
     ]
   }
 ]
