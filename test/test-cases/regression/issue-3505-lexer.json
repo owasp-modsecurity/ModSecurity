@@ -454,7 +454,7 @@
     "expected": {
       "http_code": 403
     },
-    "title": "Felipe-1: ById escaped \\/ + later setvar:tx.dir=/ must keep deny (403) [locks tip silent-200 swallow]",
+    "title": "T12: ById escaped \\/ + later setvar:tx.dir=/ must keep deny (403) [locks tip silent-200 swallow]",
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,setvar:tx.dir=/\"",
@@ -496,7 +496,7 @@
     "expected": {
       "http_code": 403
     },
-    "title": "Felipe-2: ByTag escaped \\/ + later tag:'a/b' must keep deny (403) [locks tip Unclosed/swallow]",
+    "title": "T13: ByTag escaped \\/ + later tag:'a/b' must keep deny (403) [locks tip Unclosed/swallow]",
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetByTag=unused;ARGS:/^a\\/b$/,deny,status:403,tag:'a/b'\"",
@@ -538,7 +538,7 @@
     "expected": {
       "http_code": 403
     },
-    "title": "Felipe-2b: ById escaped \\/ + later tag:'a/b' must keep deny (403) [Felipe exact PoC 2]",
+    "title": "T13b: ById escaped \\/ + later tag:'a/b' must keep deny (403) [exact PoC 2]",
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,tag:'a/b'\"",
@@ -580,7 +580,7 @@
     "expected": {
       "http_code": 403
     },
-    "title": "Felipe-3: unescaped /^a/b$/ + setvar:tx.dir=/ must keep deny (403) [optional third]",
+    "title": "T14: unescaped /^a/b$/ + setvar:tx.dir=/ must keep deny (403) [optional third]",
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a/b$/,deny,status:403,setvar:tx.dir=/\"",
