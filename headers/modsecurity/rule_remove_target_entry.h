@@ -37,6 +37,16 @@ struct RuleRemoveTargetSpec {
     bool matchesKeyWithCollection(const std::string &key,
                                   const std::string &keyWithCollection) const;
     bool matchesFullName(const std::string &fullName) const;
+
+    /**
+     * Detect COLLECTION:/pattern/ in target, compile into *regex_out.
+     * action_name is used in error strings (e.g. "ruleRemoveTargetById").
+     * Returns false on unclosed/unsupported, empty, or invalid regex.
+     */
+    static bool detectAndCompileRegex(const std::string &target,
+                                      std::shared_ptr<Utils::Regex> *regex_out,
+                                      const char *action_name,
+                                      std::string *error);
 };
 
 

@@ -24,6 +24,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_remove_target_entry.h"
+#include "src/utils/regex.h"
 #include "src/utils/string.h"
 
 
@@ -56,37 +57,8 @@ bool RuleRemoveTargetById::init(std::string *error) {
 
     m_target = param[1];
 
-    // Detect regex format: COLLECTION:/pattern/ (e.g. ARGS:/mixpanel$/)
-    if (m_target.size() >= 4) {
-        size_t colon = m_target.find(':');
-        if (colon != std::string::npos && colon + 1 < m_target.size() &&
-            m_target[colon + 1] == '/') {
-            if (m_target[m_target.size() - 1] != '/' ||
-                m_target.size() < colon + 3) {
-                error->assign("Unclosed regex in ctl:ruleRemoveTargetById: " +
-                    m_target);
-                return false;
-            }
-            size_t pattern_start = colon + 2;
-            size_t pattern_end = m_target.size() - 1;
-            if (pattern_end > pattern_start) {
-                std::string pattern = m_target.substr(pattern_start,
-                    pattern_end - pattern_start);
-                m_regex = std::make_shared<Utils::Regex>(pattern, true);
-                if (m_regex->hasError()) {
-                    error->assign("Invalid regex in ctl:ruleRemoveTargetById: " +
-                        m_target);
-                    return false;
-                }
-            } else {
-                error->assign("Empty regex in ctl:ruleRemoveTargetById: " +
-                    m_target);
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return RuleRemoveTargetSpec::detectAndCompileRegex(
+        m_target, &m_regex, "ruleRemoveTargetById", error);
 }
 
 bool RuleRemoveTargetById::evaluate(RuleWithActions *rule, Transaction *transaction) {

@@ -1,21 +1,13 @@
 v3.0.18 - TBD
 ---------------------
 
-  - feat: Regex pattern for variable key in ctl:ruleRemoveTargetById and
-    ctl:ruleRemoveTargetByTag (#3505)
+  - [feat: Regex key support for ctl:ruleRemoveTargetById/ByTag (#3505):
+     slash-aware :/…/ tokenization ({m,n}); literals with '/' no longer
+     swallow trailing actions; VariableRegex synthetic fullName skipped for
+     regex exclusions. Public Transaction::m_ruleRemoveTargetBy{Id,Tag}
+     element types change to RuleRemoveTargetBy{Id,Tag}Entry; ByTag literal
+     full-name matching is now case-insensitive (same as ById).]
     [PR #3526 - @etiennemunnich]
-  - feat: Slash-aware ctl:ruleRemoveTargetById/ByTag tokenization so commas
-    inside /…/ (e.g. {m,n}) are part of the pattern; commas outside still
-    split actions. Fail-closed for unclosed/empty regex. (#3505)
-    [@etiennemunnich]
-  - fix: ctl ruleRemoveTarget slash-bearing literals no longer swallow
-    trailing actions (e.g. ,deny); skip VariableRegex synthetic fullName
-    in regex matchesFullName (keep runtime key matching). (#3505)
-    [@etiennemunnich]
-  - fix: anchor closed ctl ruleRemoveTarget regex at :/ so a slash in a
-    literal cannot swallow a later action that also contains '/'.
-    Prefix before :/ may still contain ':' and '/' ({m,n} kept). (#3505)
-    [@etiennemunnich]
 
 v3.0.17 - 2026-Sep-29
 ---------------------

@@ -18,13 +18,17 @@
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
-#include "src/utils/regex.h"
 
 
 #ifndef SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
 #define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
 
 namespace modsecurity {
+
+namespace Utils {
+class Regex;
+}
+
 namespace actions {
 namespace ctl {
 

@@ -114,7 +114,7 @@
     "response": {"headers": {"Content-Length": "0"}, "body": [""]},
     "expected": {
       "http_code": 200,
-      "parser_error": "Unclosed regex in ctl:ruleRemoveTargetById: ARGS:/\\^x\\{1,3\\}\\$"
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById: ARGS:/\\^x\\{1,3\\}\\$"
     },
     "rules": [
       "SecRuleEngine On",

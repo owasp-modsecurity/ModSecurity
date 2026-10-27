@@ -482,15 +482,20 @@ FREE_TEXT                               ([^\"]|([^\\]\\\"))+
  * cannot pair with a later slash (tag:'x/y', a URL) and swallow ",deny".
  * The prefix before :/ may contain '/' and ':' (OWASP_CRS/ATTACK-LFI, my:tag)
  * but not a comma, so chained actions still split. Literals use LIT.
- * Unclosed only matches the :/… form. Escaped \/ does not end a span.
+ * Unclosed only matches the :/… form. Backslash is NOT in RECHAR: only \\.
+ * consumes '\', so escaped \/ stays inside the body and does not close the
+ * span. VALUE is a single /…/ group (not repeating) so a slash mid-pattern
+ * cannot open a second span through ,deny,… to a later '/'.
+ * Allowed body chars are RECHAR plus escapes; chars outside that set (e.g.
+ * ! < > # % & ~ whitespace) fail at load with "unclosed or unsupported".
  * Empty :// fails in action init(). See #3505 / #3526. */
 REMOVE_RULE_BY                          [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\']+
 REMOVE_RULE_TARGET_NAME                 [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
 REMOVE_RULE_TARGET_LIT                  [a-zA-Z0-9_\-\.\*\/\:\;\$@\=\(\)\[\]\'\^\+|?\\{}]
 REMOVE_RULE_TARGET_ATOM                 [a-zA-Z0-9_\-\.\*\;\$@\=\(\)\[\]\'\^\+|?\\{}]
-REMOVE_RULE_TARGET_RECHAR               [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?\\{},]
+REMOVE_RULE_TARGET_RECHAR               [a-zA-Z0-9_\-\.\*\:\;\$@\=\(\)\[\]\'\^\+|?{},]
 REMOVE_RULE_TARGET_REBODY               (\\.|{REMOVE_RULE_TARGET_RECHAR})*
-REMOVE_RULE_TARGET_VALUE                {REMOVE_RULE_TARGET_LIT}+[:]([/]{REMOVE_RULE_TARGET_REBODY}[/]{REMOVE_RULE_TARGET_NAME}*)+
+REMOVE_RULE_TARGET_VALUE                {REMOVE_RULE_TARGET_LIT}+[:][/]{REMOVE_RULE_TARGET_REBODY}[/]{REMOVE_RULE_TARGET_NAME}*
 
 VAR_FREE_TEXT_QUOTE                     ([^\']|([^\\]\\\'))+
 VAR_FREE_TEXT_SPACE                     [^ \t\"]+

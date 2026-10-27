@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <memory>
 #include <string>
 
 #include "src/utils/regex.h"
@@ -37,6 +38,49 @@ static bool collectionPrefixMatches(const std::string &literal,
                           return std::tolower(static_cast<unsigned char>(a)) ==
                                  std::tolower(static_cast<unsigned char>(b));
                       });
+}
+
+
+bool RuleRemoveTargetSpec::detectAndCompileRegex(
+    const std::string &target,
+    std::shared_ptr<Utils::Regex> *regex_out,
+    const char *action_name,
+    std::string *error) {
+    if (regex_out == nullptr || error == nullptr || action_name == nullptr) {
+        return false;
+    }
+    regex_out->reset();
+    // Detect regex format: COLLECTION:/pattern/ (e.g. ARGS:/mixpanel$/)
+    if (target.size() < 4) {
+        return true;
+    }
+    size_t colon = target.find(':');
+    if (colon == std::string::npos || colon + 1 >= target.size() ||
+        target[colon + 1] != '/') {
+        return true;
+    }
+    if (target[target.size() - 1] != '/' || target.size() < colon + 3) {
+        error->assign(std::string("Unclosed regex or unsupported character "
+            "in ctl:") + action_name + ": " + target);
+        return false;
+    }
+    size_t pattern_start = colon + 2;
+    size_t pattern_end = target.size() - 1;
+    if (pattern_end <= pattern_start) {
+        error->assign(std::string("Empty regex in ctl:") + action_name +
+            ": " + target);
+        return false;
+    }
+    std::string pattern = target.substr(pattern_start,
+        pattern_end - pattern_start);
+    auto compiled = std::make_shared<Utils::Regex>(pattern, true);
+    if (compiled->hasError()) {
+        error->assign(std::string("Invalid regex in ctl:") + action_name +
+            ": " + target);
+        return false;
+    }
+    *regex_out = std::move(compiled);
+    return true;
 }
 
 
