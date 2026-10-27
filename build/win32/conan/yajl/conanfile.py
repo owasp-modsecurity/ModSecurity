@@ -4,7 +4,10 @@ from conan.tools.files import apply_conandata_patches, copy, export_conandata_pa
 import os
 
 # Based on ConanCenter's YAJL recipe at 4c4ac13f1ee7ce578941859ae3d2feff7189796d.
-# CMake 4 tracking: https://github.com/conan-io/conan-center-index/issues/26878
+# Upstream CMake 4 compatibility work:
+# https://github.com/lloyd/yajl/pull/256
+# https://github.com/lloyd/yajl/issues/257
+# ConanCenter CMake 4 tracking: https://github.com/conan-io/conan-center-index/issues/26878
 # Remove this local recipe once ConanCenter also fixes CMP0026/LOCATION for YAJL.
 required_conan_version = ">=2.0 <3"
 
