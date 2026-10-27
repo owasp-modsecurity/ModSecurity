@@ -70,7 +70,8 @@ bool GeoLookup::setDataBase(const std::string& filePath,
      * singleton and SecGeoLookupDb can be used more than once, including on
      * every re-parse of the configuration. Release it before loading the new
      * one, otherwise the previous handle (and the mmap'ed database file) is
-     * leaked. */
+     * leaked. Reloading the database while other threads are performing
+     * lookups is not supported. */
     cleanUp();
 
 #ifdef WITH_MAXMIND
