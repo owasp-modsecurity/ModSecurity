@@ -290,5 +290,221 @@
       "SecRuleUpdateActionById 200004 \"redirect:'https://%{request_headers.host}/'\"",
       "SecRule ARGS \"@contains value1\" \"phase:3,id:200004,block,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (7/n) - setvar on a chain starter runs when the chain fails",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.a=0\"",
+      "SecRule REQUEST_HEADERS:User-Agent \"@rx ^curl\" \"id:10,phase:2,pass,log,setvar:tx.a=+1,chain\"",
+      "SecRule REQUEST_HEADERS:Accept \"@rx nomatch\" \"setvar:tx.a=+2\"",
+      "SecRuleUpdateActionById 10 \"setvar:tx.a=+8\"",
+      "SecRule TX:a \"@eq 9\" \"id:999,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (8/n) - adding setvar keeps the disruptive action",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleUpdateActionById 200004 \"setvar:tx.a=1\"",
+      "SecRule ARGS \"@contains value1\" \"phase:2,id:200004,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (9/n) - updated setvar runs once per match, like an inline one",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p1=value1&p2=value2",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx value\" \"id:20,phase:2,pass,log,setvar:tx.b=+1\"",
+      "SecRuleUpdateActionById 20 \"setvar:tx.c=+1\"",
+      "SecRule TX:c \"@eq 2\" \"id:998,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (10/n) - updated setvar runs after the rule's own at each match (log)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p1=value1&p2=value2",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx value\" \"id:30,phase:2,pass,log,setvar:'tx.seq=%{tx.seq}O'\"",
+      "SecRuleUpdateActionById 30 \"setvar:'tx.seq=%{tx.seq}U'\"",
+      "SecRule TX:seq \"@streq OUOU\" \"id:997,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (11/n) - updated setvar runs after the rule's own at each match (nolog)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p1=value1&p2=value2",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx value\" \"id:30,phase:2,pass,nolog,setvar:'tx.seq=%{tx.seq}O'\"",
+      "SecRuleUpdateActionById 30 \"setvar:'tx.seq=%{tx.seq}U'\"",
+      "SecRule TX:seq \"@streq OUOU\" \"id:997,phase:2,deny,status:403,log\""
+    ]
   }
 ]

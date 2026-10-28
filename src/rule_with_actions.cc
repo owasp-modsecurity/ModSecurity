@@ -210,6 +210,20 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
     }
 
     for (auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId != b.first) {
+            continue;
+        }
+        auto *a = dynamic_cast<actions::SetVar *>(b.second.get());
+        if (a == nullptr) {
+            continue;
+        }
+        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
+            "action: " + *a->m_name.get());
+        a->evaluate(this, trans);
+    }
+
+    for (auto &b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
         if (m_ruleId != b.first) {
             continue;
@@ -268,6 +282,10 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
             continue;
         }
         actions::Action *a = b.second.get();
+        // Already run in executeActionsIndependentOfChainedRuleResult.
+        if (dynamic_cast<actions::SetVar *>(a) != nullptr) {
+            continue;
+        }
         executeAction(trans, containsBlock, ruleMessage, a, false);
         disruptiveAlreadyExecuted = true;
     }
