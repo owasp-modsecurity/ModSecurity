@@ -1147,6 +1147,9 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 		// not possible
     }
 
+	// Drop stale Transfer-Encoding; Content-Length is set immediately below.
+	pHttpRequest->DeleteHeader(HttpHeaderTransferEncoding);
+
     hr = pHttpRequest->SetHeader(
             HttpHeaderContentLength, 
             szLength, 
