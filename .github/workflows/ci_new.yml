@@ -214,6 +214,10 @@ jobs:
           Add-Content $conf "tools.files.download:retry=10"
           Add-Content $conf "tools.files.download:retry_wait=30"
 
+      - name: Test LMDB source fallback
+        if: matrix.configure.label == 'full'
+        run: python -m unittest discover -s build/win32/conan/lmdb/tests -v
+
       - uses: ammaraskar/msvc-problem-matcher@master
 
       - name: Build project

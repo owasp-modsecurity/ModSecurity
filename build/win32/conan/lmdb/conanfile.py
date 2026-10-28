@@ -1,4 +1,5 @@
 from conan import ConanFile
+from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy, get
 from conan.tools.scm import Version
@@ -47,8 +48,18 @@ class lmdbConan(ConanFile):
         cmake_layout(self, src_folder="src")
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version],
-            destination=self.source_folder, strip_root=True)
+        """Prefer upstream and use the mirror only after exhausted HTTP 429 retries."""
+        original = self.conan_data["sources"][self.version]
+        try:
+            get(self, **original, destination=self.source_folder, strip_root=True)
+        except ConanException as error:
+            # Conan 2.33 exposes HTTP 429 only through this exact download error.
+            # Do not hide checksum, extraction or unrelated network failures.
+            if str(error) != f"Error 429 downloading file {original['url']}":
+                raise
+            self.output.warning("LMDB upstream download is rate limited; using the official GitHub mirror")
+            mirror = self.conan_data["fallback_sources"][self.version]
+            get(self, **mirror, destination=self.source_folder, strip_root=True)
 
     def generate(self):
         tc = CMakeToolchain(self)
