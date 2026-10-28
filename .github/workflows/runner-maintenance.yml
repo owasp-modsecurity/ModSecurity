@@ -73,4 +73,6 @@ jobs:
 
             Review the proposed additions and retirement dates in `.github/runner-lifecycle.md`. Existing runner coverage is retained. The manifest exclusions document additions that need a separate build-system change.
 
-            GitHub may require a maintainer to approve CI runs on this automated PR.
+            CI runs on this GITHUB_TOKEN-created PR require approval. A maintainer with write access must select **Approve workflows to run** on this PR. After each bot update, approve any waiting runs and verify that all required checks passed for the current head commit before merging.
+
+            See [GitHub's approval flow for bot-created PRs](https://docs.github.com/en/actions/concepts/security/github_token).

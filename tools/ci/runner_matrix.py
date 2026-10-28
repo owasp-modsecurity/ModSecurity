@@ -19,9 +19,39 @@ ISSUES_URL = "https://api.github.com/repos/actions/runner-images/issues"
 LABEL = re.compile(r"(?:ubuntu|macos|windows|xcode)-[a-z0-9]+(?:[.-][a-z0-9]+)*\Z")
 SOURCE = re.compile(r"https://github\.com/actions/runner-images/issues/[0-9]+\Z")
 GROUPS = {"linux": "ubuntu", "macos": "macos", "windows": "windows"}
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _repository_path(path):
+    """Confine data files to the checkout, including existing symlink parents."""
+    resolved = Path(path).resolve()
+    if not resolved.is_relative_to(REPOSITORY_ROOT):
+        raise ValueError("Runner data paths must stay inside the repository")
+    return resolved
+
+
+def _command_file(path, variable):
+    """Permit an external command file only when GitHub supplied its exact path."""
+    resolved = Path(path).resolve()
+    expected = os.environ.get(variable)
+    if expected and resolved == Path(expected).resolve():
+        return resolved
+    return _repository_path(resolved)
+
+
+def _read_text(path):
+    """Read a UTF-8 data file only after checking checkout containment."""
+    return _repository_path(path).read_text(encoding="utf-8")
+
+
+def _append_command_file(path, content, variable):
+    """Append workflow data to a checked repository or GitHub command file."""
+    with _command_file(path, variable).open("a", encoding="utf-8", newline="\n") as stream:
+        stream.write(content)
 
 
 def _label(value):
+    """Accept only literal runner labels suitable for matrix data."""
     if not isinstance(value, str) or not LABEL.fullmatch(value):
         raise ValueError("Invalid runner label")
     return value
@@ -72,7 +102,8 @@ def validate_manifest(data):
 
 
 def load_manifest(path):
-    return validate_manifest(json.loads(Path(path).read_text(encoding="utf-8")))
+    """Load and validate runner policy from a file confined to the checkout."""
+    return validate_manifest(json.loads(_read_text(path)))
 
 
 def matrix_outputs(manifest):
@@ -89,16 +120,19 @@ def matrix_outputs(manifest):
 
 
 def _version(label):
+    """Compare numeric runner generations without lexical version ordering."""
     match = re.fullmatch(r"(?:ubuntu|macos|windows)-(\d+)(?:\.(\d+))?(?:-(?:intel|arm))?", label)
     return tuple(int(value or 0) for value in match.groups()) if match else (0, 0)
 
 
 def _standard(label, family):
+    """Identify standard versioned labels, excluding aliases and paid variants."""
     patterns = {"ubuntu": r"ubuntu-\d{2}\.\d{2}(?:-arm)?", "macos": r"macos-\d+(?:-intel)?", "windows": r"windows-\d{4}"}
     return re.fullmatch(patterns[family], label) is not None
 
 
 def _source(url):
+    """Restrict report links to canonical runner announcements or the catalog."""
     return url if isinstance(url, str) and (SOURCE.fullmatch(url) or url == CATALOG_URL) else CATALOG_URL
 
 
@@ -181,6 +215,7 @@ def reconcile(manifest, catalog, announcements, today):
 
 
 def _cell(value):
+    """Escape report values so they cannot inject Markdown table rows."""
     return str(value).replace("|", "\\|").replace("\n", " ").replace("\r", " ")
 
 
@@ -206,6 +241,7 @@ def render_report(manifest):
 
 
 def _fetch(url, token=None):
+    """Fetch a bounded official response, sending credentials only to GitHub API."""
     headers = {"User-Agent": "ModSecurity-runner-maintenance", "Accept": "application/vnd.github+json"}
     if token and url.startswith("https://api.github.com/"):
         headers["Authorization"] = "Bearer " + token
@@ -220,6 +256,7 @@ def _fetch(url, token=None):
 
 
 def fetch_sources():
+    """Read the catalog and all bounded announcement pages before any file changes."""
     readme = _fetch(CATALOG_URL)
     issues = []
     for page in range(1, 21):
@@ -233,7 +270,8 @@ def fetch_sources():
 
 
 def _write_changed(path, content):
-    path = Path(path)
+    """Write reviewed data inside the checkout only when its content changes."""
+    path = _repository_path(path)
     if path.exists() and path.read_text(encoding="utf-8") == content:
         return False
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -242,6 +280,7 @@ def _write_changed(path, content):
 
 
 def main(argv=None):
+    """Validate all requested paths before reading sources or changing data."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["outputs", "update"])
     parser.add_argument("--manifest", type=Path, default=Path(".github/runner-matrix.json"))
@@ -252,20 +291,30 @@ def main(argv=None):
     parser.add_argument("--announcements", type=Path, help="Offline announcement fixture")
     parser.add_argument("--today", type=date.fromisoformat)
     args = parser.parse_args(argv)
+    args.manifest = _repository_path(args.manifest)
+    if args.command == "outputs":
+        if args.github_output:
+            args.github_output = _command_file(args.github_output, "GITHUB_OUTPUT")
+    else:
+        args.report = _repository_path(args.report)
+        if bool(args.catalog) != bool(args.announcements):
+            parser.error("Pass both --catalog and --announcements for an offline run")
+        if args.catalog:
+            args.catalog = _repository_path(args.catalog)
+            args.announcements = _repository_path(args.announcements)
+        if args.summary:
+            args.summary = _command_file(args.summary, "GITHUB_STEP_SUMMARY")
     manifest = load_manifest(args.manifest)
     if args.command == "outputs":
         output = "".join(f"{key}={json.dumps(value, separators=(',', ':'))}\n" for key, value in matrix_outputs(manifest).items())
         if args.github_output:
-            with args.github_output.open("a", encoding="utf-8", newline="\n") as stream:
-                stream.write(output)
+            _append_command_file(args.github_output, output, "GITHUB_OUTPUT")
         else:
             print(output, end="")
         return 0
-    if bool(args.catalog) != bool(args.announcements):
-        parser.error("Pass both --catalog and --announcements for an offline run")
     if args.catalog:
-        readme = args.catalog.read_text(encoding="utf-8")
-        issues = json.loads(args.announcements.read_text(encoding="utf-8"))
+        readme = _read_text(args.catalog)
+        issues = json.loads(_read_text(args.announcements))
     else:
         readme, issues = fetch_sources()
     catalog = parse_catalog(readme)
@@ -277,8 +326,7 @@ def main(argv=None):
     changed_manifest = _write_changed(args.manifest, json.dumps(updated, indent=2) + "\n")
     changed_report = _write_changed(args.report, report)
     if args.summary:
-        with args.summary.open("a", encoding="utf-8") as stream:
-            stream.write(report)
+        _append_command_file(args.summary, report, "GITHUB_STEP_SUMMARY")
     print("Runner data changed" if changed_manifest or changed_report else "Runner data unchanged")
     return 0
 

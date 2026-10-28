@@ -48,9 +48,12 @@ requests**.
 
 The publisher uses the repository's `GITHUB_TOKEN`; no personal access token is
 needed. It writes only the runner manifest and lifecycle report. The updater does
-not change workflow code. GitHub may require a maintainer to approve CI runs on
-pull requests created with `GITHUB_TOKEN`. Review and merge each runner change
-through the usual PR process.
+not change workflow code. Pull requests created or updated with `GITHUB_TOKEN`
+produce CI runs that require approval. A maintainer with write access must select
+**Approve workflows to run** on the pull request. After every bot update, approve
+any waiting runs and verify that all required checks passed for the current head
+commit before merging. GitHub added this approval flow for bot-created pull
+requests in June 2026; no GitHub App secret is needed.
 
 GitHub disables scheduled workflows on newly forked public repositories by
 default and can disable them after 60 days without repository activity. If the
@@ -75,9 +78,14 @@ python3 tools/ci/runner_matrix.py update \
   --today 2026-10-27
 ```
 
-The optional `--manifest` and `--report` arguments select output paths. The workflow
-uses `outputs --github-output` for matrix data and `update --summary` for its job
-summary.
+Keep offline fixtures inside the checkout. The optional `--manifest` and
+`--report` arguments select paths inside the repository, as do `--catalog` and
+`--announcements`. Paths are resolved before access; traversal or symlinks that
+lead outside the checkout are rejected. The workflow uses `outputs
+--github-output` for matrix data and `update --summary` for its job summary.
+These command files may be outside the checkout only when their paths match
+GitHub's `GITHUB_OUTPUT` or `GITHUB_STEP_SUMMARY` environment variable,
+respectively. Other files in the runner's temporary directory remain inaccessible.
 
 ## Sources
 
@@ -86,3 +94,4 @@ summary.
 - [Workflow enablement and scheduled-workflow inactivity](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows).
 - [Repository workflow permissions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository).
 - [GITHUB_TOKEN and approval of automated PR workflows](https://docs.github.com/en/actions/concepts/security/github_token).
+- [Approval for bot-created pull requests](https://github.blog/changelog/2026-06-11-bot-created-pull-requests-can-run-workflows-if-approved/).

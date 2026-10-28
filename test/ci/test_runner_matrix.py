@@ -1,12 +1,17 @@
 """Policy tests for runner additions and lifecycle reporting, without network access."""
 
 from copy import deepcopy
+from contextlib import redirect_stdout
 from datetime import date
+from io import StringIO
 from pathlib import Path
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "ci"))
@@ -20,6 +25,7 @@ TODAY = date(2026, 10, 27)
 
 
 def policy_manifest():
+    """Provide minimal reviewed policy with explicit PCRE1 and pinned coverage."""
     return {
         "version": 1,
         "coverage": {
@@ -49,6 +55,7 @@ def policy_manifest():
 
 
 def image(label, family="ubuntu", architecture="x64", **overrides):
+    """Build a catalog record whose eligibility can vary independently by test."""
     record = {
         "family": family,
         "architecture": architecture,
@@ -62,6 +69,7 @@ def image(label, family="ubuntu", architecture="x64", **overrides):
 
 
 def current_catalog():
+    """Provide one active standard image for each configured platform."""
     return {
         "ubuntu-24.04": image("ubuntu-24.04"),
         "macos-15": image("macos-15", family="macos"),
@@ -71,16 +79,20 @@ def current_catalog():
 
 class ManifestTests(unittest.TestCase):
     def load_data(self, data):
+        """Exercise manifest loading within a temporary trusted checkout."""
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "runner-matrix.json"
             path.write_text(json.dumps(data), encoding="utf-8")
-            return runner_matrix.load_manifest(path)
+            with mock.patch.object(runner_matrix, "REPOSITORY_ROOT", Path(directory).resolve()):
+                return runner_matrix.load_manifest(path)
 
     def test_valid_manifest_loads_from_a_file(self):
+        """A valid file preserves reviewed policy without normalization changes."""
         expected = policy_manifest()
         self.assertEqual(self.load_data(expected), expected)
 
     def test_invalid_policies_are_rejected(self):
+        """Reject malformed coverage before it can become workflow matrix data."""
         cases = {}
         value = policy_manifest()
         value["version"] = 2
@@ -111,6 +123,7 @@ class ManifestTests(unittest.TestCase):
                 self.load_data(data)
 
     def test_pcre1_coverage_requires_explicit_opt_in(self):
+        """A new runner receives no PCRE1 job unless policy explicitly enables it."""
         manifest = policy_manifest()
         manifest["coverage"]["linux"]["labels"].append("ubuntu-26.04")
         output = runner_matrix.matrix_outputs(manifest)
@@ -126,6 +139,7 @@ class ManifestTests(unittest.TestCase):
 class AnnouncementTrustTests(unittest.TestCase):
     @staticmethod
     def issue(association="CONTRIBUTOR", login="outside-contributor", body=None):
+        """Build a relevant notice with independently configurable publisher trust."""
         return {
             "number": 99999,
             "html_url": "https://github.com/actions/runner-images/issues/99999",
@@ -142,6 +156,7 @@ class AnnouncementTrustTests(unittest.TestCase):
         }
 
     def test_untrusted_publisher_cannot_confirm_a_fabricated_retirement(self):
+        """Public issue templates cannot turn an unknown author's date into policy."""
         issue = self.issue()
         confirmed, notes = runner_matrix.announcement_data(
             [issue], [], {"ubuntu-24.04"}
@@ -150,6 +165,7 @@ class AnnouncementTrustTests(unittest.TestCase):
         self.assertEqual(notes, [issue["html_url"]])
 
     def test_repository_members_and_allowlisted_publishers_can_confirm_dates(self):
+        """Each approved publisher category can supply a confirmed retirement date."""
         cases = (
             ("OWNER", "repository-owner", []),
             ("MEMBER", "organization-member", []),
@@ -169,6 +185,7 @@ class AnnouncementTrustTests(unittest.TestCase):
                 self.assertEqual(notes, [])
 
     def test_trusted_notice_without_resolvable_labels_still_requires_review(self):
+        """A trusted author does not make an ambiguous display name actionable."""
         issue = self.issue(
             association="MEMBER",
             login="organization-member",
@@ -189,8 +206,138 @@ class AnnouncementTrustTests(unittest.TestCase):
         self.assertEqual(notes, [issue["html_url"]])
 
 
+class PathBoundaryTests(unittest.TestCase):
+    def setUp(self):
+        """Create a trusted checkout and an unrelated neighboring directory."""
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        self.root = base / "checkout"
+        self.root.mkdir()
+        self.outside = base / "checkout-other"
+        self.outside.mkdir()
+        root_patch = mock.patch.object(runner_matrix, "REPOSITORY_ROOT", self.root.resolve())
+        root_patch.start()
+        self.addCleanup(root_patch.stop)
+        self.manifest = self.root / "manifest.json"
+        self.original = json.dumps(policy_manifest())
+        self.manifest.write_text(self.original, encoding="utf-8")
+        self.report = self.root / "report.md"
+        self.catalog = self.root / "catalog.md"
+        self.catalog.write_text(
+            (ROOT / "test/ci/fixtures/runner-catalog.md").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        self.announcements = self.root / "announcements.json"
+        self.announcements.write_text("[]", encoding="utf-8")
+        self.protected = self.outside / "protected.json"
+        self.protected.write_text(self.original, encoding="utf-8")
+
+    def arguments(self, command="update", **overrides):
+        """Build CLI arguments with contained defaults and selected path overrides."""
+        paths = {"manifest": self.manifest}
+        if command == "update":
+            paths.update(report=self.report, catalog=self.catalog, announcements=self.announcements)
+        paths.update(overrides)
+        return [command] + [item for key, path in paths.items() for item in ("--" + key, str(path))]
+
+    def test_direct_file_operations_reject_external_and_traversal_paths(self):
+        """All data sinks reject escapes, including similarly named sibling roots."""
+        for path in (self.protected, self.root / ".." / "checkout-other" / "protected.json"):
+            with self.subTest(path=path):
+                for operation in (
+                    lambda: runner_matrix.load_manifest(path),
+                    lambda: runner_matrix._read_text(path),
+                    lambda: runner_matrix._write_changed(path, "changed"),
+                ):
+                    with self.assertRaisesRegex(ValueError, "inside the repository"):
+                        operation()
+        self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
+        missing = self.outside / "new-directory" / "report.md"
+        with self.assertRaisesRegex(ValueError, "inside the repository"):
+            runner_matrix._write_changed(missing, "changed")
+        self.assertFalse(missing.parent.exists())
+
+    def test_cli_validates_every_used_path_before_reading_or_updating(self):
+        """A late invalid output path cannot leave a partially updated manifest."""
+        cases = (
+            ("outputs", "manifest"), ("outputs", "github-output"),
+            ("update", "manifest"), ("update", "report"), ("update", "catalog"),
+            ("update", "announcements"), ("update", "summary"),
+        )
+        with mock.patch.dict(os.environ, {"GITHUB_OUTPUT": "", "GITHUB_STEP_SUMMARY": ""}):
+            for command, option in cases:
+                with self.subTest(command=command, option=option):
+                    with mock.patch.object(runner_matrix, "load_manifest") as load:
+                        with self.assertRaisesRegex(ValueError, "inside the repository"):
+                            runner_matrix.main(self.arguments(command, **{option: self.protected}))
+                        load.assert_not_called()
+        self.assertEqual(self.manifest.read_text(encoding="utf-8"), self.original)
+        self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
+        self.assertFalse(self.report.exists())
+
+    def test_resolved_internal_paths_and_offline_updates_remain_supported(self):
+        """Canonical aliases inside the checkout still support local fixtures."""
+        (self.root / "nested").mkdir()
+        alias = self.root / "nested" / ".." / "manifest.json"
+        relative = os.path.relpath(self.manifest)
+        self.assertEqual(runner_matrix.load_manifest(alias), policy_manifest())
+        self.assertEqual(runner_matrix.load_manifest(relative), policy_manifest())
+        with redirect_stdout(StringIO()):
+            self.assertEqual(runner_matrix.main(self.arguments()), 0)
+        self.assertTrue(self.report.is_file())
+
+    def test_symlink_escape_is_rejected_for_reads_and_missing_output_files(self):
+        """Existing directory links cannot redirect inputs or new output parents."""
+        link = self.root / "linked"
+        try:
+            link.symlink_to(self.outside, target_is_directory=True)
+        except OSError as error:
+            if os.name != "nt":
+                raise
+            # Windows junctions exercise the same resolved-path boundary without
+            # requiring the Create symbolic links privilege on developer machines.
+            result = subprocess.run(
+                f'cmd.exe /d /c mklink /J "{link}" "{self.outside}"',
+                capture_output=True, check=False,
+            )
+            if result.returncode:
+                self.skipTest(f"Directory links are unavailable: {error}")
+        with self.assertRaisesRegex(ValueError, "inside the repository"):
+            runner_matrix.load_manifest(link / "protected.json")
+        with self.assertRaisesRegex(ValueError, "inside the repository"):
+            runner_matrix._write_changed(link / "new-directory" / "report.md", "changed")
+        self.assertFalse((self.outside / "new-directory").exists())
+        with self.assertRaisesRegex(ValueError, "inside the repository"):
+            runner_matrix.main(self.arguments(catalog=link / "protected.json"))
+        self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
+
+    def test_only_the_matching_github_command_file_is_allowed_outside_checkout(self):
+        """The environment grants one exact command file, never its directory."""
+        output = self.outside / "github-output"
+        summary = self.outside / "github-summary"
+        with mock.patch.dict(os.environ, {"GITHUB_OUTPUT": str(output), "GITHUB_STEP_SUMMARY": str(summary)}):
+            runner_matrix._append_command_file(output, "matrix=data\n", "GITHUB_OUTPUT")
+            runner_matrix._append_command_file(summary, "report\n", "GITHUB_STEP_SUMMARY")
+            for path, variable in (
+                (self.protected, "GITHUB_OUTPUT"),
+                (output, "GITHUB_STEP_SUMMARY"),
+                (summary, "GITHUB_OUTPUT"),
+            ):
+                with self.subTest(path=path, variable=variable):
+                    with self.assertRaisesRegex(ValueError, "inside the repository"):
+                        runner_matrix._append_command_file(path, "changed", variable)
+            self.assertEqual(runner_matrix.main(self.arguments("outputs", **{"github-output": output})), 0)
+            with redirect_stdout(StringIO()):
+                self.assertEqual(runner_matrix.main(self.arguments(summary=summary)), 0)
+        self.assertIn("linux=", output.read_text(encoding="utf-8"))
+        self.assertIn("# Runner lifecycle", summary.read_text(encoding="utf-8"))
+        self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
+
+
 class ReconciliationTests(unittest.TestCase):
     def test_new_generation_is_added_without_losing_legacy_coverage(self):
+        """New standard generations preserve pinned coverage and the input manifest."""
         manifest = policy_manifest()
         before = deepcopy(manifest)
         catalog = current_catalog()
@@ -202,6 +349,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(manifest, before, "Reconciliation must not mutate its input")
 
     def test_new_arm64_ubuntu_generation_keeps_the_host_architecture(self):
+        """An ARM64 policy never admits the x64 variant of a new Ubuntu runner."""
         manifest = policy_manifest()
         manifest["coverage"]["linux"]["architecture"] = "arm64"
         manifest["coverage"]["linux"]["labels"] = ["ubuntu-24.04-arm"]
@@ -220,6 +368,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(updated["pinned"], manifest["pinned"])
 
     def test_only_standard_released_runners_of_the_requested_architecture_are_added(self):
+        """Preview, retired, paid, aliased, older and other-architecture labels stay out."""
         catalog = current_catalog()
         catalog.update({
             "ubuntu-26.04": image("ubuntu-26.04"),
@@ -237,6 +386,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertNotIn("ubuntu-latest", updated["lifecycle"])
 
     def test_an_alias_of_existing_coverage_does_not_add_another_job(self):
+        """Equivalent names in one catalog row do not duplicate existing coverage."""
         manifest = policy_manifest()
         manifest["coverage"]["macos"]["labels"] = ["macos-26-intel"]
         catalog = current_catalog()
@@ -247,6 +397,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(updated["coverage"]["macos"]["labels"], ["macos-26-intel"])
 
     def test_an_explicit_exclusion_is_preserved(self):
+        """An ignored generation stays excluded and retains its review reason."""
         manifest = policy_manifest()
         reason = "The Windows build migration must be reviewed first."
         manifest["coverage"]["windows"]["ignored"]["windows-2025"] = reason
@@ -257,6 +408,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(updated["coverage"]["windows"]["ignored"], {"windows-2025": reason})
 
     def test_a_missing_catalog_entry_is_unknown_and_is_not_removed(self):
+        """Catalog disappearance marks uncertainty without silently deleting a job."""
         catalog = current_catalog()
         del catalog["ubuntu-24.04"]
         updated = runner_matrix.reconcile(policy_manifest(), catalog, {}, TODAY)
@@ -266,10 +418,12 @@ class ReconciliationTests(unittest.TestCase):
         self.assertIn("ubuntu-22.04", updated["pinned"])
 
     def test_empty_catalog_does_not_produce_a_mass_change(self):
+        """Reject a failed catalog parse rather than marking every runner absent."""
         with self.assertRaises(ValueError):
             runner_matrix.reconcile(policy_manifest(), {}, {}, TODAY)
 
     def test_a_configured_retirement_is_marked_before_and_after_its_date(self):
+        """Crossing a confirmed date changes lifecycle status but retains coverage."""
         announcement = {
             "ubuntu-22.04": {
                 "status": "deprecated",
@@ -290,6 +444,7 @@ class ReconciliationTests(unittest.TestCase):
                 self.assertEqual(updated["coverage"]["linux"]["labels"], ["ubuntu-24.04"])
 
     def test_uncertain_retirement_dates_are_not_invented(self):
+        """Missing or invalid dates remain unset and require human review."""
         for retirement, needs_review in ((None, True), ("2027-13-40", False)):
             with self.subTest(retirement=retirement):
                 announcement = {
@@ -309,6 +464,7 @@ class ReconciliationTests(unittest.TestCase):
                 self.assertTrue(entry["needs_review"])
 
     def test_announced_retirement_blocks_addition_of_a_new_runner(self):
+        """A newer catalog generation is ineligible when already marked for retirement."""
         catalog = current_catalog()
         catalog["ubuntu-26.04"] = image("ubuntu-26.04")
         announcement = {
@@ -323,6 +479,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(updated["coverage"]["linux"]["labels"], ["ubuntu-24.04"])
 
     def test_repeated_inputs_produce_the_same_manifest_and_report(self):
+        """Identical source data produces no recurring manifest or report churn."""
         catalog = current_catalog()
         catalog["ubuntu-26.04"] = image("ubuntu-26.04")
         first = runner_matrix.reconcile(policy_manifest(), catalog, {}, TODAY)
@@ -331,6 +488,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(runner_matrix.render_report(first), runner_matrix.render_report(second))
 
     def test_report_lists_the_retirement_and_legacy_reason_deterministically(self):
+        """Report ordering stays stable while exposing dates, sources and pin reasons."""
         announcement = {
             "ubuntu-22.04": {
                 "status": "deprecated",

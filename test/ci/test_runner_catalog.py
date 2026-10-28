@@ -13,6 +13,7 @@ FIXTURES = Path(__file__).with_name("fixtures")
 
 
 def issue(number, fixture=None, **changes):
+    """Build a canonical announcement from an optional captured upstream body."""
     value = {
         "number": number,
         "title": "Deprecation of operating system runner images",
@@ -26,9 +27,11 @@ def issue(number, fixture=None, **changes):
 
 class CatalogTests(unittest.TestCase):
     def setUp(self):
+        """Load a representative catalog with aliases, architectures and statuses."""
         self.readme = (FIXTURES / "runner-catalog.md").read_text(encoding="utf-8")
 
     def test_architecture_status_and_aliases_are_separate(self):
+        """Parsing preserves image metadata and every label in an alias group."""
         rows = parse_catalog(self.readme)
         self.assertEqual(rows["ubuntu-26.04"]["architecture"], "x64")
         self.assertEqual(rows["ubuntu-26.04-arm"]["architecture"], "arm64")
@@ -42,6 +45,7 @@ class CatalogTests(unittest.TestCase):
         self.assertTrue(rows["ubuntu-26.04"]["source"].startswith("https://github.com/actions/runner-images"))
 
     def test_changed_or_empty_catalog_fails_closed(self):
+        """Malformed tables and unexpected labels cannot produce partial runner data."""
         for text in (
             "# Empty",
             self.readme.replace("YAML Label", "New unknown column"),
@@ -55,16 +59,19 @@ class CatalogTests(unittest.TestCase):
                 parse_catalog(text)
 
     def test_other_sections_cannot_add_labels(self):
+        """A later Markdown table cannot inject rows into Available Images."""
         rows = parse_catalog(self.readme + "\n| Ubuntu 99.04 | x64 | `ubuntu-99.04` | text |\n")
         self.assertNotIn("ubuntu-99.04", rows)
 
     def test_repeated_alias_in_same_row_is_deduplicated(self):
+        """Repeated literal names in one image row remain one alias."""
         text = self.readme.replace("`ubuntu-26.04`", "`ubuntu-26.04` or `ubuntu-26.04`", 1)
         self.assertEqual(parse_catalog(text)["ubuntu-26.04"]["aliases"], ["ubuntu-26.04"])
 
 
 class AnnouncementTests(unittest.TestCase):
     def test_retirement_date_ignores_brownouts_and_replacements(self):
+        """Only the final retirement date and affected images become lifecycle data."""
         rows = parse_announcements([issue(14254, "announcement-14254.md")])
         self.assertEqual(set(rows), {"ubuntu-22.04", "ubuntu-22.04-arm"})
         self.assertEqual(rows["ubuntu-22.04"]["retirement"], "2027-04-17")
@@ -72,6 +79,7 @@ class AnnouncementTests(unittest.TestCase):
         self.assertEqual(rows["ubuntu-22.04"]["status"], "deprecated")
 
     def test_checked_images_resolve_exact_impact_labels(self):
+        """Checked display names confirm literal impacts without retiring replacements."""
         rows = parse_announcements([issue(13518, "announcement-13518.md")])
         self.assertEqual(set(rows), {"macos-14", "macos-14-large", "macos-14-xlarge"})
         self.assertEqual(rows["macos-14"]["retirement"], "2026-11-02")
@@ -79,11 +87,13 @@ class AnnouncementTests(unittest.TestCase):
         self.assertNotIn("macos-26", rows)
 
     def test_iso_final_retirement_date_on_next_line(self):
+        """A complete date on the next template line remains a valid retirement."""
         rows = parse_announcements([issue(12045, "announcement-12045.md")])
         self.assertEqual(set(rows), {"windows-2019"})
         self.assertEqual(rows["windows-2019"]["retirement"], "2025-06-30")
 
     def test_ambiguous_missing_year_and_invalid_dates_need_review(self):
+        """Incomplete, impossible or conflicting dates never become confirmed dates."""
         for date in ("April 17th", "2027-02-30", "April 17th, 2027\nRetirement: April 18th, 2027"):
             body = f"### Breaking changes\nDeprecation of `ubuntu-22.04` runner images.\n### Target date\nRetirement: {date}\n"
             rows = parse_announcements([issue(1, body=body)])
@@ -91,27 +101,32 @@ class AnnouncementTests(unittest.TestCase):
             self.assertTrue(rows["ubuntu-22.04"]["needs_review"])
 
     def test_unchecked_labels_and_display_names_are_not_invented(self):
+        """Unsupported display names and unchecked choices remain a review note."""
         body = "### Breaking changes\nRetirement of runner images.\n### Target date\nRetirement: 2027-04-17\n### Runner images affected\n- [x] Ubuntu 22.04\n- [ ] `ubuntu-24.04`\n### Mitigation ways\nUse `ubuntu-26.04`.\n"
         data = issue(2, body=body)
         self.assertEqual(parse_announcements([data]), {})
         self.assertEqual(announcement_review_notes([data]), [data["html_url"]])
 
     def test_tool_deprecation_is_not_an_os_retirement(self):
+        """Removing a bundled tool does not retire the runner hosting that tool."""
         body = "### Breaking changes\nRemove Node.js from `ubuntu-22.04`.\n### Target date\nRetirement: 2027-04-17\n"
         self.assertEqual(parse_announcements([issue(3, title="Deprecation of Node.js tools", body=body)]), {})
         self.assertEqual(parse_announcements([issue(3, title="Deprecation of tools on runner images", body=body)]), {})
 
     def test_checked_literal_label_is_supported_without_impact_list(self):
+        """An explicitly checked YAML label identifies its image without prose impact."""
         body = "### Breaking changes\nRetirement of runner images.\n### Target date\n**Retirement: April 17th, 2027**\n### Runner images affected\n- [x] `ubuntu-22.04`\n- [ ] `ubuntu-24.04`\n"
         rows = parse_announcements([issue(4, body=body)])
         self.assertEqual(set(rows), {"ubuntu-22.04"})
         self.assertEqual(rows["ubuntu-22.04"]["retirement"], "2027-04-17")
 
     def test_plain_mitigation_text_does_not_add_replacement_labels(self):
+        """Unheaded mitigation prose cannot add a suggested replacement to impacts."""
         body = "Retirement of `ubuntu-22.04` runner images.\nMitigation ways\nUse `ubuntu-26.04`.\n"
         self.assertEqual(set(parse_announcements([issue(5, body=body)])), {"ubuntu-22.04"})
 
     def test_inline_migration_recommendations_do_not_deprecate_replacements(self):
+        """Migration advice in the same sentence never retires the suggested target."""
         for text in (
             "The `ubuntu-22.04` runner images will be retired. Please migrate jobs to `ubuntu-24.04`.",
             "The `ubuntu-22.04` runner images will be retired; migrate jobs to `ubuntu-24.04`.",
@@ -126,6 +141,7 @@ class AnnouncementTests(unittest.TestCase):
                 self.assertFalse(rows["ubuntu-22.04"]["needs_review"])
 
     def test_multiple_generations_without_clear_direction_require_review(self):
+        """Ambiguous prose about multiple generations cannot confirm retirement dates."""
         body = "### Breaking changes\nRetirement changes for `ubuntu-22.04` and `ubuntu-24.04` runner images.\n### Target date\nRetirement: April 17th, 2027\n"
         rows = parse_announcements([issue(7, body=body)])
         self.assertEqual(set(rows), {"ubuntu-22.04", "ubuntu-24.04"})
@@ -133,6 +149,7 @@ class AnnouncementTests(unittest.TestCase):
         self.assertTrue(all(row["retirement"] is None for row in rows.values()))
 
     def test_noncanonical_sources_and_pull_requests_are_ignored(self):
+        """Untrusted URLs, mismatched identities and non-announcement issues are ignored."""
         valid = issue(14254, "announcement-14254.md")
         for changes in (
             {"html_url": "https://evil.example/issues/14254"},
@@ -146,6 +163,7 @@ class AnnouncementTests(unittest.TestCase):
                 self.assertEqual(parse_announcements([{**valid, **changes}]), {})
 
     def test_conflicting_retirement_announcements_need_review(self):
+        """Conflicting official notices retain evidence but clear the disputed date."""
         first = issue(14254, "announcement-14254.md")
         second = issue(14255, body=first["body"].replace("April 17th, 2027", "April 18th, 2027"))
         rows = parse_announcements([second, first])

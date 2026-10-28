@@ -27,10 +27,12 @@ _MONTHS = {
 
 
 def _family(label):
+    """Map Xcode image labels to the macOS family used by coverage policy."""
     return "macos" if label.startswith("xcode-") else label.split("-", 1)[0]
 
 
 def _cells(line):
+    """Split a Markdown table row without treating escaped pipes as columns."""
     return [cell.strip() for cell in re.split(r"(?<!\\)\|", line.strip().strip("|"))]
 
 
@@ -102,6 +104,7 @@ def parse_catalog(readme):
 
 
 def _sections(body):
+    """Group announcement prose by normalized headings, omitting template comments."""
     sections = {}
     heading = ""
     for line in re.sub(r"<!--.*?-->", "", body, flags=re.S).splitlines():
@@ -114,6 +117,7 @@ def _sections(body):
 
 
 def _literal_labels(text):
+    """Extract recognized backtick labels without inventing YAML runner names."""
     return {
         value for value in re.findall(r"`([^`\r\n]+)`", text)
         if _LABEL.fullmatch(value)
@@ -121,6 +125,7 @@ def _literal_labels(text):
 
 
 def _source(issue):
+    """Accept canonical runner-images Announcement issues with matching identities."""
     if not isinstance(issue, dict) or "pull_request" in issue:
         return None
     source = issue.get("html_url")
@@ -141,6 +146,7 @@ def _source(issue):
 
 
 def _lifecycle_issue(issue, sections):
+    """Distinguish whole runner-image retirements from bundled tool removals."""
     title = issue.get("title", "")
     breaking = sections.get("breaking changes", "") + "\n" + sections.get("", "")
     lifecycle = r"\b(?:deprecat\w*|retir\w*|unsupported)\b"
@@ -158,6 +164,7 @@ def _lifecycle_issue(issue, sections):
 
 
 def _checked_images(text):
+    """Return only checked image entries from the upstream issue template."""
     return [
         match.group(1).strip()
         for line in text.splitlines()
@@ -224,6 +231,7 @@ def _leading_labels(text):
 
 
 def _affected_label_details(sections):
+    """Combine explicit impact labels and checked entries, tracking ambiguity."""
     preamble = re.split(
         r"(?im)^\s*(?:mitigation ways?|possible impact|runner images affected)\s*:?\s*$",
         sections.get("", ""), maxsplit=1,
@@ -241,10 +249,12 @@ def _affected_label_details(sections):
 
 
 def _affected_labels(sections):
+    """Return impacted labels without exposing internal ambiguity bookkeeping."""
     return _affected_label_details(sections)[0]
 
 
 def _date_value(value):
+    """Normalize a complete ISO or English date, rejecting incomplete dates."""
     value = value.strip()
     try:
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
@@ -258,6 +268,7 @@ def _date_value(value):
 
 
 def _retirement(sections):
+    """Accept one explicit retirement date; flag missing or conflicting values."""
     lines = [
         re.sub(r"[*_]", "", line).strip()
         for line in sections.get("target date", "").splitlines()
@@ -283,6 +294,7 @@ def _retirement(sections):
 
 
 def _parsed_issue(issue):
+    """Validate the source and lifecycle scope before parsing announcement data."""
     source = _source(issue)
     body = issue.get("body") if isinstance(issue, dict) else None
     if source is None or not isinstance(body, str):
