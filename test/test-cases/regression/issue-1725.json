@@ -37,7 +37,7 @@
       ]
     },
     "expected": {
-      "debug_log": "/test; 0.[0-9]+; 0.[0-9]+;",
+      "debug_log": "/test; [0-9]+; [0-9]+;",
       "http_code": 200
     },
     "rules": [
