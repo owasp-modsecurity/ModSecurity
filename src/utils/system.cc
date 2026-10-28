@@ -206,8 +206,8 @@ bool createDir(const std::string& dir, int mode, std::string *error) {
 
 bool isFile(const std::string& f) {
     struct stat fileInfo;
-    FILE *fp;
-    if (!fopen_modsec(&fp, f.c_str(), "r")) {
+    FILE *fp = fopen_modsec(f.c_str(), "r");
+    if (fp == nullptr) {
         return false;
     }
     fstat(fileno(fp), &fileInfo);
@@ -220,16 +220,11 @@ bool isFile(const std::string& f) {
     return true;
 }
 
-bool fopen_modsec(FILE **v_fp, const char *filename, const char *mode) {
-    if (v_fp == nullptr || filename == nullptr || mode == nullptr) {
-        return false;
-    }
+FILE *fopen_modsec(const char *filename, const char *mode) {
 #if defined(_MSC_VER)
-    *v_fp = _fsopen(filename, mode, _SH_DENYNO);
-    return *v_fp != nullptr;
+    return _fsopen(filename, mode, _SH_DENYNO);
 #else
-    *v_fp = fopen(filename, mode);
-    return *v_fp != nullptr;
+    return fopen(filename, mode);
 #endif
 }
 

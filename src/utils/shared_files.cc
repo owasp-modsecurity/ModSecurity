@@ -28,8 +28,8 @@ namespace utils {
 
 SharedFiles::handlers_map::iterator SharedFiles::add_new_handler(
     const std::string &fileName, std::string *error) {
-    FILE *fp;
-    if (!fopen_modsec(&fp, fileName.c_str(), "a")) {
+    FILE *fp = fopen_modsec(fileName.c_str(), "a");
+    if (fp == nullptr) {
         error->assign("Failed to open file: " + fileName);
         return m_handlers.end();
     }
