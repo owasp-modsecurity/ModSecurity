@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
+from urllib.error import HTTPError, URLError
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "ci"))
@@ -134,6 +135,31 @@ class ManifestTests(unittest.TestCase):
             [{"os": "ubuntu-26.04", "configure": {"label": "with pcre", "opt": "--with-pcre"}}],
         )
         self.assertNotIn("ubuntu-22.04", output["linux"])
+
+    def test_review_links_require_canonical_ascii_issue_numbers(self):
+        """Using a digit shorthand must not admit Unicode digits into source URLs."""
+        manifest = policy_manifest()
+        manifest["review_notes"] = [RETIREMENT_SOURCE]
+        self.assertIs(runner_matrix.validate_manifest(manifest), manifest)
+        for number in ("٣٧١٨", "３７１８"):
+            with self.subTest(number=number):
+                manifest["review_notes"] = [f"https://github.com/actions/runner-images/issues/{number}"]
+                with self.assertRaisesRegex(ValueError, "Invalid announcement review links"):
+                    runner_matrix.validate_manifest(manifest)
+
+
+class SourceRequestTests(unittest.TestCase):
+    def test_download_failures_preserve_the_public_failure_contract(self):
+        """HTTP errors remain covered by URLError while timeouts fail the same way."""
+        failures = (
+            HTTPError(CATALOG_SOURCE, 429, "Too Many Requests", None, None),
+            URLError("Unavailable"),
+            TimeoutError("Timed out"),
+        )
+        for error in failures:
+            with self.subTest(error=type(error).__name__), mock.patch.object(runner_matrix, "urlopen", side_effect=error):
+                with self.assertRaisesRegex(RuntimeError, "runner files were not changed"):
+                    runner_matrix._fetch(CATALOG_SOURCE)
 
 
 class AnnouncementTrustTests(unittest.TestCase):
@@ -268,9 +294,10 @@ class PathBoundaryTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {"GITHUB_OUTPUT": "", "GITHUB_STEP_SUMMARY": ""}):
             for command, option in cases:
                 with self.subTest(command=command, option=option):
+                    arguments = self.arguments(command, **{option: self.protected})
                     with mock.patch.object(runner_matrix, "load_manifest") as load:
                         with self.assertRaisesRegex(ValueError, "inside the repository"):
-                            runner_matrix.main(self.arguments(command, **{option: self.protected}))
+                            runner_matrix.main(arguments)
                         load.assert_not_called()
         self.assertEqual(self.manifest.read_text(encoding="utf-8"), self.original)
         self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
@@ -284,8 +311,39 @@ class PathBoundaryTests(unittest.TestCase):
         self.assertEqual(runner_matrix.load_manifest(alias), policy_manifest())
         self.assertEqual(runner_matrix.load_manifest(relative), policy_manifest())
         with redirect_stdout(StringIO()):
-            self.assertEqual(runner_matrix.main(self.arguments()), 0)
+            runner_matrix.main(self.arguments())
         self.assertTrue(self.report.is_file())
+
+    def test_missing_configured_runners_keep_untrusted_announcement_review_links(self):
+        """A vanished covered or pinned image still exposes relevant notices for review."""
+        for label in ("ubuntu-22.04", "ubuntu-24.04"):
+            with self.subTest(label=label):
+                catalog = current_catalog()
+                catalog.pop(label, None)
+                rows = [
+                    "## Available Images", "",
+                    "| Image | Architecture | YAML Label | Included Software |",
+                    "| --- | --- | --- | --- |",
+                ]
+                rows.extend(
+                    f"| {name} | {image['architecture']} | `{name}` | software |"
+                    for name, image in catalog.items()
+                )
+                self.catalog.write_text("\n".join(rows) + "\n", encoding="utf-8")
+                self.manifest.write_text(self.original, encoding="utf-8")
+                issue = AnnouncementTrustTests.issue(body=(
+                    f"## Breaking changes\nThe `{label}` runner images will be deprecated.\n"
+                    "## Target date\nRetirement: April 17, 2027\n"
+                ))
+                self.announcements.write_text(json.dumps([issue]), encoding="utf-8")
+                with redirect_stdout(StringIO()):
+                    runner_matrix.main(self.arguments())
+                updated = json.loads(self.manifest.read_text(encoding="utf-8"))
+                self.assertEqual(updated["review_notes"], [issue["html_url"]])
+                self.assertEqual(updated["lifecycle"][label]["status"], "unknown")
+                self.assertIsNone(updated["lifecycle"][label]["retirement"])
+                self.assertTrue(updated["lifecycle"][label]["needs_review"])
+                self.assertIn(issue["html_url"], self.report.read_text(encoding="utf-8"))
 
     def test_symlink_escape_is_rejected_for_reads_and_missing_output_files(self):
         """Existing directory links cannot redirect inputs or new output parents."""
@@ -303,13 +361,16 @@ class PathBoundaryTests(unittest.TestCase):
             )
             if result.returncode:
                 self.skipTest(f"Directory links are unavailable: {error}")
+        protected = link / "protected.json"
+        missing_report = link / "new-directory" / "report.md"
         with self.assertRaisesRegex(ValueError, "inside the repository"):
-            runner_matrix.load_manifest(link / "protected.json")
+            runner_matrix.load_manifest(protected)
         with self.assertRaisesRegex(ValueError, "inside the repository"):
-            runner_matrix._write_changed(link / "new-directory" / "report.md", "changed")
+            runner_matrix._write_changed(missing_report, "changed")
         self.assertFalse((self.outside / "new-directory").exists())
+        arguments = self.arguments(catalog=protected)
         with self.assertRaisesRegex(ValueError, "inside the repository"):
-            runner_matrix.main(self.arguments(catalog=link / "protected.json"))
+            runner_matrix.main(arguments)
         self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
 
     def test_only_the_matching_github_command_file_is_allowed_outside_checkout(self):
@@ -327,9 +388,9 @@ class PathBoundaryTests(unittest.TestCase):
                 with self.subTest(path=path, variable=variable):
                     with self.assertRaisesRegex(ValueError, "inside the repository"):
                         runner_matrix._append_command_file(path, "changed", variable)
-            self.assertEqual(runner_matrix.main(self.arguments("outputs", **{"github-output": output})), 0)
+            runner_matrix.main(self.arguments("outputs", **{"github-output": output}))
             with redirect_stdout(StringIO()):
-                self.assertEqual(runner_matrix.main(self.arguments(summary=summary)), 0)
+                runner_matrix.main(self.arguments(summary=summary))
         self.assertIn("linux=", output.read_text(encoding="utf-8"))
         self.assertIn("# Runner lifecycle", summary.read_text(encoding="utf-8"))
         self.assertEqual(self.protected.read_text(encoding="utf-8"), self.original)
@@ -419,8 +480,9 @@ class ReconciliationTests(unittest.TestCase):
 
     def test_empty_catalog_does_not_produce_a_mass_change(self):
         """Reject a failed catalog parse rather than marking every runner absent."""
+        manifest = policy_manifest()
         with self.assertRaises(ValueError):
-            runner_matrix.reconcile(policy_manifest(), {}, {}, TODAY)
+            runner_matrix.reconcile(manifest, {}, {}, TODAY)
 
     def test_a_configured_retirement_is_marked_before_and_after_its_date(self):
         """Crossing a confirmed date changes lifecycle status but retains coverage."""

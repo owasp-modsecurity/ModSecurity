@@ -36,81 +36,131 @@ def _cells(line):
     return [cell.strip() for cell in re.split(r"(?<!\\)\|", line.strip().strip("|"))]
 
 
-def parse_catalog(readme):
-    """Return one record per official table label, retaining each alias group.
-
-    Raise ValueError on an absent, empty, or structurally changed catalog rather
-    than treating a failed upstream parse as an empty set of available runners.
-    """
+def _catalog_lines(readme):
+    """Locate the catalog table and reject missing header or separator lines."""
     if not isinstance(readme, str):
         raise ValueError("The runner catalog must be Markdown text")
     section = re.search(r"(?im)^##\s+Available Images\s*$", readme)
     if not section:
         raise ValueError("Available Images section is missing")
     lines = readme[section.end():].splitlines()
-    while lines and not lines[0].strip():
-        lines.pop(0)
+    first = next((index for index, line in enumerate(lines) if line.strip()), len(lines))
+    lines = lines[first:]
     if len(lines) < 2:
         raise ValueError("Available Images table is missing")
-    header = [re.sub(r"\s+", " ", cell).casefold() for cell in _cells(lines[0])]
+    return lines
+
+
+def _catalog_columns(header_line, separator_line):
+    """Validate the table shape and locate the required metadata columns."""
+    header = [" ".join(cell.split()).casefold() for cell in _cells(header_line)]
     required = ("image", "architecture", "yaml label", "included software")
     if any(header.count(name) != 1 for name in required):
         raise ValueError("Available Images table columns changed")
-    if not lines[0].lstrip().startswith("|"):
+    if not header_line.lstrip().startswith("|"):
         raise ValueError("Available Images table header is malformed")
-    if len(_cells(lines[1])) != len(header) or not all(
-        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) for cell in _cells(lines[1])
+    separator = _cells(separator_line)
+    if len(separator) != len(header) or not all(
+        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) for cell in separator
     ):
         raise ValueError("Available Images table separator is malformed")
-    columns = {name: header.index(name) for name in required}
-    records = {}
-    for line in lines[2:]:
+    return {name: header.index(name) for name in required}, len(header)
+
+
+def _catalog_rows(lines, column_count):
+    """Yield complete table rows, stopping only at a blank line or heading."""
+    for line in lines:
         if not line.lstrip().startswith("|"):
             if line.strip() and not re.match(r"^#{1,6}\s", line):
                 raise ValueError("Available Images table ended unexpectedly")
             break
         cells = _cells(line)
-        if len(cells) != len(header):
+        if len(cells) != column_count:
             raise ValueError("Available Images table row is malformed")
-        raw_arch = cells[columns["architecture"]].casefold().replace("_", "-")
-        architecture = {
-            "x64": "x64", "amd64": "x64", "x86-64": "x64",
-            "arm64": "arm64", "aarch64": "arm64",
-        }.get(raw_arch)
-        if architecture is None:
-            raise ValueError("Unknown runner architecture")
-        aliases = list(dict.fromkeys(re.findall(r"`([^`\r\n]+)`", cells[columns["yaml label"]])))
-        if not aliases or any(_LABEL.fullmatch(label) is None for label in aliases):
-            raise ValueError("Unknown or missing runner label")
-        families = {_family(label) for label in aliases}
-        if len(families) != 1:
-            raise ValueError("Runner alias group crosses OS families")
-        image = cells[columns["image"]]
-        entry = {
-            "family": families.pop(),
-            "architecture": architecture,
-            "preview": bool(re.search(r"\b(?:preview|beta)\b", image, re.I)),
-            "deprecated": bool(re.search(r"\bdeprecated\b", image, re.I)),
-            "source": CATALOG_SOURCE,
-            "aliases": aliases,
-        }
-        for label in aliases:
+        yield cells
+
+
+def _catalog_entry(cells, columns):
+    """Validate one image's architecture, aliases and shared lifecycle metadata."""
+    raw_arch = cells[columns["architecture"]].casefold().replace("_", "-")
+    architecture = {
+        "x64": "x64", "amd64": "x64", "x86-64": "x64",
+        "arm64": "arm64", "aarch64": "arm64",
+    }.get(raw_arch)
+    if architecture is None:
+        raise ValueError("Unknown runner architecture")
+    aliases = list(dict.fromkeys(re.findall(r"`([^`\r\n]+)`", cells[columns["yaml label"]])))
+    if not aliases or any(_LABEL.fullmatch(label) is None for label in aliases):
+        raise ValueError("Unknown or missing runner label")
+    families = {_family(label) for label in aliases}
+    if len(families) != 1:
+        raise ValueError("Runner alias group crosses OS families")
+    image = cells[columns["image"]]
+    return {
+        "family": families.pop(),
+        "architecture": architecture,
+        "preview": bool(re.search(r"\b(?:preview|beta)\b", image, re.I)),
+        "deprecated": bool(re.search(r"\bdeprecated\b", image, re.I)),
+        "source": CATALOG_SOURCE,
+        "aliases": aliases,
+    }
+
+
+def parse_catalog(readme):
+    """Return one record per official table label, retaining each alias group.
+
+    Raise ValueError on an absent, empty, or structurally changed catalog rather
+    than treating a failed upstream parse as an empty set of available runners.
+    """
+    lines = _catalog_lines(readme)
+    columns, column_count = _catalog_columns(lines[0], lines[1])
+    records = {}
+    for cells in _catalog_rows(lines[2:], column_count):
+        entry = _catalog_entry(cells, columns)
+        for label in entry["aliases"]:
             if label in records and records[label] != entry:
                 raise ValueError("Runner label appears in conflicting image rows")
-            records[label] = dict(entry, aliases=list(aliases))
+            records[label] = dict(entry, aliases=list(entry["aliases"]))
     if not records:
         raise ValueError("Available Images table has no runner records")
     return records
+
+
+def _without_comments(body):
+    """Remove complete HTML comments in one pass, retaining an unclosed comment."""
+    pieces = []
+    cursor = 0
+    while (start := body.find("<!--", cursor)) != -1:
+        end = body.find("-->", start + 4)
+        if end == -1:
+            break
+        pieces.append(body[cursor:start])
+        cursor = end + 3
+    pieces.append(body[cursor:])
+    return "".join(pieces)
+
+
+def _section_heading(line):
+    """Parse an ATX heading without backtracking over its closing decoration."""
+    marker_end = len(line) - len(line.lstrip("#"))
+    tail = line[marker_end:]
+    if not 1 <= marker_end <= 6 or len(tail) < 2 or not tail[0].isspace():
+        return None
+    title = tail.lstrip()
+    if not title:
+        return ""
+    # A heading made solely of hashes must still retain one title character.
+    return (title.rstrip().rstrip("#").rstrip() or "#").casefold()
 
 
 def _sections(body):
     """Group announcement prose by normalized headings, omitting template comments."""
     sections = {}
     heading = ""
-    for line in re.sub(r"<!--.*?-->", "", body, flags=re.S).splitlines():
-        match = re.match(r"^#{1,6}\s+(.+?)\s*#*\s*$", line)
-        if match:
-            heading = match.group(1).strip().casefold()
+    for line in _without_comments(body).splitlines():
+        title = _section_heading(line)
+        if title is not None:
+            heading = title
         else:
             sections.setdefault(heading, []).append(line)
     return {name: "\n".join(lines) for name, lines in sections.items()}
@@ -136,12 +186,13 @@ def _source(issue):
     if number is not None and (isinstance(number, bool) or str(number) != match.group(1)):
         return None
     labels = issue.get("labels")
-    if labels is not None:
-        if not isinstance(labels, (list, tuple)) or not any(
+    if labels is not None and (
+        not isinstance(labels, (list, tuple)) or not any(
             (value.get("name") if isinstance(value, dict) else value) == "Announcement"
             for value in labels
-        ):
-            return None
+        )
+    ):
+        return None
     return source
 
 
@@ -163,12 +214,23 @@ def _lifecycle_issue(issue, sections):
     )
 
 
+def _checked_image(line):
+    """Parse a checked list item using only forward whitespace scans."""
+    value = line.lstrip()
+    if len(value) < 2 or value[0] not in "-*" or not value[1].isspace():
+        return None
+    value = value[1:].lstrip()
+    if len(value) < 5 or value[:3].casefold() != "[x]" or not value[3].isspace():
+        return None
+    return value[3:].strip()
+
+
 def _checked_images(text):
     """Return only checked image entries from the upstream issue template."""
     return [
-        match.group(1).strip()
+        value
         for line in text.splitlines()
-        if (match := re.match(r"^\s*[-*]\s+\[[xX]\]\s+(.+?)\s*$", line))
+        if (value := _checked_image(line)) is not None
     ]
 
 
@@ -230,12 +292,20 @@ def _leading_labels(text):
     return confirmed, ambiguous
 
 
+def _preamble(text):
+    """Stop leading prose at an unheaded template section without rescanning it."""
+    offset = 0
+    for line in text.splitlines(keepends=True):
+        title = line.strip().removesuffix(":").rstrip()
+        if re.fullmatch(r"(?:mitigation ways?|possible impact|runner images affected)", title, re.I):
+            return text[:offset]
+        offset += len(line)
+    return text
+
+
 def _affected_label_details(sections):
     """Combine explicit impact labels and checked entries, tracking ambiguity."""
-    preamble = re.split(
-        r"(?im)^\s*(?:mitigation ways?|possible impact|runner images affected)\s*:?\s*$",
-        sections.get("", ""), maxsplit=1,
-    )[0]
+    preamble = _preamble(sections.get("", ""))
     leading = preamble + "\n" + sections.get("breaking changes", "")
     affected, ambiguous = _leading_labels(leading)
     checked = _checked_images(sections.get("runner images affected", ""))
@@ -259,11 +329,20 @@ def _date_value(value):
     try:
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
             return date.fromisoformat(value).isoformat()
-        match = re.fullmatch(r"([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,\s*(\d{4})", value, re.I)
+        match = re.fullmatch(r"([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,\s*(\d{4})", value, re.I)
         if match and match.group(1).casefold() in _MONTHS:
             return date(int(match.group(3)), _MONTHS[match.group(1).casefold()], int(match.group(2))).isoformat()
     except ValueError:
         pass
+    return None
+
+
+def _retirement_value(line):
+    """Recognize a retirement prefix before the first colon in linear time."""
+    prefix, separator, value = line.partition(":")
+    name = " ".join(prefix.split())
+    if separator and re.fullmatch(r"(?:final )?retirement(?: date)?", name, re.I):
+        return value.strip()
     return None
 
 
@@ -276,10 +355,9 @@ def _retirement(sections):
     dates = []
     invalid = False
     for index, line in enumerate(lines):
-        match = re.fullmatch(r"(?:final\s+)?retirement(?:\s+date)?\s*:\s*(.*)", line, re.I)
-        if not match:
+        value = _retirement_value(line)
+        if value is None:
             continue
-        value = match.group(1).strip()
         if not value:
             value = next((item for item in lines[index + 1:] if item), "")
         parsed = _date_value(value)

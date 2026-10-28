@@ -225,7 +225,7 @@ jobs:
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan --upgrade
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0"
           conan profile detect
 
       - uses: ammaraskar/msvc-problem-matcher@master

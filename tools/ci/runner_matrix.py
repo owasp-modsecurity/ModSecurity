@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 import re
 import sys
-from urllib.error import HTTPError, URLError
+from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 from runner_catalog import announcement_review_notes, parse_announcements, parse_catalog
@@ -17,7 +17,7 @@ from runner_catalog import announcement_review_notes, parse_announcements, parse
 CATALOG_URL = "https://raw.githubusercontent.com/actions/runner-images/main/README.md"
 ISSUES_URL = "https://api.github.com/repos/actions/runner-images/issues"
 LABEL = re.compile(r"(?:ubuntu|macos|windows|xcode)-[a-z0-9]+(?:[.-][a-z0-9]+)*\Z")
-SOURCE = re.compile(r"https://github\.com/actions/runner-images/issues/[0-9]+\Z")
+SOURCE = re.compile(r"https://github\.com/actions/runner-images/issues/\d+\Z", re.ASCII)
 GROUPS = {"linux": "ubuntu", "macos": "macos", "windows": "windows"}
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 
@@ -57,6 +57,46 @@ def _label(value):
     return value
 
 
+def _validate_reasons(reasons, message):
+    """Require a valid runner label and a nonempty reason for each policy exception."""
+    for label, reason in reasons.items():
+        _label(label)
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError(message)
+
+
+def _validate_policy(policy, family):
+    """Validate one platform's architecture, runner labels and optional coverage."""
+    if not isinstance(policy, dict):
+        raise ValueError("Invalid runner policy")
+    if policy.get("family") != family or policy.get("architecture") not in {"x64", "arm64"}:
+        raise ValueError("Invalid runner family or architecture")
+    labels = policy.get("labels")
+    if not isinstance(labels, list) or not labels or not all(isinstance(label, str) for label in labels) or len(labels) != len(set(labels)):
+        raise ValueError("Runner labels must be a nonempty, unique list")
+    for label in labels:
+        _label(label)
+        if not label.startswith(family + "-"):
+            raise ValueError("Runner label does not match its family")
+    ignored = policy.get("ignored", {})
+    if not isinstance(ignored, dict):
+        raise ValueError("Ignored runners must include reasons")
+    _validate_reasons(ignored, "Ignored runners need a reason")
+    pcre1 = policy.get("pcre1_labels", [])
+    if not isinstance(pcre1, list) or not set(pcre1).issubset(labels):
+        raise ValueError("PCRE1 labels must be a subset of the configured runners")
+
+
+def _validate_announcement_metadata(data):
+    """Validate trusted publisher names and canonical links awaiting human review."""
+    authors = data.get("trusted_announcement_authors", [])
+    if not isinstance(authors, list) or any(not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9-]{1,39}", name) for name in authors):
+        raise ValueError("Invalid announcement publisher allowlist")
+    notes = data.get("review_notes", [])
+    if not isinstance(notes, list) or any(not isinstance(url, str) or not SOURCE.fullmatch(url) for url in notes):
+        raise ValueError("Invalid announcement review links")
+
+
 def validate_manifest(data):
     """Reject invalid policy before emitting a matrix or modifying files."""
     if not isinstance(data, dict) or data.get("version") != 1:
@@ -64,40 +104,11 @@ def validate_manifest(data):
     if not isinstance(data.get("coverage"), dict) or set(data["coverage"]) != set(GROUPS):
         raise ValueError("Expected linux, macos and windows coverage")
     for group, family in GROUPS.items():
-        policy = data["coverage"][group]
-        if not isinstance(policy, dict):
-            raise ValueError("Invalid runner policy")
-        if policy.get("family") != family or policy.get("architecture") not in {"x64", "arm64"}:
-            raise ValueError("Invalid runner family or architecture")
-        labels = policy.get("labels")
-        if not isinstance(labels, list) or not labels or not all(isinstance(label, str) for label in labels) or len(labels) != len(set(labels)):
-            raise ValueError("Runner labels must be a nonempty, unique list")
-        for label in labels:
-            _label(label)
-            if not label.startswith(family + "-"):
-                raise ValueError("Runner label does not match its family")
-        ignored = policy.get("ignored", {})
-        if not isinstance(ignored, dict):
-            raise ValueError("Ignored runners must include reasons")
-        for label, reason in ignored.items():
-            _label(label)
-            if not isinstance(reason, str) or not reason.strip():
-                raise ValueError("Ignored runners need a reason")
-        pcre1 = policy.get("pcre1_labels", [])
-        if not isinstance(pcre1, list) or not set(pcre1).issubset(labels):
-            raise ValueError("PCRE1 labels must be a subset of the configured runners")
+        _validate_policy(data["coverage"][group], family)
     if not isinstance(data.get("pinned", {}), dict) or not isinstance(data.get("lifecycle", {}), dict):
         raise ValueError("Invalid pinned or lifecycle data")
-    for label, reason in data.get("pinned", {}).items():
-        _label(label)
-        if not isinstance(reason, str) or not reason.strip():
-            raise ValueError("Pinned runners need a reason")
-    authors = data.get("trusted_announcement_authors", [])
-    if not isinstance(authors, list) or any(not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9-]{1,39}", name) for name in authors):
-        raise ValueError("Invalid announcement publisher allowlist")
-    notes = data.get("review_notes", [])
-    if not isinstance(notes, list) or any(not isinstance(url, str) or not SOURCE.fullmatch(url) for url in notes):
-        raise ValueError("Invalid announcement review links")
+    _validate_reasons(data.get("pinned", {}), "Pinned runners need a reason")
+    _validate_announcement_metadata(data)
     return data
 
 
@@ -136,6 +147,15 @@ def _source(url):
     return url if isinstance(url, str) and (SOURCE.fullmatch(url) or url == CATALOG_URL) else CATALOG_URL
 
 
+def _trusted_publisher(issue, allowed):
+    """Accept repository associations or an explicit case-insensitive author allowlist."""
+    user = issue.get("user")
+    author = user.get("login", "") if isinstance(user, dict) else ""
+    author = author if isinstance(author, str) else ""
+    association = issue.get("author_association", "")
+    return association in {"OWNER", "MEMBER", "COLLABORATOR"} or author.casefold() in allowed
+
+
 def announcement_data(issues, trusted_authors, watched_labels):
     """A public issue template can apply Announcement even for an unknown opener."""
     allowed = {name.casefold() for name in trusted_authors}
@@ -144,11 +164,7 @@ def announcement_data(issues, trusted_authors, watched_labels):
     for issue in issues:
         if not isinstance(issue, dict):
             continue
-        user = issue.get("user")
-        author = user.get("login", "") if isinstance(user, dict) else ""
-        author = author if isinstance(author, str) else ""
-        association = issue.get("author_association", "")
-        if association in {"OWNER", "MEMBER", "COLLABORATOR"} or author.casefold() in allowed:
+        if _trusted_publisher(issue, allowed):
             trusted.append(issue)
             continue
         records = parse_announcements([issue])
@@ -158,6 +174,59 @@ def announcement_data(issues, trusted_authors, watched_labels):
                 notes.add(url)
     notes.update(announcement_review_notes(trusted))
     return parse_announcements(trusted), sorted(notes)
+
+
+def _eligible_addition(label, image, policy, newest, announcements):
+    """Require a newer active standard image without duplicate or excluded coverage."""
+    if not LABEL.fullmatch(label) or not _standard(label, policy["family"]):
+        return False
+    if label in policy.get("ignored", {}) or label in policy["labels"]:
+        return False
+    if image.get("family") != policy["family"] or image.get("architecture") != policy["architecture"]:
+        return False
+    if image.get("preview") or image.get("deprecated") or label in announcements:
+        return False
+    return _version(label) > newest and not set(image.get("aliases", [])) & set(policy["labels"])
+
+
+def _notice_lifecycle(notice, today):
+    """Use only a confirmed valid retirement date to mark a runner as retired."""
+    retirement = None
+    needs_review = bool(notice.get("needs_review"))
+    if notice.get("retirement") and not needs_review:
+        try:
+            retirement = date.fromisoformat(notice["retirement"]).isoformat()
+        except (ValueError, TypeError):
+            needs_review = True
+    status = "retired" if retirement and date.fromisoformat(retirement) <= today else "deprecated"
+    return {
+        "status": status,
+        "retirement": retirement,
+        "source": _source(notice.get("source")),
+        "needs_review": needs_review or retirement is None,
+    }
+
+
+def _lifecycle_entry(image, notice, today):
+    """Prefer announcement evidence, then catalog status, retaining unknown runners."""
+    if notice:
+        return _notice_lifecycle(notice, today)
+    if image:
+        return {
+            "status": "deprecated" if image.get("deprecated") else "active",
+            "retirement": None,
+            "source": _source(image.get("source")),
+            "needs_review": bool(image.get("deprecated")),
+        }
+    return {"status": "unknown", "retirement": None, "source": CATALOG_URL, "needs_review": True}
+
+
+def _configured_labels(manifest):
+    """Keep both active coverage and pinned runners in lifecycle and notice review."""
+    labels = set(manifest.get("pinned", {}))
+    for policy in manifest["coverage"].values():
+        labels.update(policy["labels"])
+    return labels
 
 
 def reconcile(manifest, catalog, announcements, today):
@@ -170,47 +239,13 @@ def reconcile(manifest, catalog, announcements, today):
         original = list(policy["labels"])
         newest = max(_version(label) for label in original)
         for label, image in sorted(catalog.items(), key=lambda item: (_version(item[0]), item[0])):
-            if not LABEL.fullmatch(label) or not _standard(label, policy["family"]):
-                continue
-            if label in policy.get("ignored", {}) or label in policy["labels"]:
-                continue
-            if image.get("family") != policy["family"] or image.get("architecture") != policy["architecture"]:
-                continue
-            if image.get("preview") or image.get("deprecated") or label in announcements:
-                continue
-            if _version(label) <= newest or set(image.get("aliases", [])) & set(policy["labels"]):
-                continue
-            policy["labels"].append(label)
+            if _eligible_addition(label, image, policy, newest, announcements):
+                policy["labels"].append(label)
 
-    labels = set(updated.get("pinned", {}))
-    for policy in updated["coverage"].values():
-        labels.update(policy["labels"])
-    lifecycle = {}
-    for label in sorted(labels):
-        image = catalog.get(label)
-        notice = announcements.get(label)
-        retirement = None
-        needs_review = False
-        if notice:
-            source = _source(notice.get("source"))
-            needs_review = bool(notice.get("needs_review"))
-            if notice.get("retirement") and not needs_review:
-                try:
-                    retirement = date.fromisoformat(notice["retirement"]).isoformat()
-                except (ValueError, TypeError):
-                    needs_review = True
-            status = "retired" if retirement and date.fromisoformat(retirement) <= today else "deprecated"
-            needs_review = needs_review or retirement is None
-        elif image:
-            source = _source(image.get("source"))
-            status = "deprecated" if image.get("deprecated") else "active"
-            needs_review = bool(image.get("deprecated"))
-        else:
-            source = CATALOG_URL
-            status = "unknown"
-            needs_review = True
-        lifecycle[label] = {"status": status, "retirement": retirement, "source": source, "needs_review": needs_review}
-    updated["lifecycle"] = lifecycle
+    updated["lifecycle"] = {
+        label: _lifecycle_entry(catalog.get(label), announcements.get(label), today)
+        for label in sorted(_configured_labels(updated))
+    }
     return validate_manifest(updated)
 
 
@@ -248,7 +283,7 @@ def _fetch(url, token=None):
     try:
         with urlopen(Request(url, headers=headers), timeout=30) as response:
             data = response.read(10_000_001)
-    except (HTTPError, URLError, TimeoutError) as error:
+    except (URLError, TimeoutError) as error:
         raise RuntimeError("Could not read an official runner source; runner files were not changed") from error
     if len(data) > 10_000_000:
         raise ValueError("Runner source response exceeds the size limit")
@@ -279,8 +314,8 @@ def _write_changed(path, content):
     return True
 
 
-def main(argv=None):
-    """Validate all requested paths before reading sources or changing data."""
+def _parse_args(argv):
+    """Parse the requested command and validate every path before file access."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["outputs", "update"])
     parser.add_argument("--manifest", type=Path, default=Path(".github/runner-matrix.json"))
@@ -304,31 +339,42 @@ def main(argv=None):
             args.announcements = _repository_path(args.announcements)
         if args.summary:
             args.summary = _command_file(args.summary, "GITHUB_STEP_SUMMARY")
+    return args
+
+
+def _emit_outputs(manifest, github_output):
+    """Emit compact matrix JSON to stdout or the designated GitHub output file."""
+    output = "".join(f"{key}={json.dumps(value, separators=(',', ':'))}\n" for key, value in matrix_outputs(manifest).items())
+    if github_output:
+        _append_command_file(github_output, output, "GITHUB_OUTPUT")
+    else:
+        print(output, end="")
+
+
+def main(argv=None):
+    """Run a fully validated output or update command; failures propagate to the CLI."""
+    args = _parse_args(argv)
     manifest = load_manifest(args.manifest)
     if args.command == "outputs":
-        output = "".join(f"{key}={json.dumps(value, separators=(',', ':'))}\n" for key, value in matrix_outputs(manifest).items())
-        if args.github_output:
-            _append_command_file(args.github_output, output, "GITHUB_OUTPUT")
-        else:
-            print(output, end="")
-        return 0
-    if args.catalog:
-        readme = _read_text(args.catalog)
-        issues = json.loads(_read_text(args.announcements))
+        _emit_outputs(manifest, args.github_output)
     else:
-        readme, issues = fetch_sources()
-    catalog = parse_catalog(readme)
-    notices, notes = announcement_data(issues, manifest.get("trusted_announcement_authors", []), set(catalog))
-    updated = reconcile(manifest, catalog, notices, args.today or datetime.now(timezone.utc).date())
-    updated["review_notes"] = notes
-    validate_manifest(updated)
-    report = render_report(updated)
-    changed_manifest = _write_changed(args.manifest, json.dumps(updated, indent=2) + "\n")
-    changed_report = _write_changed(args.report, report)
-    if args.summary:
-        _append_command_file(args.summary, report, "GITHUB_STEP_SUMMARY")
-    print("Runner data changed" if changed_manifest or changed_report else "Runner data unchanged")
-    return 0
+        if args.catalog:
+            readme = _read_text(args.catalog)
+            issues = json.loads(_read_text(args.announcements))
+        else:
+            readme, issues = fetch_sources()
+        catalog = parse_catalog(readme)
+        watched_labels = set(catalog) | _configured_labels(manifest)
+        notices, notes = announcement_data(issues, manifest.get("trusted_announcement_authors", []), watched_labels)
+        updated = reconcile(manifest, catalog, notices, args.today or datetime.now(timezone.utc).date())
+        updated["review_notes"] = notes
+        validate_manifest(updated)
+        report = render_report(updated)
+        changed_manifest = _write_changed(args.manifest, json.dumps(updated, indent=2) + "\n")
+        changed_report = _write_changed(args.report, report)
+        if args.summary:
+            _append_command_file(args.summary, report, "GITHUB_STEP_SUMMARY")
+        print("Runner data changed" if changed_manifest or changed_report else "Runner data unchanged")
 
 
 if __name__ == "__main__":

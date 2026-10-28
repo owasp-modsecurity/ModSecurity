@@ -1,5 +1,7 @@
 """Tests for upstream runner catalog and lifecycle announcement formats."""
 
+import json
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -70,6 +72,84 @@ class CatalogTests(unittest.TestCase):
 
 
 class AnnouncementTests(unittest.TestCase):
+    def test_comments_and_decorated_headings_preserve_announcement_scope(self):
+        """Complete template comments disappear while unclosed comments remain prose."""
+        body = """<!-- Retirement of `ubuntu-24.04` runner images.
+<!-- nested opener ends at the first closer -->
+<!-- adjacent comment --><!-- another comment -->
+<!-- unfinished template comment
+### Breaking changes ###
+Retirement of `ubuntu-22.04` runner images.
+### Target date ####
+Final retirement date: APRIL 17TH, 2027
+"""
+        rows = parse_announcements([issue(8, body=body)])
+        self.assertEqual(set(rows), {"ubuntu-22.04"})
+        self.assertEqual(rows["ubuntu-22.04"]["retirement"], "2027-04-17")
+        self.assertFalse(rows["ubuntu-22.04"]["needs_review"])
+
+    def test_checked_entries_require_spaces_around_checkbox(self):
+        """Tabs and uppercase checks work, but incomplete list syntax adds no labels."""
+        body = """### Breaking changes
+Retirement of runner images.
+### Target date
+Retirement: 2027-04-17
+### Runner images affected
+  -\t[X]\t`ubuntu-22.04`\t
+- [x]\t\t
+*[x] `ubuntu-24.04`
+- [x]`ubuntu-26.04`
+- [ ] `ubuntu-20.04`
+"""
+        rows = parse_announcements([issue(9, body=body)])
+        self.assertEqual(set(rows), {"ubuntu-22.04"})
+        self.assertEqual(rows["ubuntu-22.04"]["retirement"], "2027-04-17")
+
+    def test_retirement_prefixes_accept_only_complete_template_names(self):
+        """Whitespace and case vary without accepting additional prefix words."""
+        for prefix, retirement in (
+            ("Retirement", "2027-04-17"),
+            ("retirement date", "2027-04-17"),
+            ("FINAL\tRETIREMENT   DATE", "2027-04-17"),
+            ("Retirement planned date", None),
+            ("Finalretirement", None),
+        ):
+            body = f"### Breaking changes\nRetirement of `ubuntu-22.04` runner images.\n### Target date\n{prefix}: April 17th, 2027\n"
+            with self.subTest(prefix=prefix):
+                rows = parse_announcements([issue(10, body=body)])
+                self.assertEqual(rows["ubuntu-22.04"]["retirement"], retirement)
+                self.assertEqual(rows["ubuntu-22.04"]["needs_review"], retirement is None)
+
+    def test_long_near_matches_finish_and_keep_the_confirmed_retirement(self):
+        """Hostile comment, whitespace and template near-matches cannot stall parsing."""
+        base = "### Breaking changes\nRetirement of `ubuntu-22.04` runner images.\n### Target date\nRetirement: 2027-04-17\n"
+        padding = " " * 100_000
+        cases = {
+            "unclosed comments": "<!--" * 50_000 + "\n" + base,
+            "heading decoration": "### title" + padding + "!\n" + base,
+            "checked entry": base + "### Runner images affected\n- [x] title" + padding + "!\n",
+            "unheaded section": "prose\n" + "\n" * 100_000 + "unknown\n" + base,
+            "retirement prefix": base + "Retirement" + padding + "!\n",
+        }
+        program = """
+import json
+import sys
+sys.path.insert(0, sys.argv[1])
+from runner_catalog import parse_announcements
+print(json.dumps(parse_announcements([json.load(sys.stdin)])))
+"""
+        for name, body in cases.items():
+            with self.subTest(name=name):
+                result = subprocess.run(
+                    [sys.executable, "-c", program, str(ROOT / "tools" / "ci")],
+                    input=json.dumps(issue(11, body=body)), text=True,
+                    capture_output=True, check=True, timeout=10,
+                )
+                rows = json.loads(result.stdout)
+                self.assertEqual(set(rows), {"ubuntu-22.04"})
+                self.assertEqual(rows["ubuntu-22.04"]["retirement"], "2027-04-17")
+                self.assertFalse(rows["ubuntu-22.04"]["needs_review"])
+
     def test_retirement_date_ignores_brownouts_and_replacements(self):
         """Only the final retirement date and affected images become lifecycle data."""
         rows = parse_announcements([issue(14254, "announcement-14254.md")])
