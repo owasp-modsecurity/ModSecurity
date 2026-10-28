@@ -82,6 +82,7 @@ class RuleWithActions : public Rule {
         const Transaction *t);
     bool containsTag(const std::string& name, Transaction *t);
     bool containsMsg(const std::string& name, Transaction *t);
+    bool isActionUpdated(const std::string& name, const Transaction *t) const;
 
     inline bool isChained() const { return m_isChained == true; }
     inline bool hasCaptureAction() const { return m_containsCaptureAction == true; }
