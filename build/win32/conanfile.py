@@ -13,7 +13,7 @@ class ModSecurityConan(ConanFile):
         "libxml2/2.15.2",
         "lua/5.5.0",
         "libcurl/8.19.0",
-        "lmdb/0.9.32",
+        "lmdb/0.9.32@modsecurity/ci",
         "libmaxminddb/1.12.2",
         "dirent/1.24",
         "poco/1.14.2",

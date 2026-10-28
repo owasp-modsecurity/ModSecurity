@@ -1,0 +1,4 @@
+sources:
+  "0.9.32":
+    url: "https://github.com/LMDB/lmdb/archive/e96d8dfa3951c06062a6fffbe1d7a2f3c9c1ff76.tar.gz"
+    sha256: "6c8197c7f473953941cb49070d24e7318ec465b8a0224c284876db646bb8ede0"

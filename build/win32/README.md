@@ -42,6 +42,8 @@ where `[build_configuration]` can be: `Release` (default), `RelWithDebInfo`, `Mi
 
 `build/win32/conanfile.py` uses the Conan 2 `CMakeDeps`, `CMakeToolchain` and `cmake_layout` APIs. Generated files are placed in `build/win32/build/generators`. The build script first exports the local YAJL recipe as `yajl/2.1.0@modsecurity/ci`; this recipe fixes the CMake 4 policy and target-path incompatibilities without changing the Conan Center cache recipe. See the [local YAJL recipe notes](conan/yajl/README.md) for patch provenance and the conditions for removing this copy. Windows CI and release builds log the selected Conan/CMake executable paths and versions.
 
+The build script also exports `lmdb/0.9.32@modsecurity/ci` from the [local LMDB recipe](conan/lmdb/README.md). It downloads the unchanged LMDB 0.9.32 source revision from the official GitHub mirror with a pinned commit and SHA-256 checksum, avoiding rate limits at the original source host. The recipe and build instructions are shared by CI and release packaging.
+
 Built files will be located in the directory: `build\win32\build\[build_configuration]` and include:
 
  * `libModSecurity.dll`

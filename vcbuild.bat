@@ -24,6 +24,8 @@ if errorlevel 1 exit /b %errorlevel%
 
 conan export conan\yajl --user=modsecurity --channel=ci
 if errorlevel 1 goto error
+conan export conan\lmdb --version=0.9.32 --user=modsecurity --channel=ci
+if errorlevel 1 goto error
 
 conan install . -pr:h default -pr:b default -s:h compiler.cppstd=17 %CI_ASAN% --build=missing -s:h build_type=%build_type% -s:h arch=%arch%
 if errorlevel 1 goto error
