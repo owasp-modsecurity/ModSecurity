@@ -773,6 +773,58 @@ static int msre_op_validateHash_param_init(msre_rule *rule, char **error_msg) {
     return 1; /* OK */
 }
 
+/* Sets a TX:MSC_* flag to 1, where TX:/^MSC_/ rules see it. */
+static int msre_op_set_tx_flag(modsec_rec *msr, const char *name) {
+    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+
+    if (s == NULL) return -1;
+    s->name = apr_pstrdup(msr->mp, name);
+    if (s->name == NULL) return -1;
+    s->name_len = strlen(s->name);
+    s->value = apr_pstrdup(msr->mp, "1");
+    if (s->value == NULL) return -1;
+    s->value_len = 1;
+    apr_table_setn(msr->tx_vars, s->name, (void *)s);
+
+    return 1;
+}
+
+/* Tells whether a regex execution failed on a PCRE limit. */
+static int msre_op_pcre_limits_exceeded(int rc) {
+#ifndef WITH_PCRE
+    return (rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT);
+#else
+    return (rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)
+#ifdef PCRE_ERROR_JITSTACKLIMIT
+        /* Unlike msc_regexec_ex() with PCRE2, pcre_exec() does not retry
+         * without JIT when the JIT stack is full. */
+        || (rc == PCRE_ERROR_JITSTACKLIMIT)
+#endif
+        ;
+#endif
+}
+
+/* Flags and logs a regex execution that failed on a PCRE limit. A limit
+ * error is a regex error too, so both TX:MSC_PCRE_LIMITS_EXCEEDED and
+ * TX:MSC_PCRE_ERROR are set, the more specific one first. */
+static int msre_op_pcre_limits_error(modsec_rec *msr, msre_rule *rule, int rc,
+        const char *my_error_msg, char **error_msg) {
+    if (msre_op_set_tx_flag(msr, "MSC_PCRE_LIMITS_EXCEEDED") < 0) return -1;
+    if (msre_op_set_tx_flag(msr, "MSC_PCRE_ERROR") < 0) return -1;
+
+    *error_msg = apr_psprintf(msr->mp,
+            "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
+            "Execution error - "
+            "PCRE limits exceeded (%d): %s",
+            rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
+            rule->filename != NULL ? rule->filename : "-",
+            rule->line_num,rc, my_error_msg);
+
+    msr_log(msr, 3, "%s.", *error_msg);
+
+    return 1;
+}
+
 /**
  * \brief Execute function to validateHash
  *
@@ -845,7 +897,12 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
             if (regex == NULL) {
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
-                return 0;
+                msr_log(msr, 3, "%s.", *error_msg);
+                if (msre_op_set_tx_flag(msr, "MSC_PCRE_ERROR") < 0) return -1;
+
+                /* A regex error is neither a match nor a mismatch: return
+                 * what the negation in re.c turns into "no match". */
+                return rule->op_negated;
             }
 
             #ifdef WITH_PCRE_STUDY
@@ -889,37 +946,17 @@ static int msre_op_validateHash_execute(modsec_rec *msr, msre_rule *rule, msre_v
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
-#ifndef WITH_PCRE
-    if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
-#else
-    if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
-#endif
-        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
+    if (msre_op_pcre_limits_exceeded(rc)) {
+        if (msre_op_pcre_limits_error(msr, rule, rc, my_error_msg, error_msg) < 0) return -1;
 
-        if (s == NULL) return -1;
-        s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
-        if (s->name == NULL) return -1;
-        s->name_len = strlen(s->name);
-        s->value = apr_pstrdup(msr->mp, "1");
-        if (s->value == NULL) return -1;
-        s->value_len = 1;
-        apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-        *error_msg = apr_psprintf(msr->mp,
-                "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
-                "Execution error - "
-                "PCRE limits exceeded (%d): %s",
-                rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
-                rule->filename != NULL ? rule->filename : "-",
-                rule->line_num,rc, my_error_msg);
-
-        msr_log(msr, 3, "%s.", *error_msg);
-
-        return 0; /* No match. */
+        /* A regex error is neither a match nor a mismatch: return
+         * what the negation in re.c turns into "no match". */
+        return rule->op_negated;
     }
     else if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                 rc, my_error_msg);
+        msre_op_set_tx_flag(msr, "MSC_PCRE_ERROR");
         return -1;
     }
 
@@ -1050,22 +1087,6 @@ static int msre_op_rx_param_init(msre_rule *rule, char **error_msg) {
     return 1; /* OK */
 }
 
-/* Flags a regex error in TX:MSC_PCRE_ERROR, where TX:/^MSC_/ rules see it. */
-static int msre_op_rx_set_error_flag(modsec_rec *msr) {
-    msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-
-    if (s == NULL) return -1;
-    s->name = apr_pstrdup(msr->mp, "MSC_PCRE_ERROR");
-    if (s->name == NULL) return -1;
-    s->name_len = strlen(s->name);
-    s->value = apr_pstrdup(msr->mp, "1");
-    if (s->value == NULL) return -1;
-    s->value_len = 1;
-    apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-    return 1;
-}
-
 static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
     assert(msr != NULL);
     assert(rule != NULL);
@@ -1131,7 +1152,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
                 *error_msg = apr_psprintf(msr->mp, "Error compiling pattern (offset %d): %s",
                         erroffset, errptr);
                 msr_log(msr, 3, "%s.", *error_msg);
-                if (msre_op_rx_set_error_flag(msr) < 0) return -1;
+                if (msre_op_set_tx_flag(msr, "MSC_PCRE_ERROR") < 0) return -1;
 
                 /* A regex error is neither a match nor a mismatch: return
                  * what the negation in re.c turns into "no match". */
@@ -1209,31 +1230,8 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
      * and no memory has to be allocated for any backreferences.
      */
     rc = msc_regexec_capture(regex, target, target_length, ovector, 30, &my_error_msg);
-#ifndef WITH_PCRE
-    if ((rc == PCRE2_ERROR_MATCHLIMIT) || (rc == PCRE2_ERROR_RECURSIONLIMIT)) {
-#else
-    if ((rc == PCRE_ERROR_MATCHLIMIT) || (rc == PCRE_ERROR_RECURSIONLIMIT)) {
-#endif
-        msc_string *s = (msc_string *)apr_pcalloc(msr->mp, sizeof(msc_string));
-
-        if (s == NULL) return -1;
-        s->name = apr_pstrdup(msr->mp, "MSC_PCRE_LIMITS_EXCEEDED");
-        if (s->name == NULL) return -1;
-        s->name_len = strlen(s->name);
-        s->value = apr_pstrdup(msr->mp, "1");
-        if (s->value == NULL) return -1;
-        s->value_len = 1;
-        apr_table_setn(msr->tx_vars, s->name, (void *)s);
-
-        *error_msg = apr_psprintf(msr->mp,
-                "Rule %pp [id \"%s\"][file \"%s\"][line \"%d\"] - "
-                "Execution error - "
-                "PCRE limits exceeded (%d): %s",
-                rule,((rule->actionset != NULL)&&(rule->actionset->id != NULL)) ? rule->actionset->id : "-",
-                rule->filename != NULL ? rule->filename : "-",
-                rule->line_num,rc, my_error_msg);
-
-        msr_log(msr, 3, "%s.", *error_msg);
+    if (msre_op_pcre_limits_exceeded(rc)) {
+        if (msre_op_pcre_limits_error(msr, rule, rc, my_error_msg, error_msg) < 0) return -1;
 
         /* A regex error is neither a match nor a mismatch: return
          * what the negation in re.c turns into "no match". */
@@ -1242,7 +1240,7 @@ static int msre_op_rx_execute(modsec_rec *msr, msre_rule *rule, msre_var *var, c
     else if (rc < -1) {
         *error_msg = apr_psprintf(msr->mp, "Regex execution failed (%d): %s",
                 rc, my_error_msg);
-        msre_op_rx_set_error_flag(msr);
+        msre_op_set_tx_flag(msr, "MSC_PCRE_ERROR");
         return -1;
     }
 
