@@ -39,6 +39,14 @@ void DebugLog::setDebugLogFile(const std::string& fileName,
 }
 
 
+bool DebugLog::reopenDebugLogFile(std::string *error) {
+    if (!isLogFileSet()) {
+        return true;
+    }
+    return DebugLogWriter::reopen(m_fileName, error);
+}
+
+
 void DebugLog::setDebugLogLevel(int level) {
     m_debugLevel = level;
 }
