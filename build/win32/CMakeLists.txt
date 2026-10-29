@@ -36,7 +36,7 @@ add_library(libinjection STATIC ${LIBINJECTION_DIR}/src/libinjection_sqli.c ${LI
 
 # get libinjection version with git describe
 execute_process(
-    COMMAND git describe
+    COMMAND git describe --tags --match "v[0-9]*"
     WORKING_DIRECTORY ${LIBINJECTION_DIR}
     OUTPUT_VARIABLE LIBINJECTION_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE
