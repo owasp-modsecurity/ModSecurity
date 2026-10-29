@@ -170,6 +170,12 @@ Transaction::~Transaction() {
 
     m_rulesMessages.clear();
 
+    m_ruleRemoveById.clear();
+    m_ruleRemoveByIdRange.clear();
+    m_ruleRemoveByTag.clear();
+    m_ruleRemoveTargetById.clear();
+    m_ruleRemoveTargetByTag.clear();
+
     intervention::free(&m_it);
     intervention::clean(&m_it);
 
