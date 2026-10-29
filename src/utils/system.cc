@@ -36,6 +36,7 @@
 #if defined _MSC_VER
 #include "src/compat/msvc.h"
 #include <direct.h>
+#include <share.h>
 #elif defined __GNUC__
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,7 +49,7 @@
 
 // Public domain code from mingw-w64's winpthreads
 // https://sourceforge.net/p/mingw-w64/code/HEAD/tree/trunk/mingw-w64-libraries/winpthreads/src/clock.c
-// 
+//
 
 #define CLOCK_PROCESS_CPUTIME_ID    2
 #define POW10_7                 10000000
@@ -205,8 +206,8 @@ bool createDir(const std::string& dir, int mode, std::string *error) {
 
 bool isFile(const std::string& f) {
     struct stat fileInfo;
-    FILE *fp = fopen(f.c_str(), "r");
-    if (fp == NULL) {
+    FILE *fp = fopen_modsec(f.c_str(), "r");
+    if (fp == nullptr) {
         return false;
     }
     fstat(fileno(fp), &fileInfo);
@@ -219,6 +220,13 @@ bool isFile(const std::string& f) {
     return true;
 }
 
+FILE *fopen_modsec(const char *filename, const char *mode) {
+#if defined(_MSC_VER)
+    return _fsopen(filename, mode, _SH_DENYNO);
+#else
+    return fopen(filename, mode);
+#endif
+}
 
 }  // namespace utils
 }  // namespace modsecurity
