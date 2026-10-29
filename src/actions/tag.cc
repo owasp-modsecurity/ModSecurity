@@ -57,6 +57,14 @@ std::string Tag::getName(Transaction *transaction) {
 }
 
 
+bool Tag::hasName(std::string_view name, Transaction *transaction) {
+    if (m_staticName) {
+        return *m_staticName == name;
+    }
+    return getName(transaction) == name;
+}
+
+
 bool Tag::evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) {
     std::string tag = getName(transaction);
     ms_dbg_a(transaction, 9, "Rule tag: " + tag);
