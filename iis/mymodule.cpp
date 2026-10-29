@@ -639,9 +639,9 @@ CMyHttpModule::OnSendResponse(
 
          ZeroMemory(szLength, sizeof(szLength));
 
-         hr = StringCchPrintfA(
+          hr = StringCchPrintfA(
                     szLength, 
-                    sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+                    sizeof(szLength) / sizeof(CHAR), "%llu", 
                     ulTotalLength);
 
         if(FAILED(hr))
@@ -1139,7 +1139,7 @@ apr_status_t WriteBodyCallback(request_rec *r, char *buf, unsigned int length)
 
     HRESULT hr = StringCchPrintfA(
             szLength, 
-            sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+            sizeof(szLength) / sizeof(CHAR), "%u", 
             length);
 
     if(FAILED(hr))
@@ -1227,7 +1227,7 @@ apr_status_t WriteResponseCallback(request_rec *r, char *buf, unsigned int lengt
 
     HRESULT hr = StringCchPrintfA(
             szLength, 
-            sizeof(szLength) / sizeof(CHAR) - 1, "%d", 
+            sizeof(szLength) / sizeof(CHAR), "%u", 
             length);
 
     if(FAILED(hr))
