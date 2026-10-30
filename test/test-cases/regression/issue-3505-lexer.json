@@ -1,0 +1,1397 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F1: slash-bearing literal ARGS:a/b must not swallow ,deny,status:403 (still 403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetById=2;ARGS:a/b,deny,status:403\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F1-control: underscore literal ARGS:a_b still chains ,deny,status:403 (403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetById=2;ARGS:a_b,deny,status:403\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F1b: ByTag slash-bearing literal ARGS:a/b must not swallow ,deny,status:403 (403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetByTag=other;ARGS:a/b,deny,status:403\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog,tag:'other'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F1-parity: slash-bearing literal exclusion still applies (200 when key matches)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a%2Fb=secret",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:a/b\"",
+      "SecRule ARGS \"@contains secret\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F3: ctl ARGS:/regex/ must not wipe SecRule ARGS:/^k[0-9]$/ via synthetic fullName (k2 still 403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?k2=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/regex/\"",
+      "SecRule ARGS:/^k[0-9]$/ \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F3b: ctl ARGS:/0-9/ matches synthetic fullName only \u2014 VariableRegex kept (k2 still 403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?k2=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/0-9/\"",
+      "SecRule ARGS:/^k[0-9]$/ \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F3-control: ctl ARGS:/^k2$/ still excludes matching key from VariableRegex rule (200)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?k2=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^k2$/\"",
+      "SecRule ARGS:/^k[0-9]$/ \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F3-ByTag: ctl ARGS:/regex/ must not wipe VariableRegex (k2 still 403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?k2=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=test;ARGS:/regex/\"",
+      "SecRule ARGS:/^k[0-9]$/ \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F4: slash literal ARGS:a/b plus later tag:'x/y' must still deny (403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetById=2;ARGS:a/b,deny,status:403,tag:'x/y'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "F4b: ByTag slash literal ARGS:a/b plus later tag:'x/y' must still deny (403)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?evil=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:evil \"@contains attack\" \"id:1,phase:2,log,ctl:ruleRemoveTargetByTag=other;ARGS:a/b,deny,status:403,tag:'x/y'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog,tag:'other'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "T12: ById escaped \\/ + later setvar:tx.dir=/ must keep deny (403) [locks tip silent-200 swallow]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,setvar:tx.dir=/\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "T13: ByTag escaped \\/ + later tag:'a/b' must keep deny (403) [locks tip Unclosed/swallow]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetByTag=unused;ARGS:/^a\\/b$/,deny,status:403,tag:'a/b'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog,tag:'unused'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "T13b: ById escaped \\/ + later tag:'a/b' must keep deny (403) [exact PoC 2]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,tag:'a/b'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "T14: unescaped /^a/b$/ + setvar:tx.dir=/ must keep deny (403) [optional third]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a/b$/,deny,status:403,setvar:tx.dir=/\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "Escape-deny-only: mid-pattern \\/ + ,deny,status:403 with no later / still denies (403)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById: ARGS:/\\^\\(\\?"
+    },
+    "title": "Unsupported-char: ARGS:/^(?!x)/ fail-closed with clearer message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^(?!x)/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403,tag:'test'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "P2-ByTag-setvar: ByTag escaped \\/ + setvar:tx.dir=/ must keep deny (403) [tip silent-200]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetByTag=unused;ARGS:/^a\\/b$/,deny,status:403,setvar:tx.dir=/\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog,tag:'unused'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "P2-path-foo: ById escaped \\/ + setvar:tx.path=/foo (later / not only EOL) must keep deny (403)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,setvar:tx.path=/foo\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "P2-msg-slash: ById escaped \\/ + msg:'path/a/b' must keep deny (403) [later / in msg]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,msg:'path/a/b'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=a",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "P2-logdata-slash: ById escaped \\/ + logdata:'x/y' must keep deny (403) [later / in logdata]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:x \"@contains a\" \"id:1,phase:2,ctl:ruleRemoveTargetById=2;ARGS:/^a\\/b$/,deny,status:403,logdata:'x/y'\"",
+      "SecRule ARGS \"@contains never\" \"id:2,phase:2,pass,nolog\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=xx",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "P2-prefix-slash-tag: tag OWASP_CRS/ATTACK-LFI + ARGS:/^x{1,2}$/ excludes xx (200)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=OWASP_CRS/ATTACK-LFI;ARGS:/^x{1,2}$/\"",
+      "SecRule ARGS \"@contains xx\" \"id:1,phase:2,deny,status:403,tag:'OWASP_CRS/ATTACK-LFI'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?x=xx&y=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "title": "P2-prefix-slash-tag-sibling: same ctl does not exclude sibling (403)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetByTag=OWASP_CRS/ATTACK-LFI;ARGS:/^x{1,2}$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403,tag:'OWASP_CRS/ATTACK-LFI'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a%2Fb=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "P2-esc-mid: ARGS:/^a\\/b$/ excludes key a/b (200) [single \\/ in body]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a\\/b$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?foo%5C=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "P2-esc-double-close: ARGS:/foo\\\\/ loads as regex body foo\\\\ (literal backslash); key foo\\\\ still excluded path documented",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^foo\\\\$/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid regex in ctl:ruleRemoveTargetById: ARGS:/foo\\\\/"
+    },
+    "title": "P2-esc-odd-close: ARGS:/foo\\/ is closed-looking but pattern foo\\\\ invalid \u2192 parser_error Invalid regex",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/foo\\/\"",
+      "SecRule ARGS \"@contains attack\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-bang: ARGS:/^a!b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a!b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-lt: ARGS:/^a<b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a<b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-gt: ARGS:/^a>b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a>b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-hash: ARGS:/^a#b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a#b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-pct: ARGS:/^a%b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a%b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-amp: ARGS:/^a&b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a&b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Unclosed regex or unsupported character in ctl:ruleRemoveTargetById:"
+    },
+    "title": "Unsupported-matrix-tilde: ARGS:/^a~b/ fail-closed soft message (item 2)",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^a~b/\"",
+      "SecRule ARGS \"@contains test\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?aaa=aaa",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "title": "ReDoS-defer: nested quantifier (a+)+$ loads; short subject still excludes (200) [SecPcreMatchLimit deferred \u2014 same as VariableRegex]",
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:100,phase:1,pass,nolog,ctl:ruleRemoveTargetById=1;ARGS:/^(a+)+$/\"",
+      "SecRule ARGS \"@contains aaa\" \"id:1,phase:2,deny,status:403\""
+    ]
+  }
+]

@@ -1,3 +1,14 @@
+v3.0.18 - TBD
+---------------------
+
+  - [feat: Regex key support for ctl:ruleRemoveTargetById/ByTag (#3505):
+     slash-aware :/…/ tokenization ({m,n}); literals with '/' no longer
+     swallow trailing actions; VariableRegex synthetic fullName skipped for
+     regex exclusions. Public Transaction::m_ruleRemoveTargetBy{Id,Tag}
+     element types change to RuleRemoveTargetBy{Id,Tag}Entry; ByTag literal
+     full-name matching is now case-insensitive (same as ById).]
+    [PR #3526 - @etiennemunnich]
+
 v3.0.17 - 2026-Sep-29
 ---------------------
 
