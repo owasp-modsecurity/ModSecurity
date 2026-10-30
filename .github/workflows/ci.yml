@@ -28,11 +28,16 @@ jobs:
           - {label: "wo ssdeep",  opt: "--without-ssdeep" }
           - {label: "with lmdb",  opt: "--with-lmdb" }
           - {label: "with pcre", opt: "--with-pcre" }
+          - {label: "with log message escape", opt: "--enable-log-message-escape" }
         exclude:
           - platform: {label: "x32"}
             configure: {label: "wo geoip"}
           - platform: {label: "x32"}
             configure: {label: "wo ssdeep"}
+          - platform: {label: "x32"}
+            configure: {label: "with log message escape"}
+          - compiler: {label: "clang"}
+            configure: {label: "with log message escape"}
     steps:
       - name: Detect latest Lua dev package
         id: detect_lua
@@ -122,6 +127,7 @@ jobs:
           - {label: "wo maxmind", opt: "-DWITH_MAXMIND=OFF" }
           - {label: "wo libxml",  opt: "-DWITH_LIBXML2=OFF" }
           - {label: "with lmdb",  opt: "-DWITH_LMDB=ON" }
+          - {label: "with log message escape", opt: "-DLOG_MESSAGE_ESCAPE=ON" }
     steps:
       - uses: actions/checkout@v6
         with:

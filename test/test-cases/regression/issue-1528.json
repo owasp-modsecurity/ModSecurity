@@ -34,7 +34,7 @@
     },
     "expected": {
       "debug_log": "Rule returned 1",
-      "error_log": "Matched \"Operator `Rx' with parameter `\\^attack\\$'",
+      "error_log": "Operator `Rx' with parameter `\\^attack\\$'",
       "http_code": 200
     },
     "rules": [
