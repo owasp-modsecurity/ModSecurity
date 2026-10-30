@@ -101,9 +101,9 @@ jobs:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
       - name: make
-        run: make -j `nproc`
+        run: make -j "$(nproc)"
       - name: check
         run: make check
 
@@ -216,7 +216,7 @@ jobs:
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
 
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 
       - name: Compile
         run: make -j "$(nproc)"
@@ -272,7 +272,7 @@ jobs:
       - name: Configure
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
 
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 
       - name: Compile
         run: make -j "$(sysctl -n hw.logicalcpu)"
@@ -309,7 +309,7 @@ jobs:
           pip3 install conan --upgrade
           conan profile detect
 
-      - uses: ammaraskar/msvc-problem-matcher@master
+      - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
 
       - name: Build project
         shell: cmd
