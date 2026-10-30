@@ -259,7 +259,7 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
             has_content_length = true;
         }
     }
-    if (!has_content_length) {
+    if (!has_content_length && length != 0) {
         headers.emplace_back(std::pair{"Content-Length", std::to_string(length)});
     }
 }
