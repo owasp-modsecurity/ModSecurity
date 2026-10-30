@@ -87,6 +87,7 @@ TESTS+=test/test-cases/regression/operator-detectsqli.json
 TESTS+=test/test-cases/regression/operator-detectxss.json
 TESTS+=test/test-cases/regression/operator-fuzzyhash.json
 TESTS+=test/test-cases/regression/operator-inpectFile.json
+TESTS+=test/test-cases/regression/operator-ipMatch-overlapping.json
 TESTS+=test/test-cases/regression/operator-ipMatchFromFile.json
 TESTS+=test/test-cases/regression/operator-pm.json
 TESTS+=test/test-cases/regression/operator-pmfromfile.json
