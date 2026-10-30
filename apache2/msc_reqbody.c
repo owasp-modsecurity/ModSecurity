@@ -651,7 +651,8 @@ static apr_status_t modsecurity_request_body_end_urlencoded(modsec_rec *msr, cha
 }
 
 /**
- * Stops receiving the request body.
+ * Stops receiving the request body. Returns -2 for a JSON completion error,
+ * -5 for the no-files limit, and -1 for other failures.
  */
 apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
     assert(msr != NULL);
@@ -728,8 +729,8 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
                 msr_log(msr, 2, "%s", *error_msg);
-                 return -1;
-             }
+                return -2;
+            }
 #else
             *error_msg = apr_psprintf(msr->mp, "JSON support was not enabled");
             msr->msc_reqbody_error = 1;
