@@ -101,7 +101,7 @@ jobs:
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
       - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
       - name: make
-        run: make -j `nproc`
+        run: make -j "$(nproc)"
       - name: check
         run: make check
 
