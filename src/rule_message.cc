@@ -47,8 +47,9 @@ std::string RuleMessage::_details(const RuleMessage &rm) {
     msg.append(" [id \"" + std::to_string(rm.m_rule.m_ruleId) + "\"]");
     msg.append(" [rev \"" + utils::string::toHexIfNeeded(rm.m_rule.m_rev, true) + "\"]");
     msg.append(" [msg \"" +
-        utils::string::toHexIfNeeded(
-            rm.m_message, kEscapeLogMessage) + "\"]");
+        (kEscapeLogMessage
+            ? utils::string::toHexIfNeeded(rm.m_message, true)
+            : rm.m_message) + "\"]");
     msg.append(" [data \"" + utils::string::toHexIfNeeded(utils::string::limitTo(200, rm.m_data), true) + "\"]");
     msg.append(" [severity \"" +
         std::to_string(rm.m_severity) + "\"]");
@@ -60,14 +61,17 @@ std::string RuleMessage::_details(const RuleMessage &rm) {
         msg.append(" [tag \"" + utils::string::toHexIfNeeded(a, true) + "\"]");
     }
 
-    msg.append(" [hostname \"" + utils::string::toHexIfNeeded(
-        rm.m_transaction.m_requestHostName, kEscapeLogMessage) + "\"]");
-    msg.append(" [uri \"" + utils::string::toHexIfNeeded(
-        utils::string::limitTo(200,
-            rm.m_transaction.m_uri_no_query_string_decoded),
-        kEscapeLogMessage) + "\"]");
-    msg.append(" [unique_id \"" + utils::string::toHexIfNeeded(
-        rm.m_transaction.m_id, kEscapeLogMessage) + "\"]");
+    msg.append(" [hostname \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(rm.m_transaction.m_requestHostName, true)
+        : rm.m_transaction.m_requestHostName) + "\"]");
+    msg.append(" [uri \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(utils::string::limitTo(200,
+            rm.m_transaction.m_uri_no_query_string_decoded), true)
+        : utils::string::limitTo(200,
+            rm.m_transaction.m_uri_no_query_string_decoded)) + "\"]");
+    msg.append(" [unique_id \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(rm.m_transaction.m_id, true)
+        : rm.m_transaction.m_id) + "\"]");
     msg.append(" [ref \"" + utils::string::limitTo(200, rm.m_reference) + "\"]");
 
     return msg;
@@ -85,14 +89,17 @@ std::string RuleMessage::_details(const RuleMessage &rm) {
 std::string RuleMessage::_errorLogTail(const RuleMessage &rm) {
     std::string msg;
 
-    msg.append("[hostname \"" + utils::string::toHexIfNeeded(
-        rm.m_transaction.m_serverIpAddress, kEscapeLogMessage) + "\"]");
-    msg.append(" [uri \"" + utils::string::toHexIfNeeded(
-        utils::string::limitTo(200,
-            rm.m_transaction.m_uri_no_query_string_decoded),
-        kEscapeLogMessage) + "\"]");
-    msg.append(" [unique_id \"" + utils::string::toHexIfNeeded(
-        rm.m_transaction.m_id, kEscapeLogMessage) + "\"]");
+    msg.append("[hostname \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(rm.m_transaction.m_serverIpAddress, true)
+        : rm.m_transaction.m_serverIpAddress) + "\"]");
+    msg.append(" [uri \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(utils::string::limitTo(200,
+            rm.m_transaction.m_uri_no_query_string_decoded), true)
+        : utils::string::limitTo(200,
+            rm.m_transaction.m_uri_no_query_string_decoded)) + "\"]");
+    msg.append(" [unique_id \"" + (kEscapeLogMessage
+        ? utils::string::toHexIfNeeded(rm.m_transaction.m_id, true)
+        : rm.m_transaction.m_id) + "\"]");
 
     return msg;
 }

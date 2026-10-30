@@ -90,8 +90,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "msg (unquoted action value): escaped double quote immediately after a %{macro} does not truncate the action value",
-    "url": "https://github.com/owasp-modsecurity/ModSecurity/pull/3641#pullrequestreview",
+    "title": "RuleMessage text log preserves legacy quotes and backslashes in a macro-expanded message",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -128,8 +127,9 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule REQUEST_METHOD \"@unconditionalMatch\" \"phase:1,id:10007,log,pass,msg:prefix%{REQUEST_METHOD}\\\"suffix\""
-    ]
+      "SecRule REQUEST_METHOD \"@unconditionalMatch\" \"phase:1,id:3601003,log,pass,msg:prefix%{REQUEST_METHOD}\\\"suffix\""
+    ],
+    "github_issue": 3601
   },
   {
     "enabled": 1,
