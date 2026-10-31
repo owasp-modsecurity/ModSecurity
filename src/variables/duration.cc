@@ -15,6 +15,7 @@
 
 #include "src/variables/duration.h"
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,7 +31,11 @@ namespace variables {
 void Duration::evaluate(Transaction *transaction,
     RuleWithActions *rule,
     std::vector<const VariableValue *> *l) {
-    double e = utils::cpu_seconds() - transaction->m_creationTimeStamp;
+    // Elapsed wall-clock time since the transaction was created, in whole
+    // microseconds (same unit and type as v2: apr_time_now() - request_time).
+    const double now = utils::steady_micros();
+    const int64_t e = static_cast<int64_t>(
+        now - transaction->m_creationTimeStamp);
 
     transaction->m_variableDuration.assign(std::to_string(e));
 
