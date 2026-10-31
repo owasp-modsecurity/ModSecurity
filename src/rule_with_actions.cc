@@ -124,7 +124,7 @@ RuleWithActions::RuleWithActions(
                     }
                     break;
                 default:
-                    std::cout << "General failure, action: " << a->m_name;
+                    std::cout << "General failure, action: " << *a->m_name.get();
                     std::cout << " has an unknown type." << std::endl;
                     delete a;
                     #ifdef NDEBUG
