@@ -1,4 +1,4 @@
-name: Quality Assurance new
+name: Quality Assurance
 
 on:
   push:
@@ -82,7 +82,7 @@ jobs:
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
         run: |
-          sudo apt-get install g++-multilib
+          sudo apt-get install -y g++-multilib
           sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
                                   libpcre3-dev:${{ matrix.platform.arch }}
       - name: Setup Dependencies (x64)
@@ -231,7 +231,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15,macos-26,xcode-27]
+        os: [macos-15,macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -243,6 +243,12 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",       opt: "--with-pcre" }
+
+        include:
+          - os: xcode-27
+            configure: { label: "with pcre2 (default)", opt: "" }
+          - os: xcode-27
+            configure: { label: "with parser generation", opt: "--enable-parser-generation" }
 
     steps:
       - uses: actions/checkout@v7
