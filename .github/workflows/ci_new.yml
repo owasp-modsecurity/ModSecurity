@@ -88,8 +88,10 @@ jobs:
       - name: Setup Dependencies (x64)
         if: ${{ matrix.platform.label == 'x64' }}
         run: |
-          sudo apt-get install -y libfuzzy-dev:${{ matrix.platform.arch }}
-
+          sudo apt-get install -y libfuzzy-dev:${{ matrix.platform.arch }} \
+                                  libxml2-dev:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }}
+                                  
       - uses: actions/checkout@v7
         with:
           submodules: recursive
