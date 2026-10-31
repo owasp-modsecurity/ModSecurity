@@ -1,4 +1,4 @@
-name: Quality Assurance new
+name: Quality Assurance
 
 on:
   push:
@@ -8,16 +8,121 @@ permissions:
   contents: read
 
 jobs:
+  # Keep legacy Ubuntu 22.04 coverage, including x32, in a self-contained job.
+  # Remove this job when the legacy matrix is no longer needed.
+  build-linux-old:
+    name: Linux (old, ${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04]
+        platform:
+          - {label: "x64", arch: "amd64", configure: ""}
+          - {label: "x32", arch: "i386", configure: "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32"}
+        compiler:
+          - {label: "gcc", cc: "gcc", cxx: "g++"}
+          - {label: "clang", cc: "clang", cxx: "clang++"}
+        configure:
+          - {label: "with parser generation", opt: "--enable-parser-generation" }
+          - {label: "wo curl",    opt: "--without-curl" }
+          - {label: "wo lua",     opt: "--without-lua" }
+          - {label: "wo maxmind", opt: "--without-maxmind" }
+          - {label: "wo libxml",  opt: "--without-libxml" }
+          - {label: "wo geoip",   opt: "--without-geoip" }
+          - {label: "wo ssdeep",  opt: "--without-ssdeep" }
+          - {label: "with lmdb",  opt: "--with-lmdb" }
+          - {label: "with pcre", opt: "--with-pcre" }
+        exclude:
+          - platform: {label: "x32"}
+            configure: {label: "wo geoip"}
+          - platform: {label: "x32"}
+            configure: {label: "wo ssdeep"}
+    steps:
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update -y -qq
+
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua package"
+            exit 1
+          fi
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
+
+      - name: Setup Dependencies (common)
+        run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
+          sudo apt-get update -y -qq
+          sudo apt-get install -y libyajl-dev:${{ matrix.platform.arch }} \
+                                  libcurl4-openssl-dev:${{ matrix.platform.arch }} \
+                                  liblmdb-dev:${{ matrix.platform.arch }} \
+                                  ${{ steps.detect_lua.outputs.lua_pkg }}:${{ matrix.platform.arch }} \
+                                  libmaxminddb-dev:${{ matrix.platform.arch }} \
+                                  libpcre2-dev:${{ matrix.platform.arch }} \
+                                  pcre2-utils:${{ matrix.platform.arch }} \
+                                  bison flex python3 python3-venv
+      - name: Setup Dependencies (x32)
+        if: ${{ matrix.platform.label == 'x32' }}
+        run: |
+          sudo apt-get install -y g++-multilib
+          sudo apt-get install -y libxml2-dev:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }}
+      - name: Setup Dependencies (x64)
+        if: ${{ matrix.platform.label == 'x64' }}
+        run: |
+          sudo apt-get install -y libfuzzy-dev:${{ matrix.platform.arch }} \
+                                  libxml2-dev:${{ matrix.platform.arch }} \
+                                  libpcre3-dev:${{ matrix.platform.arch }}
+                                  
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: build.sh
+        run: ./build.sh
+      - name: configure
+        env:
+          CC: ${{ matrix.compiler.cc }}
+          CXX: ${{ matrix.compiler.cxx }}
+        run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
+      - name: make
+        run: make -j "$(nproc)"
+      - name: check
+        run: make check
+
   build-linux:
-    name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    name: Linux (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
 
     # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
     # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04,ubuntu-26.04]
         platform:
           - { label: "x64", arch: "amd64", configure: "" }
 
@@ -36,9 +141,13 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
+        exclude:
+          # Ubuntu 26.04 no longer provides the PCRE1 development package.
+          - os: ubuntu-26.04
+            configure: { label: "with pcre", opt: "--with-pcre" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -88,12 +197,15 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
-            libpcre3-dev \
             bison \
             flex \
             pkg-config \
             python3 \
             python3-venv
+
+      - name: Install PCRE1 development package
+        if: matrix.os != 'ubuntu-26.04'
+        run: sudo apt-get install -y libpcre3-dev
 
       - name: Show Lua installation
         run: |
@@ -119,13 +231,13 @@ jobs:
         run: make check
 
   build-macos:
-    name: macOS (${{ matrix.configure.label }})
+    name: macOS (${{ matrix.os }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
+        os: [macos-15,macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -138,8 +250,14 @@ jobs:
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",       opt: "--with-pcre" }
 
+        include:
+          - os: xcode-27
+            configure: { label: "with pcre2 (default)", opt: "" }
+          - os: xcode-27
+            configure: { label: "with parser generation", opt: "--enable-parser-generation" }
+
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -197,7 +315,7 @@ jobs:
           - { label: "with lmdb",        opt: "-DWITH_LMDB=ON" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -257,7 +375,7 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -289,7 +407,7 @@ jobs:
       - name: Mark repo as safe for git
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
         
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
