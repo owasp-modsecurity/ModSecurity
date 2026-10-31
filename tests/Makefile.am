@@ -75,7 +75,8 @@ msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 
 check_SCRIPTS = run-unit-tests.pl
-TESTS = $(check_SCRIPTS)
+TESTS = $(check_SCRIPTS) test-pcre-rpath-optin.sh
+EXTRA_DIST = test-pcre-rpath-optin.sh
 
 test: check
 
