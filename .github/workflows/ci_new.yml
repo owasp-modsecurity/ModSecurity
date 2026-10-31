@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   # Keep legacy Ubuntu 22.04 coverage, including x32, in a self-contained job.
   # Remove this job when the legacy matrix is no longer needed.
@@ -146,6 +149,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
@@ -255,6 +259,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
           
@@ -289,12 +294,15 @@ jobs:
         run: make check
 
   build-windows:
-    name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2022
+    name: Windows (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.configure.label }})
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
+      # Limit simultaneous dependency downloads to reduce upstream rate limiting.
+      max-parallel: 2
       matrix:
+        os: [windows-2022, windows-2025-vs2026]
         platform:
           - { label: "x64", arch: "x86_64" }
         configuration: [Release]
@@ -309,13 +317,24 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan --upgrade
-          conan profile detect
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"
+          Get-Command conan, cmake | Select-Object Name, Source
+          conan --version
+          cmake --version
+          conan profile detect --force
+          $conf = Join-Path (conan config home) "global.conf"
+          Add-Content $conf "tools.files.download:retry=10"
+          Add-Content $conf "tools.files.download:retry_wait=30"
+
+      - name: Test LMDB source fallback
+        if: matrix.configure.label == 'full'
+        run: python -m unittest discover -s build/win32/conan/lmdb/tests -v
 
       - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
 
@@ -358,6 +377,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
@@ -389,6 +409,7 @@ jobs:
         
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
           

@@ -1,0 +1,8 @@
+sources:
+  "0.9.32":
+    url: "https://git.openldap.org/openldap/openldap/-/archive/LMDB_0.9.32/openldap-LMDB_0.9.32.tar.gz"
+    sha256: "c0937223bba3c37c896809883a3c9b43049354578b239d6ed2476236a87f40c9"
+fallback_sources:
+  "0.9.32":
+    url: "https://github.com/LMDB/lmdb/archive/e96d8dfa3951c06062a6fffbe1d7a2f3c9c1ff76.tar.gz"
+    sha256: "6c8197c7f473953941cb49070d24e7318ec465b8a0224c284876db646bb8ede0"
