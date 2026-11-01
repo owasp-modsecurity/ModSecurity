@@ -22,6 +22,7 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_with_actions.h"
 #include "modsecurity/rule_message.h"
 
 /*
@@ -47,7 +48,7 @@ namespace actions {
 
 
 bool Msg::evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) {
-    const auto msg = data(transaction);
+    const auto msg = m_string->evaluate(transaction, rule);
     ruleMessage.m_message = msg;
     ms_dbg_a(transaction, 9, "Saving msg: " + msg);
 
