@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (1/6) :: exec, m.getvar(\"RULE.id\")",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (1/7) :: exec, m.getvar(\"RULE.id\")",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -49,7 +49,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (2/6) :: SecRuleScript, m.getvar(\"RULE.id\")",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (2/7) :: SecRuleScript, m.getvar(\"RULE.id\")",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -95,7 +95,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (3/6) :: exec, m.getvar(\"UNKNOWN_VARIABLE\")",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (3/7) :: exec, m.getvar(\"UNKNOWN_VARIABLE\")",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -141,7 +141,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (4/6) :: exec, m.getvars(\"RULE\")",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (4/7) :: exec, m.getvars(\"RULE\")",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -187,7 +187,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (5/6) :: exec, m.getvars(\"RULE.id\")",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (5/7) :: exec, m.getvars(\"RULE.id\")",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -233,7 +233,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (6/6) :: exec, RULE.id copied to TX with setvar",
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (6/7) :: exec, RULE.id copied to TX with setvar",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -273,6 +273,52 @@
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS:param1 \"@streq value1\" \"id:105,phase:2,pass,setvar:tx.rule_id=%{RULE.id},exec:test-cases/data/lua-getvar-tx-rule-id.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (7/7) :: exec, name with a newline from the request",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1&name=FOO%0ABAR",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: FOO\\\\x0aBAR\\..*The variable named in the request is not available from Lua\\."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:106,phase:2,pass,exec:test-cases/data/lua-getvar-name-from-request.lua\""
     ]
   }
 ]

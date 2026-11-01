@@ -272,7 +272,7 @@ int Lua::getvar(lua_State *L) {
         var = variables::Variable::stringMatchResolve(t, varname);
     } catch (const std::invalid_argument &) {
         ms_dbg_a(t, 2, "Lua: m.getvar(): unknown variable: "
-            + std::string(varname) + ".");
+            + utils::string::toHexIfNeeded(varname) + ".");
         lua_pushnil(L);
         return 1;
     }
@@ -307,7 +307,7 @@ int Lua::getvars(lua_State *L) {
         variables::Variable::stringMatchResolveMulti(t, varname, &l);
     } catch (const std::invalid_argument &) {
         ms_dbg_a(t, 2, "Lua: m.getvars(): unknown variable: "
-            + std::string(varname) + ".");
+            + utils::string::toHexIfNeeded(varname) + ".");
         lua_newtable(L);
         return 1;
     }
