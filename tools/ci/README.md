@@ -20,8 +20,9 @@ The Windows 2025 exclusion records the dependency on the
 [Windows build migration in #3715](https://github.com/owasp-modsecurity/ModSecurity/pull/3715).
 Review that exclusion after the build migration is integrated.
 
-The legacy Ubuntu 22.04 job in `ci.yml` stays fixed. The manifest's `pinned`
-entries keep that coverage visible to the monitor. Existing runners are retained
+The legacy Ubuntu 22.04 `build-linux-old` job in `ci_new.yml` stays fixed.
+Xcode 27 retains its default PCRE2 and parser-generation checks. The manifest's
+`pinned` entries keep both fixed runners visible to the monitor. Existing runners are retained
 even when deprecated, retired or absent from the catalog; a maintainer must review
 their replacement or removal. A retirement marker does not make an unavailable
 runner usable.

@@ -8,11 +8,14 @@ Generated from GitHub's runner catalog and retirement announcements. Review runn
 | `macos-26` | active | not announced | [GitHub](https://raw.githubusercontent.com/actions/runner-images/main/README.md) |
 | `ubuntu-22.04` | deprecated | 2027-04-17 | [GitHub](https://github.com/actions/runner-images/issues/14254) |
 | `ubuntu-24.04` | active | not announced | [GitHub](https://raw.githubusercontent.com/actions/runner-images/main/README.md) |
+| `ubuntu-26.04` | active | not announced | [GitHub](https://raw.githubusercontent.com/actions/runner-images/main/README.md) |
 | `windows-2022` | active | not announced | [GitHub](https://raw.githubusercontent.com/actions/runner-images/main/README.md) |
+| `xcode-27` | active | not announced | [GitHub](https://raw.githubusercontent.com/actions/runner-images/main/README.md) |
 
 ## Pinned coverage
 
-- `ubuntu-22.04`: Legacy Linux x32/x64 coverage in ci.yml; keep this runner until a replacement for the 32-bit build is reviewed.
+- `ubuntu-22.04`: Legacy Linux x32/x64 coverage in the build-linux-old job in ci_new.yml; keep this runner until a replacement for the 32-bit build is reviewed.
+- `xcode-27`: Fixed macOS coverage in ci_new.yml for the default PCRE2 build and parser generation.
 
 ## Excluded additions
 

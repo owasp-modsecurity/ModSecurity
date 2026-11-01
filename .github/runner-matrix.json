@@ -8,7 +8,8 @@
       "family": "ubuntu",
       "architecture": "x64",
       "labels": [
-        "ubuntu-24.04"
+        "ubuntu-24.04",
+        "ubuntu-26.04"
       ],
       "pcre1_labels": [
         "ubuntu-24.04"
@@ -36,7 +37,8 @@
     }
   },
   "pinned": {
-    "ubuntu-22.04": "Legacy Linux x32/x64 coverage in ci.yml; keep this runner until a replacement for the 32-bit build is reviewed."
+    "ubuntu-22.04": "Legacy Linux x32/x64 coverage in the build-linux-old job in ci_new.yml; keep this runner until a replacement for the 32-bit build is reviewed.",
+    "xcode-27": "Fixed macOS coverage in ci_new.yml for the default PCRE2 build and parser generation."
   },
   "lifecycle": {
     "macos-15": {
@@ -64,6 +66,18 @@
       "needs_review": false
     },
     "windows-2022": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    },
+    "ubuntu-26.04": {
+      "status": "active",
+      "retirement": null,
+      "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
+      "needs_review": false
+    },
+    "xcode-27": {
       "status": "active",
       "retirement": null,
       "source": "https://raw.githubusercontent.com/actions/runner-images/main/README.md",
