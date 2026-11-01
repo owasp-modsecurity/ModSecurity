@@ -325,9 +325,6 @@ int Lua::setvar(lua_State *L) {
     Transaction *t(NULL);
     const char *var_value(NULL);
     const char *var_name(NULL);
-    std::string vname;
-    std::string collection;
-    std::string variableName;
     int nargs = lua_gettop(L);
     size_t pos;
     void *z(NULL);
@@ -337,21 +334,23 @@ int Lua::setvar(lua_State *L) {
     t = reinterpret_cast<Transaction *>(z);
 
 
+    /* A lua_CFunction returns the number of values it pushed, so the
+     * error paths return 0 (the script gets nil), never a negative value.
+     */
     if (nargs != 2) {
         ms_dbg_a(t, 8,
-            "m.setvar: Failed m.setvar funtion must has 2 arguments");
-        return -1;
+            "m.setvar: Failed m.setvar function must have 2 arguments");
+        return 0;
     }
+    /* luaL_checkstring() raises a Lua error (longjmp) on a non-string
+     * argument, so call it before any C++ object with a destructor exists.
+     */
     var_value = luaL_checkstring(L, 2);
     var_name = luaL_checkstring(L, 1);
 
-    lua_pop(L, 2);
-
-    if (var_value == NULL || var_name == NULL) {
-        return -1;
-    }
-
-    vname.assign(var_name);
+    std::string vname(var_name);
+    std::string collection;
+    std::string variableName;
     pos = vname.find(".");
     if (pos != std::string::npos) {
         collection = std::string(vname, 0, pos);
@@ -363,7 +362,7 @@ int Lua::setvar(lua_State *L) {
         ms_dbg_a(t, 8,
             "m.setvar: Must specify a collection using dot character" \
             " - ie m.setvar(tx.myvar,mydata)");
-        return -1;
+        return 0;
     }
 
     if (collection == "TX") {
