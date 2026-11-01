@@ -115,6 +115,16 @@ Windows build information can be found [here](build/win32/README.md).
   * **Default:** PCRE2 is detected and used.
   * **Fallback:** legacy PCRE can be used if `--with-pcre` is explicitly provided (`WITH_PCRE`).
 * In other words, current builds expect PCRE2 unless explicitly configured otherwise.
+* `@rx` and `@rxGlobal` compile patterns with `DOTALL | MULTILINE` by default: `DOTALL`
+  lets `.` match newlines, and `MULTILINE` lets `^`/`$` anchor at every internal line
+  break rather than only at the start/end of the whole subject. Pass
+  `--enable-regex-dollar-endonly=yes` to compile them with `DOTALL | DOLLAR_ENDONLY`
+  instead: without `MULTILINE`, `^`/`$` anchor only at the start/end of the whole
+  subject, and `DOLLAR_ENDONLY` further restricts `$` to match only there rather than
+  also just before a trailing newline. `DOTALL` is unchanged either way, so patterns
+  can still match across internal line breaks via `.`. This matches ModSecurity v2's
+  `@rx` behavior. The flag is disabled by default; see
+  [issue #3295](https://github.com/owasp-modsecurity/ModSecurity/issues/3295).
 
 All other dependencies are related to operators specified within SecRules or configuration directives and may not be required for compilation.
 
@@ -446,9 +456,13 @@ is one.
 
 ### Security issue
 
-Please do not make public any security issue. Contact us at:
-modsecurity@owasp.org reporting the issue. Once the problem is fixed your
-credit will be given.
+Please do not report security issues publicly. Instead, open a
+[draft security advisory](https://github.com/owasp-modsecurity/ModSecurity/security/advisories/new)
+on GitHub so the report stays private while the maintainers triage it and
+prepare a fix. The advisory is published together with the fixed release, and
+reporters are credited in it.
+
+If you cannot use GitHub, email modsecurity@owasp.org instead.
 
 ## Feature request
 

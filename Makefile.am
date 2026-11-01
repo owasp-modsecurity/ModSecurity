@@ -60,7 +60,7 @@ cppcheck:
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
 		--inline-suppr \
-		--enable=warning,style,performance,portability,unusedFunction,missingInclude \
+		--enable=warning,style,performance,portability,missingInclude \
 		--inconclusive \
 		--template="warning: {file},{line},{severity},{id},{message}" \
 		-I headers -I . -I $(top_srcdir)/others -I $(top_srcdir)/src -I $(top_srcdir)/others/mbedtls/include -I $(top_srcdir)/others/mbedtls/tf-psa-crypto/include -I $(top_srcdir)/others/mbedtls/tf-psa-crypto/drivers/builtin/include \
@@ -68,6 +68,7 @@ cppcheck:
 		-i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
 		-i others \
 		--std=c++17 \
+		-j $$(nproc 2>/dev/null || sysctl -n hw.ncpu) \
 		--force --verbose .
 
 

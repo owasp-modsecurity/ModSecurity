@@ -1134,7 +1134,7 @@ int Transaction::processResponseBody() {
 
     const std::set<std::string> &bi = \
         m_rules->m_responseBodyTypeToBeInspected.m_value;
-    auto t = bi.find(m_variableResponseContentType.m_value);
+    auto t = bi.find(utils::string::tolower(m_variableResponseContentType.m_value));
     if (t == bi.end()
         && m_rules->m_responseBodyTypeToBeInspected.m_set == true) {
         ms_dbg(5, "Response Content-Type is " \
@@ -1185,7 +1185,7 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
 
     const std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
-    auto t = bi.find(m_variableResponseContentType.m_value);
+    auto t = bi.find(utils::string::tolower(m_variableResponseContentType.m_value));
     if (t == bi.end() && bi.empty() == false) {
         ms_dbg(4, "Not appending response body. " \
             "Response Content-Type is " \

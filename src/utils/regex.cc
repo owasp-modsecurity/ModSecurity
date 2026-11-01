@@ -87,11 +87,12 @@ bool crlfIsNewline() {
     return crlf_is_newline;
 }
 
-Regex::Regex(const std::string& pattern_, bool ignoreCase)
+Regex::Regex(const std::string& pattern_, bool ignoreCase, bool multiLine)
     : pattern(pattern_.empty() ? ".*" : pattern_) {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_pattern = reinterpret_cast<PCRE2_SPTR>(pattern.c_str());
-    uint32_t pcre2_options = (PCRE2_DOTALL|PCRE2_MULTILINE);
+    uint32_t pcre2_options = PCRE2_DOTALL |
+        (multiLine ? PCRE2_MULTILINE : PCRE2_DOLLAR_ENDONLY);
     if (ignoreCase) {
         pcre2_options |= PCRE2_CASELESS;
     }
@@ -103,7 +104,7 @@ Regex::Regex(const std::string& pattern_, bool ignoreCase)
 #else
     const char *errptr = nullptr;
     int erroffset;
-    int flags = (PCRE_DOTALL|PCRE_MULTILINE);
+    int flags = PCRE_DOTALL | (multiLine ? PCRE_MULTILINE : PCRE_DOLLAR_ENDONLY);
 
     if (ignoreCase == true) {
         flags |= PCRE_CASELESS;
@@ -261,6 +262,12 @@ RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>
         }
         int rc = pcre2_match(m_pc, pcre2_s, s.length(),
                             startOffset, pcre2_options, match_data, static_cast<pcre2_match_context*>(match_context));
+
+        RegexResult regex_result = to_regex_result(rc);
+        if (regex_result != RegexResult::Ok) {
+            pcre2_match_data_free(match_data);
+            return regex_result;
+        }
         const PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 
 #else

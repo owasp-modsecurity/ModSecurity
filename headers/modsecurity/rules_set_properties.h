@@ -31,6 +31,7 @@
 #include <set>
 #include <cstring>
 #include <limits>
+#include <algorithm>
 #include <cstdint>
 #endif
 
@@ -96,7 +97,7 @@ public:
     }
 
     // default parser
-    bool parse(const std::string& a, std::string* errmsg = nullptr) {
+    virtual bool parse(const std::string& a, std::string* errmsg = nullptr) {
 
         // use an alias type because the template can convert both signed and unsigned int
         using LimitSigned = std::conditional_t<std::is_signed_v<T>, std::int64_t, std::uint64_t>;
@@ -188,6 +189,33 @@ class ConfigUnsignedInt : public ConfigValue<uint32_t> {
 protected:
     uint32_t maxValue() const override {
         return std::numeric_limits<uint32_t>::max();
+    }
+};
+
+/**
+ * Octal variant for file modes (SecUploadFileMode): "0640" is 0640, not 640.
+ */
+class ConfigOctalInt : public ConfigUnsignedInt {
+ public:
+    bool parse(const std::string& a, std::string* errmsg = nullptr) override {
+        if (a.empty() || a.find_first_not_of("01234567") != std::string::npos) {
+            if (errmsg) {
+                *errmsg = "Invalid octal number";
+            }
+            return false;
+        }
+        // Leading zeroes are not significant ("000640" is still 0640).
+        const std::string digits = a.substr(
+            std::min(a.find_first_not_of('0'), a.size() - 1));
+        // 11 octal digits always fit in uint64_t, so stoull cannot throw;
+        // the base class then checks the value against uint32_t.
+        if (digits.size() > 11) {
+            if (errmsg) {
+                *errmsg = "Value is too big.";
+            }
+            return false;
+        }
+        return ConfigUnsignedInt::parse(std::to_string(std::stoull(digits, nullptr, 8)), errmsg);
     }
 };
 
@@ -607,7 +635,7 @@ class RulesSetProperties {
     ConfigUnsignedLong m_responseBodyLimit;
     ConfigUnsignedInt m_pcreMatchLimit;
     ConfigUnsignedInt m_uploadFileLimit;
-    ConfigUnsignedInt m_uploadFileMode;
+    ConfigOctalInt m_uploadFileMode;
     DebugLog *m_debugLog;
     OnFailedRemoteRulesAction m_remoteRulesActionOnFailed;
     RuleEngine m_secRuleEngine;
