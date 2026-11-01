@@ -117,6 +117,7 @@ jobs:
         run: sudo make install
       - name: prepare config
         run: |
+          sudo a2enmod unique_id
           sudo cp .github/security2.conf /etc/apache2/mods-enabled/
           sudo cp modsecurity.conf-recommended /etc/apache2/modsecurity.conf
           sudo cp unicode.mapping /etc/apache2/
