@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (1/11)",
+    "title": "Testing Variables :: RULE (1/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -48,7 +48,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (2/11)",
+    "title": "Testing Variables :: RULE (2/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -94,7 +94,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (3/11)",
+    "title": "Testing Variables :: RULE (3/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -140,7 +140,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (4/11)",
+    "title": "Testing Variables :: RULE (4/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -186,7 +186,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (5/11)",
+    "title": "Testing Variables :: RULE (5/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -232,7 +232,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (6/11)",
+    "title": "Testing Variables :: RULE (6/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -278,7 +278,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (7/11)",
+    "title": "Testing Variables :: RULE (7/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -324,7 +324,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (8/11)",
+    "title": "Testing Variables :: RULE (8/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -370,7 +370,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (9/11)",
+    "title": "Testing Variables :: RULE (9/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -416,7 +416,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (10/11)",
+    "title": "Testing Variables :: RULE (10/13)",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -463,7 +463,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Variables :: RULE (11/11)",
+    "title": "Testing Variables :: RULE (11/13)",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -505,6 +505,98 @@
       "SecRuleEngine On",
       "SecAction \"id:111,phase:3,pass,setvar:tx.score=5\"",
       "SecAction \"id:112,phase:3,pass,setvar:tx.score=+%{RULE.id}\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: RULE (12/13)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=value1&param2=value2"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving variable: TX:score_113 with value: 6",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:113,phase:3,pass,setvar:tx.score_%{RULE.id}=5,setvar:tx.score_%{RULE.id}=+1\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: RULE (13/13)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "27",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=value1&param2=value2"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving variable: TX:score_114 with value: 6",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_METHOD \"@streq POST\" \"id:114,phase:3,pass,setvar:tx.score_%{RULE.id}=5,setvar:tx.score_%{RULE.id}=+1\""
     ]
   }
 ]
