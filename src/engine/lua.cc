@@ -402,6 +402,10 @@ int Lua::setvar(lua_State *L) {
             var_value);
 
     }
+    else {
+        ms_dbg_a(t, 8, "m.setvar: Unknown collection: "
+            + utils::string::toHexIfNeeded(collection) + ".");
+    }
     return 0;
 }
 
