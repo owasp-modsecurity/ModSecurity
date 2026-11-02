@@ -34,7 +34,7 @@ namespace actions {
 
 bool ExpireVar::evaluate(RuleWithActions *rule, Transaction *t) {
 
-    std::string expireExpressionExpanded(m_string->evaluate(t));
+    std::string expireExpressionExpanded(m_string->evaluate(t, rule));
 
     std::string fully_qualified_var;
     int expirySeconds = 0;
