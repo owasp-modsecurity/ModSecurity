@@ -3,7 +3,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (1/6) :: a table with 100 entries",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (1/8) :: a table with 100 entries",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -49,7 +49,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (2/6) :: \"none\" after a transformation",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (2/8) :: \"none\" after a transformation",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -95,7 +95,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (3/6) :: \"none\" before a transformation",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (3/8) :: \"none\" before a transformation",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -141,7 +141,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (4/6) :: an entry that isn't a string",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (4/8) :: an entry that isn't a string",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -187,7 +187,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (5/6) :: m.getvars() with a transformation name",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (5/8) :: m.getvars() with a transformation name",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -233,7 +233,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Lua :: transformations in m.getvar()/m.getvars() (6/6) :: m.getvars() with a transformation table",
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (6/8) :: m.getvars() with a transformation table",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -273,6 +273,98 @@
     "rules": [
       "SecRuleEngine On",
       "SecRuleScript test-cases/data/lua-tfn-getvars-table.lua \"id:305,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (7/8) :: an entry that is a number",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Transformation name must be a string, but found number.*number entry: abc"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-number.lua \"id:306,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (8/8) :: a transformation name with a colon",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Invalid transformation function: lowercase:.*colon: ABC"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-colon.lua \"id:307,phase:2,pass\""
     ]
   }
 ]

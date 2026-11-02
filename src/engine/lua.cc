@@ -449,7 +449,8 @@ std::vector<std::string> Lua::getTransformationNames(lua_State *L,
 
         for (i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
-            if (!lua_isstring(L, -1)) {
+            /* Not lua_isstring(): that is true for a number too. */
+            if (lua_type(L, -1) != LUA_TSTRING) {
                 ms_dbg_a(t, 8, "SecRuleScript: Transformation name must " \
                     "be a string, but found " \
                     + std::string(lua_typename(L, lua_type(L, -1))));
@@ -470,9 +471,8 @@ std::vector<std::string> Lua::getTransformationNames(lua_State *L,
         return names;
     }
 
-    if (lua_isstring(L, idx)) {
-        std::string name(lua_tostring(L, idx));
-        if (name != "none") {
+    if (lua_type(L, idx) == LUA_TSTRING) {
+        if (std::string name(lua_tostring(L, idx)); name != "none") {
             names.push_back(name);
         }
         return names;
@@ -489,6 +489,14 @@ std::vector<std::string> Lua::getTransformationNames(lua_State *L,
 void Lua::applyTransformations(const Transaction *t,
     const std::vector<std::string> &names, std::string &var) {
     for (const auto &name : names) {
+        /* A transformation takes no argument, and a name with a ':'
+         * would make the Action constructor throw on an empty payload.
+         */
+        if (name.find(':') != std::string::npos) {
+            ms_dbg_a(t, 1,
+                "SecRuleScript: Invalid transformation function: " + name);
+            continue;
+        }
         auto tfn = \
             actions::transformations::Transformation::instantiate(
                 "t:" + name);
