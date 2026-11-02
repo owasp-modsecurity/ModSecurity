@@ -22,6 +22,7 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "modsecurity/rule_with_actions.h"
 #include "modsecurity/rule_message.h"
 
 
@@ -30,7 +31,7 @@ namespace actions {
 
 
 bool LogData::evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) {
-    ruleMessage.m_data = data(transaction);
+    ruleMessage.m_data = m_string->evaluate(transaction, rule);
 
     return true;
 }

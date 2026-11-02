@@ -91,7 +91,7 @@ class Resource_DynamicElement : public Variable {
     void evaluate(Transaction *t,
         RuleWithActions *rule,
         std::vector<const VariableValue *> *l) override {
-        std::string string = m_string->evaluate(t);
+        std::string string = m_string->evaluate(t, rule);
         t->m_collections.m_resource_collection->resolveMultiMatches(
             string,
             t->m_collections.m_resource_collection_key,
