@@ -61,3 +61,60 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+{
+	type => "rule",
+	comment => "SecRuleScript m.setvar without a collection returns nil",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "setvar-error-nodot.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/m.setvar: Must specify a collection using dot character.*m.setvar\(\) without a collection returned: nil/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "SecRuleScript m.setvar with one argument returns nil",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "setvar-error-onearg.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/m.setvar: Failed m.setvar function must have 2 arguments.*m.setvar\(\) with one argument returned: nil/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},
+{
+	type => "rule",
+	comment => "SecRuleScript m.setvar sets a TX variable and returns nil",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "setvar-tx.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/m.setvar\(\) with TX returned: nil.*tx.a is now: x/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+	),
+},

@@ -374,26 +374,28 @@ static int l_setvar(lua_State *L) {
     lua_getglobal(L, "__rule");
     rule = (msre_rule *)lua_topointer(L, -1);
 
+    /* A lua_CFunction returns the number of values it pushed, so always
+     * return 0 (the script gets nil), never a negative value or the
+     * status of msre_action_setvar_execute().
+     */
     if(nargs != 2)  {
-        msr_log(msr, 8, "m.setvar: Failed m.setvar funtion must has 2 arguments");
-        return -1;
+        msr_log(msr, 8, "m.setvar: Failed m.setvar function must have 2 arguments");
+        return 0;
     }
     var_value = luaL_checkstring (L, 2);
     var_name = luaL_checkstring (L, 1);
 
     lua_pop(L,2);
 
-    if(var_value == NULL || var_name == NULL)
-        return -1;
-
     chr = strchr((char *)var_name,0x2e);
 
     if(chr == NULL) {
         msr_log(msr, 8, "m.setvar: Must specify a collection using dot character - ie m.setvar(tx.myvar,mydata)");
-        return -1;
+        return 0;
     }
 
-    return msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,(char *)var_name,(char *)var_value);
+    msre_action_setvar_execute(msr,msr->msc_rule_mptmp,rule,(char *)var_name,(char *)var_value);
+    return 0;
 }
 
 static const struct luaL_Reg mylib[] = {
