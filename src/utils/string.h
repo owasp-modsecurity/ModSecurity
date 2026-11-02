@@ -106,18 +106,23 @@ inline std::string limitTo(int amount, const std::string &str) {
 inline std::string toHexIfNeeded(const std::string &str, bool escape_spec = false) {
     // escape_spec: escape special chars or not
     // spec chars: '"' (quotation mark, ascii 34), '\' (backslash, ascii 92)
-    std::stringstream res;
+    static constexpr char hex[] = "0123456789abcdef";
 
-    for (const auto ch : str) {
-        int c = (unsigned char)ch;
-        if (c < 32 || c > 126 || (escape_spec == true && (c == 34 || c == 92))) {
-            res << "\\x" << std::setw(2) << std::setfill('0') << std::hex << c;
+    std::string res;
+    res.reserve(str.size());
+
+    for (const char ch : str) {
+        const unsigned char c = static_cast<unsigned char>(ch);
+        if (c < 32 || c > 126 || (escape_spec && (c == '"' || c == '\\'))) {
+            res += '\\';
+            res += 'x';
+            res += hex[c >> 4];
+            res += hex[c & 0x0F];
         } else {
-            res << ch;
+            res += ch;
         }
     }
-
-    return res.str();
+    return res;
 }
 
 
