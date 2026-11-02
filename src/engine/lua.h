@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #ifndef SRC_ENGINE_LUA_H_
 #define SRC_ENGINE_LUA_H_
@@ -82,8 +83,10 @@ class Lua {
     static int getvar(lua_State *L);
     static int getvars(lua_State *L);
     static int setvar(lua_State *L);
-    static void applyTransformations(lua_State *L, const Transaction *t,
-        int idx, std::string &var);
+    static std::vector<std::string> getTransformationNames(lua_State *L,
+        const Transaction *t, int idx);
+    static void applyTransformations(const Transaction *t,
+        const std::vector<std::string> &names, std::string &var);
 
     LuaScriptBlob m_blob;
 #endif
