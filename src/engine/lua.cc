@@ -267,6 +267,8 @@ int Lua::getvar(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
+    std::vector<std::string> tfns = getTransformationNames(L, t, 2);
+
     std::string var;
     try {
         var = variables::Variable::stringMatchResolve(t, varname);
@@ -276,7 +278,7 @@ int Lua::getvar(lua_State *L) {
         lua_pushnil(L);
         return 1;
     }
-    applyTransformations(L, t, 2, var);
+    applyTransformations(t, tfns, var);
 
     if (var.size() == 0) {
         lua_pushnil(L);
@@ -303,6 +305,8 @@ int Lua::getvars(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
+    std::vector<std::string> tfns = getTransformationNames(L, t, 2);
+
     try {
         variables::Variable::stringMatchResolveMulti(t, varname, &l);
     } catch (const std::invalid_argument &) {
@@ -321,8 +325,10 @@ int Lua::getvars(lua_State *L) {
         lua_pushlstring(L, i->getKeyWithCollection().c_str(), i->getKeyWithCollection().size());
         lua_settable(L, -3);
 
+        std::string value(i->getValue());
+        applyTransformations(t, tfns, value);
         lua_pushstring(L, "value");
-        lua_pushlstring(L, i->getValue().c_str(), i->getValue().size());
+        lua_pushlstring(L, value.c_str(), value.size());
         lua_settable(L, -3);
 
         lua_settable(L, -3);
@@ -423,14 +429,18 @@ int Lua::setvar(lua_State *L) {
 }
 
 
-void Lua::applyTransformations(lua_State *L, const Transaction *t,
-    int idx, std::string &var) {
+std::vector<std::string> Lua::getTransformationNames(lua_State *L,
+    const Transaction *t, int idx) {
+    /* Don't use luaL_checkstring() here: the Lua error it raises would
+     * longjmp past the destructors of the caller's C++ objects.
+     */
+    std::vector<std::string> names;
+
     if (lua_isuserdata(L, idx) || lua_isnoneornil(L, idx)) {
-        return;
+        return names;
     }
 
     if (lua_istable(L, idx)) {
-        const char *name = NULL;
 #ifdef WITH_LUA_5_1
         int i, n = lua_objlen(L, idx);
 #else
@@ -439,52 +449,58 @@ void Lua::applyTransformations(lua_State *L, const Transaction *t,
 
         for (i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
-            name = reinterpret_cast<const char *>(luaL_checkstring(L, -1));
-
-            /* A "none" means start over */
-            if (strcmp("none", name) == 0) {
+            if (!lua_isstring(L, -1)) {
+                ms_dbg_a(t, 8, "SecRuleScript: Transformation name must " \
+                    "be a string, but found " \
+                    + std::string(lua_typename(L, lua_type(L, -1))));
+                lua_pop(L, 1);
                 continue;
             }
+            std::string name(lua_tostring(L, -1));
+            lua_pop(L, 1);
 
-            auto tfn = \
-                actions::transformations::Transformation::instantiate(
-                    "t:" + std::string(name));
-            // FIXME: transformation is not yet returning null.
-            if (tfn) {
-                tfn->transform(var, t);
-            } else {
-                ms_dbg_a(t, 1,
-                    "SecRuleScript: Invalid transformation function: " \
-                    + std::string(name));
+            /* A "none" means start over */
+            if (name == "none") {
+                names.clear();
+                continue;
             }
-            delete tfn;
+            names.push_back(name);
         }
 
-        return;
+        return names;
     }
 
     if (lua_isstring(L, idx)) {
-        const char *name(NULL);
-        name = reinterpret_cast<const char *>(luaL_checkstring(L, idx));
-
-        auto tfn = \
-            actions::transformations::Transformation::instantiate(
-                "t:" + std::string(name));
-
-        // FIXME: transformation is not yet returning null.
-        if (tfn) {
-            tfn->transform(var, t);
-            delete tfn;
-        } else {
-            ms_dbg_a(t, 1, "SecRuleScript: Invalid transformation function: " \
-                + std::string(name));
+        std::string name(lua_tostring(L, idx));
+        if (name != "none") {
+            names.push_back(name);
         }
-        return;
+        return names;
     }
     ms_dbg_a(t, 8, "SecRuleScript: Transformation parameter must be a " \
         "transformation name or array of transformation names, but found " \
-        "" + std::string(lua_typename(L, idx)) + " (type " \
+        "" + std::string(lua_typename(L, lua_type(L, idx))) + " (type " \
         + std::to_string(lua_type(L, idx)) + ")");
+
+    return names;
+}
+
+
+void Lua::applyTransformations(const Transaction *t,
+    const std::vector<std::string> &names, std::string &var) {
+    for (const auto &name : names) {
+        auto tfn = \
+            actions::transformations::Transformation::instantiate(
+                "t:" + name);
+        // FIXME: transformation is not yet returning null.
+        if (tfn) {
+            tfn->transform(var, t);
+        } else {
+            ms_dbg_a(t, 1,
+                "SecRuleScript: Invalid transformation function: " + name);
+        }
+        delete tfn;
+    }
 }
 #endif
 

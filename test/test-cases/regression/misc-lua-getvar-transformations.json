@@ -1,0 +1,278 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (1/6) :: a table with 100 entries",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "long table: abc"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-long-table.lua \"id:300,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (2/6) :: \"none\" after a transformation",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "none last: ABC"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-none-last.lua \"id:301,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (3/6) :: \"none\" before a transformation",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "none first: abc"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-none-first.lua \"id:302,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (4/6) :: an entry that isn't a string",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Transformation name must be a string, but found table.*not a string: abc"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-not-a-string.lua \"id:303,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (5/6) :: m.getvars() with a transformation name",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "getvars string: abc"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-getvars-string.lua \"id:304,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: transformations in m.getvar()/m.getvars() (6/6) :: m.getvars() with a transformation table",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=ABC&b=%26LT%3BSCRIPT",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "getvars table: <script"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-tfn-getvars-table.lua \"id:305,phase:2,pass\""
+    ]
+  }
+]
