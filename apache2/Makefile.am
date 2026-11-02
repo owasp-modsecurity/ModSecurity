@@ -120,7 +120,7 @@ mod_security2_la_LDFLAGS = -module -avoid-version \
 endif
 
 if LINUX
-mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version -R @PCRE_LD_PATH@ \
+mod_security2_la_LDFLAGS = -no-undefined -module -avoid-version @PCRE_RPATH_FLAGS@ \
     @APR_LDFLAGS@ \
     @APU_LDFLAGS@ \
     @APXS_LDFLAGS@ \

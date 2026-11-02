@@ -1,3 +1,13 @@
+Unreleased
+----------
+ * build: Remove incorrect construction of PCRE/PCRE2 runtime search
+   directories from pcre-config --libs and pcre2-config --libs8 output.
+   The Linux Apache module build no longer adds a PCRE-specific Libtool
+   -R option by default. Builds using shared PCRE/PCRE2 libraries in
+   nonstandard directories that previously relied on the automatically
+   generated -R may need --with-pcre-rpath=DIR or another explicit runtime
+   library search-path configuration.
+
 29 Sep 2026 - 2.9.15
 --------------------
 
