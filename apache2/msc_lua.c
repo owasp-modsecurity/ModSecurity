@@ -180,6 +180,7 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
             /* A "none" means start over */
             if (strcmp("none", name) == 0) {
                 tfn_arr->nelts = 0;
+                lua_pop(L, 1);
                 continue;
             }
 
@@ -189,6 +190,11 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
             } else {
                 *(msre_tfn_metadata **)apr_array_push(tfn_arr) = tfn;
             }
+
+            /* Pop the entry, otherwise a table longer than LUA_MINSTACK
+             * writes past the stack. name isn't used after this.
+             */
+            lua_pop(L, 1);
         }
     } else if (lua_isstring(L, idx)) { /* The second parameter may be a simple string? */
         name = (char *)luaL_checkstring(L, idx);

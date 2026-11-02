@@ -118,3 +118,22 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar with a long transformation table",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-long-table.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/long table: abc/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},
