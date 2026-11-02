@@ -222,7 +222,7 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
             }
         }
     } else {
-        msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names, but found \"%s\" (type %d).", lua_typename(L, idx), lua_type(L, idx));
+        msr_log(msr, 1, "SecRuleScript: Transformation parameter must be a transformation name or array of transformation names, but found \"%s\" (type %d).", lua_typename(L, lua_type(L, idx)), lua_type(L, idx));
         return NULL;
     }
 

@@ -156,3 +156,22 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
 	),
 },
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar logs the type of a bad transformation parameter",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-bad-param.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/but found "boolean" \(type 1\).*bad param: ABC/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},
