@@ -20,8 +20,11 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <memory>
 
 #include "modsecurity/transaction.h"
+#include "modsecurity/rule_remove_target_entry.h"
+#include "src/utils/regex.h"
 #include "src/utils/string.h"
 
 
@@ -47,12 +50,16 @@ bool RuleRemoveTargetByTag::init(std::string *error) {
     m_tag = param[0];
     m_target = param[1];
 
-    return true;
+    return RuleRemoveTargetSpec::detectAndCompileRegex(
+        m_target, &m_regex, "ruleRemoveTargetByTag", error);
 }
 
 bool RuleRemoveTargetByTag::evaluate(RuleWithActions *rule, Transaction *transaction) {
-    transaction->m_ruleRemoveTargetByTag.push_back(
-        std::make_pair(m_tag, m_target));
+    RuleRemoveTargetByTagEntry entry;
+    entry.tag = m_tag;
+    entry.target.literal = m_target;
+    entry.target.regex = m_regex;
+    transaction->m_ruleRemoveTargetByTag.push_back(std::move(entry));
     return true;
 }
 
