@@ -137,3 +137,22 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
 	),
 },
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar skips a transformation that isn't a string",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-not-a-string.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/Transformation name must be a string, but found table.*Transformation name must be a string, but found number.*not a string: abc/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},

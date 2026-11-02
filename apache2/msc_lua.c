@@ -175,7 +175,17 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
 
         for(i = 1; i <= n; i++) {
             lua_rawgeti(L, idx, i);
-            name = (char *)luaL_checkstring(L, -1);
+
+            /* Skip anything but a string, a number included, instead of
+             * failing the whole script with luaL_checkstring().
+             */
+            if (lua_type(L, -1) != LUA_TSTRING) {
+                msr_log(msr, 8, "SecRuleScript: Transformation name must be a string, but found %s",
+                    lua_typename(L, lua_type(L, -1)));
+                lua_pop(L, 1);
+                continue;
+            }
+            name = (char *)lua_tostring(L, -1);
 
             /* A "none" means start over */
             if (strcmp("none", name) == 0) {
@@ -196,8 +206,8 @@ static apr_array_header_t *resolve_tfns(lua_State *L, int idx, modsec_rec *msr, 
              */
             lua_pop(L, 1);
         }
-    } else if (lua_isstring(L, idx)) { /* The second parameter may be a simple string? */
-        name = (char *)luaL_checkstring(L, idx);
+    } else if (lua_type(L, idx) == LUA_TSTRING) { /* The second parameter may be a simple string? */
+        name = (char *)lua_tostring(L, idx);
 
         /* A "none" means start over */
         if (strcmp("none", name) == 0) {
