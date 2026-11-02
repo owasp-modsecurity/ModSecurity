@@ -118,3 +118,60 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar with a long transformation table",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-long-table.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/long table: abc/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar skips a transformation that isn't a string",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-not-a-string.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/Transformation name must be a string, but found table.*Transformation name must be a string, but found number.*not a string: abc/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},
+{
+	type => "rule",
+	comment => "SecRuleScript m.getvar logs the type of a bad transformation parameter",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecRuleScript "tfn-bad-param.lua" "phase:2,pass"
+	),
+	match_log => {
+		debug => [ qr/but found "boolean" \(type 1\).*bad param: ABC/s, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt?a=ABC",
+	),
+},
