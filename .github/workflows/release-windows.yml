@@ -24,6 +24,8 @@ jobs:
 
     strategy:
       fail-fast: false
+      # Limit simultaneous dependency downloads to reduce upstream rate limiting.
+      max-parallel: 2
       matrix:
         platform:
           - { label: "x64", arch: "x86_64", msvc: "x64" }
@@ -44,7 +46,10 @@ jobs:
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan==2.33.0
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0" "cmake==4.4.3"
+          Get-Command conan, cmake | Select-Object Name, Source
+          conan --version
+          cmake --version
           conan profile detect --force
           # without a cache, dependency sources are downloaded from their upstream
           # hosts on every run, and some (git.openldap.org) rate limit with HTTP 429
