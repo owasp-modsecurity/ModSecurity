@@ -568,12 +568,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     /**
      * Holds the request body, in case of any.
      */
-    std::ostringstream m_requestBody;
+    std::string m_requestBody;
 
     /**
      * Holds the response body, in case of any.
      */
-    std::ostringstream m_responseBody;
+    std::string m_responseBody;
 
     /**
      * Contains the unique ID of the transaction. Use by the variable
@@ -659,6 +659,9 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 
     Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
         void *logCbData, const time_t timestamp);
+
+    void reserveBody(std::string &body, AnchoredSetVariable &headers,
+        double limit, size_t incoming);
 
     /**
      * Pointer to the callback function that will be called to fill
