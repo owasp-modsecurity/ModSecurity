@@ -1,0 +1,201 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Actions :: ctl:ruleRemoveById on SecAction (1) - SecAction removed by id",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/test.pl?param=evil",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Rule id: 20 was skipped due to a ruleRemoveById action"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains test\" \"id:1,phase:1,pass,ctl:ruleRemoveById=20\"",
+      "SecAction \"id:20,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Actions :: ctl:ruleRemoveById on SecAction (2) - SecAction removed by id range",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/test.pl?param=evil",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Rule id: 20 was skipped due to a ruleRemoveById action"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains test\" \"id:1,phase:1,pass,ctl:ruleRemoveById=10-30\"",
+      "SecAction \"id:20,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Actions :: ctl:ruleRemoveById on SecAction (3) - SecAction still runs when the id does not match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/test.pl?param=evil",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains test\" \"id:1,phase:1,pass,ctl:ruleRemoveById=21\"",
+      "SecAction \"id:20,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Actions :: ctl:ruleRemoveById on SecAction (4) - SecAction with ctl:ruleRemoveByTag is disabled, so the tagged rule blocks",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/test.pl?param=evil",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains test\" \"id:1,phase:1,pass,ctl:ruleRemoveById=2\"",
+      "SecAction \"id:2,phase:1,pass,ctl:ruleRemoveByTag=blocking\"",
+      "SecRule ARGS \"@contains evil\" \"id:3,phase:2,deny,status:403,tag:blocking\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Actions :: ctl:ruleRemoveById on SecAction (5) - SecRule removed by id still works",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/test.pl?param=evil",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Rule id: 20 was skipped due to a ruleRemoveById action"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@contains test\" \"id:1,phase:1,pass,ctl:ruleRemoveById=20\"",
+      "SecRule REQUEST_URI \"@contains test\" \"id:20,phase:1,deny,status:403\""
+    ]
+  }
+]

@@ -208,25 +208,6 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
-
-    // FIXME: Make a class runTimeException to handle this cases.
-    for (const auto &i : trans->m_ruleRemoveById) {
-        if (m_ruleId != i) {
-            continue;
-        }
-        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
-            " was skipped due to a ruleRemoveById action...");
-        return true;
-    }
-    for (const auto &i : trans->m_ruleRemoveByIdRange) {
-        if (!(i.first <= m_ruleId && i.second >= m_ruleId)) {
-            continue;
-        }
-        ms_dbg_a(trans, 9, "Rule id: " + std::to_string(m_ruleId) +
-            " was skipped due to a ruleRemoveById action...");
-        return true;
-    }
-
     if (m_operator->m_string) {
         eparam = m_operator->m_string->evaluate(trans);
 
