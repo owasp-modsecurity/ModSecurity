@@ -64,7 +64,7 @@ void IpTree::postOrderTraversal(TreeNode *node) {
 
 IpTree::IpTree() {
     // FIXME: deal with possible error.
-    char *error;
+    std::string error;
     create_radix_tree(&m_tree, &error);
 }
 
@@ -90,17 +90,13 @@ IpTree::~IpTree() {
 }
 
 bool IpTree::addFromBuffer(std::istream *ss, std::string *error) {
-    char *error_msg = NULL;
     for (std::string line; std::getline(*ss, line); ) {
         size_t comment_start = line.find('#');
         if (comment_start != std::string::npos) {
             line = line.substr(0, comment_start);
         }
-        int res = add_ip_from_param(line.c_str(), &m_tree, &error_msg);
+        int res = add_ip_from_param(line.c_str(), &m_tree, error);
         if (res != 0) {
-            if (error_msg != NULL) {
-                error->assign(error_msg);
-            }
             return false;
         }
     }
@@ -143,10 +139,8 @@ bool IpTree::addFromUrl(const std::string& url, std::string *error) {
 
 
 bool IpTree::contains(const std::string& ip) {
-    int res = 0;
-    char *error_msg = NULL;
-
-    res = tree_contains_ip(m_tree, ip.c_str(), &error_msg);
+    std::string error_msg;
+    int res = tree_contains_ip(m_tree, ip.c_str(), &error_msg);
 
     if (res < 0) {
         return false;

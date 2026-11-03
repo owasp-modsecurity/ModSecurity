@@ -379,7 +379,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Invalid Content-Disposition header \\(-18\\): form-data; name=\"file\"; filename\\*=UTF-8''Math\\+physics%20v1\\.pdf%ZZ",
+      "debug_log": "Invalid Content-Disposition header \\(-18: filename\\*: invalid percent-encoding\\): form-data; name=\"file\"; filename\\*=UTF-8''Math\\+physics%20v1\\.pdf%ZZ",
       "http_code": 200
     },
     "rules": [
@@ -432,7 +432,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Invalid Content-Disposition header \\(-16\\): form-data; name=\"file\"; filename\\*=\"UTF-8''Math\\+physics%20v1\\.pdf\"",
+      "debug_log": "Invalid Content-Disposition header \\(-16: filename\\*: charset missing\\): form-data; name=\"file\"; filename\\*=\"UTF-8''Math\\+physics%20v1\\.pdf\"",
       "http_code": 200
     },
     "rules": [
