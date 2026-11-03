@@ -433,9 +433,10 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 	 *       need to be filled if there is no rule using the variable
 	 *       `duration'.
      *
-     * @note Must be a floating point type: utils::cpu_seconds() returns a
-     *       double and storing it in an integer type (as the former clock_t
-     *       did) truncated the fractional seconds, making `duration' wrong.
+     * @note Holds a utils::steady_micros() timestamp: a monotonic
+     *       (std::chrono::steady_clock) time in whole microseconds. It is
+     *       kept as a double so the layout of this public class does not
+     *       change; a double represents integers exactly up to 2^53.
      */
     const double m_creationTimeStamp;
 

@@ -1,3 +1,12 @@
+v3.0.18 - to be released
+------------------------
+
+  - fix: DURATION now measures elapsed wall-clock time (monotonic
+     std::chrono::steady_clock) instead of process CPU time, and is reported
+     as an integer number of microseconds, like v2. It also works on macOS
+     and Windows. Together with #3687 this changes the value that rules see
+    [PR #3721 - @Nikhil-jaiswal007]
+
 v3.0.17 - 2026-Sep-29
 ---------------------
 

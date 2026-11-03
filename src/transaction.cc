@@ -118,7 +118,7 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id, void 
 
 Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
     void *logCbData, const time_t timestamp)
-    : m_creationTimeStamp(utils::cpu_seconds()),
+    : m_creationTimeStamp(utils::steady_micros()),
     m_ARGScombinedSizeDouble(0),
     m_clientPort(0),
     m_highestSeverityAction(255),
