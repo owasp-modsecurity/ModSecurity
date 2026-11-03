@@ -44,5 +44,128 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@verifyssn \\d{3}-?\\d{2}-?\\d{4}\" \"id:1,phase:2,capture,pass,t:trim\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @verifySSN area 800 is valid since 2011",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?ssn=800-57-8065",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@verifyssn \\d{3}-?\\d{2}-?\\d{4}\" \"id:1,phase:1,deny,status:403,capture\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @verifySSN area 900 is not assigned",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?ssn=900-57-8065",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@verifyssn \\d{3}-?\\d{2}-?\\d{4}\" \"id:1,phase:1,deny,status:403,capture\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @verifySSN area 666 is not assigned",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?ssn=666-57-8065",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@verifyssn \\d{3}-?\\d{2}-?\\d{4}\" \"id:1,phase:1,deny,status:403,capture\""
+    ]
   }
 ]

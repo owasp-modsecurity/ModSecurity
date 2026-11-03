@@ -99,8 +99,9 @@ bool VerifySSN::verify(const char *ssnumber, int len) {
     if (area == 0 || serial == 0 || grp == 0)
         goto invalid;
 
-    /* More tests */
-    if (area >= 740 || area == 666)
+    /* Since the 2011 randomisation every area number is assigned except
+     * 000, 666 and 900-999 (#2970). */
+    if (area == 666 || area >= 900)
         goto invalid;
 
     return true;
