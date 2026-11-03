@@ -194,14 +194,22 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
 
 void InMemoryPerProcess::resolveRegularExpression(const std::string& var,
     std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
+    // Callers that do not hold a compiled regex (e.g. the compartment-prefixed
+    // overloads) still pay the compilation cost here.
     Utils::Regex r(var, true);
+    resolveRegularExpression(&r, l, ke);
+}
+
+
+void InMemoryPerProcess::resolveRegularExpression(const Utils::Regex *r,
+    std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
     std::list<std::string> expiredVars;
 
     {
         const std::shared_lock lock(m_mutex); // read lock (shared access)
 
         for (const auto& x : m_map) {
-            const auto ret = Utils::regex_search(x.first, r);
+            const auto ret = Utils::regex_search(x.first, *r);
             if (ret <= 0) {
                 continue;
             }
