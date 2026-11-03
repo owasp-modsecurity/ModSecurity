@@ -313,7 +313,7 @@
     },
     "expected": {
       "debug_log": "rxGlobal: regex error 'MATCH_LIMIT' for pattern",
-      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_LIMITS_EXCEEDED'",
+      "error_log": "Operator `StrEq' with parameter `1' against variable `MSC_PCRE_LIMITS_EXCEEDED'",
       "http_code": 200
     },
     "rules": [
@@ -363,7 +363,7 @@
     },
     "expected": {
       "debug_log": "Error with regular expression: \"\\(\"",
-      "error_log": "Matched \"Operator `StrEq' with parameter `1' against variable `MSC_PCRE_ERROR'",
+      "error_log": "Operator `StrEq' with parameter `1' against variable `MSC_PCRE_ERROR'",
       "http_code": 200
     },
     "rules": [
