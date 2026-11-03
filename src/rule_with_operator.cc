@@ -269,8 +269,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             {
                 const auto range = trans->m_ruleRemoveTargetById.equal_range(m_ruleId);
                 const bool removedById = std::any_of(range.first, range.second,
-                    [&v](const auto &m) -> bool {
-                        return m.second == v->getKeyWithCollection();
+                    [&key](const auto &m) -> bool {
+                        return m.second == key;
                     });
                 if (removedById) {
                     delete v;
@@ -281,8 +281,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
-                    [&, v, trans, this](const auto &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                    [&key, trans, this](const auto &m) -> bool {
+                        return containsTag(m.first, trans) && m.second == key;
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
