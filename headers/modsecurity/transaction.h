@@ -410,6 +410,8 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
     const char *getResponseBody() const;
     size_t getResponseBodyLength();
     size_t getRequestBodyLength();
+    size_t getResponseBodyLength() const;
+    size_t getRequestBodyLength() const;
 
 #ifndef NO_LOGS
     void debug(int level, const std::string& message) const;

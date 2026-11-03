@@ -1315,6 +1315,19 @@ const char *Transaction::getResponseBody() const {
     return strdup(this->m_responseBody.c_str());
 }
 
+/**
+ * @name    getResponseBodyLength
+ * @brief   Retrieve the length of the response body.
+ *
+ * This method returns the size of the response body buffer.
+ *
+ *
+ * @return Size of the update response body.
+ *
+ */
+size_t Transaction::getResponseBodyLength() const {
+    return m_responseBody.size();
+}
 
 /**
  * @name    getResponseBodyLength
@@ -1326,8 +1339,9 @@ const char *Transaction::getResponseBody() const {
  * @return Size of the update response body.
  *
  */
+// cppcheck-suppress functionConst  -  keep the old signatures for ABI compatibility
 size_t Transaction::getResponseBodyLength() {
-    return m_responseBody.size();
+    return static_cast<const Transaction *>(this)->getResponseBodyLength();
 }
 
 /**
@@ -1342,14 +1356,26 @@ size_t Transaction::getResponseBodyLength() {
  * @return Size of the request body.
  *
  */
-size_t Transaction::getRequestBodyLength() {
-    size_t size = 0;
-
-    size = m_requestBody.size();
-
-    return size;
+size_t Transaction::getRequestBodyLength() const {
+    return m_requestBody.size();
 }
 
+/**
+ * @name    getRequestBodyLength
+ * @brief   Retrieve the length of the request body.
+ *
+ * This method returns the size of the request body buffer, notice
+ * however, that most likely there isn't an update. Thus, this method will
+ * return 0.
+ *
+ *
+ * @return Size of the request body.
+ *
+ */
+// cppcheck-suppress functionConst  -  keep the old signatures for ABI compatibility
+size_t Transaction::getRequestBodyLength() {
+    return static_cast<const Transaction *>(this)->getRequestBodyLength();
+}
 
 /**
  * @name    processLogging
