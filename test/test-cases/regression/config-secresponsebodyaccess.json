@@ -1,0 +1,86 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecResponseBodyAccess (1) - Off: the body is not copied and not inspected",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Not appending response body. Response body access is disabled.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecResponseBodyAccess Off",
+      "SecResponseBodyMimeType text/html",
+      "SecRule RESPONSE_BODY \"@contains need\" \"id:1,phase:4,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecResponseBodyAccess (2) - On: the body is copied and inspected",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Appending response body: 8 bytes",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecResponseBodyAccess On",
+      "SecResponseBodyMimeType text/html",
+      "SecRule RESPONSE_BODY \"@contains need\" \"id:1,phase:4,deny,status:403\""
+    ]
+  }
+]
