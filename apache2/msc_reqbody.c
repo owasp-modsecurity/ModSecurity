@@ -13,6 +13,7 @@
 */
 
 #include "modsecurity.h"
+#include <sys/stat.h>
 #include "re.h"
 #include "msc_parsers.h"
 
@@ -556,6 +557,75 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
 
     *error_msg = NULL;
 
+    /* The body was moved to disk once it exceeded SecRequestBodyInMemoryLimit:
+     * the chunk array is gone, so read the temporary file back instead of
+     * dereferencing it (#3300). msc_reqbody_length only counted the bytes
+     * stored in memory, so the size comes from the file. The storage stays
+     * on disk; the buffer is used for parsing and the REQUEST_BODY /
+     * FULL_REQUEST variables.
+     */
+    if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
+        msc_data_chunk *chunk = NULL;
+        struct stat st;
+        apr_size_t length;
+        apr_status_t rc;
+
+        if (modsecurity_request_body_retrieve_start(msr, error_msg) < 0) {
+            return -1;
+        }
+
+        if (fstat(msr->msc_reqbody_fd, &st) < 0) {
+            modsecurity_request_body_retrieve_end(msr);
+            *error_msg = apr_psprintf(msr->mp, "Input filter: Failed to stat temporary file: %s",
+                strerror(errno));
+            return -1;
+        }
+        length = (apr_size_t)st.st_size;
+
+        if (length + 1 == 0) {
+            modsecurity_request_body_retrieve_end(msr);
+            *error_msg = apr_psprintf(msr->mp, "Internal error, request body length will overflow: %" APR_SIZE_T_FMT,
+                length);
+            return -1;
+        }
+
+        msr->msc_reqbody_buffer = malloc(length + 1);
+        if (msr->msc_reqbody_buffer == NULL) {
+            modsecurity_request_body_retrieve_end(msr);
+            *error_msg = apr_psprintf(msr->mp, "Unable to allocate memory to hold request body. Asked for %" APR_SIZE_T_FMT " bytes.",
+                length + 1);
+            return -1;
+        }
+        msr->msc_reqbody_buffer[length] = '\0';
+
+        sofar = 0;
+        d = msr->msc_reqbody_buffer;
+        do {
+            rc = modsecurity_request_body_retrieve(msr, &chunk, -1, error_msg);
+            if (rc < 0 || (chunk != NULL && sofar + chunk->length > length)) {
+                modsecurity_request_body_retrieve_end(msr);
+                free(msr->msc_reqbody_buffer);
+                msr->msc_reqbody_buffer = NULL;
+                if (rc >= 0) {
+                    *error_msg = apr_psprintf(msr->mp, "Internal error, request body buffer overflow "
+                        "(file %" APR_SIZE_T_FMT " bytes, read %d, next chunk %u).",
+                        length, sofar, chunk->length);
+                }
+                return -1;
+            }
+            if (chunk != NULL && chunk->length > 0) {
+                memcpy(d, chunk->data, chunk->length);
+                d += chunk->length;
+                sofar += chunk->length;
+            }
+        } while (rc > 0);
+        modsecurity_request_body_retrieve_end(msr);
+
+        msr->msc_reqbody_length = sofar;
+
+        return 1;
+    }
+
     /* Allocate a buffer large enough to hold the request body. */
 
     if (msr->msc_reqbody_length + 1 == 0) {
@@ -959,6 +1029,12 @@ apr_status_t modsecurity_request_body_clear(modsec_rec *msr, char **error_msg) {
 
     if (msr->msc_reqbody_storage == MSC_REQBODY_DISK) {
         int keep_body = 0;
+
+        /* The raw buffer read back from the file is not owned by a chunk. */
+        if (msr->msc_reqbody_buffer != NULL) {
+            free(msr->msc_reqbody_buffer);
+            msr->msc_reqbody_buffer = NULL;
+        }
 
         /* Should we keep the body? This normally
          * happens when a PUT method was used, which
