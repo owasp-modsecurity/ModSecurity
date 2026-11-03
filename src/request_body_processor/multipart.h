@@ -258,6 +258,7 @@ class Multipart {
     int m_flag_lf_line;
     int m_flag_crlf_line;
     int m_flag_unmatched_boundary;
+    int m_flag_unmatched_boundary_preamble;
     int m_flag_boundary_whitespace;
     int m_flag_missing_semicolon;
     int m_flag_invalid_quoting;

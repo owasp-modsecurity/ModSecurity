@@ -99,47 +99,55 @@ FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 
 # Did we see anything that might be a boundary?
 #
-# Here is a short description about the ModSecurity Multipart parser: the
-# parser returns with value 0, if all "boundary-like" line matches with
-# the boundary string which given in MIME header. In any other cases it returns
-# with different value, eg. 1 or 2.
+# The boundary string is given by the boundary parameter of the Content-Type
+# request header (it is not part of the body), eg.
+#     Content-Type: multipart/form-data; boundary=BOUNDARY_STRING
 #
-# The RFC 1341 descript the multipart content-type and its syntax must contains
-# only three mandatory lines (above the content):
-# * Content-Type: multipart/mixed; boundary=BOUNDARY_STRING
-# * --BOUNDARY_STRING
-# * --BOUNDARY_STRING--
+# The multipart body (RFC 2046, section 5.1) uses it in two kinds of lines:
+# * a delimiter line before each part:
+#     --BOUNDARY_STRING
+# * a closing delimiter line after the last part:
+#     --BOUNDARY_STRING--
 #
-# First line indicates, that this is a multipart content, second shows that
-# here starts a part of the multipart content, third shows the end of content.
+# Part data may also contain lines starting with "--", eg. PEM files
+# ("-----BEGIN CERTIFICATE-----"). If such a line looks like a delimiter
+# but does not match the boundary, MULTIPART_UNMATCHED_BOUNDARY is set:
 #
-# If there are any other lines, which starts with "--", then it should be
-# another boundary id - or not.
+# * 0: no unmatched boundary-like line was seen.
+# * 2: an unmatched boundary-like line was seen inside a part, and a valid
+#      delimiter followed it, so it was most likely part data.
+# * 1: an unmatched boundary-like line was seen, and no valid delimiter
+#      followed it (broken body, REQBODY_ERROR is also set), or the line
+#      was before the first delimiter (MULTIPART_STRICT_ERROR is also set).
 #
-# After 3.0.3, there are two kinds of types of boundary errors: strict and permissive.
+# This variable does not detect a broken body by itself: eg. a body that is
+# truncated inside ordinary part data, or has no closing delimiter, leaves
+# it at 0. Use REQBODY_ERROR (rule 200002) to catch those.
 #
-# If multipart content contains the three necessary lines with correct order, but
-# there are one or more lines with "--", then parser returns with value 2 (non-zero).
+# After 3.0.3 you can choose between two modes. The rule below uses the
+# 'permissive' mode: only value 1 is blocked, so part data with lines
+# starting with "--" (eg. PEM files) is allowed.
 #
-# If some of the necessary lines (usually the start or end) misses, or the order
-# is wrong, then parser returns with value 1 (also a non-zero).
+# For the 'strict' mode, change the operator to "!@eq 0": then the request
+# is blocked for any non-zero value.
 #
-# You can choose, which one is what you need. The example below contains the
-# 'strict' mode, which means if there are any lines with start of "--", then
-# ModSecurity blocked the content. But the next, commented example contains
-# the 'permissive' mode, then you check only if the necessary lines exists in
-# correct order. Whit this, you can enable to upload PEM files (eg "----BEGIN.."),
-# or other text files, which contains eg. HTTP headers.
+# The outcomes below apply with "SecRuleEngine On"; in DetectionOnly mode
+# the rule only logs the match.
 #
-# The difference is only the operator - in strict mode (first) the content blocked
-# in case of any non-zero value. In permissive mode (second, commented) the
-# content blocked only if the value is explicit 1. If it 0 or 2, the content will
-# allowed.
+# +-------------------------------------------+-------+--------+-------+
+# | Body                                      | Value | !@eq 0 | @eq 1 |
+# +-------------------------------------------+-------+--------+-------+
+# | valid body                                | 0     | pass   | pass  |
+# | part data line starting with "--"         | 2     | block  | pass  |
+# | unmatched "--" line, no valid delimiter   | 1     | block  | block |
+# | after it                                  |       |        |       |
+# | unmatched "--" line before the first      | 1     | block  | block |
+# | delimiter                                 |       |        |       |
+# | broken body without unmatched "--" line   | 0     | pass   | pass  |
+# +-------------------------------------------+-------+--------+-------+
 #
-
-#
-# See #1747 and #1924 for further information on the possible values for
-# MULTIPART_UNMATCHED_BOUNDARY.
+# See #1747, #1924 and #3654 for further information on the possible
+# values of MULTIPART_UNMATCHED_BOUNDARY.
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "@eq 1" \
     "id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
