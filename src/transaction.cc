@@ -23,12 +23,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cstdint>
 #include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <new>
 #include <set>
+#include <stdexcept>
 #include <unordered_map>
 #include <vector>
 
@@ -162,11 +165,9 @@ Transaction::Transaction(ModSecurity *ms, RulesSet *rules, const char *id,
 
 
 Transaction::~Transaction() {
-    m_responseBody.str(std::string());
-    m_responseBody.clear();
+    std::string().swap(m_responseBody);
 
-    m_requestBody.str(std::string());
-    m_requestBody.clear();
+    std::string().swap(m_requestBody);
 
     m_rulesMessages.clear();
 
@@ -686,7 +687,7 @@ int Transaction::processRequestBody() {
     /*
      * Process the request body even if there is nothing to be done.
      *
-     * if (m_requestBody.tellp() <= 0) {
+     * if (m_requestBody.empty()) {
      *     return true;
      * }
      *
@@ -699,7 +700,7 @@ int Transaction::processRequestBody() {
         (m_requestBodyProcessor == JSONRequestBody) ||
         (m_requestBodyProcessor == XMLRequestBody)) {
         if ((m_rules->m_requestBodyNoFilesLimit.m_set)
-            && (m_requestBody.str().size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
+            && (m_requestBody.size() > m_rules->m_requestBodyNoFilesLimit.m_value)) {
             m_variableReqbodyError.set("1", 0);
             m_variableReqbodyErrorMsg.set("Request body excluding files is bigger than the maximum expected.", 0);
             m_variableInboundDataError.set("1", m_variableOffset);
@@ -715,8 +716,8 @@ int Transaction::processRequestBody() {
         if (!requestBodyNoFilesLimitExceeded) {
             std::string error;
             if (m_xml->init() == true) {
-                m_xml->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                m_xml->processChunk(m_requestBody.c_str(),
+                    m_requestBody.size(),
                     &error);
                 m_xml->complete(&error);
             }
@@ -746,12 +747,12 @@ int Transaction::processRequestBody() {
                 m_json->setMaxDepth(m_rules->m_requestBodyJsonDepthLimit.m_value);
             }
             if (m_json->init() == true) {
-                m_json->processChunk(m_requestBody.str().c_str(),
-                    m_requestBody.str().size(),
+                m_json->processChunk(m_requestBody.c_str(),
+                    m_requestBody.size(),
                     &error);
                 m_json->complete(&error);
             }
-            if (error.empty() == false && m_requestBody.str().size() > 0) {
+            if (error.empty() == false && m_requestBody.size() > 0) {
                 m_variableReqbodyError.set("1", m_variableOffset);
                 m_variableReqbodyProcessorError.set("1", m_variableOffset);
                 m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
@@ -774,7 +775,7 @@ int Transaction::processRequestBody() {
         if (a != NULL) {
             Multipart m(*a, this);
             if (m.init(&error) == true) {
-                m.process(m_requestBody.str(), &error, m_variableOffset);
+                m.process(m_requestBody, &error, m_variableOffset);
             }
             reqbodyNoFilesLength = m.m_reqbody_no_files_length;
             m.multipart_complete(&error);
@@ -801,7 +802,7 @@ int Transaction::processRequestBody() {
         m_variableOffset++;
         // large size might cause issues in the parsing itself; omit if exceeded
         if (!requestBodyNoFilesLimitExceeded) {
-            extractArguments("POST", m_requestBody.str(), m_variableOffset);
+            extractArguments("POST", m_requestBody, m_variableOffset);
 	}
     } else if (m_requestBodyType != UnknownFormat) {
         /**
@@ -855,16 +856,16 @@ int Transaction::processRequestBody() {
     }
 
     fullRequest = fullRequest + "\n\n";
-    fullRequest = fullRequest + m_requestBody.str();
-    m_variableFullRequest.set(fullRequest, m_variableOffset);
-    m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
+    fullRequest.append(m_requestBody);
+    const size_t fullRequestLength = fullRequest.size();
+    m_variableFullRequest.set(std::move(fullRequest), m_variableOffset);
+    m_variableFullRequestLength.set(std::to_string(fullRequestLength),
         m_variableOffset);
 
-    if (m_requestBody.tellp() > 0) {
-        m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
-        m_variableRequestBodyLength.set(std::to_string(
-            m_requestBody.str().size()),
-            m_variableOffset, m_requestBody.str().size());
+    if (!m_requestBody.empty()) {
+        m_variableRequestBody.set(m_requestBody, m_variableOffset);
+        m_variableRequestBodyLength.set(std::to_string(m_requestBody.size()),
+            m_variableOffset, m_requestBody.size());
     }
 
     this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
@@ -927,7 +928,7 @@ int Transaction::requestBodyFromFile(const char *path) {
 }
 
 int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
-    int current_size = this->m_requestBody.tellp();
+    size_t current_size = this->m_requestBody.size();
 
     ms_dbg(9, "Appending request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: "
@@ -942,7 +943,10 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
             RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->m_requestBodyLimit.m_value
                 - current_size;
-            this->m_requestBody.write(reinterpret_cast<const char*>(buf),
+            reserveBody(m_requestBody, m_variableRequestHeaders,
+                m_rules->m_requestBodyLimit.m_set
+                    ? m_rules->m_requestBodyLimit.m_value : 0, spaceLeft);
+            this->m_requestBody.append(reinterpret_cast<const char*>(buf),
                 spaceLeft);
             ms_dbg(5, "Request body limit is marked to process partial");
             return false;
@@ -966,9 +970,66 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
         }
     }
 
-    this->m_requestBody.write(reinterpret_cast<const char*>(buf), len);
+    reserveBody(m_requestBody, m_variableRequestHeaders,
+        m_rules->m_requestBodyLimit.m_set
+            ? m_rules->m_requestBodyLimit.m_value : 0, len);
+    this->m_requestBody.append(reinterpret_cast<const char*>(buf), len);
 
     return true;
+}
+
+
+/*
+ * Reserve body storage on the first non-empty append. Content-Length is only
+ * a client-provided hint, so the reservation is always capped by
+ * the corresponding body limit and is skipped when no limit is configured.
+ */
+void Transaction::reserveBody(std::string &body, AnchoredSetVariable &headers,
+    double limit, size_t incoming) {
+    if (incoming == 0 || !body.empty()) {
+        return;
+    }
+
+    if (!(limit > 0)) {
+        return;
+    }
+
+    std::unique_ptr<std::string> contentLength =
+        headers.resolveFirst("Content-Length");
+    if (contentLength == nullptr || contentLength->empty()
+        || contentLength->size() > 20) {
+        return;
+    }
+
+    size_t expected = 0;
+    for (const char c : *contentLength) {
+        if (c < '0' || c > '9') {
+            return;
+        }
+        const size_t digit = static_cast<size_t>(c - '0');
+        if (expected > (SIZE_MAX - digit) / 10) {
+            return;
+        }
+        expected = expected * 10 + digit;
+    }
+
+    if (static_cast<long double>(expected) > limit) {
+        expected = static_cast<size_t>(limit);
+    }
+
+    if (expected <= incoming || expected <= body.capacity()) {
+        return;
+    }
+
+    try {
+        body.reserve(expected);
+    } catch (const std::bad_alloc &) {
+        ms_dbg(5, "Failed to reserve body storage, continuing " \
+            "without reservation.");
+    } catch (const std::length_error &) {
+        ms_dbg(5, "Body reservation exceeds string capacity, continuing " \
+            "without reservation.");
+    }
 }
 
 
@@ -1099,13 +1160,13 @@ int Transaction::addResponseHeader(const unsigned char *key, size_t key_n,
 
 /**
  * @name    processResponseBody
- * @brief   Perform the request body (if any)
+ * @brief   Perform the response body (if any)
  *
- * This method perform the analysis on the request body. It is optional to
+ * This method perform the analysis on the response body. It is optional to
  * call that method. If this API consumer already know that there isn't a
  * body for inspect it is recommended to skip this step.
  *
- * @note It is necessary to "append" the request body prior to the execution
+ * @note It is necessary to "append" the response body prior to the execution
  *       of this method.
  * @note Remember to check for a possible intervention.
  *
@@ -1148,9 +1209,9 @@ int Transaction::processResponseBody() {
         m_variableOutboundDataError.set("0", m_variableOffset);
     }
 
-    m_variableResponseBody.set(m_responseBody.str(), m_variableOffset);
+    m_variableResponseBody.set(m_responseBody, m_variableOffset);
     m_variableResponseContentLength.set(std::to_string(
-        m_responseBody.str().size()), m_variableOffset);
+        m_responseBody.size()), m_variableOffset);
 
     m_rules->evaluate(modsecurity::ResponseBodyPhase, this);
     return true;
@@ -1176,7 +1237,7 @@ int Transaction::processResponseBody() {
  *
  */
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
-    int current_size = this->m_responseBody.tellp();
+    size_t current_size = this->m_responseBody.size();
 
     const std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
@@ -1201,7 +1262,10 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
             RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
             size_t spaceLeft = this->m_rules->m_responseBodyLimit.m_value \
                 - current_size;
-            this->m_responseBody.write(reinterpret_cast<const char*>(buf),
+            reserveBody(m_responseBody, m_variableResponseHeaders,
+                m_rules->m_responseBodyLimit.m_set
+                    ? m_rules->m_responseBodyLimit.m_value : 0, spaceLeft);
+            this->m_responseBody.append(reinterpret_cast<const char*>(buf),
                 spaceLeft);
             ms_dbg(5, "Response body limit is marked to process partial");
             return false;
@@ -1225,7 +1289,10 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
         }
     }
 
-    this->m_responseBody.write(reinterpret_cast<const char*>(buf), len);
+    reserveBody(m_responseBody, m_variableResponseHeaders,
+        m_rules->m_responseBodyLimit.m_set
+            ? m_rules->m_responseBodyLimit.m_value : 0, len);
+    this->m_responseBody.append(reinterpret_cast<const char*>(buf), len);
 
     return true;
 }
@@ -1245,9 +1312,8 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
  *
  */
 const char *Transaction::getResponseBody() const {
-    return strdup(this->m_responseBody.str().c_str());
+    return strdup(this->m_responseBody.c_str());
 }
-
 
 /**
  * @name    getResponseBodyLength
@@ -1259,12 +1325,23 @@ const char *Transaction::getResponseBody() const {
  * @return Size of the update response body.
  *
  */
-size_t Transaction::getResponseBodyLength() {
-    size_t size = 0;
-    m_responseBody.seekp(0, std::ios::end);
-    size = m_responseBody.tellp();
+size_t Transaction::getResponseBodyLength() const {
+    return m_responseBody.size();
+}
 
-    return size;
+/**
+ * @name    getResponseBodyLength
+ * @brief   Retrieve the length of the response body.
+ *
+ * This method returns the size of the response body buffer.
+ *
+ *
+ * @return Size of the update response body.
+ *
+ */
+// cppcheck-suppress functionConst  -  keep the old signatures for ABI compatibility
+size_t Transaction::getResponseBodyLength() {
+    return static_cast<const Transaction *>(this)->getResponseBodyLength();
 }
 
 /**
@@ -1279,15 +1356,26 @@ size_t Transaction::getResponseBodyLength() {
  * @return Size of the request body.
  *
  */
-size_t Transaction::getRequestBodyLength() {
-    size_t size = 0;
-
-    m_requestBody.seekp(0, std::ios::end);
-    size = m_requestBody.tellp();
-
-    return size;
+size_t Transaction::getRequestBodyLength() const {
+    return m_requestBody.size();
 }
 
+/**
+ * @name    getRequestBodyLength
+ * @brief   Retrieve the length of the request body.
+ *
+ * This method returns the size of the request body buffer, notice
+ * however, that most likely there isn't an update. Thus, this method will
+ * return 0.
+ *
+ *
+ * @return Size of the request body.
+ *
+ */
+// cppcheck-suppress functionConst  -  keep the old signatures for ABI compatibility
+size_t Transaction::getRequestBodyLength() {
+    return static_cast<const Transaction *>(this)->getRequestBodyLength();
+}
 
 /**
  * @name    processLogging
@@ -1430,7 +1518,7 @@ std::string Transaction::toOldAuditLogFormatIndex(const std::string &filename,
     ss << "\" ";
 
     ss << this->m_httpCodeReturned << " ";
-    ss << this->m_responseBody.tellp() << " ";
+    ss << this->m_responseBody.size() << " ";
     /** TODO: Check variable */
     ss << utils::string::dash_if_empty(
         m_variableRequestHeaders.resolveFirst("REFERER").get()) << " ";
@@ -1492,12 +1580,9 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         audit_log << prefix << std::endl;
     }
     if (parts & audit_log::AuditLog::CAuditLogPart
-        &&  m_requestBody.tellp() > 0) {
-        std::string body =  m_requestBody.str();
+        && !m_requestBody.empty()) {
         audit_log << prefix << "--" << trailer << "-" << "C--" << std::endl;
-        if (body.size() > 0) {
-            audit_log << prefix << body << std::endl;
-        }
+        audit_log << prefix << m_requestBody << std::endl;
         audit_log << prefix << std::endl;
     }
     if (parts & audit_log::AuditLog::DAuditLogPart) {
@@ -1506,8 +1591,8 @@ std::string Transaction::toOldAuditLogFormat(int parts,
         /** TODO: write audit_log D part. */
     }
     if (parts & audit_log::AuditLog::EAuditLogPart
-        && m_responseBody.tellp() > 0) {
-        std::string body = utils::string::toHexIfNeeded(m_responseBody.str());
+        && !m_responseBody.empty()) {
+        std::string body = utils::string::toHexIfNeeded(m_responseBody);
         audit_log << prefix << "--" << trailer << "-" << "E--" << std::endl;
         if (body.size() > 0) {
             audit_log << prefix << body << std::endl;
@@ -1615,7 +1700,7 @@ std::string Transaction::toJSON(int parts) {
 
     if (parts & audit_log::AuditLog::CAuditLogPart) {
         // FIXME: check for the binary content size.
-        LOGFY_ADD("body", utils::string::toHexIfNeeded(this->m_requestBody.str()));
+        LOGFY_ADD("body", utils::string::toHexIfNeeded(this->m_requestBody));
     }
 
     /* request headers */
@@ -1644,7 +1729,7 @@ std::string Transaction::toJSON(int parts) {
     yajl_gen_map_open(g);
 
     if (parts & audit_log::AuditLog::EAuditLogPart) {
-        LOGFY_ADD("body", this->m_responseBody.str());
+        LOGFY_ADD("body", this->m_responseBody);
     }
     LOGFY_ADD_NUM("http_code", m_httpCodeReturned);
 

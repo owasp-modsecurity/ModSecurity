@@ -57,13 +57,22 @@ void AnchoredVariable::set(const std::string &a, size_t offset) {
 }
 
 
+void AnchoredVariable::set(std::string &&a, size_t offset) {
+    m_offset = offset;
+    m_value = std::move(a);
+    m_var.addOrigin(m_value.size(), offset);
+}
+
+
 void AnchoredVariable::evaluate(std::vector<const VariableValue *> *l) {
     if (m_name.empty()) {
         return;
     }
 
-    m_var.setValue(m_value);
-    l->push_back(new VariableValue(&m_var));
+    auto value = std::make_unique<VariableValue>(&m_var);
+    value->setValue(m_value);
+    l->push_back(value.get());
+    value.release();
 }
 
 

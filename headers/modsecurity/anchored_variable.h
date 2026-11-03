@@ -51,6 +51,7 @@ class AnchoredVariable {
 
     void unset();
     void set(const std::string &a, size_t offset);
+    void set(std::string &&a, size_t offset);
     void set(const std::string &a, size_t offset, size_t offsetLen);
 
     void evaluate(std::vector<const VariableValue *> *l);
@@ -72,4 +73,3 @@ class AnchoredVariable {
 
 
 #endif  // HEADERS_MODSECURITY_ANCHORED_VARIABLE_H_
-
