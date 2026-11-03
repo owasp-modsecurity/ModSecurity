@@ -23,6 +23,7 @@
 #include <Windows.h>
 #include <sal.h>
 #include <strsafe.h>
+#include <string.h>
 #include "httpserv.h"
 
 //  Project header files
@@ -1068,6 +1069,26 @@ CMyHttpModule::OnBeginRequest(
 	if(status != DECLINED)
 	{
 		pHttpContext->GetResponse()->SetStatus(status, "ModSecurity Action");
+
+		const char *location = apr_table_get(r->headers_out, "Location");
+
+		if(location != nullptr)
+		{
+			if(strpbrk(location, "\r\n") != nullptr)
+			{
+				// Reject macro-expanded redirect targets containing CR/LF.
+				WriteEventViewerLog(
+					"ModSecurity: redirect Location header contains CR/LF; returning 500.",
+					EVENTLOG_ERROR_TYPE);
+				pHttpContext->GetResponse()->SetStatus(500, "ModSecurity Internal Error");
+			}
+			else
+			{
+				pHttpContext->GetResponse()->SetHeader(
+					HttpHeaderLocation, location, (USHORT)strlen(location), TRUE);
+			}
+		}
+
 		pHttpContext->SetRequestHandled();
 
 		hr = E_FAIL;
