@@ -302,7 +302,7 @@ HRESULT CMyHttpModule::ReadFileChunk(HTTP_DATA_CHUNK *chunk, char *buf)
 	HRESULT hr = S_OK;
 
     pIoBuffer = (BYTE *)VirtualAlloc(NULL,
-                                        1,
+                                        m_dwPageSize,
                                         MEM_COMMIT | MEM_RESERVE,
                                         PAGE_READWRITE);
     if (pIoBuffer == NULL)
