@@ -226,13 +226,13 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
     }
 
     if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr) {
-        if (m_severity) {
+        if (m_severity && !isActionUpdated("severity", trans)) {
             m_severity->evaluate(this, trans, ruleMessage);
         }
-        if (m_logData) {
+        if (m_logData && !isActionUpdated("logdata", trans)) {
             m_logData->evaluate(this, trans, ruleMessage);
         }
-        if (m_msg) {
+        if (m_msg && !isActionUpdated("msg", trans)) {
             m_msg->evaluate(this, trans, ruleMessage);
         }
         for (actions::Tag *a : m_actionsTag) {
@@ -269,17 +269,21 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         }
         actions::Action *a = b.second.get();
         executeAction(trans, containsBlock, ruleMessage, a, false);
-        disruptiveAlreadyExecuted = true;
+        // Only a disruptive update replaces the rule's own disruptive action;
+        // a msg/logdata/severity update must not turn a deny into a pass.
+        if (a->isDisruptive()) {
+            disruptiveAlreadyExecuted = true;
+        }
     }
-    if (m_severity) {
+    if (m_severity && !isActionUpdated("severity", trans)) {
         m_severity->evaluate(this, trans, ruleMessage);
     }
 
-    if (m_logData) {
+    if (m_logData && !isActionUpdated("logdata", trans)) {
         m_logData->evaluate(this, trans, ruleMessage);
     }
 
-    if (m_msg) {
+    if (m_msg && !isActionUpdated("msg", trans)) {
         m_msg->evaluate(this, trans, ruleMessage);
     }
     for (Action *a : this->m_actionsRuntimePos) {
@@ -453,6 +457,24 @@ bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
 
 bool RuleWithActions::containsMsg(const std::string& name, Transaction *t) {
     return m_msg && m_msg->data(t) == name;
+}
+
+
+/*
+ * True when SecRuleUpdateActionById supplied an action with this name for
+ * the rule. Single instance actions (msg, logdata, severity) from the rule
+ * itself must then be skipped, so the update replaces them instead of being
+ * logged next to them (#2928).
+ */
+bool RuleWithActions::isActionUpdated(const std::string& name,
+    const Transaction *t) const {
+    for (auto &b :
+        t->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (m_ruleId == b.first && *b.second->m_name.get() == name) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
