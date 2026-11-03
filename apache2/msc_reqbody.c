@@ -707,13 +707,13 @@ apr_status_t modsecurity_request_body_end(modsec_rec *msr, char **error_msg) {
                 *error_msg = apr_psprintf(msr->mp, "Multipart parsing error: %s", my_error_msg);
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
-                if (msr->txcfg->debuglog_level >= 4) {
-                    msr_log(msr, 4, "%s", *error_msg);
-                }
-                return -1;
+                msr_log(msr, 2, "%s", *error_msg);
+                /* Do not abort the transaction here: the error is reported
+                 * through REQBODY_ERROR and the MULTIPART_* variables, so the
+                 * rules in phase REQUEST_BODY decide what to do with it.
+                 */
             }
-
-            if (multipart_get_arguments(msr, "BODY", msr->arguments) < 0) {
+            else if (multipart_get_arguments(msr, "BODY", msr->arguments) < 0) {
                 *error_msg = "Multipart parsing error: Failed to retrieve arguments.";
                 msr->msc_reqbody_error = 1;
                 msr->msc_reqbody_error_msg = *error_msg;
