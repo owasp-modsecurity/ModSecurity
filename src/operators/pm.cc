@@ -113,12 +113,12 @@ void Pm::cleanup(acmp_node_t *n) {
 
     postOrderTraversal(n->btree);
 
-    if (n->text && strlen(n->text) > 0) {
+    if (n->text && n->text[0] != '\0') {
         free(n->text);
         n->text = NULL;
     }
 
-    if (n->pattern && strlen(n->pattern) > 0) {
+    if (n->pattern && n->pattern[0] != '\0') {
         free(n->pattern);
         n->pattern = NULL;
     }

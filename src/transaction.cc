@@ -52,6 +52,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "src/actions/disruptive/allow.h"
 #include "src/variables/remote_user.h"
+#include "src/transaction_raw_args.h"
 
 #ifdef WIN32
 #include "src/compat/msvc.h"
@@ -262,6 +263,8 @@ bool Transaction::extractArguments(const std::string &orig,
     for (const auto &t : key_value_sets) {
         const auto sep2 = '=';
         auto [key, value] = utils::string::ssplit_pair(t, sep2);
+        std::string keyRaw = key;
+        std::string valueRaw = value;
 
         int invalid_count;
         utils::urldecode_nonstrict_inplace(key, invalid_count);
@@ -271,7 +274,9 @@ bool Transaction::extractArguments(const std::string &orig,
             m_variableUrlEncodedError.set("1", m_variableOffset);
         }
 
-        addArgument(orig, key, value, offset);
+        if (addArgument(orig, key, value, offset)) {
+            addRawArgument(this, orig, keyRaw, valueRaw, offset);
+        }
         offset = offset + t.size() + 1;
     }
 
@@ -2386,4 +2391,3 @@ extern "C" size_t msc_get_rules_messages_rule_ids(const Transaction *transaction
 
 
 }  // namespace modsecurity
-
