@@ -62,7 +62,7 @@ static int op_strstr_init(msre_rule *rule, char **error_msg) {
 /**
  * Operator execution entry point.
  */
-static int op_strstr_exec(modsec_rec *msr, msre_rule *rule, msre_var *var, char **error_msg) {
+static int op_strstr_exec(modsec_rec const *msr, msre_rule const *rule, msre_var const *var, char **error_msg) {
     /* Here we need to inspect the contents of the supplied variable. */
 
     /* In a general case it is possible for the value
@@ -169,14 +169,12 @@ static void initBoyerMooreHorspool(const char *pattern, int patlength,
 }
 
 static int BoyerMooreHorspool(const char *pattern, int patlength,
-    const char *text, int textlen, int *bm_badcharacter_array)
+    const char *text, int textlen, int const *bm_badcharacter_array)
 {
-    int j;
-    char c;
+    int j  = 0;
 
-    j = 0;
     while (j <= textlen - patlength) {
-        c = text[j + patlength - 1];
+        char c = text[j + patlength - 1];
         if (pattern[patlength - 1] == c && memcmp(pattern, text + j, patlength - 1) == 0) {
             return j;
         }

@@ -25,6 +25,7 @@ extern PVOID                               g_pModuleContext;
 class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
 {
  public:
+    void*			  m_Config; // cppcheck-suppress initializerList
     MODSECURITY_STORED_CONTEXT();
     ~MODSECURITY_STORED_CONTEXT();
     
@@ -66,8 +67,6 @@ class MODSECURITY_STORED_CONTEXT : public IHttpStoredContext
             DWORD   dwLengthSource,
             CHAR**  ppszDestination,
             USHORT*  pdwLengthDestination );
-
-	void*			  m_Config;
 
 private:
     HRESULT 
