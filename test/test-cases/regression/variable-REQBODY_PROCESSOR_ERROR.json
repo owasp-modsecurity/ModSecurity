@@ -140,5 +140,84 @@
       "SecRule REQBODY_PROCESSOR_ERROR \"@contains test\" \"phase:2,id:1,pass,t:trim\"",
       "SecRule REQBODY_PROCESSOR_ERROR_MSG \"@contains test\" \"phase:2,id:2,pass,t:trim\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: REQBODY_ERROR_MSG carries the libxml2 parse error",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/xml",
+        "Content-Length": "736"
+      },
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+        "<bookstore>",
+        "<book category=\"COOKING\">",
+        "<title lang=\"en\">Everyday Italian</title>",
+        "<author>Giada De Laurentiis</author>",
+        "<year>2005</year>",
+        "<price>30.00</price>",
+        "</book>",
+        "<book category=\"CHILDREN\">",
+        "<title lang=\"en\">Harry Potter</title>",
+        "<author>J K. Rowling</author>",
+        "<year>2005</year>",
+        "<price>29.99</price>",
+        "</book>",
+        "<book category=\"WEB\">",
+        "<title lang=\"en\">XQuery Kick Start</title>",
+        "<author>James McGovern</author>",
+        "<author>Per Bothner</author>",
+        "<author>Kurt Cagle</author>",
+        "<author>James Linn</author>",
+        "<author>Vaidyanathan Nagarajan</author>",
+        "<year>2003</year>",
+        "<price>49.99</price>",
+        "</book>",
+        "<book category=\"WEB\">",
+        "<title lang=\"en\">Learning XML</title>",
+        "<author>Erik T. Ray</author>",
+        "<year>2003</year>",
+        "<price>39.95</price>",
+        "</bookasdf>",
+        "</bookstore>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "XML: Failed to parse document: Opening and ending tag mismatch: book line 1 and bookasdf \\(line 1, column [0-9]+\\)",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500005,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
+      "SecRule REQBODY_ERROR_MSG \"@contains Opening and ending tag mismatch: book line 1 and bookasdf\" \"phase:2,id:3,deny,status:403\""
+    ]
   }
 ]
