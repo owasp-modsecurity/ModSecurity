@@ -298,5 +298,65 @@
       "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
       "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope-bad.xsd\" \"id:500007,phase:3,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing XML request body parser (bad schema, errors are not accumulated between evaluations)",
+    "resource": "libxml2",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Type": "text/xml",
+        "Content-Length": "683"
+      },
+      "uri": "/?key=value&key=other_value",
+      "method": "POST",
+      "body": [
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+        "    <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"",
+        "        xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\"",
+        "        xmlns:tns=\"http://www.bluebank.example.com/axis/getBalance.jws\"",
+        "        xmlns:types=\"http://www.bluebank.example.com/axis/getBalance.jws/encodedTypes\"",
+        "        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
+        "        xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">",
+        "    <soap:Body soap:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">",
+        "        <q1:getInput xmlns:q1=\"http://DefaultNamespace\">",
+        "            <id xsi:type=\"xsd:string\">12123</id>",
+        "        </q1:getInput>",
+        "    </soap:Body>",
+        "</soap:Envelope>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "XML: Failed to load Schema: test-cases/data/SoapEnvelope-bad\\.xsd\\. XML Error: Failed to parse(?!.*^XML Error:)",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecXMLExternalEntity On",
+      "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
+      "SecRule XML \"@validateSchema test-cases/data/SoapEnvelope-bad.xsd\" \"id:500007,phase:3,deny,t:none,t:lowercase,multiMatch\""
+    ]
   }
 ]
