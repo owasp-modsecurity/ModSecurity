@@ -565,6 +565,9 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      */
     std::list<modsecurity::RuleMessage> m_rulesMessages;
 
+    bool m_fullRequestPending = false;
+    bool m_fullRequestBuilt = false;
+    void buildFullRequest();
     /**
      * Holds the request body, in case of any.
      */
