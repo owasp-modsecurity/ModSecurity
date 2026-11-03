@@ -135,5 +135,97 @@
     "rules": [
       "SecRule ARGS:key \".\" \"id:4,ctl:ruleRemoveByTag,whee\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing ctl:ruleRemoveByTag with a macro in the tag, removal applies",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.suffix=a\"",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:3,phase:1,pass,nolog,ctl:ruleRemoveByTag=test-a\"",
+      "SecRule ARGS \"@contains value\" \"id:2,phase:2,t:none,tag:'test-%{tx.suffix}',deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing ctl:ruleRemoveByTag with a macro in the tag, removal does not apply",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.suffix=b\"",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:3,phase:1,pass,nolog,ctl:ruleRemoveByTag=test-a\"",
+      "SecRule ARGS \"@contains value\" \"id:2,phase:2,t:none,tag:'test-%{tx.suffix}',deny\""
+    ]
   }
 ]

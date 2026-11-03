@@ -313,5 +313,97 @@
       "SecRuleUpdateTargetByTag test !ARGS:ref",
       "SecRule ARGS \"@contains something\" \"id:1,pass,t:trim,tag:'test',deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateTargetByTag Test (8/6) Tag with a macro, exclusion applies",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.suffix=a\"",
+      "SecRuleUpdateTargetByTag test-a !ARGS",
+      "SecRule ARGS \"@contains value\" \"id:2,phase:2,t:trim,tag:'test-%{tx.suffix}',deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateTargetByTag Test (9/6) Tag with a macro, exclusion does not apply",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.suffix=b\"",
+      "SecRuleUpdateTargetByTag test-a !ARGS",
+      "SecRule ARGS \"@contains value\" \"id:2,phase:2,t:trim,tag:'test-%{tx.suffix}',deny\""
+    ]
   }
 ]
