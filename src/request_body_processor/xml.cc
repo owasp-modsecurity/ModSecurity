@@ -252,7 +252,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
                 return false;
             }
             // disable parser errors being printed to stderr
-            m_data.parsing_ctx->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            xmlCtxtUseOptions(m_data.parsing_ctx, XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
         }
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
@@ -270,7 +270,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
                 return false;
             }
             // disable parser errors being printed to stderr
-            m_data.parsing_ctx_arg->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            xmlCtxtUseOptions(m_data.parsing_ctx_arg, XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
             // the SAX callback (onEndElement) stops parsing through this
             // context when SecArgumentsLimit is hit; it must be set here,
             // not only in the multi-chunk branch below.
