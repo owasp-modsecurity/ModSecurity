@@ -4,7 +4,27 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  runner-matrix:
+    name: Read runner matrix
+    runs-on: ubuntu-latest
+    outputs:
+      linux: ${{ steps.runners.outputs.linux }}
+      macos: ${{ steps.runners.outputs.macos }}
+      windows: ${{ steps.runners.outputs.windows }}
+      pcre1: ${{ steps.runners.outputs.pcre1 }}
+      linux_exclude: ${{ steps.runners.outputs.linux_exclude }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Load reviewed runner data
+        id: runners
+        run: python3 -B tools/ci/runner_matrix.py outputs --github-output "$GITHUB_OUTPUT"
+
   # Keep legacy Ubuntu 22.04 coverage, including x32, in a self-contained job.
   # Remove this job when the legacy matrix is no longer needed.
   build-linux-old:
@@ -91,7 +111,7 @@ jobs:
           sudo apt-get install -y libfuzzy-dev:${{ matrix.platform.arch }} \
                                   libxml2-dev:${{ matrix.platform.arch }} \
                                   libpcre3-dev:${{ matrix.platform.arch }}
-                                  
+
       - uses: actions/checkout@v7
         with:
           submodules: recursive
@@ -111,6 +131,7 @@ jobs:
 
   build-linux:
     name: Linux (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
 
     # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
     # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
@@ -119,7 +140,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04,ubuntu-26.04]
+        os: ${{ fromJSON(needs.runner-matrix.outputs.linux) }}
         platform:
           - { label: "x64", arch: "amd64", configure: "" }
 
@@ -138,10 +159,7 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
-        exclude:
-          # Ubuntu 26.04 no longer provides the PCRE1 development package.
-          - os: ubuntu-26.04
-            configure: { label: "with pcre", opt: "--with-pcre" }
+        exclude: ${{ fromJSON(needs.runner-matrix.outputs.linux_exclude) }}
 
     steps:
       - uses: actions/checkout@v7
@@ -200,7 +218,7 @@ jobs:
             python3-venv
 
       - name: Install PCRE1 development package
-        if: matrix.os != 'ubuntu-26.04'
+        if: contains(fromJSON(needs.runner-matrix.outputs.pcre1), matrix.os)
         run: sudo apt-get install -y libpcre3-dev
 
       - name: Show Lua installation
@@ -228,12 +246,13 @@ jobs:
 
   build-macos:
     name: macOS (${{ matrix.os }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15,macos-26]
+        os: ${{ fromJSON(needs.runner-matrix.outputs.macos) }}
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -289,12 +308,14 @@ jobs:
         run: make check
 
   build-windows:
-    name: Windows (${{ matrix.platform.label }}, ${{ matrix.configure.label }})
-    runs-on: windows-2022
+    name: Windows (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.configure.label }})
+    needs: runner-matrix
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: ${{ fromJSON(needs.runner-matrix.outputs.windows) }}
         platform:
           - { label: "x64", arch: "x86_64" }
         configuration: [Release]
@@ -314,7 +335,7 @@ jobs:
 
       - name: Install Conan package manager
         run: |
-          pip3 install conan --upgrade
+          python -m pip install --upgrade --only-binary=:all: "conan==2.33.0"
           conan profile detect
 
       - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
