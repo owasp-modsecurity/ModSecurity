@@ -161,7 +161,7 @@ static void acmp_connect_other_matches(ACMP *parser, acmp_node_t *node) {
 }
 
 void acmp_btree_free(acmp_btree_node_t *node) {
-    if (node == NULL) {
+    if (node == nullptr) {
         return;
     }
 
