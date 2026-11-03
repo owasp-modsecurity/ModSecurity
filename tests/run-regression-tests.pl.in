@@ -354,6 +354,13 @@ sub runfile {
     msg(sprintf("Passed: %2d; Failed: %2d", $pass, $testnum ? (1 - $pass) : ($n - $pass)));
 }
 
+# Trim indent in action strings
+sub trim_action_indent {
+    my $r = $_[0];
+    $r =~ s/[\t]+//mg;
+    return $r;
+}
+
 # Take out any indenting and translate LF -> CRLF
 sub normalize_raw_request_data {
     my $r = $_[0];

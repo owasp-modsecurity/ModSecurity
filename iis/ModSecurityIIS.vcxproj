@@ -317,6 +317,7 @@ net start W3SVC /y</Command>
     <ClInclude Include="..\apache2\msc_parsers.h" />
     <ClInclude Include="..\apache2\msc_pcre.h" />
     <ClInclude Include="..\apache2\msc_release.h" />
+    <ClInclude Include="..\apache2\msc_reqbody.h" />
     <ClInclude Include="..\apache2\msc_tree.h" />
     <ClInclude Include="..\apache2\msc_unicode.h" />
     <ClInclude Include="..\apache2\msc_util.h" />

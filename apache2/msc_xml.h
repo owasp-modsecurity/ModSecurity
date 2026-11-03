@@ -43,6 +43,7 @@ struct xml_data {
     xmlDocPtr               doc;
 
     unsigned int            well_formed;
+    unsigned int            allow_ill_formed;
 
     /* error reporting and XML array flag */
     char                   *xml_error;

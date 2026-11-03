@@ -4,7 +4,7 @@ MOD_SECURITY2 = mod_security2 apache2_config apache2_io apache2_util \
     persist_dbm msc_reqbody pdf_protect msc_geo msc_gsb msc_unicode acmp msc_lua
 
 H = re.h modsecurity.h msc_logging.h msc_multipart.h msc_parsers.h \
-    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h apache2.h pdf_protect.h \
+    msc_pcre.h msc_util.h msc_xml.h persist_dbm.h msc_reqbody.h apache2.h pdf_protect.h \
     msc_geo.h msc_gsb.h msc_unicode.h acmp.h utf8tables.h msc_lua.h
 
 ${MOD_SECURITY2:=.slo}: ${H}
