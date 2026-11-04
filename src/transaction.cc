@@ -671,6 +671,28 @@ int Transaction::addRequestHeader(const unsigned char *key, size_t key_n,
  * @retval false Operation failed.
  *
  */
+void Transaction::buildFullRequest() {
+    if (!m_fullRequestPending || m_fullRequestBuilt) {
+        return;
+    }
+    m_fullRequestBuilt = true;
+    std::string fullRequest;
+    std::vector<const VariableValue *> l;
+    m_variableRequestHeaders.resolve(&l);
+    for (auto &h : l) {
+        fullRequest.append(h->getKey()).append(": ")
+            .append(h->getValue()).append("\n");
+        delete h;
+    }
+
+    fullRequest.append("\n\n");
+    fullRequest.append(m_requestBody.str());
+    m_variableFullRequest.set(fullRequest, m_variableOffset);
+    m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
+        m_variableOffset);
+}
+
+
 int Transaction::processRequestBody() {
     ms_dbg(4, "Starting phase REQUEST_BODY. (SecRules 2)");
 
@@ -842,23 +864,8 @@ int Transaction::processRequestBody() {
         }
     }
 
-    /**
-     * FIXME: This variable should be calculated on demand, it is
-     * computationally intensive.
-     */
-    std::string fullRequest;
-    std::vector<const VariableValue *> l;
-    m_variableRequestHeaders.resolve(&l);
-    for (auto &h : l) {
-        fullRequest = fullRequest + h->getKey() + ": " + h->getValue() + "\n";
-        delete h;
-    }
-
-    fullRequest = fullRequest + "\n\n";
-    fullRequest = fullRequest + m_requestBody.str();
-    m_variableFullRequest.set(fullRequest, m_variableOffset);
-    m_variableFullRequestLength.set(std::to_string(fullRequest.size()),
-        m_variableOffset);
+    m_fullRequestPending = true;
+    m_fullRequestBuilt = false;
 
     if (m_requestBody.tellp() > 0) {
         m_variableRequestBody.set(m_requestBody.str(), m_variableOffset);
