@@ -26,6 +26,11 @@
 #include "src/run_time_string.h"
 
 namespace modsecurity {
+namespace Utils {
+class Regex;
+enum class RegexResult;
+}  // namespace Utils
+
 namespace operators {
 
 class Operator {
@@ -140,6 +145,15 @@ class Operator {
     std::string m_param;
     std::unique_ptr<RunTimeString> m_string;
     bool m_couldContainsMacro;
+
+ protected:
+    /* Regex error reporting shared by @rx and @rxGlobal: sets the
+     * standalone MSC_PCRE_* variables and the TX:MSC_PCRE_* flags. */
+    static void reportRegexCompileError(Transaction *transaction,
+        const Utils::Regex &re);
+    static void reportRegexSearchError(Transaction *transaction,
+        const Utils::Regex &re, Utils::RegexResult result,
+        const std::string &opName);
 };
 
 }  // namespace operators

@@ -1,6 +1,7 @@
 /*
  * ModSecurity, http://www.modsecurity.org/
  * Copyright (c) 2015 - 2021 Trustwave Holdings, Inc. (http://www.trustwave.com/)
+ *               2026 OWASP (https://owasp.org)
  *
  * You may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -143,6 +144,7 @@ class TransactionAnchoredVariables {
         m_variableMultipartCrlfLFLines(t, "MULTIPART_CRLF_LF_LINES"),
         m_variableMultipartDataAfter(t, "MULTIPART_DATA_AFTER"),
         m_variableMultipartDataBefore(t, "MULTIPART_DATA_BEFORE"),
+        m_variableMultipartDuplicatePartHeader(t, "MULTIPART_DUPLICATE_PART_HEADER"),
         m_variableMultipartFileLimitExceeded(t,
             "MULTIPART_FILE_LIMIT_EXCEEDED"),
         m_variableMultipartHeaderFolding(t, "MULTIPART_HEADER_FOLDING"),
@@ -194,6 +196,8 @@ class TransactionAnchoredVariables {
         m_variableFilesNames(t, "FILES_NAMES"),
         m_variableFilesTmpContent(t, "FILES_TMP_CONTENT"),
         m_variableMultipartFileName(t, "MULTIPART_FILENAME"),
+        m_variableMultipartFileNameCharset(t, "MULTIPART_FILENAME_CHARSET"),
+        m_variableMultipartFileNameLanguage(t, "MULTIPART_FILENAME_LANGUAGE"),
         m_variableMultipartName(t, "MULTIPART_NAME"),
         m_variableMatchedVarsNames(t, "MATCHED_VARS_NAMES"),
         m_variableMatchedVars(t, "MATCHED_VARS"),
@@ -229,6 +233,7 @@ class TransactionAnchoredVariables {
     AnchoredVariable m_variableMultipartCrlfLFLines;
     AnchoredVariable m_variableMultipartDataAfter;
     AnchoredVariable m_variableMultipartDataBefore;
+    AnchoredVariable m_variableMultipartDuplicatePartHeader;
     AnchoredVariable m_variableMultipartFileLimitExceeded;
     AnchoredVariable m_variableMultipartHeaderFolding;
     AnchoredVariable m_variableMultipartInvalidHeaderFolding;
@@ -278,6 +283,8 @@ class TransactionAnchoredVariables {
     AnchoredSetVariable m_variableFilesNames;
     AnchoredSetVariable m_variableFilesTmpContent;
     AnchoredSetVariable m_variableMultipartFileName;
+    AnchoredSetVariable m_variableMultipartFileNameCharset;
+    AnchoredSetVariable m_variableMultipartFileNameLanguage;
     AnchoredSetVariable m_variableMultipartName;
     AnchoredSetVariable m_variableMatchedVarsNames;
     AnchoredSetVariable m_variableMatchedVars;
@@ -425,8 +432,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * @note There is space for performance improvement. This value don't
 	 *       need to be filled if there is no rule using the variable
 	 *       `duration'.
+     *
+     * @note Must be a floating point type: utils::cpu_seconds() returns a
+     *       double and storing it in an integer type (as the former clock_t
+     *       did) truncated the fractional seconds, making `duration' wrong.
      */
-    const clock_t m_creationTimeStamp;
+    const double m_creationTimeStamp;
 
     /**
      * Holds the client IP address.

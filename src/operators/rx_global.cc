@@ -26,10 +26,21 @@
 namespace modsecurity {
 namespace operators {
 
+#ifdef MODSEC_REGEX_DOLLAR_ENDONLY
+static const bool kRxGlobalMultiLine = false;
+#else
+static const bool kRxGlobalMultiLine = true;
+#endif
 
 bool RxGlobal::init(const std::string &arg, std::string *error) {
     if (m_string->m_containsMacro == false) {
-        m_re = new Regex(m_param);
+        m_re = new Regex(m_param, false, kRxGlobalMultiLine);
+        if (m_re->hasError()) {
+            if (error) {
+                *error = "Invalid regular expression: " + m_param;
+            }
+            return false;
+        }
     }
 
     return true;
@@ -38,7 +49,8 @@ bool RxGlobal::init(const std::string &arg, std::string *error) {
 
 bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    Regex *re;
+    const Regex *re;
+    std::unique_ptr<Regex> re_ptr;
 
     if (m_param.empty() && !m_string->m_containsMacro) {
         return true;
@@ -46,9 +58,19 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     if (m_string->m_containsMacro) {
         std::string eparam(m_string->evaluate(transaction));
-        re = new Regex(eparam);
+        re_ptr = std::make_unique<Regex>(eparam, false, kRxGlobalMultiLine);
+        re = re_ptr.get();
     } else {
         re = m_re;
+    }
+
+    if (re->hasError()) {
+        reportRegexCompileError(transaction, *re);
+        /* A regex failure is neither a match nor a mismatch. Return the
+         * value that the negation in Operator::evaluateInternal turns
+         * into "no match", so that the negated form does not fire on
+         * errors either (#3123). */
+        return m_negation;
     }
 
     Utils::RegexResult regex_result;
@@ -60,23 +82,14 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
         regex_result = re->searchGlobal(input, captures);
     }
 
-    // FIXME: DRY regex error reporting. This logic is currently duplicated in other operators.
     if (regex_result != Utils::RegexResult::Ok) {
-        if (transaction) {
-            transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+        reportRegexSearchError(transaction, *re, regex_result, "rxGlobal");
 
-            std::string regex_error_str = "OTHER";
-            if (regex_result == Utils::RegexResult::ErrorMatchLimit) {
-                regex_error_str = "MATCH_LIMIT";
-                transaction->m_variableMscPcreLimitsExceeded.set("1", transaction->m_variableOffset);
-                transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_LIMITS_EXCEEDED", "1");
-                ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_LIMITS_EXCEEDED to 1");
-            }
-
-            ms_dbg_a(transaction, 1, "rxGlobal: regex error '" + regex_error_str + "' for pattern '" + re->pattern + "'");
-        }
-
-        return false;
+        /* A regex failure is neither a match nor a mismatch. Return the
+         * value that the negation in Operator::evaluateInternal turns
+         * into "no match", so that the negated form does not fire on
+         * errors either (#3123). */
+        return m_negation;
     }
 
 
@@ -93,10 +106,6 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
 
     for (const auto & capture : captures) {
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
-    }
-
-    if (m_string->m_containsMacro) {
-        delete re;
     }
 
     if (captures.size() > 0) {

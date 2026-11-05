@@ -21,6 +21,7 @@
 
 #include "modsecurity/transaction.h"
 #include "src/run_time_string.h"
+#include "src/utils/regex.h"
 #include "src/utils/string.h"
 #include "src/operators/begins_with.h"
 #include "src/operators/contains.h"
@@ -68,6 +69,43 @@
 
 namespace modsecurity {
 namespace operators {
+
+
+void Operator::reportRegexCompileError(Transaction *transaction,
+    const Utils::Regex &re) {
+    if (transaction == nullptr) {
+        return;
+    }
+
+    ms_dbg_a(transaction, 1, "Error with regular expression: \"" + re.pattern + "\"");
+    transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+    transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
+    ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
+}
+
+
+void Operator::reportRegexSearchError(Transaction *transaction,
+    const Utils::Regex &re, Utils::RegexResult result,
+    const std::string &opName) {
+    if (transaction == nullptr) {
+        return;
+    }
+
+    transaction->m_variableMscPcreError.set("1", transaction->m_variableOffset);
+    transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_ERROR", "1");
+    ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_ERROR to 1");
+
+    const bool match_limit = (result == Utils::RegexResult::ErrorMatchLimit);
+    if (match_limit) {
+        transaction->m_variableMscPcreLimitsExceeded.set("1", transaction->m_variableOffset);
+        transaction->m_collections.m_tx_collection->storeOrUpdateFirst("MSC_PCRE_LIMITS_EXCEEDED", "1");
+        ms_dbg_a(transaction, 7, "Set TX.MSC_PCRE_LIMITS_EXCEEDED to 1");
+    }
+
+    ms_dbg_a(transaction, 1, opName + ": regex error '"
+        + (match_limit ? "MATCH_LIMIT" : "OTHER")
+        + "' for pattern '" + re.pattern + "'");
+}
 
 
 bool Operator::evaluateInternal(Transaction *transaction,
