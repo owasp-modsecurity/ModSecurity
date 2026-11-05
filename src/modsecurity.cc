@@ -44,6 +44,18 @@
 
 namespace modsecurity {
 
+namespace {
+
+// Reserved internal bit; it must not be exposed as a LogProperty.
+constexpr int InterventionLogPayloadDisabledMask = 0x40000000;
+static_assert((InterventionLogPayloadDisabledMask
+    & (TextLogProperty | RuleMessageLogProperty
+        | IncludeFullHighlightLogProperty)) == 0,
+    "intervention log payload state must not overlap public "
+    "log properties");
+
+}  // namespace
+
 /**
  * @name    ModSecurity
  * @brief   Initilizes ModSecurity CPP API
@@ -404,6 +416,11 @@ void ModSecurity::setInterventionLogPayloadEnabled(bool enabled) {
     } else {
         m_logProperties |= InterventionLogPayloadDisabledMask;
     }
+}
+
+
+bool ModSecurity::isInterventionLogPayloadEnabled() const {
+    return (m_logProperties & InterventionLogPayloadDisabledMask) == 0;
 }
 
 

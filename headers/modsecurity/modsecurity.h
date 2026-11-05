@@ -229,9 +229,6 @@ namespace modsecurity {
 namespace actions {
 class Action;
 }
-namespace intervention {
-class LogPayloadAccess;
-}
 class RuleWithOperator;
 
 #ifdef __cplusplus
@@ -317,6 +314,11 @@ class ModSecurity {
      */
     void setInterventionLogPayloadEnabled(bool enabled);
 
+    /**
+     * Returns whether human-readable intervention log payloads are enabled.
+     */
+    bool isInterventionLogPayloadEnabled() const;
+
     void serverLog(void *data, const RuleMessage &rm);
 
     const std::string& getConnectorInformation() const;
@@ -331,14 +333,6 @@ class ModSecurity {
     collection::Collection *m_user_collection;
 
  private:
-    friend class intervention::LogPayloadAccess;
-    // Reserved internal bit; it must not be exposed as a LogProperty.
-    static constexpr int InterventionLogPayloadDisabledMask = 0x40000000;
-    static_assert((InterventionLogPayloadDisabledMask
-        & (TextLogProperty | RuleMessageLogProperty
-            | IncludeFullHighlightLogProperty)) == 0,
-        "intervention log payload state must not overlap public "
-        "log properties");
     std::string m_connector;
     std::string m_whoami;
     ModSecLogCb m_logCb;

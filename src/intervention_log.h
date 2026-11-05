@@ -26,19 +26,10 @@ namespace modsecurity {
 
 namespace intervention {
 
-class LogPayloadAccess {
- public:
-    static bool isEnabled(const ModSecurity *modsecurity) {
-        return (modsecurity->m_logProperties
-            & ModSecurity::InterventionLogPayloadDisabledMask) == 0;
-    }
-};
-
-
 static inline void setLogPayload(Transaction *transaction,
     const RuleMessage &message) {
     freeLog(&transaction->m_it);
-    if (!LogPayloadAccess::isEnabled(transaction->m_ms)) {
+    if (!transaction->m_ms->isInterventionLogPayloadEnabled()) {
         return;
     }
 
@@ -50,7 +41,7 @@ static inline void setLogPayload(Transaction *transaction,
 static inline void setLogPayload(Transaction *transaction,
     const char *message) {
     freeLog(&transaction->m_it);
-    if (!LogPayloadAccess::isEnabled(transaction->m_ms)) {
+    if (!transaction->m_ms->isInterventionLogPayloadEnabled()) {
         return;
     }
 
