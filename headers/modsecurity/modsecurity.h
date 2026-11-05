@@ -305,6 +305,11 @@ class ModSecurity {
      * status codes, redirect URLs, server log callbacks, debug logs, or audit
      * logs.
      *
+     * Disruptive rule messages are not sent to the server log callback.
+     * Connectors that rely on this payload for error logging will no longer
+     * log these messages when the payload is disabled. Audit logging still
+     * depends on the audit log settings.
+     *
      * This setting applies to the ModSecurity instance and every transaction
      * created from it; it is not a per-transaction or per-rule option.
      * Configure it before publishing the instance to worker threads. Changing
@@ -367,6 +372,11 @@ void msc_set_log_cb(ModSecurity *msc, ModSecLogCb cb);
  * it before publishing the instance to worker threads. It does not affect
  * disruptive actions, status codes, redirect URLs, server log callbacks,
  * debug logs, or audit logs.
+ *
+ * Disruptive rule messages are not sent to the server log callback.
+ * Connectors that rely on this payload for error logging will no longer
+ * log these messages when the payload is disabled. Audit logging still
+ * depends on the audit log settings.
  *
  * @param msc A non-NULL ModSecurity instance.
  * @param enabled Zero to disable the payload, nonzero to enable it.
