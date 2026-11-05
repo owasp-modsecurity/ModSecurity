@@ -165,6 +165,8 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
 
         if (t->intervention_log_payload_enabled.has_value()) {
             const int enabled = t->intervention_log_payload_enabled.value();
+            // When enabling, disable first to exercise the state transition
+            // instead of relying on the enabled default.
             if (t->intervention_log_payload_api == "c") {
                 if (enabled != 0) {
                     modsecurity::msc_set_intervention_log_payload_enabled(
