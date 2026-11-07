@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include <charconv>
 #include <sstream>
 #include <unordered_map>
 #include <string>
@@ -247,18 +248,50 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
             });
 }
 
+// Returns true when any Transfer-Encoding header value contains the
+// "chunked" transfer coding, comparing the comma-separated coding list
+// token by token, e.g. "gzip, chunked".
 static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
-    return std::any_of(std::begin(headers), std::end(headers),
-        [](const auto &header) {
-            const auto &[name, value]{header};
-            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
-        });
+    for (const auto &header : headers) {
+        const auto &[name, value]{header};
+        if (!iequals_ascii(name, "Transfer-Encoding")) {
+            continue;
+        }
+        size_t begin = 0;
+        while (begin != std::string::npos && begin <= value.size()) {
+            const size_t end = value.find(',', begin);
+            std::string_view coding(value.data() + begin,
+                (end == std::string::npos ? value.size() : end) - begin);
+            while (!coding.empty() && (coding.front() == ' ' || coding.front() == '\t')) {
+                coding.remove_prefix(1);
+            }
+            while (!coding.empty() && (coding.back() == ' ' || coding.back() == '\t')) {
+                coding.remove_suffix(1);
+            }
+            if (iequals_ascii(coding, "chunked")) {
+                return true;
+            }
+            begin = (end == std::string::npos) ? std::string::npos : end + 1;
+        }
+    }
+    return false;
 }
 
-// Rewrites the Content-Length headers to match the given body length, and
-// adds a Content-Length header when none is set and the body length is not
-// zero. Bodies announced with Transfer-Encoding: chunked are left untouched,
-// as their length is not carried by Content-Length.
+// Parses a Content-Length field value as a decimal number, as required by
+// RFC 9110 (1*DIGIT). Returns false when the value is not entirely digits
+// or does not fit in size_t.
+static bool parse_content_length_value(const std::string &value, size_t &out) {
+    const char *end = value.data() + value.size();
+    const auto [ptr, ec] = std::from_chars(value.data(), end, out);
+    return ec == std::errc() && ptr == end;
+}
+
+// Rewrites the Content-Length headers whose value does not match the given
+// body length numerically, and adds a Content-Length header when none is
+// set and the body length is not zero. Values that are already numerically
+// correct, e.g. with leading zeroes, are left untouched. Bodies announced
+// with Transfer-Encoding: chunked are left untouched, as their length is
+// not carried by Content-Length.
 static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
     if (has_chunked_header(headers)) {
         return;
@@ -267,8 +300,11 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
     bool has_content_length = false;
     for (auto &[name, value] : headers) {
         if (iequals_ascii(name, "Content-Length")) {
-            value = std::to_string(length);
             has_content_length = true;
+            size_t parsed = 0;
+            if (!parse_content_length_value(value, parsed) || parsed != length) {
+                value = std::to_string(length);
+            }
         }
     }
     if (!has_content_length && length != 0) {
@@ -281,14 +317,20 @@ void RegressionTest::update_content_lengths() {
     update_content_length(response_headers, response_body.size());
 }
 
+// Returns the values of the Content-Length headers that are not valid
+// decimal numbers equal to the given body length. Values that are
+// numerically correct, e.g. with leading zeroes, are not mismatches.
 static std::vector<std::string> mismatching_content_length_values(
     const std::vector<std::pair<std::string, std::string>> &headers,
     size_t body_length) {
     std::vector<std::string> values;
-    const std::string expected = std::to_string(body_length);
     for (const auto &header : headers) {
         const auto &[name, value]{header};
-        if (iequals_ascii(name, "Content-Length") && value != expected) {
+        if (!iequals_ascii(name, "Content-Length")) {
+            continue;
+        }
+        size_t parsed = 0;
+        if (!parse_content_length_value(value, parsed) || parsed != body_length) {
             values.push_back(value);
         }
     }

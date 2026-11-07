@@ -93,9 +93,11 @@ class RegressionTest {
     void update_content_lengths();
 
     // Returns a message describing every Content-Length header whose value
-    // does not match the length of the corresponding body, e.g.:
+    // is not a valid decimal number equal to the length of the
+    // corresponding body, e.g.:
     // "request Content-Length header (5) does not match the request body
-    // length (3)". These are exactly the mismatches that
+    // length (3)". Values that are numerically correct, e.g. with leading
+    // zeroes, are not reported. These are exactly the mismatches that
     // update_content_lengths() fixes; it may additionally add a missing
     // Content-Length header, which is not reported here. Returns an empty
     // string when all the Content-Length headers match; bodies announced
