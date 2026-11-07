@@ -1,0 +1,465 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (marked) :: request only",
+    "content_length_mismatch": true,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "99"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "3"
+      },
+      "body": [
+        "OK."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 99\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (marked) :: response only",
+    "content_length_mismatch": true,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "24"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "999"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecResponseBodyAccess On",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 999\" \"id:1,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (marked) :: both mismatched",
+    "content_length_mismatch": true,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "99"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "999"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecResponseBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 99\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\"",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 999\" \"id:3,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:4\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (marked) :: both match",
+    "content_length_mismatch": true,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "24"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "23"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecResponseBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 24\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\"",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 23\" \"id:3,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:4\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (unmarked) :: request only",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "99"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "3"
+      },
+      "body": [
+        "OK."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 99\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (unmarked) :: response only",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "24"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "999"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecResponseBodyAccess On",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 999\" \"id:1,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:2\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (unmarked) :: both mismatched",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "99"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "999"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecResponseBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 99\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\"",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 999\" \"id:3,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:4\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (unmarked) :: both match",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain",
+        "Content-Length": "24"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "23"
+      },
+      "body": [
+        "response body inspected"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecResponseBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Length \"@eq 24\" \"id:1,phase:2,deny,status:403,chain\"",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:2\"",
+      "SecRule RESPONSE_HEADERS:Content-Length \"@eq 23\" \"id:3,phase:4,deny,status:403,chain\"",
+      "SecRule RESPONSE_BODY \"@contains response body\" \"id:4\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (marked) :: request body without a Content-Length header",
+    "content_length_mismatch": true,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "3"
+      },
+      "body": [
+        "OK."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:1,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Content-Length mismatch (unmarked) :: request body without a Content-Length header",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "text/plain"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "ModSecurity request body"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "3"
+      },
+      "body": [
+        "OK."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_BODY \"@contains request body\" \"id:1,phase:2,deny,status:403\""
+    ]
+  }
+]
