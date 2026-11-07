@@ -186,6 +186,16 @@ void perform_unit_test(const ModSecurityTest<RegressionTest> &test,
             continue;
         }
 
+        if (!t->content_length_mismatch) {
+            const std::string mismatches = t->content_length_mismatches();
+            if (!mismatches.empty()) {
+                std::cerr << "warning: " << filename << ", test " << *count
+                    << " (\"" << t->name << "\"): " << mismatches
+                    << "; set \"content_length_mismatch\": true in this test"
+                    << " if the mismatch is intentional" << std::endl;
+            }
+        }
+
         context.m_modsec_rules.load("SecDebugLogLevel 9");
         if (context.m_modsec_rules.load(t->rules.c_str(), filename) < 0) {
             /* Parser error */

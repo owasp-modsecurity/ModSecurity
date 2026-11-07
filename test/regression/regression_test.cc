@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include <charconv>
 #include <sstream>
 #include <unordered_map>
 #include <string>
@@ -103,6 +104,13 @@ static inline void set_string_from_yajl(std::string &dest, std::string_view want
     }
 }
 
+static inline void set_bool_from_yajl(bool &dest, std::string_view want_key, std::string_view key, const yajl_val &val) {
+    if (key == want_key) {
+        dest = YAJL_IS_TRUE(val) ||
+            (YAJL_IS_INTEGER(val) && YAJL_GET_INTEGER(val) != 0);
+    }
+}
+
 std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &node) {
     size_t nelem = node->u.object.len;
     auto u = std::make_unique<RegressionTest>();
@@ -119,6 +127,7 @@ std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &n
         set_string_from_yajl(u->url, "url", key, val);
         set_string_from_yajl(u->resource, "resource", key, val);
         set_opt_int_from_yajl(u->github_issue, "github_issue", key, val);
+        set_bool_from_yajl(u->content_length_mismatch, "content_length_mismatch", key, val);
         if (strcmp(key, "client") == 0) {
             u->update_client_from_yajl_node(val);
         }
@@ -239,14 +248,50 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
             });
 }
 
+// Returns true when any Transfer-Encoding header value contains the
+// "chunked" transfer coding, comparing the comma-separated coding list
+// token by token, e.g. "gzip, chunked".
 static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
-    return std::any_of(std::begin(headers), std::end(headers),
-        [](const auto &header) {
-            const auto &[name, value]{header};
-            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
-        });
+    for (const auto &header : headers) {
+        const auto &[name, value]{header};
+        if (!iequals_ascii(name, "Transfer-Encoding")) {
+            continue;
+        }
+        size_t begin = 0;
+        while (begin != std::string::npos && begin <= value.size()) {
+            const size_t end = value.find(',', begin);
+            std::string_view coding(value.data() + begin,
+                (end == std::string::npos ? value.size() : end) - begin);
+            while (!coding.empty() && (coding.front() == ' ' || coding.front() == '\t')) {
+                coding.remove_prefix(1);
+            }
+            while (!coding.empty() && (coding.back() == ' ' || coding.back() == '\t')) {
+                coding.remove_suffix(1);
+            }
+            if (iequals_ascii(coding, "chunked")) {
+                return true;
+            }
+            begin = (end == std::string::npos) ? std::string::npos : end + 1;
+        }
+    }
+    return false;
 }
 
+// Parses a Content-Length field value as a decimal number, as required by
+// RFC 9110 (1*DIGIT). Returns false when the value is not entirely digits
+// or does not fit in size_t.
+static bool parse_content_length_value(const std::string &value, size_t &out) {
+    const char *end = value.data() + value.size();
+    const auto [ptr, ec] = std::from_chars(value.data(), end, out);
+    return ec == std::errc() && ptr == end;
+}
+
+// Rewrites the Content-Length headers whose value does not match the given
+// body length numerically, and adds a Content-Length header when none is
+// set and the body length is not zero. Values that are already numerically
+// correct, e.g. with leading zeroes, are left untouched. Bodies announced
+// with Transfer-Encoding: chunked are left untouched, as their length is
+// not carried by Content-Length.
 static void update_content_length(std::vector<std::pair<std::string, std::string>> &headers, size_t length) {
     if (has_chunked_header(headers)) {
         return;
@@ -255,8 +300,11 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
     bool has_content_length = false;
     for (auto &[name, value] : headers) {
         if (iequals_ascii(name, "Content-Length")) {
-            value = std::to_string(length);
             has_content_length = true;
+            size_t parsed = 0;
+            if (!parse_content_length_value(value, parsed) || parsed != length) {
+                value = std::to_string(length);
+            }
         }
     }
     if (!has_content_length && length != 0) {
@@ -267,6 +315,69 @@ static void update_content_length(std::vector<std::pair<std::string, std::string
 void RegressionTest::update_content_lengths() {
     update_content_length(request_headers, request_body.size());
     update_content_length(response_headers, response_body.size());
+}
+
+// Returns the values of the Content-Length headers that are not valid
+// decimal numbers equal to the given body length. Values that are
+// numerically correct, e.g. with leading zeroes, are not mismatches.
+static std::vector<std::string> mismatching_content_length_values(
+    const std::vector<std::pair<std::string, std::string>> &headers,
+    size_t body_length) {
+    std::vector<std::string> values;
+    for (const auto &header : headers) {
+        const auto &[name, value]{header};
+        if (!iequals_ascii(name, "Content-Length")) {
+            continue;
+        }
+        size_t parsed = 0;
+        if (!parse_content_length_value(value, parsed) || parsed != body_length) {
+            values.push_back(value);
+        }
+    }
+    return values;
+}
+
+static std::string content_length_mismatches_for(std::string_view side,
+    const std::vector<std::pair<std::string, std::string>> &headers,
+    size_t body_length) {
+    // Bodies announced with Transfer-Encoding: chunked are never rewritten
+    // by update_content_length(), so their Content-Length headers, if any,
+    // are not reported as mismatches either.
+    if (has_chunked_header(headers)) {
+        return "";
+    }
+    const std::vector<std::string> values =
+        mismatching_content_length_values(headers, body_length);
+    if (values.empty()) {
+        return "";
+    }
+    std::stringstream ss;
+    ss << side << " Content-Length header";
+    if (values.size() > 1) {
+        ss << "s";
+    }
+    ss << " (";
+    for (size_t i = 0; i < values.size(); i++) {
+        if (i > 0) {
+            ss << ", ";
+        }
+        ss << values[i];
+    }
+    ss << ") " << (values.size() > 1 ? "do" : "does") << " not match the "
+        << side << " body length (" << body_length << ")";
+    return ss.str();
+}
+
+std::string RegressionTest::content_length_mismatches() const {
+    std::string mismatches = content_length_mismatches_for("request",
+        request_headers, request_body.size());
+    const std::string response_mismatches = content_length_mismatches_for(
+        "response", response_headers, response_body.size());
+    if (!mismatches.empty() && !response_mismatches.empty()) {
+        mismatches += "; ";
+    }
+    mismatches += response_mismatches;
+    return mismatches;
 }
 
 std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val &node) {
@@ -280,8 +391,26 @@ std::unique_ptr<RegressionTests> RegressionTests::from_yajl_node(const yajl_val 
 }
 
 void RegressionTests::update_content_lengths() {
+    size_t test_number = 1;
     for (auto & test : tests) {
-        test->update_content_lengths();
+        if (!test->content_length_mismatch) {
+            const std::string mismatches = test->content_length_mismatches();
+            // content_length_mismatches() only reports sides that
+            // update_content_lengths() rewrites, so the update below always
+            // changes at least one header when there is a mismatch. It may
+            // additionally add a missing Content-Length header, which is
+            // reported by neither the mismatches above nor this warning.
+            test->update_content_lengths();
+            if (!mismatches.empty()) {
+                std::cerr << "warning: " << filename << ", test " << test_number
+                    << " (\"" << test->name << "\"): " << mismatches
+                    << "; the Content-Length header was updated to match the"
+                    << " body length; if the mismatch was intentional, revert"
+                    << " the change and set \"content_length_mismatch\": true"
+                    << " in this test" << std::endl;
+            }
+        }
+        test_number++;
     }
 }
 
@@ -324,6 +453,13 @@ static yajl_gen_status gen_key_int_if_non_zero(yajl_gen g, std::string_view key,
         return yajl_gen_status_ok;
     }
     return gen_key_int(g, key, val);
+}
+
+static yajl_gen_status gen_key_bool(yajl_gen g, std::string_view key, bool val) {
+    if (auto s{gen_string_view(g, key)}; s != yajl_gen_status_ok) {
+        return s;
+    }
+    return yajl_gen_bool(g, val ? 1 : 0);
 }
 
 static yajl_gen_status gen_key_number(yajl_gen g, std::string_view key, std::string_view raw_val) {
@@ -385,6 +521,9 @@ std::string RegressionTests::toJSON() const {
         gen_key_str_if_non_empty(g, "url", t->url);
         gen_key_str_if_non_empty(g, "resource", t->resource);
         gen_key_opt_int(g, "github_issue", t->github_issue);
+        if (t->content_length_mismatch) {
+            gen_key_bool(g, "content_length_mismatch", true);
+        }
 
         gen_string_view(g, "client");
         yajl_gen_map_open(g);

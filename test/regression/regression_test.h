@@ -47,6 +47,13 @@ class RegressionTest {
     std::optional<int> version_max;
     std::optional<int> github_issue;
 
+    // Set from the "content_length_mismatch" JSON field. It marks tests
+    // whose Content-Length headers intentionally do not match the length
+    // of the request/response bodies. Those tests are left untouched by
+    // "regression_tests format" even when UPDATE_CONTENT_LENGTH is set,
+    // and do not trigger Content-Length warnings in the test runs.
+    bool content_length_mismatch = false;
+
     std::vector<std::pair<std::string, std::string>> request_headers;
     std::vector<std::pair<std::string, std::string>> response_headers;
     std::string request_body;
@@ -84,6 +91,19 @@ class RegressionTest {
     std::vector<std::string> response_body_lines;
     std::vector<std::string> rules_lines;
     void update_content_lengths();
+
+    // Returns a message describing every Content-Length header whose value
+    // is not a valid decimal number equal to the length of the
+    // corresponding body, e.g.:
+    // "request Content-Length header (5) does not match the request body
+    // length (3)". Values that are numerically correct, e.g. with leading
+    // zeroes, are not reported. These are exactly the mismatches that
+    // update_content_lengths() fixes; it may additionally add a missing
+    // Content-Length header, which is not reported here. Returns an empty
+    // string when all the Content-Length headers match; bodies announced
+    // with Transfer-Encoding: chunked are never reported, as their
+    // Content-Length headers are left untouched.
+    std::string content_length_mismatches() const;
 
 private:
    void update_client_from_yajl_node(const yajl_val &val);
