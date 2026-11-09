@@ -234,5 +234,1184 @@
       "SecRuleEngine On",
       "SecRule REQUEST_URI \"@rx /test[0-9]+\" \"id:6,phase:1,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @detectSQLiFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@detectSQLiFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectSQLiFoo\" \"id:7,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @detectXSSFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@detectXSSFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSSFoo\" \"id:8,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @validateUrlEncodingFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@validateUrlEncodingFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@validateUrlEncodingFoo\" \"id:9,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @unconditionalMatchFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/something/else",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@unconditionalMatchFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@unconditionalMatchFoo\" \"id:10,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @detectSQLiFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@detectSQLiFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @detectSQLiFoo \"id:11,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @detectXSSFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@detectXSSFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @detectXSSFoo \"id:12,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @validateUrlEncodingFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@validateUrlEncodingFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @validateUrlEncodingFoo \"id:13,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @unconditionalMatchFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/something/else",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@unconditionalMatchFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI @unconditionalMatchFoo \"id:14,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @notAnOperator should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@notAnOperator"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@notAnOperator\" \"id:15,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @notAnOperator should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@notAnOperator"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @notAnOperator \"id:16,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted negated @detectSQLiFoo should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +@detectSQLiFoo"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"!@detectSQLiFoo\" \"id:17,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @equalsx should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +ualsx"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@equalsx 1\" \"id:18,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @equalsx should fail",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "8",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=1"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Invalid input: +ualsx"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @equalsx 1 \"id:19,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @detectSQLi should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "61",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=ascii(substring(version() from 1 for 1))&param2=value2"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectSQLi\" \"id:20,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @detectSQLi should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "61",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=ascii(substring(version() from 1 for 1))&param2=value2"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @detectSQLi \"id:21,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @detectXSS should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "32",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<script>alert(1)</script>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@detectXSS\" \"id:22,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @detectXSS should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "32",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=<script>alert(1)</script>"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @detectXSS \"id:23,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @validateUrlEncoding should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "X-Test": "%"
+      },
+      "uri": "/",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Test \"@validateUrlEncoding\" \"id:24,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @validateUrlEncoding should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "X-Test": "%"
+      },
+      "uri": "/",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS:X-Test @validateUrlEncoding \"id:25,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @unconditionalMatch should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/plain",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"@unconditionalMatch\" \"id:26,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @unconditionalMatch should still work",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/plain",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI @unconditionalMatch \"id:27,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted implicit regex should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/something/else",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI \"something\" \"id:28,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted implicit regex should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/something/else",
+      "method": "GET"
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_URI something \"id:29,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted pattern with embedded @ should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "23",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=user@example.com"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"user@example.com\" \"id:30,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted pattern with embedded @ should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "23",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=user@example.com"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS user@example.com \"id:31,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @rx parameter starting with @ should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "11",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=@foo"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx @foo\" \"id:32,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: unquoted @rx parameter starting with @ should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "11",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=@foo"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS @rx @foo \"id:33,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Operator prefix match :: quoted @streq parameter containing @ should still match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "23",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "param1=user@example.com"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "blocked."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@streq user@example.com\" \"id:34,phase:2,deny,status:403\""
+    ]
   }
 ]

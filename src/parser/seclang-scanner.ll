@@ -1169,6 +1169,7 @@ EQUALS_MINUS                            (?i:=\-)
 {OPERATOR_RSUB}                         { BEGIN_PARAMETER(); return p::make_OPERATOR_RSUB(*driver.loc.back()); }
 
 {NOT}                                   { return p::make_NOT(*driver.loc.back()); }
+"@"                                     { /* leading @ names an operator; implicit @rx has none */ BEGIN(LEXING_ERROR); yyless(0); }
 .                                       { BEGIN_NO_OP_INFORMED(); yyless(0); }
 }
 

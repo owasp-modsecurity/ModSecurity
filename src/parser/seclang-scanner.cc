@@ -433,8 +433,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 /* %% [3.0] code to copy yytext_ptr to yytext[] goes here, if %array \ */\
 	(yy_c_buf_p) = yy_cp;
 /* %% [4.0] data tables for the DFA and the user's section 1 definitions go here */
-#define YY_NUM_RULES 561
-#define YY_END_OF_BUFFER 562
+#define YY_NUM_RULES 562
+#define YY_END_OF_BUFFER 563
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -451,62 +451,62 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,    0,  291,  291,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,  562,  554,  548,  272,  276,  277,
-      275,  278,  554,  554,  554,  554,  554,  554,  554,  554,
-      554,  554,  554,  554,  554,  295,  295,  561,  295,  295,
+        0,    0,    0,    0,  563,  555,  549,  272,  276,  277,
+      275,  278,  555,  555,  555,  555,  555,  555,  555,  555,
+      555,  555,  555,  555,  555,  295,  295,  562,  295,  295,
 
       295,  295,  295,  295,  295,  295,  295,  295,  295,  295,
       295,  295,  295,  295,  295,  295,  125,  279,  285,  287,
-      289,  283,  282,  284,  281,  287,  280,  508,  508,  507,
-      508,  508,  508,  120,  119,  118,  128,  128,  128,  137,
+      289,  283,  282,  284,  281,  287,  280,  509,  509,  507,
+      508,  509,  508,  120,  119,  118,  128,  128,  128,  137,
       126,  128,  131,  131,  131,  129,  137,  131,  135,  135,
-      135,  133,  137,  132,  135,  553,  553,  553,  561,  512,
-      511,  510,  509,  459,  462,  561,  462,  459,  459,  459,
+      135,  133,  137,  132,  135,  554,  554,  554,  562,  513,
+      512,  511,  510,  459,  462,  562,  462,  459,  459,  459,
       448,  448,  448,  451,  453,  448,  452,  448,  442,  448,
-      522,  522,  522,  520,  526,  522,  524,  524,  524,  523,
-      526,  524,  117,  117,  109,  117,  114,  108,  117,  117,
+      523,  523,  523,  521,  527,  523,  525,  525,  525,  524,
+      527,  525,  117,  117,  109,  117,  114,  108,  117,  117,
 
       117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  117,  112,  117,  111,  561,
-      531,  561,  527,  540,  561,  291,  292,  561,  517,  517,
-      516,  519,  517,  515,  515,  513,  519,  515,  152,  555,
-      556,  557,  139,  138,  139,  139,  139,  139,  139,  139,
+      117,  117,  117,  117,  117,  117,  112,  117,  111,  562,
+      532,  562,  528,  541,  562,  291,  292,  562,  518,  518,
+      517,  520,  518,  516,  516,  514,  520,  516,  152,  556,
+      557,  558,  139,  138,  139,  139,  139,  139,  139,  139,
       143,  142,  147,  148,  148,  147,  145,  144,  142,  150,
-      151,  151,  149,  150,  548,  272,    0,  275,  275,  275,
+      151,  151,  149,  150,  549,  272,    0,  275,  275,  275,
         0,    0,    0,    0,    0,    0,    0,    0,  223,    0,
-        0,    0,    0,    0,  549,    0,    0,    0,    0,    0,
+        0,    0,    0,    0,  550,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,  427,    0,
 
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,  432,    0,    0,    0,    0,    0,  121,    0,  124,
-      279,  285,  287,  289,  286,  287,  288,  289,  290,  548,
+      279,  285,  287,  289,  286,  287,  288,  289,  290,  549,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,  128,    0,
       128,  128,  128,    0,  136,  121,  128,  127,  128,  131,
         0,    0,  131,  131,  131,    0,  131,  121,  131,  130,
       131,  135,    0,    0,  135,  135,  135,    0,  135,  121,
-      135,  134,  135,  553,  553,  553,    0,  551,  553,  459,
+      135,  134,  135,  554,  554,  554,    0,  552,  554,  459,
         0,  459,    0,  459,  459,    0,  459,  459,  448,    0,
 
-        0,  447,  448,  448,  448,    0,  448,  525,  448,  448,
-        0,  447,    0,  448,  440,  441,  448,  448,  522,    0,
-        0,  522,  522,  522,    0,  522,  121,  522,  521,  522,
-      524,    0,  524,  524,    0,  524,    0,    0,  121,  524,
-      524,    0,  109,    0,  108,    0,  110,  114,  115,    0,
+        0,  447,  448,  448,  448,    0,  448,  526,  448,  448,
+        0,  447,    0,  448,  440,  441,  448,  448,  523,    0,
+        0,  523,  523,  523,    0,  523,  121,  523,  522,  523,
+      525,    0,  525,  525,    0,  525,    0,    0,  121,  525,
+      525,    0,  109,    0,  108,    0,  110,  114,  115,    0,
       108,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       104,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  106,    0,    0,  112,    0,  113,  111,
-      111,    0,  531,    0,  540,    0,  531,  529,  539,    0,
+      111,    0,  532,    0,  541,    0,  532,  530,  540,    0,
 
-      527,  540,    0,    0,  547,    0,  530,    0,  291,  292,
-        0,  292,    0,    0,  517,    0,  517,    0,  518,  517,
-      515,    0,    0,  515,    0,  515,  514,  515,  555,  556,
-      557,    0,    0,    0,    0,    0,    0,  140,  141,  147,
+      528,  541,    0,    0,  548,    0,  531,    0,  291,  292,
+        0,  292,    0,    0,  518,    0,  518,    0,  519,  518,
+      516,    0,    0,  516,    0,  516,  515,  516,  556,  557,
+      558,    0,    0,    0,    0,    0,    0,  140,  141,  147,
         0,    0,  147,    0,  147,  146,  150,    0,    0,  150,
         0,  150,  275,    0,    0,    0,    0,    0,    0,    0,
-      222,    0,    0,    0,    0,    0,    0,    0,    0,  549,
-      550,    0,    0,    0,  410,    0,    0,  398,    0,    0,
+      222,    0,    0,    0,    0,    0,    0,    0,    0,  550,
+      551,    0,    0,    0,  410,    0,    0,  398,    0,    0,
         0,  435,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,  438,    0,    0,
 
@@ -516,27 +516,27 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,  128,    0,  128,    0,  121,  122,  127,
         0,  127,  128,    0,  131,    0,    0,  121,  122,  130,
         0,    0,  130,  131,    0,  135,    0,    0,  121,  122,
-      134,    0,    0,  134,  135,  551,  552,  459,    0,  459,
+      134,    0,    0,  134,  135,  552,  553,  459,    0,  459,
         0,  454,    0,  454,    0,  459,    0,  448,    0,    0,
       448,    0,  447,    0,  448,  448,  448,  448,  448,    0,
-        0,    0,    0,  448,  448,  448,    0,  522,    0,    0,
+        0,    0,    0,  448,  448,  448,    0,  523,    0,    0,
 
-      121,  122,  521,    0,    0,  521,  522,    0,  524,    0,
+      121,  122,  522,    0,    0,  522,  523,    0,  525,    0,
         0,  121,  121,  122,  116,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    9,    0,    0,    0,    0,    0,  103,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,  106,  107,
-      529,  539,  535,  538,    0,  542,    0,    0,  547,    0,
-        0,  530,  528,  537,    0,    0,  293,    0,    0,  517,
-        0,    0,    0,  515,    0,    0,  514,    0,    0,  514,
+      530,  540,  536,  539,    0,  543,    0,    0,  548,    0,
+        0,  531,  529,  538,    0,    0,  293,    0,    0,  518,
+        0,    0,    0,  516,    0,    0,  515,    0,    0,  515,
 
-      515,    0,    0,    0,    0,    0,  147,    0,    0,    0,
+      516,    0,    0,    0,    0,    0,  147,    0,    0,    0,
       150,    0,    0,  275,    0,    0,    0,    0,    0,  171,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,  229,  550,  374,    0,    0,  411,    0,    0,  399,
+        0,  229,  551,  374,    0,    0,  411,    0,    0,  399,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,  404,    0,    0,    0,  423,
         0,    0,  433,    0,    0,  409,  122,    0,    0,    0,
@@ -545,12 +545,12 @@ static const flex_int16_t yy_accept[4157] =
 
         0,  122,  127,    0,    0,  128,  127,  131,    0,  122,
       130,    0,  130,  131,    0,  130,  135,    0,  122,  134,
-        0,  134,  135,    0,  134,  552,  459,    0,    0,    0,
+        0,  134,  135,    0,  134,  553,  459,    0,    0,    0,
         0,  459,    0,    0,  455,  460,  456,  455,  460,  456,
       448,    0,  448,  448,  448,    0,  448,    0,    0,    0,
         0,  448,    0,  447,    0,  448,  448,  443,  449,  444,
-      443,  449,  444,    0,    0,  448,  448,  522,    0,  122,
-      521,    0,  521,  522,    0,  521,  524,    0,  122,  122,
+      443,  449,  444,    0,    0,  448,  448,  523,    0,  122,
+      522,    0,  522,  523,    0,  522,  525,    0,  122,  122,
         0,    0,    0,    0,    0,    0,    0,    0,    5,    0,
         0,    7,    0,    0,    0,    8,    0,    0,    0,   47,
 
@@ -558,10 +558,10 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,   61,    0,    0,  107,  535,  538,  534,  542,    0,
-      545,    0,    0,  541,    0,    0,  528,  537,  533,  536,
-      293,    0,  294,  517,    0,  515,    0,  514,    0,  514,
-      515,    0,  514,    0,    0,    0,    0,  147,    0,  150,
+        0,   61,    0,    0,  107,  536,  539,  535,  543,    0,
+      546,    0,    0,  542,    0,    0,  529,  538,  534,  537,
+      293,    0,  294,  518,    0,  516,    0,  515,    0,  515,
+      516,    0,  515,    0,    0,    0,    0,  147,    0,  150,
         0,  275,  275,  218,    0,    0,  220,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
@@ -578,17 +578,17 @@ static const flex_int16_t yy_accept[4157] =
 
       134,  457,  457,  457,    0,    0,  445,  445,    0,    0,
         0,  448,  448,    0,  445,    0,  448,    0,    0,    0,
-        0,    0,  521,    0,    0,  522,  521,    0,    0,    0,
+        0,    0,  522,    0,    0,  523,  522,    0,    0,    0,
        26,    0,    0,    2,    0,    4,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
        12,    0,   14,    0,    0,   16,    0,    0,   51,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
        73,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,  534,  545,    0,  546,  541,    0,
+        0,    0,    0,    0,  535,  546,    0,  547,  542,    0,
 
-      543,    0,  533,  536,  532,  294,    0,    0,    0,    0,
-        0,  514,    0,    0,  515,  514,    0,    0,    0,    0,
+      544,    0,  534,  537,  533,  294,    0,    0,    0,    0,
+        0,  515,    0,    0,  516,  515,    0,    0,    0,    0,
         0,    0,    0,  275,  275,    0,    0,    0,  172,    0,
         0,    0,  226,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -604,7 +604,7 @@ static const flex_int16_t yy_accept[4157] =
       127,    0,    0,  127,  128,    0,  130,    0,  130,    0,
       131,    0,  134,    0,  134,    0,  135,    0,  461,  458,
       461,  458,  450,  446,  450,  446,    0,  445,    0,    0,
-        0,  448,    0,  521,    0,  521,    0,  522,    0,    0,
+        0,  448,    0,  522,    0,  522,    0,  523,    0,    0,
         0,    1,    0,    0,    0,    0,    0,    0,    0,    0,
         0,   42,   42,    0,    8,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -612,8 +612,8 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,   60,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,   82,    0,    0,
         0,    0,   72,    0,   90,    0,    0,    0,    0,    0,
-        0,    0,    0,  546,  543,    0,  544,  532,  514,    0,
-      514,    0,  515,    0,    0,    0,    0,  275,  275,    0,
+        0,    0,    0,  547,  544,    0,  545,  533,  515,    0,
+      515,    0,  516,    0,    0,    0,    0,  275,  275,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -626,7 +626,7 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,  476,
         0,    0,    0,    0,    0,    0,  128,    0,    0,  131,
-        0,    0,  135,    0,    0,    0,    0,    0,  522,    0,
+        0,    0,  135,    0,    0,    0,    0,    0,  523,    0,
         0,    0,    0,    3,    0,    0,    0,    0,    0,    0,
         0,   42,    0,   42,   42,    0,    0,    0,    0,    0,
         0,    0,    0,   48,    0,    0,   15,    0,    0,   50,
@@ -634,7 +634,7 @@ static const flex_int16_t yy_accept[4157] =
         0,   52,   22,   53,   54,   56,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,   62,    0,    0,   63,  544,    0,    0,  515,    0,
+        0,   62,    0,    0,   63,  545,    0,    0,  516,    0,
         0,  275,  275,    0,    0,    0,  221,  224,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -656,7 +656,7 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,   55,    0,    0,   23,    0,    0,    0,    0,
         0,    0,    0,    0,    0,   95,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,   62,    0,
-        0,  275,  275,    0,    0,    0,  558,    0,  558,    0,
+        0,  275,  275,    0,    0,    0,  559,    0,  559,    0,
         0,  268,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -700,7 +700,7 @@ static const flex_int16_t yy_accept[4157] =
         0,    0,    0,   88,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,   91,    0,    0,    0,
         0,    0,  275,    0,  273,  273,  273,  273,  273,    0,
-      559,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+      560,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,  197,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -831,7 +831,7 @@ static const flex_int16_t yy_accept[4157] =
 
         0,    0,  167,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  181,    0,  255,    0,    0,    0,    0,
-      560,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+      561,    0,    0,    0,    0,    0,    0,    0,    0,    0,
       261,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,  212,    0,  296,    0,  385,    0,  307,
       386,    0,    0,    0,    0,    0,    0,  320,    0,    0,
@@ -5386,7 +5386,7 @@ static char *yy_last_accepting_cpos;
 extern int yy_flex_debug;
 int yy_flex_debug = 1;
 
-static const flex_int16_t yy_rule_linenum[561] =
+static const flex_int16_t yy_rule_linenum[562] =
     {   0,
       533,  534,  535,  536,  537,  538,  539,  540,  541,  542,
       543,  544,  545,  546,  547,  548,  549,  550,  551,  552,
@@ -5443,12 +5443,13 @@ static const flex_int16_t yy_rule_linenum[561] =
      1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154,
      1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164,
 
-     1165, 1166, 1167, 1168, 1169, 1170, 1172, 1173, 1178, 1179,
-     1183, 1184, 1188, 1189, 1190, 1194, 1195, 1198, 1199, 1203,
-     1204, 1205, 1209, 1210, 1214, 1215, 1220, 1222, 1223, 1224,
-     1225, 1227, 1228, 1229, 1230, 1232, 1233, 1234, 1235, 1237,
-     1239, 1240, 1242, 1243, 1244, 1245, 1247, 1252, 1253, 1254,
-     1258, 1259, 1260, 1265, 1267, 1268, 1269, 1288, 1317, 1347
+     1165, 1166, 1167, 1168, 1169, 1170, 1172, 1173, 1174, 1179,
+     1180, 1184, 1185, 1189, 1190, 1191, 1195, 1196, 1199, 1200,
+     1204, 1205, 1206, 1210, 1211, 1215, 1216, 1221, 1223, 1224,
+     1225, 1226, 1228, 1229, 1230, 1231, 1233, 1234, 1235, 1236,
+     1238, 1240, 1241, 1243, 1244, 1245, 1246, 1248, 1253, 1254,
+     1255, 1259, 1260, 1261, 1266, 1268, 1269, 1270, 1289, 1318,
+     1348
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -5539,7 +5540,7 @@ static const char* find_separator(const char *s) {
 #define BEGIN_PREVIOUS() { BEGIN(YY_PREVIOUS_STATE.top()); YY_PREVIOUS_STATE.pop(); }
 
 // The location of the current token.
-#line 5543 "seclang-scanner.cc"
+#line 5544 "seclang-scanner.cc"
 #define YY_NO_INPUT 1
 #define YY_NO_UNISTD_H 1
 /* An escaped quote at the very start of a fresh token has no preceding
@@ -5557,8 +5558,8 @@ static const char* find_separator(const char *s) {
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  driver.loc.back()->columns (yyleng);
 
-#line 5561 "seclang-scanner.cc"
 #line 5562 "seclang-scanner.cc"
+#line 5563 "seclang-scanner.cc"
 
 #define INITIAL 0
 #define EXPECTING_ACTION_PREDICATE_VARIABLE 1
@@ -5880,7 +5881,7 @@ YY_DECL
   // Code run each time yylex is called.
   driver.loc.back()->step();
 
-#line 5884 "seclang-scanner.cc"
+#line 5885 "seclang-scanner.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -5934,13 +5935,13 @@ do_action:	/* This label is used only to access EOF actions. */
 			{
 			if ( yy_act == 0 )
 				fprintf( stderr, "--scanner backing up\n" );
-			else if ( yy_act < 561 )
+			else if ( yy_act < 562 )
 				fprintf( stderr, "--accepting rule at line %ld (\"%s\")\n",
 				         (long)yy_rule_linenum[yy_act], yytext );
-			else if ( yy_act == 561 )
+			else if ( yy_act == 562 )
 				fprintf( stderr, "--accepting default rule (\"%s\")\n",
 				         yytext );
-			else if ( yy_act == 562 )
+			else if ( yy_act == 563 )
 				fprintf( stderr, "--(end of buffer or a NUL)\n" );
 			else
 				fprintf( stderr, "--EOF (start condition %d)\n", YY_START );
@@ -8620,44 +8621,43 @@ YY_RULE_SETUP
 case 508:
 YY_RULE_SETUP
 #line 1173 "seclang-scanner.ll"
+{ /* leading @ names an operator; implicit @rx has none */ BEGIN(LEXING_ERROR); yyless(0); }
+	YY_BREAK
+case 509:
+YY_RULE_SETUP
+#line 1174 "seclang-scanner.ll"
 { BEGIN_NO_OP_INFORMED(); yyless(0); }
 	YY_BREAK
 
 
-case 509:
-YY_RULE_SETUP
-#line 1178 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_SPACE); }
-	YY_BREAK
 case 510:
 YY_RULE_SETUP
 #line 1179 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_SPACE); }
+	YY_BREAK
+case 511:
+YY_RULE_SETUP
+#line 1180 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 
 
-case 511:
-YY_RULE_SETUP
-#line 1183 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_QUOTE); }
-	YY_BREAK
 case 512:
 YY_RULE_SETUP
 #line 1184 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_PARAMETER_ENDS_WITH_QUOTE); }
+	YY_BREAK
+case 513:
+YY_RULE_SETUP
+#line 1185 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 
 
-case 513:
-YY_RULE_SETUP
-#line 1188 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
 case 514:
-/* rule 514 can match eol */
 YY_RULE_SETUP
 #line 1189 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
 case 515:
 /* rule 515 can match eol */
@@ -8665,43 +8665,43 @@ YY_RULE_SETUP
 #line 1190 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
-
-
 case 516:
+/* rule 516 can match eol */
 YY_RULE_SETUP
-#line 1194 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
-case 517:
-/* rule 517 can match eol */
-YY_RULE_SETUP
-#line 1195 "seclang-scanner.ll"
+#line 1191 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 518:
+case 517:
 YY_RULE_SETUP
-#line 1198 "seclang-scanner.ll"
-{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+#line 1195 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
+case 518:
+/* rule 518 can match eol */
+YY_RULE_SETUP
+#line 1196 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
 case 519:
 YY_RULE_SETUP
 #line 1199 "seclang-scanner.ll"
+{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+	YY_BREAK
+case 520:
+YY_RULE_SETUP
+#line 1200 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 
 
-case 520:
-YY_RULE_SETUP
-#line 1203 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
 case 521:
-/* rule 521 can match eol */
 YY_RULE_SETUP
 #line 1204 "seclang-scanner.ll"
-{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
 case 522:
 /* rule 522 can match eol */
@@ -8709,43 +8709,43 @@ YY_RULE_SETUP
 #line 1205 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
-
-
 case 523:
+/* rule 523 can match eol */
 YY_RULE_SETUP
-#line 1209 "seclang-scanner.ll"
-{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-	YY_BREAK
-case 524:
-/* rule 524 can match eol */
-YY_RULE_SETUP
-#line 1210 "seclang-scanner.ll"
+#line 1206 "seclang-scanner.ll"
 { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
 	YY_BREAK
 
 
-case 525:
+case 524:
 YY_RULE_SETUP
-#line 1214 "seclang-scanner.ll"
-{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+#line 1210 "seclang-scanner.ll"
+{ BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
 	YY_BREAK
+case 525:
+/* rule 525 can match eol */
+YY_RULE_SETUP
+#line 1211 "seclang-scanner.ll"
+{ return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+	YY_BREAK
+
+
 case 526:
 YY_RULE_SETUP
 #line 1215 "seclang-scanner.ll"
+{ BEGINX(EXPECTING_ACTION_PREDICATE_VARIABLE); }
+	YY_BREAK
+case 527:
+YY_RULE_SETUP
+#line 1216 "seclang-scanner.ll"
 { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 	YY_BREAK
 
 
-case 527:
-YY_RULE_SETUP
-#line 1220 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
-	YY_BREAK
 case 528:
-/* rule 528 can match eol */
 YY_RULE_SETUP
-#line 1222 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1221 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 529:
 /* rule 529 can match eol */
@@ -8757,7 +8757,7 @@ case 530:
 /* rule 530 can match eol */
 YY_RULE_SETUP
 #line 1224 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 531:
 /* rule 531 can match eol */
@@ -8768,8 +8768,8 @@ YY_RULE_SETUP
 case 532:
 /* rule 532 can match eol */
 YY_RULE_SETUP
-#line 1227 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1226 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 533:
 /* rule 533 can match eol */
@@ -8792,8 +8792,8 @@ YY_RULE_SETUP
 case 536:
 /* rule 536 can match eol */
 YY_RULE_SETUP
-#line 1232 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
+#line 1231 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 537:
 /* rule 537 can match eol */
@@ -8814,15 +8814,15 @@ YY_RULE_SETUP
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 540:
+/* rule 540 can match eol */
 YY_RULE_SETUP
-#line 1237 "seclang-scanner.ll"
-{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1236 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ONLY_ONE); }
 	YY_BREAK
 case 541:
-/* rule 541 can match eol */
 YY_RULE_SETUP
-#line 1239 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+#line 1238 "seclang-scanner.ll"
+{ BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 542:
 /* rule 542 can match eol */
@@ -8833,7 +8833,7 @@ YY_RULE_SETUP
 case 543:
 /* rule 543 can match eol */
 YY_RULE_SETUP
-#line 1242 "seclang-scanner.ll"
+#line 1241 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 544:
@@ -8855,22 +8855,22 @@ YY_RULE_SETUP
 { driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 case 547:
+/* rule 547 can match eol */
 YY_RULE_SETUP
-#line 1247 "seclang-scanner.ll"
+#line 1246 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
+	YY_BREAK
+case 548:
+YY_RULE_SETUP
+#line 1248 "seclang-scanner.ll"
 { BEGIN(EXPECTING_ACTIONS_ENDS_WITH_DOUBLE_QUOTE); }
 	YY_BREAK
 
 
-case 548:
-YY_RULE_SETUP
-#line 1252 "seclang-scanner.ll"
-{  }
-	YY_BREAK
 case 549:
-/* rule 549 can match eol */
 YY_RULE_SETUP
 #line 1253 "seclang-scanner.ll"
-{ driver.loc.back()->lines(1); driver.loc.back()->step(); }
+{  }
 	YY_BREAK
 case 550:
 /* rule 550 can match eol */
@@ -8878,14 +8878,14 @@ YY_RULE_SETUP
 #line 1254 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
-
-
 case 551:
 /* rule 551 can match eol */
 YY_RULE_SETUP
-#line 1258 "seclang-scanner.ll"
+#line 1255 "seclang-scanner.ll"
 { driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
+
+
 case 552:
 /* rule 552 can match eol */
 YY_RULE_SETUP
@@ -8896,27 +8896,33 @@ case 553:
 /* rule 553 can match eol */
 YY_RULE_SETUP
 #line 1260 "seclang-scanner.ll"
+{ driver.loc.back()->lines(1); driver.loc.back()->step(); }
+	YY_BREAK
+case 554:
+/* rule 554 can match eol */
+YY_RULE_SETUP
+#line 1261 "seclang-scanner.ll"
 { BEGIN(INITIAL); driver.loc.back()->lines(1); driver.loc.back()->step(); }
 	YY_BREAK
 
-case 554:
-YY_RULE_SETUP
-#line 1265 "seclang-scanner.ll"
-{ BEGIN(LEXING_ERROR); yyless(0); }
-	YY_BREAK
 case 555:
 YY_RULE_SETUP
-#line 1267 "seclang-scanner.ll"
-{ driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+#line 1266 "seclang-scanner.ll"
+{ BEGIN(LEXING_ERROR); yyless(0); }
 	YY_BREAK
 case 556:
 YY_RULE_SETUP
 #line 1268 "seclang-scanner.ll"
-{ driver.error (*driver.loc.back(), "Expecting an action, got: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+{ driver.error (*driver.loc.back(), "Invalid input: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case 557:
 YY_RULE_SETUP
 #line 1269 "seclang-scanner.ll"
+{ driver.error (*driver.loc.back(), "Expecting an action, got: ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
+	YY_BREAK
+case 558:
+YY_RULE_SETUP
+#line 1270 "seclang-scanner.ll"
 { driver.error (*driver.loc.back(), "Expecting a variable, got:  : ", yytext); throw p::syntax_error(*driver.loc.back(), ""); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -8955,7 +8961,7 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_COLLECTION_ELEM):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_OPERATION):
 case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
-#line 1272 "seclang-scanner.ll"
+#line 1273 "seclang-scanner.ll"
 {
     if (yyin) {
         fclose(yyin);
@@ -8971,9 +8977,9 @@ case YY_STATE_EOF(SETVAR_ACTION_QUOTED_WAITING_CONTENT):
     delete l;
 }
 	YY_BREAK
-case 558:
+case 559:
 YY_RULE_SETUP
-#line 1288 "seclang-scanner.ll"
+#line 1289 "seclang-scanner.ll"
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
@@ -9003,9 +9009,9 @@ YY_RULE_SETUP
     }
 }
 	YY_BREAK
-case 559:
+case 560:
 YY_RULE_SETUP
-#line 1317 "seclang-scanner.ll"
+#line 1318 "seclang-scanner.ll"
 {
     std::string err;
     const char *tmpStr = yytext + strlen("include");
@@ -9036,10 +9042,10 @@ YY_RULE_SETUP
     }
 }
 	YY_BREAK
-case 560:
-/* rule 560 can match eol */
+case 561:
+/* rule 561 can match eol */
 YY_RULE_SETUP
-#line 1347 "seclang-scanner.ll"
+#line 1348 "seclang-scanner.ll"
 {
     HttpsClient c;
     std::string key;
@@ -9076,12 +9082,12 @@ YY_RULE_SETUP
     yy_scan_string(c.content.c_str());
 }
 	YY_BREAK
-case 561:
+case 562:
 YY_RULE_SETUP
-#line 1384 "seclang-scanner.ll"
+#line 1385 "seclang-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 9085 "seclang-scanner.cc"
+#line 9091 "seclang-scanner.cc"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -10186,7 +10192,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 1384 "seclang-scanner.ll"
+#line 1385 "seclang-scanner.ll"
 
 
 namespace modsecurity {
