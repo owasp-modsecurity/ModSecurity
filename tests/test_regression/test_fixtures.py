@@ -22,11 +22,13 @@ FIXTURES = discover_fixtures()
 # can't be fully overridden from here) - this is a client-library
 # difference, not a migration bug. Skipped rather than chasing byte-for-byte
 # LWP parity via a different HTTP stack.
+# Keyed by comment rather than index, so adding a test to the .t file does
+# not silently move the skip onto a different case.
 _KNOWN_CLIENT_FINGERPRINT_DIVERGENCE = {
-    "target/00-targets.t#14",
-    "target/00-targets.t#15",
-    "target/00-targets.t#16",
-    "target/00-targets.t#17",
+    ("target/00-targets.t", "FULL_REQUEST (get)"),
+    ("target/00-targets.t", "FULL_REQUEST (post)"),
+    ("target/00-targets.t", "FULL_REQUEST_LENGTH (get)"),
+    ("target/00-targets.t", "FULL_REQUEST_LENGTH (post)"),
 }
 
 
@@ -35,7 +37,7 @@ def _test_id(entry):
 
 
 def _fixture_key(entry):
-    return f"{entry['_source']}#{entry['_index']}"
+    return (entry['_source'], entry.get('comment'))
 
 
 @pytest.mark.regression
