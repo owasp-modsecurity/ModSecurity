@@ -87,5 +87,50 @@
       "SecAction \"id:1,phase:1,pass,nolog,setvar:tx.counter=abc,setvar:tx.counter=-3\"",
       "SecRule TX:counter \"@eq -3\" \"id:2,phase:1,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2306 - setvar =+N reads only the exact key, not keys sharing its prefix",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving variable: IP:counter with value: 1",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,initcol:ip=%{REMOTE_ADDR}\"",
+      "SecAction \"id:2,phase:1,pass,nolog,setvar:ip.counterx=10,setvar:ip.counter=+1\"",
+      "SecRule IP:counter \"@eq 1\" \"id:3,phase:1,deny,status:403\""
+    ]
   }
 ]
