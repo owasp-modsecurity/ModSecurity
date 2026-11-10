@@ -4,8 +4,9 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Set library path for macOS
+# Set library path for macOS and Linux
 export DYLD_LIBRARY_PATH="${SCRIPT_DIR}/../../src/.libs:/opt/homebrew/lib:${DYLD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="${SCRIPT_DIR}/../../src/.libs:${LD_LIBRARY_PATH}"
 
 # Run the benchmark with all arguments passed through
 "${SCRIPT_DIR}/benchmark_rules" "$@"
