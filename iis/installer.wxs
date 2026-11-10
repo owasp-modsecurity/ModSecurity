@@ -121,9 +121,9 @@
         <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x64). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x64.exe">
             <![CDATA[Installed OR VC142X64INSTALLED]]>
         </Condition>
-        <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86) for 32-bit support. Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
-            <![CDATA[Installed OR (&ModSec32 <> 3) OR VC142X86INSTALLED]]>
-        </Condition>
+        <!-- The x86 runtime is only needed when the 32-bit feature is installed. Feature
+             action states (&ModSec32) are not available to launch conditions, which run
+             before CostFinalize, so that check is the RequireVC142X86 action below. -->
         <?else?>
         <Condition Message="This application requires Microsoft Visual C++ 2019 Redistributable (x86). Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe">
             <![CDATA[Installed OR VC142X86INSTALLED]]>
@@ -383,6 +383,7 @@
             <Custom Action="Cleanup5" Before="Cleanup4"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="CreateModSecurityDirs" After="InstallFiles"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <?if $(var.Win64) = "yes" ?>
+            <Custom Action="RequireVC142X86" After="CostFinalize"><![CDATA[NOT Installed AND (&ModSec32 = 3) AND NOT VC142X86INSTALLED]]></Custom>
             <Custom Action="InstallModule32" Before="InstallFinalize"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallModule64" After="InstallModule32"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
             <Custom Action="InstallConf" After="InstallModule64"><![CDATA[NOT Installed AND IIS_SETUP]]></Custom>
@@ -410,6 +411,9 @@
         <CustomAction Id="Cleanup3" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS (64bits)&quot;" />
         <CustomAction Id="Cleanup4" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurity IIS&quot;" />
         <CustomAction Id="Cleanup5" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]inetsrv\appcmd.exe&quot; uninstall module /module.name:&quot;ModSecurityIIS&quot;" />
+        <?endif?>
+        <?if $(var.Win64) = "yes" ?>
+        <CustomAction Id="RequireVC142X86" Error="This application requires Microsoft Visual C++ 2019 Redistributable (x86) for 32-bit support. Please download and install from: https://aka.ms/vs/17/release/vc_redist.x86.exe" />
         <?endif?>
         <!-- Create required directories for ModSecurity with proper permissions for IIS -->
         <CustomAction Id="CreateModSecurityDirs" Execute="deferred" Impersonate="no" Return="check" Directory="INSTALLFOLDER" ExeCommand="&quot;[SystemFolder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;New-Item -ItemType Directory -Path 'c:\inetpub\temp', 'c:\inetpub\logs' -Force | Out-Null; icacls 'c:\inetpub\temp' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null; icacls 'c:\inetpub\logs' /grant 'IIS_IUSRS:(OI)(CI)M' /T /Q | Out-Null&quot;" />
