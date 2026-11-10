@@ -372,7 +372,7 @@ static void BM_Args(benchmark::State& state) {
 
     std::string rules = R"(
         SecRuleEngine On
-        SecRequestBodyAccess Off
+        SecRequestBodyAccess On
         SecResponseBodyAccess Off
         SecRule ARGS "@contains test" \
             "id:1015,phase:2,pass,nolog,t:none"
@@ -397,7 +397,7 @@ static void BM_SingleArg(benchmark::State& state) {
 
     std::string rules = R"(
         SecRuleEngine On
-        SecRequestBodyAccess Off
+        SecRequestBodyAccess On
         SecResponseBodyAccess Off
         SecRule ARGS:name "@contains test" \
             "id:1016,phase:2,pass,nolog,t:none"
