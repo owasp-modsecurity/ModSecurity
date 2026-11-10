@@ -111,6 +111,14 @@ class Global_DynamicElement : public Variable {
             t->m_rules->m_secWebAppId.m_value, expiry_seconds);
     }
 
+    static int incrementFirst(Transaction *t, const std::string &var,
+        int delta) {
+        return t->m_collections.m_global_collection->incrementFirst(
+            var, t->m_collections.m_global_collection_key,
+            t->m_rules->m_secWebAppId.m_value,
+            delta);
+    }
+
     static void storeOrUpdateFirst(Transaction *t, const std::string &var,
         const std::string &value) {
         t->m_collections.m_global_collection->storeOrUpdateFirst(
