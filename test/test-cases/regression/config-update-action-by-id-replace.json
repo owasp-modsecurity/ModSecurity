@@ -158,5 +158,45 @@
       "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,msg:'abc',logdata:'ld-abc',severity:2\"",
       "SecRuleUpdateActionById 200005 \"msg:'def'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById replaces single instance actions (5) - msg is replaced in a multiMatch rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?test=value1",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[msg \"def\"\\] \\[data \"ld-abc\"\\] \\[severity \"2\"\\] \\[ver \"\"\\] \\[maturity \"0\"\\] \\[accuracy \"0\"\\] \\[hostname \"200.249.12.31\"\\] \\[uri \"/\"\\] \\[unique_id \"[0-9.]+\"\\] \\[ref \"o0,6v11,6\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains value1\" \"phase:1,id:200004,deny,status:403,log,multiMatch,msg:'abc',logdata:'ld-abc',severity:2\"",
+      "SecRuleUpdateActionById 200004 \"msg:'def'\""
+    ]
   }
 ]

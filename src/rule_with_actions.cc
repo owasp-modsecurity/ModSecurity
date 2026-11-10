@@ -235,6 +235,16 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         if (m_msg && !isActionUpdated("msg", trans)) {
             m_msg->evaluate(this, trans, ruleMessage);
         }
+        // multiMatch logs each match before executeActionsAfterFullMatch
+        // runs the updates, so the replacements must be evaluated here too.
+        for (auto &b :
+            trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+            const std::string &name = *b.second->m_name.get();
+            if (m_ruleId == b.first && (name == "severity"
+                || name == "logdata" || name == "msg")) {
+                b.second->evaluate(this, trans, ruleMessage);
+            }
+        }
         for (actions::Tag *a : m_actionsTag) {
             a->evaluate(this, trans, ruleMessage);
         }
