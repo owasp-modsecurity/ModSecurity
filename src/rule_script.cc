@@ -32,13 +32,25 @@ bool RuleScript::evaluate(Transaction *trans,
     executeActionsIndependentOfChainedRuleResult(trans,
         &containsDisruptive, ruleMessage);
 
-    bool ret = m_lua.run(trans);
-
-    if (ret) {
-        executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
+    if (m_lua.run(trans) == false) {
+        return false;
     }
 
-    return ret;
+    if (isChained()) {
+        if (m_chainedRuleChild == nullptr) {
+            ms_dbg_a(trans, 4, "Rule is marked as chained but there " \
+                "isn't a subsequent rule.");
+            return false;
+        }
+        ms_dbg_a(trans, 4, "Executing chained rule.");
+        if (m_chainedRuleChild->evaluate(trans, ruleMessage) == false) {
+            return false;
+        }
+    }
+
+    executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
+
+    return true;
 }
 
 }  // namespace modsecurity
