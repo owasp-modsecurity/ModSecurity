@@ -502,3 +502,49 @@
 		),
 	),
 },
+# SecParseXmlIntoArgs
+{
+	type => "rule",
+	comment => "Test SecParseXmlIntoArgs On, over SecArgumentsLimit",
+	conf => qq(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecXmlExternalEntity On
+		SecDebugLog $ENV{DEBUG_LOG}
+		SecDebugLogLevel 9
+		SecParseXmlIntoArgs On
+		SecArgumentsLimit 5
+		SecRule REQUEST_HEADERS:Content-Type "^(?:application(?:/soap\+|/)|text/)xml" "id:500029, \\
+		        phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML"
+		SecRule REQBODY_PROCESSOR "!^XML\$" nolog,pass,skipAfter:12345,id:500030
+		SecRule ARGS "\@rx attack" "id:500031 \\
+		        phase:2,deny,id:12345"
+	),
+	match_log => {
+		debug => [ qr/Skipping request argument, over limit \(XML\): name "xml.root.item", value "attack"/s, 1 ],
+	},
+	match_response => {
+		status => qr/^500$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/xml",
+		],
+		normalize_raw_request_data(
+			q(
+				<?xml version="1.0" encoding="utf-8"?>
+				<root>
+					<item>attack</item>
+					<item>attack</item>
+					<item>attack</item>
+					<item>attack</item>
+					<item>attack</item>
+					<item>attack</item>
+					<item>attack</item>
+				</root>
+			),
+		),
+	),
+},
+
