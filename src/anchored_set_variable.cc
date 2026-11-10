@@ -69,9 +69,14 @@ void AnchoredSetVariable::set(const std::string &key,
 
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l) const {
+    // Each value went to the front of `l` (O(n^2) over n arguments);
+    // collected first, then put in front at once in the same order.
+    std::vector<const VariableValue *> found;
+    found.reserve(size());
     for (const auto& x : *this) {
-        l->insert(l->begin(), new VariableValue(x.second));
+        found.push_back(new VariableValue(x.second));
     }
+    l->insert(l->begin(), found.rbegin(), found.rend());
 }
 
 
@@ -84,14 +89,17 @@ void AnchoredSetVariable::resolve(
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l,
     const variables::KeyExclusions &ke) const {
+    std::vector<const VariableValue *> found;
+    found.reserve(size());
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            found.push_back(new VariableValue(x.second));
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    l->insert(l->begin(), found.rbegin(), found.rend());
 }
 
 
@@ -124,13 +132,15 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 // cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l) const {
+    std::vector<const VariableValue *> found;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
-        l->insert(l->begin(), new VariableValue(x.second));
+        found.push_back(new VariableValue(x.second));
     }
+    l->insert(l->begin(), found.rbegin(), found.rend());
 }
 
 
@@ -143,18 +153,20 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l,
     const variables::KeyExclusions &ke) const {
+    std::vector<const VariableValue *> found;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            found.push_back(new VariableValue(x.second));
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    l->insert(l->begin(), found.rbegin(), found.rend());
 }
 
 
