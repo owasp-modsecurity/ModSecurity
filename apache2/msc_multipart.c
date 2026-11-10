@@ -165,7 +165,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
     /* accept only what we understand */
     if (strncmp(c_d_value, "form-data", 9) != 0) {
-        return -1;
+        return CD_ERR_NOT_FORM_DATA;
     }
 
     /* see if there are any other parts to parse */
@@ -174,7 +174,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
     while((*p == '\t') || (*p == ' ')) p++;
     if (*p == '\0') return 1; /* this is OK */
 
-    if (*p != ';') return -2;
+    if (*p != ';') return CD_ERR_SEMICOLON_EXPECTED;
     p++;
 
     /* parse the appended parts */
@@ -184,22 +184,22 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
         /* go over the whitespace */
         while((*p == '\t') || (*p == ' ')) p++;
-        if (*p == '\0') return -3;
+        if (*p == '\0') return CD_ERR_PARAMETER_MISSING;
 
         start = p;
         while((*p != '\0') && (*p != '=') && (*p != '\t') && (*p != ' ')) p++;
-        if (*p == '\0') return -4;
+        if (*p == '\0') return CD_ERR_VALUE_MISSING;
 
         name = apr_pstrmemdup(msr->mp, start, (p - start));
 
         while((*p == '\t') || (*p == ' ')) p++;
-        if (*p == '\0') return -5;
+        if (*p == '\0') return CD_ERR_EQUALS_MISSING;
 
-        if (*p != '=') return -13;
+        if (*p != '=') return CD_ERR_EQUALS_EXPECTED;
         p++;
 
         while((*p == '\t') || (*p == ' ')) p++;
-        if (*p == '\0') return -6;
+        if (*p == '\0') return CD_ERR_VALUE_EMPTY;
 
         /* Accept both quotes as some backends will accept them, but
          * technically "'" is invalid and so flag_invalid_quoting is
@@ -215,7 +215,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 p++;
             }
             if ((*p != '\'') || (p == start_of_charset)) {
-                return -16; // Must be at least one legit char before ' for start of language
+                return CD_ERR_FILENAME_STAR_CHARSET; // Must be at least one legit char before ' for start of language
             }
             msr->mpd->mpp->filename_charset = apr_pstrmemdup(msr->mp, start_of_charset, (p - start_of_charset));
             if (msr->txcfg->debuglog_level >= 9) {
@@ -229,7 +229,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             }
             if (*p != '\'') {
                 msr->mpd->flag_invalid_quoting = 1;
-                return -17; // Single quote for end-of-language not found
+                return CD_ERR_FILENAME_STAR_LANGUAGE; // Single quote for end-of-language not found
             }
             msr->mpd->mpp->filename_language = apr_pstrmemdup(msr->mp, start_of_language, (p - start_of_language));
             if (msr->txcfg->debuglog_level >= 9) {
@@ -243,13 +243,13 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             while ((*p != '\0') && (*p != ';')) {
                 if (*p == '%') {
                     if ((*(p+1) == '\0') || (*(p+2) == '\0') || (!isxdigit(*(p+1))) || (!isxdigit(*(p+2)))) {
-                        return -18;
+                        return CD_ERR_FILENAME_STAR_PCT_ENCODING;
                     }
                     p += 3;
                 } else if (isalnum(*p) || strchr(attr_char_special, *p)) {
                     p++;
                 } else {
-                    return -19;
+                    return CD_ERR_FILENAME_STAR_CHARACTER;
                 }
             }
             value = apr_pmemdup(msr->mp, start_of_filename, p - start_of_filename);
@@ -262,7 +262,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
             }
 
             p++;
-            if (*p == '\0') return -7;
+            if (*p == '\0') return CD_ERR_QUOTE_EMPTY_UNTERMINATED;
 
             start = p;
             value = apr_pstrdup(msr->mp, p);
@@ -272,7 +272,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 if (*p == '\\') {
                     if (*(p + 1) == '\0') {
                         /* improper escaping */
-                        return -8;
+                        return CD_ERR_ESCAPE_INCOMPLETE;
                     }
                     /* only quote and \ can be escaped */
                     if ((*(p + 1) == quote) || (*(p + 1) == '\\')) {
@@ -296,7 +296,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
 
                 *(t++) = *(p++);
             }
-            if (*p == '\0') return -10;
+            if (*p == '\0') return CD_ERR_QUOTE_UNTERMINATED;
 
             p++; /* go over the quote at the end */
 
@@ -318,7 +318,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                 msr->mpd->flag_duplicate_part_header = 1;
                 msr_log(msr, 4, "Multipart: Warning: Duplicate Content-Disposition name: %s",
                     log_escape_nq(msr->mp, value));
-                return -14;
+                return CD_ERR_DUPLICATE_NAME;
             }
             msr->mpd->mpp->name = value;
 
@@ -366,7 +366,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     log_escape_nq(msr->mp, decoded_value));
             }
         }
-        else return -11;
+        else return CD_ERR_UNKNOWN_PARAMETER;
 
         if (*p != '\0') {
             while((*p == '\t') || (*p == ' ')) p++;
@@ -382,7 +382,7 @@ static int multipart_parse_content_disposition(modsec_rec *msr, char *c_d_value)
                     msr->mpd->flag_invalid_quoting = 1;
                 }
                 // p++;
-                return -12;
+                return CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE;
             }
             p++; /* move over the semi-colon */
         }
