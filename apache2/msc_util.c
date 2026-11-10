@@ -94,15 +94,6 @@ int swap_int32(int x) {
 #endif
 
 
-/** \brief Decode utf-8 to unicode format.
- *
- * \param mp Pointer to memory pool
- * \param input Pointer to input data
- * \param input_len Input data length
- * \param changed Set if data is changed
- *
- * \retval rval On Success
- */
 /**
  * Decodes the multibyte UTF-8 sequence that starts with the lead byte utf[0]
  * (a byte with the high bit set). Returns the sequence length (2 to 4) and
@@ -146,6 +137,15 @@ static int utf8_decode_sequence(const unsigned char *utf, unsigned int bytes_lef
     return seq_len;
 }
 
+/** \brief Decode utf-8 to unicode format.
+ *
+ * \param mp Pointer to memory pool
+ * \param input Pointer to input data
+ * \param input_len Input data length
+ * \param changed Set if data is changed
+ *
+ * \retval rval On Success
+ */
 char *utf8_unicode_inplace_ex(apr_pool_t *mp, unsigned char *input, long int input_len, int *changed) {
     int unicode_len = 0;
     unsigned int d = 0;
