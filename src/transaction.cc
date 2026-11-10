@@ -707,6 +707,12 @@ int Transaction::processRequestBody() {
     }
 
     if (requestBodyAccess == false) {
+        /*
+         * No body processor runs, so report no error instead of leaving
+         * REQBODY_ERROR and REQBODY_PROCESSOR_ERROR empty.
+         */
+        m_variableReqbodyError.set("0", m_variableOffset);
+        m_variableReqbodyProcessorError.set("0", m_variableOffset);
         this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
         return true;
     }

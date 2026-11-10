@@ -178,5 +178,50 @@
       "SecRequestBodyAccess On",
       "SecRule REQUEST_BODY|ARGS_POST \"@contains evilbody\" \"id:1,phase:2,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing SecRequestBodyAccess Off keeps phase 2 (5) - body error variables report no error",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "10",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?q=evil",
+      "method": "POST",
+      "body": [
+        "q=evilbody"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Rule returned 0",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess Off",
+      "SecRule REQBODY_ERROR|REQBODY_PROCESSOR_ERROR \"!@streq 0\" \"id:1,phase:2,deny,status:403\""
+    ]
   }
 ]
