@@ -81,8 +81,8 @@ pytest test_regression
 # A single case, by test ID (see `pytest --collect-only` for exact IDs)
 pytest "test_regression/test_fixtures.py::test_regression_fixture[action/00-disruptive-actions.t#0:pass in phase:1]"
 
-# Parallel
-pytest -n auto
+# Parallel (unit tests only - regression tests share port 8088 and the log files)
+pytest -n auto test_operators test_transformations
 ```
 
 Markers: `unit`, `regression`, `apache` (needs Apache), `slow`. `pytest -m unit` / `pytest -m regression`
