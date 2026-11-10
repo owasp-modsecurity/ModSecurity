@@ -307,16 +307,16 @@ class ModSecurityTestCase:
         the request, check match_response/match_log/match_file (each
         respecting a leading "-" for negation), stop Apache."""
         comment = entry.get("comment", "")
+        unsupported = entry.get("unsupported")
+        unsupported_msg = (
+            f"'{unsupported}' is a Perl coderef this migration doesn't "
+            "execute - needs manual follow-up (see dump_regression_fixtures.pl)"
+        )
 
-        if entry.get("unsupported"):
-            return TestResult(
-                success=False,
-                skipped=True,
-                message=(
-                    f"'{entry['unsupported']}' is a Perl coderef this migration doesn't "
-                    "execute - needs manual follow-up (see dump_regression_fixtures.pl)"
-                ),
-            )
+        # A prerun coderef sets up state the rest of the test depends on, so
+        # nothing after it is meaningful without it.
+        if unsupported == "prerun":
+            return TestResult(success=False, skipped=True, message=unsupported_msg)
 
         conf = entry.get("conf", "")
         request = entry.get("request")
@@ -359,6 +359,11 @@ class ModSecurityTestCase:
                 failure = _check_match_spec(match_file, get_file_match, lambda file_name: f"file {file_name}")
                 if failure:
                     return TestResult(success=False, message=failure, response=response)
+
+            if unsupported:
+                # Everything declarative passed; only the coderef itself
+                # (run-regression-tests.pl's `test => sub {...}`) was not run.
+                return TestResult(success=False, skipped=True, message=unsupported_msg, response=response)
 
             return TestResult(success=True, message=f"Test '{comment}' passed", response=response)
 
