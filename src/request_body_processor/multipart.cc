@@ -1349,11 +1349,24 @@ int Multipart::count_boundary_params(const std::string& str_header_value) {
     int count = 0;
 
     const auto lower = utils::string::tolower(str_header_value);
-    const char *s = lower.c_str();
+    const char *start = lower.c_str();
+    const char *s = start;
     while ((s = strstr(s, "boundary")) != NULL) {
+        /* Only count "boundary" when it is a parameter name: not the tail of
+         * a longer token, and followed by '='. A boundary value such as
+         * "----geckoformboundary..." followed by another parameter
+         * ("charset=UTF-8") must not count (#3610). Any non-token character
+         * (';', ',', whitespace, ...) may start a parameter: some backends
+         * also split parameters on ','. */
+        bool param_start = (s == start) || !(isalnum(s[-1])
+            || strchr("!#$%&'*+-.^_`|~", s[-1]) != NULL);
         s += 8;
-
-        if (strchr(s, '=') != NULL) {
+        const char *p = s;
+        /* Same whitespace as Multipart::init accepts before the '='. */
+        while (isspace(*p)) {
+            p++;
+        }
+        if (param_start && *p == '=') {
             count++;
         }
     }
