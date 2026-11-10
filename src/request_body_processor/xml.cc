@@ -15,6 +15,7 @@
 
 #include "src/request_body_processor/xml.h"
 
+#include <algorithm>
 #include <cctype>
 #include <list>
 #include <iostream>
@@ -163,8 +164,13 @@ static std::string parseError(xmlParserCtxtPtr ctx, const std::string &what) {
     if (e == NULL || e->message == NULL || *e->message == '\0') {
         return "XML: " + what + ".";
     }
+    /* Some messages span lines (libxml2 2.9's "Input is not proper UTF-8,
+     * indicate encoding !\nBytes: ..."); keep the result on one line. */
     std::string detail(e->message);
-    while (!detail.empty() && isspace(static_cast<unsigned char>(detail.back()))) {
+    std::replace(detail.begin(), detail.end(), '\n', ' ');
+    std::replace(detail.begin(), detail.end(), '\r', ' ');
+    while (!detail.empty()
+        && isspace(static_cast<unsigned char>(detail.back()))) {
         detail.pop_back();
     }
     return "XML: " + what + ": " + detail + " (line " + std::to_string(e->line)
