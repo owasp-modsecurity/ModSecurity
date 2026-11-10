@@ -42,9 +42,16 @@ bool XmlNS::init(std::string *error) {
         return false;
     }
 
-    if (m_href[0] == '\'' && m_href.size() > 3) {
+    if (m_href.size() >= 2 && m_href.front() == '\''
+        && m_href.back() == '\'') {
         m_href.erase(0, 1);
         m_href.pop_back();
+    }
+
+    if (m_href.empty()) {
+        error->assign("XMLS: Missing xmlns href for prefix: " \
+            "`" + m_scope + "'.");
+        return false;
     }
 
     /* Any URI reference is a valid namespace name (https://, urn:, ...);

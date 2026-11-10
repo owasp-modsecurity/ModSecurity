@@ -80,6 +80,45 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Testing action :: XMLNS (parser error 3)",
+    "client": {
+      "ip": "",
+      "port": 0
+    },
+    "server": {
+      "ip": "",
+      "port": 0
+    },
+    "request": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "uri": "",
+      "method": "",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "XMLS: Missing xmlns href for prefix: `soap'."
+    },
+    "rules": [
+      "SecRule REQUEST_HEADERS:Content-Type \"^text/xml$\" \"id:500008,phase:1,t:none,t:lowercase,nolog,pass,ctl:requestBodyProcessor=XML\"",
+      "SecRule REQUEST_HEADERS:User-Agent \"^(.*)$\" \"id:123,xmlns:soap=''\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Testing action :: XMLNS (https href)",
     "resource": "libxml2",
     "client": {
@@ -221,7 +260,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Target value: \"39.95\" \\(Variable: XML:/bookstore/book/price\\[text\\(\\)\\]\\)",
+      "debug_log": "Registered XML namespace href \"urn:example:soap:envelope\" prefix \"soap\"",
       "http_code": 200
     },
     "rules": [
