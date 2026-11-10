@@ -291,7 +291,7 @@
 		SecRule MULTIPART_FILENAME:file "\@contains Math+physics v1.pdf" "id:1,phase:2,pass,t:trim"
 	),
 	match_log => {
-		debug => [ qr/Invalid Content-Disposition header \(-18\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
+		debug => [ qr/Invalid Content-Disposition header \(-18: filename\*: invalid percent encoding\): form-data; name="file"; filename\*=UTF-8''Math\+physics%20v1\.pdf%ZZ/s, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
@@ -335,7 +335,7 @@
 		SecRule MULTIPART_FILENAME:file "\@contains Math+physics v1.pdf" "id:1,phase:2,pass,t:trim"
 	),
 	match_log => {
-		debug => [ qr/Invalid Content-Disposition header \(-16\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
+		debug => [ qr/Invalid Content-Disposition header \(-16: filename\*: charset missing\): form-data; name="file"; filename\*="UTF-8''Math\+physics%20v1\.pdf"/s, 1 ],
 	},
 	match_response => {
 		status => qr/^200$/,
