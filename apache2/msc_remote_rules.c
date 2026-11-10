@@ -344,7 +344,7 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
 
         /* those are the default options, but lets make sure */
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
 
         /* send all data to this function  */
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, msc_curl_write_memory_cb);

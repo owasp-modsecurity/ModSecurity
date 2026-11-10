@@ -54,3 +54,35 @@
         output => " %u27f0 %u27f1 %u27f2 %u27f3 %u27f4 %u27f5 %u27f6 %u27f7 %u27f8 %u27f9 %u27fa %u27fb %u27fc %u27fd %u27fe %u27ff",
         ret => 1,
 },
+# Supplementary planes (four-byte sequences, five hex digits)
+{
+        type => "tfn",
+        name => "utf8toUnicode",
+        input => "😀 𝒜 𠀀 􏿿",
+        output => "%u1f600 %u1d49c %u20000 %u10ffff",
+        ret => 1,
+},
+# Four-byte sequence followed by ASCII must not lose its last digit
+{
+        type => "tfn",
+        name => "utf8toUnicode",
+        input => "😀A",
+        output => "%u1f600A",
+        ret => 1,
+},
+# Code point above U+10FFFF is not valid UTF-8 and is passed through
+{
+        type => "tfn",
+        name => "utf8toUnicode",
+        input => "\xf4\x90\x80\x80",
+        output => "\xf4\x90\x80\x80",
+        ret => 0,
+},
+# Truncated sequence at the end of the input is passed through
+{
+        type => "tfn",
+        name => "utf8toUnicode",
+        input => "a\xe2\x82",
+        output => "a\xe2\x82",
+        ret => 0,
+},
