@@ -42,8 +42,6 @@ CPTTree *CPTCreateRadixTree()   {
     return tree;
 }
 
-int TreeCheckData(TreePrefix *prefix, CPTData *prefix_data, unsigned int netmask);
-
 void ConvertIPNetmask(unsigned char *buffer, unsigned char netmask, unsigned int ip_bitmask) {
     int aux = 0, bytes = 0;
     int mask = 0;
@@ -413,8 +411,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
              * 10.0.0.0/8). Record the netmask unless it is a duplicate;
              * previously anything but an exact duplicate was dropped.
              */
-            if (TreeCheckData(node->prefix, node->prefix->prefix_data,
-                    netmask) == 0) {
+            if (TreePrefixContainNetmask(node->prefix, netmask) == 0) {
                 CPTData *prefix_data = CPTCreateCPTData(netmask);
                 if (prefix_data == NULL) {
                     CPTFreePrefix(prefix);
