@@ -945,10 +945,7 @@ if test -e "$PERL"; then
     if test "$build_mlogc" -ne 0; then
         AC_CONFIG_FILES([mlogc/mlogc-batch-load.pl], [chmod +x mlogc/mlogc-batch-load.pl])
     fi
-    AC_CONFIG_FILES([tests/run-unit-tests.pl], [chmod +x tests/run-unit-tests.pl])
     AC_CONFIG_FILES([tests/run-regression-tests.pl], [chmod +x tests/run-regression-tests.pl])
-    AC_CONFIG_FILES([tests/gen_rx-pm.pl], [chmod +x tests/gen_rx-pm.pl])
-    AC_CONFIG_FILES([tests/csv_rx-pm.pl], [chmod +x tests/csv_rx-pm.pl])
     AC_CONFIG_FILES([tests/regression/server_root/conf/httpd.conf])
 
     # Perl based tools
