@@ -59,6 +59,9 @@ void GeoLookup::cleanUp() {
 
 bool GeoLookup::setDataBase(const std::string& filePath,
     std::string *err) {
+    // A database may already be open (SecGeoLookupDb seen again, e.g. on a
+    // reload). Open the new one first and only then release the old one, so
+    // a path that fails to load leaves the database in use untouched.
 #ifdef WITH_MAXMIND
     std::string intMax;
 #endif
@@ -67,51 +70,52 @@ bool GeoLookup::setDataBase(const std::string& filePath,
 #endif
 
 #ifdef WITH_MAXMIND
-    int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &mmdb);
+    MMDB_s newMmdb;
+    int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &newMmdb);
     if (status != MMDB_SUCCESS) {
         intMax.assign("libMaxMind: Can't open: " + std::string(MMDB_strerror(status)) + ".");
     } else {
+        cleanUp();
+        mmdb = newMmdb;
         m_version = VERSION_MAXMIND;
+        return true;
     }
 #endif
 
 #ifdef WITH_GEOIP
-    if (m_version == NOT_LOADED) {
-        m_gi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
-        if (m_gi == NULL) {
-            intGeo.append("GeoIP: Can't open: " + filePath + ".");
-        } else {
-            m_version = VERSION_GEOIP;
-        }
+    GeoIP *newGi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
+    if (newGi == NULL) {
+        intGeo.append("GeoIP: Can't open: " + filePath + ".");
+    } else {
+        cleanUp();
+        m_gi = newGi;
+        m_version = VERSION_GEOIP;
+        return true;
     }
 #endif
 
-    if (m_version == NOT_LOADED) {
-        err->assign("Can't open:  " + filePath + ". ");
-        err->append("Support enabled for:");
+    err->assign("Can't open:  " + filePath + ". ");
+    err->append("Support enabled for:");
 #ifdef WITH_MAXMIND
-        err->append(" libMaxMind");
+    err->append(" libMaxMind");
 #endif
 #ifdef WITH_GEOIP
-        err->append(" GeoIP");
+    err->append(" GeoIP");
 #endif
-        err->append(".");
+    err->append(".");
 
 #ifdef WITH_MAXMIND
-        if (!intMax.empty()) {
-            err->append(" " + intMax);
-        }
+    if (!intMax.empty()) {
+        err->append(" " + intMax);
+    }
 #endif
 #ifdef WITH_GEOIP
-        if (!intGeo.empty()) {
-            err->append(" " + intGeo);
-        }
+    if (!intGeo.empty()) {
+        err->append(" " + intGeo);
+    }
 #endif
 
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 
