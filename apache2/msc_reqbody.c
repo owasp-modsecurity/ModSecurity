@@ -623,6 +623,11 @@ static apr_status_t modsecurity_request_body_end_raw(modsec_rec *msr, char **err
 
         msr->msc_reqbody_length = sofar;
 
+        /* Same ProcessPartial cut as the in-memory path below. */
+        if (msr->txcfg->reqbody_limit > 0 && msr->txcfg->reqbody_limit < msr->msc_reqbody_length) {
+            msr->msc_reqbody_length = msr->txcfg->reqbody_limit;
+        }
+
         return 1;
     }
 

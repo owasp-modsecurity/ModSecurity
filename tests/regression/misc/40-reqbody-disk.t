@@ -53,3 +53,29 @@
 		"a=1&pad=" . ("x" x 200) . "&b=2",
 	),
 },
+{
+	type => "misc",
+	comment => "reqbody on disk, forced URLENCODED processor, ProcessPartial stops at the limit",
+	conf => q(
+		SecRuleEngine On
+		SecRequestBodyAccess On
+		SecRequestBodyLimit 128
+		SecRequestBodyLimitAction ProcessPartial
+		SecRequestBodyInMemoryLimit 64
+		SecRule REQUEST_HEADERS:Content-Type "text/plain" "id:500304,phase:1,pass,nolog,ctl:requestBodyProcessor=URLENCODED"
+		SecRule ARGS:b "@streq 2" "id:500305,phase:2,deny,status:403"
+	),
+	match_log => {
+		-error => [ qr/Access denied/, 1 ],
+	},
+	match_response => {
+		status => qr/^200$/,
+	},
+	request => new HTTP::Request(
+		POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+		[
+			"Content-Type" => "text/plain",
+		],
+		"a=1&pad=" . ("x" x 200) . "&b=2",
+	),
+},
