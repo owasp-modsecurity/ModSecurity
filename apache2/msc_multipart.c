@@ -43,7 +43,7 @@ void validate_quotes(modsec_rec *msr, char *data, char quote)  {
 
         if(data[i] == '\'') {
             if (msr->txcfg->debuglog_level >= 9) {
-                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %zu bytes",
+                msr_log(msr, 9, "Multipart: Invalid quoting detected: %s length %" APR_SIZE_T_FMT " bytes",
                         log_escape_nq(msr->mp, data), len);
             }
             msr->mpd->flag_invalid_quoting = 1;
