@@ -18,11 +18,11 @@
 
 #include "src/request_body_processor/json.h"
 
-#include "src/utils/string.h"
-
 #include <list>
 #include <iostream>
 #include <string>
+
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
