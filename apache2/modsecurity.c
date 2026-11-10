@@ -183,6 +183,17 @@ static apr_status_t modsecurity_curl_cleanup(void *data) {
     curl_global_cleanup();
     return APR_SUCCESS;
 }
+
+/**
+ * curl_global_init() paired with a curl_global_cleanup() when mp goes
+ * away. Every libcurl user in the module goes through here, so that
+ * curl_easy_init() never initialises libcurl without a matching cleanup.
+ */
+void modsecurity_curl_global_init(apr_pool_t *mp) {
+    curl_global_init(CURL_GLOBAL_ALL);
+    apr_pool_cleanup_register(mp, NULL, modsecurity_curl_cleanup,
+        apr_pool_cleanup_null);
+}
 #endif
 
 /**
@@ -210,9 +221,7 @@ int modsecurity_init(msc_engine *msce, apr_pool_t *mp) {
      * tore down global OpenSSL state that mod_ssl was still using.
      */
 #ifdef WITH_CURL
-    curl_global_init(CURL_GLOBAL_ALL);
-    apr_pool_cleanup_register(mp, NULL, modsecurity_curl_cleanup,
-        apr_pool_cleanup_null);
+    modsecurity_curl_global_init(mp);
 #endif
     /* Serial audit log mutex */
     rc = acquire_global_lock(&msce->auditlog_lock, mp);
