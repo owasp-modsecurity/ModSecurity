@@ -126,7 +126,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Request body processing is disabled",
+      "debug_log": "Rule returned 0",
       "http_code": 200
     },
     "rules": [
