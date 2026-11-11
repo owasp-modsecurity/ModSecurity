@@ -2284,6 +2284,30 @@ extern "C" int msc_update_status_code(Transaction *transaction, int status) {
 
 
 /**
+ * @name    msc_get_tx
+ * @brief   Retrieve the value of TX:<name> for this transaction.
+ *
+ * Lets the connector expose values set by rules (e.g. setvar:tx.foo=bar)
+ * to the web server.
+ *
+ * @param transaction ModSecurity transaction.
+ * @param name Variable name, case-insensitive (as in rules).
+ *
+ * @returns Copy of the value; the caller must free() it.
+ * @retval NULL Variable not set.
+ *
+ */
+extern "C" char *msc_get_tx(Transaction *transaction, const char *name) {
+    std::unique_ptr<std::string> value =
+        transaction->m_collections.m_tx_collection->resolveFirst(name);
+    if (value == nullptr) {
+        return NULL;
+    }
+    return strdup(value->c_str());
+}
+
+
+/**
  * @name    setRequestHostName
  * @brief   Set request's host name
  *

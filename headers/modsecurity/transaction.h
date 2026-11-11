@@ -757,6 +757,9 @@ int msc_process_logging(Transaction *transaction);
 int msc_update_status_code(Transaction *transaction, int status);
 
 /** @ingroup ModSecurity_C_API */
+char *msc_get_tx(Transaction *transaction, const char *name);
+
+/** @ingroup ModSecurity_C_API */
 int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
 
 /** @ingroup ModSecurity_C_API */
