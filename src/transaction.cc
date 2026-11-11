@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -2292,18 +2293,65 @@ extern "C" int msc_update_status_code(Transaction *transaction, int status) {
  *
  * @param transaction ModSecurity transaction.
  * @param name Variable name, case-insensitive (as in rules).
+ * @param value Receives a NUL-terminated copy of the value, which may also
+ *              contain NUL bytes; release it with msc_free(). Set to NULL
+ *              when nothing is returned.
+ * @param len Receives the value length, excluding the terminator. May be
+ *            NULL.
  *
- * @returns Copy of the value; the caller must free() it.
- * @retval NULL Variable not set.
+ * @returns If the variable was found.
+ * @retval 1 Variable found, *value and *len are set.
+ * @retval 0 Variable not set.
+ * @retval -1 Invalid arguments or allocation failure.
  *
  */
-extern "C" char *msc_get_tx(Transaction *transaction, const char *name) {
-    std::unique_ptr<std::string> value =
-        transaction->m_collections.m_tx_collection->resolveFirst(name);
+extern "C" int msc_get_tx(Transaction *transaction, const char *name,
+    char **value, size_t *len) {
     if (value == nullptr) {
-        return NULL;
+        return -1;
     }
-    return strdup(value->c_str());
+    *value = nullptr;
+    if (transaction == nullptr || name == nullptr) {
+        return -1;
+    }
+
+    try {
+        std::unique_ptr<std::string> v =
+            transaction->m_collections.m_tx_collection->resolveFirst(name);
+        if (v == nullptr) {
+            return 0;
+        }
+
+        auto copy = static_cast<char *>(malloc(v->size() + 1));
+        if (copy == nullptr) {
+            return -1;
+        }
+        memcpy(copy, v->data(), v->size());
+        copy[v->size()] = '\0';
+
+        *value = copy;
+        if (len != nullptr) {
+            *len = v->size();
+        }
+        return 1;
+    } catch (...) {
+        return -1;
+    }
+}
+
+
+/**
+ * @name    msc_free
+ * @brief   Release memory returned by the C API (e.g. msc_get_tx()).
+ *
+ * Use this rather than the caller's free(), which may belong to a
+ * different C runtime (e.g. on Windows).
+ *
+ * @param ptr Memory to release; NULL is ignored.
+ *
+ */
+extern "C" void msc_free(void *ptr) {
+    free(ptr);
 }
 
 
