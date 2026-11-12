@@ -104,8 +104,8 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
         }
     }
 
-    for (const auto & capture : captures) {
-        logOffset(ruleMessage, capture.m_offset, capture.m_length);
+    for (size_t i = 0; i < captures.size() && i < MAX_LOGGED_OFFSETS; i++) {
+        logOffset(ruleMessage, captures[i].m_offset, captures[i].m_length);
     }
 
     if (captures.size() > 0) {

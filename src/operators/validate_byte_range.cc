@@ -133,7 +133,9 @@ bool ValidateByteRange::evaluate(Transaction *transaction, RuleWithActions *rule
         if (!(table[x >> 3] & (1 << (x & 0x7)))) {
             // debug(9, "Value " + std::to_string(x) + " in " +
             //     input + " ouside range: " + param);
-            logOffset(ruleMessage, i, 1);
+            if (count < MAX_LOGGED_OFFSETS) {
+                logOffset(ruleMessage, i, 1);
+            }
             count++;
         }
     }

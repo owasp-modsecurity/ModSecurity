@@ -133,6 +133,14 @@ class Operator {
         return evaluate(transaction, str);
     }
 
+    /**
+     * Most offsets that a single evaluation may add to the rule message
+     * reference. An operator that can match an input-dependent number of
+     * times has to stop logging at this point, otherwise the reference
+     * outgrows the inspected value. The error log shows 200 characters of it.
+     */
+    static constexpr size_t MAX_LOGGED_OFFSETS = 20;
+
     static void logOffset(RuleMessage &ruleMessage, int offset, int len) {
         ruleMessage.m_reference.append("o"
             + std::to_string(offset) + ","

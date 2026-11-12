@@ -419,5 +419,46 @@
       "SecRule ARGS:subject \"!@rxGlobal %{ARGS:patt}\" \"id:4001,phase:2,deny,status:403\"",
       "SecRule TX:/^MSC_/ \"!@streq 0\" \"id:4002,phase:2,t:none,log,deny,status:409,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @rxGlobal limits the offsets in the reference",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[ref \"(?:o\\d+,1){20}v\\d+,40\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:p \"@rxGlobal a\" \"id:1,phase:2,deny,status:403,t:none\""
+    ]
   }
 ]
