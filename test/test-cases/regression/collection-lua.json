@@ -486,7 +486,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing LUA :: m.setvar with a non-string value fails the script",
+    "title": "Testing LUA :: m.setvar with a non-string value returns nil",
     "resource": "lua",
     "client": {
       "ip": "200.249.12.31",
@@ -518,7 +518,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Failed to execute lua script: .*setvar-error-table.lua \\(main\\) - .*bad argument #2 to 'setvar'",
+      "debug_log": "m.setvar: Failed m.setvar arguments must be strings.*m.setvar\\(\\) with a table value returned: nil",
       "http_code": 200
     },
     "rules": [

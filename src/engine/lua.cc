@@ -342,11 +342,16 @@ int Lua::setvar(lua_State *L) {
             "m.setvar: Failed m.setvar function must have 2 arguments");
         return 0;
     }
-    /* luaL_checkstring() raises a Lua error (longjmp) on a non-string
-     * argument, so call it before any C++ object with a destructor exists.
+    /* lua_tostring() rather than luaL_checkstring(): a Lua error would
+     * longjmp out of this C++ frame, which crashes the MSVC build.
      */
-    var_value = luaL_checkstring(L, 2);
-    var_name = luaL_checkstring(L, 1);
+    var_value = lua_tostring(L, 2);
+    var_name = lua_tostring(L, 1);
+    if (var_value == NULL || var_name == NULL) {
+        ms_dbg_a(t, 8,
+            "m.setvar: Failed m.setvar arguments must be strings");
+        return 0;
+    }
 
     std::string vname(var_name);
     std::string collection;
