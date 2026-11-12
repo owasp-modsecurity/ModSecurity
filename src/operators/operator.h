@@ -134,15 +134,27 @@ class Operator {
     }
 
     /**
-     * Most offsets that a single evaluation may add to the rule message
-     * reference. An operator that can match an input-dependent number of
-     * times has to stop logging at this point, otherwise the reference
-     * outgrows the inspected value. The error log shows 200 characters of it.
+     * Upper bound for the reference of a rule message. The reference is
+     * built up across every operator call, target variable and chained rule
+     * of a rule, so without a bound it grows with the input. Once it reaches
+     * this size, further entries are dropped. One entry may cross the limit.
      */
-    static constexpr size_t MAX_LOGGED_OFFSETS = 20;
+    static constexpr size_t MAX_REFERENCE_SIZE = 1024;
+
+    static bool referenceIsFull(const RuleMessage &ruleMessage) {
+        return ruleMessage.m_reference.size() >= MAX_REFERENCE_SIZE;
+    }
+
+    static void appendReference(RuleMessage &ruleMessage,
+        const std::string &entry) {
+        if (referenceIsFull(ruleMessage)) {
+            return;
+        }
+        ruleMessage.m_reference.append(entry);
+    }
 
     static void logOffset(RuleMessage &ruleMessage, int offset, int len) {
-        ruleMessage.m_reference.append("o"
+        appendReference(ruleMessage, "o"
             + std::to_string(offset) + ","
             + std::to_string(len));
     }
