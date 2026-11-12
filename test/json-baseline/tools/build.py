@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build probes against a verified pinned baseline or an explicit CI commit."""
+"""Build the selected engine commit in a fresh checkout, then build its probes."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -34,7 +34,7 @@ def sha256(path):
     return digest.hexdigest()
 
 
-def capture(command, *, cwd=None, env=None, timeout=30):
+def capture(command, *, cwd=None, env=None, timeout=30, strip=True):
     try:
         result = subprocess.run(command, cwd=cwd, env=env, text=True,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -44,11 +44,11 @@ def capture(command, *, cwd=None, env=None, timeout=30):
     if result.returncode:
         raise Blocked('Command failed: ' + str(command[0]) + ': ' +
                       result.stderr[-2000:].strip())
-    return result.stdout.strip()
+    return result.stdout.strip() if strip else result.stdout
 
 
 def git(source, *arguments):
-    return capture(['git', '-C', str(source), *arguments])
+    return capture(['git', '-C', str(source), *arguments], strip='-z' not in arguments)
 
 
 def untracked_files(source):
@@ -118,6 +118,108 @@ def source_metadata(source, source_ref=ORIGINAL):
             'ancillary_differences': changes}
 
 
+ENGINE_ARTIFACTS = {
+    'library': 'src/.libs/libmodsecurity.so',
+    'native_launcher': 'test/regression_tests',
+    'native_runner': 'test/.libs/regression_tests',
+}
+CONFIGURE_ARGS = (
+    '--enable-assertions=yes', '--enable-parser-generation=no', '--without-geoip',
+    '--with-yajl', '--with-pcre2', '--with-curl', '--with-libxml', '--with-lua',
+    '--with-lmdb', '--with-maxmind', '--with-ssdeep=/usr',
+)
+
+
+def run_build_step(command, cwd, log_path, timeout):
+    """Retain the real build output and never treat a failed step as provenance."""
+    with log_path.open('w') as log:
+        result = subprocess.run(command, cwd=cwd, stdout=log,
+                                stderr=subprocess.STDOUT, timeout=timeout,
+                                check=False)
+    if result.returncode:
+        raise RuntimeError('Engine build step failed: ' + str(command[0]) +
+                           '; see ' + str(log_path))
+
+
+def engine_artifacts(source):
+    """Hash the actual library, executable and libtool launcher from this build."""
+    records = {}
+    for name, relative in ENGINE_ARTIFACTS.items():
+        artifact = (source / relative).resolve(strict=True)
+        if not artifact.is_file() or not artifact.is_relative_to(source):
+            raise Blocked('Engine artifact is not a file inside the fresh build: ' + name)
+        records[name] = {'path': str(artifact), 'sha256': sha256(artifact)}
+    return records
+
+
+def clean_source_build(source, source_ref, output, jobs=2):
+    """Compile immutable Git contents, not the caller's existing build products.
+
+    The caller's checkout is never cleaned or rebuilt. A new independent local
+    clone contains no ignored/untracked headers, old .libs files or old native
+    runner. Submodules are checked out at the selected tree's exact gitlinks.
+    """
+    if type(jobs) is not int or jobs < 1:
+        raise ValueError('Build jobs must be a positive integer')
+    source_metadata(source, source_ref)
+    target = output / 'engine'
+    logs = output / 'engine-logs'
+    if target.exists() or target.is_symlink():
+        raise Blocked('Fresh engine directory already exists; choose a new output')
+    logs.mkdir()
+    steps = [
+        (['git', 'clone', '--no-local', '--no-checkout', '--',
+          str(source), str(target)], output, 'clone.log', 300),
+        (['git', 'checkout', '--detach', source_ref], target, 'checkout.log', 60),
+        (['git', 'submodule', 'update', '--init', '--recursive', '--', *SUBMODULES],
+         target, 'submodules.log', 900),
+    ]
+    for command, cwd, filename, timeout in steps:
+        run_build_step(command, cwd, logs / filename, timeout)
+    before = source_metadata(target, source_ref)
+    if before['source_head'] != source_ref:
+        raise Blocked('Fresh engine checkout is not at the selected commit')
+    build_steps = [
+        (['sh', '-e', './build.sh'], 'bootstrap.log'),
+        (['./configure', *CONFIGURE_ARGS], 'configure.log'),
+        (['make', '-j' + str(jobs)], 'make.log'),
+    ]
+    for command, filename in build_steps:
+        run_build_step(command, target, logs / filename, 1800)
+    after = source_metadata(target, source_ref)
+    if after != before:
+        raise Blocked('Source checkout changed during the engine build')
+    provenance = {
+        'schema': 1, 'method': 'fresh-git-clone', 'source_commit': source_ref,
+        'source_root': str(target), 'configure_arguments': list(CONFIGURE_ARGS),
+        'jobs': jobs, 'artifacts': engine_artifacts(target),
+    }
+    return target, after, provenance
+
+
+def verify_engine_build(manifest, source):
+    """Reject legacy/partial provenance or any changed engine/native artifact."""
+    provenance = manifest.get('engine_build')
+    if not isinstance(provenance, dict) or provenance.get('schema') != 1:
+        raise Blocked('Fresh engine-build provenance is required; rebuild with build.py')
+    if (provenance.get('method') != 'fresh-git-clone' or
+            provenance.get('source_commit') != manifest.get('original_commit') or
+            provenance.get('source_commit') != manifest.get('source_head') or
+            provenance.get('source_root') != str(source)):
+        raise Blocked('Engine-build provenance does not match the selected source')
+    recorded = provenance.get('artifacts')
+    if not isinstance(recorded, dict) or recorded != engine_artifacts(source):
+        raise Blocked('Engine library or native runner changed after the clean build')
+    library = manifest.get('library')
+    if not isinstance(library, dict):
+        raise Blocked('Library metadata must be an object')
+    if (library.get('path') != recorded['library']['path'] or
+            library.get('sha256') != recorded['library']['sha256'] or
+            library.get('directory') != str(source / 'src/.libs')):
+        raise Blocked('Library metadata does not match the clean engine build')
+    return provenance
+
+
 def runtime_environment(library_dir):
     environment = os.environ.copy()
     previous = environment.get('LD_LIBRARY_PATH', '')
@@ -170,19 +272,25 @@ def main():
                         help='full source commit SHA; defaults to the pinned baseline')
     parser.add_argument('--output', type=Path, required=True,
                         help='new directory outside the source tree')
+    parser.add_argument('--jobs', type=int, default=2, help='parallel engine build jobs')
     options = parser.parse_args()
+    if options.jobs < 1:
+        parser.error('--jobs must be positive')
     output = options.output.resolve()
     source = options.source.resolve()
     if (options.output.is_symlink() or output.exists() or output.is_relative_to(source)
             or output.is_relative_to(TESTS.parents[1])):
         parser.error('--output must be a new directory outside both source repositories')
     output.mkdir(parents=True)
-    manifest = {'schema': 1, 'status': 'BLOCKED',
+    manifest = {'schema': 2, 'status': 'BLOCKED',
                 'created_utc': datetime.now(timezone.utc).isoformat(),
                 'probe_sources_root': str(TESTS), 'original_commit': None,
                 'requested_source_ref': options.source_ref}
     try:
-        manifest.update(source_metadata(source, options.source_ref))
+        source, metadata, provenance = clean_source_build(
+            source, options.source_ref, output, options.jobs)
+        manifest.update(metadata)
+        manifest['engine_build'] = provenance
         library = (source / 'src/.libs/libmodsecurity.so').resolve(strict=True)
         manifest['library'] = {'path': str(library), 'sha256': sha256(library),
                                'directory': str(source / 'src/.libs')}
@@ -221,6 +329,7 @@ def main():
             manifest['probes'][name] = {'path': str(output / name),
                 'sha256': sha256(output / name), 'source_file': filename,
                 'source_sha256': sha256(input_file), 'loader': loader}
+        verify_engine_build(manifest, source)
         manifest['active_json_canary'] = active_canary(output / 'probe', environment)
         manifest['status'] = 'PASS'
         status = 0

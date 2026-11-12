@@ -48,26 +48,33 @@ jobs:
           sudo apt-get install -y autoconf automake build-essential git libcurl4-openssl-dev liblmdb-dev liblzma-dev libpcre2-dev libtool libxml2-dev libyajl-dev "$LUA_DEV_PACKAGE" libmaxminddb-dev libfuzzy-dev pkg-config python3 python3-yaml
       - name: Test JSON harness verification
         run: python3 -m unittest discover -s test/json-baseline/tools -p 'test_*.py' -v
-      - name: Prepare and build pinned original
+      - name: Prepare pinned source without reusing a build
         run: |
           python3 test/json-baseline/tools/prepare_source.py \
-            --destination "$RUNNER_TEMP/modsecurity-original" --build
-      - name: Build standalone test probes against the pinned original
+            --destination "$RUNNER_TEMP/modsecurity-original"
+      - name: Build engine and probes from a fresh checkout of the pinned commit
         run: |
           python3 test/json-baseline/tools/build.py \
-            --source "$RUNNER_TEMP/modsecurity-original" --output "$RUNNER_TEMP/probes"
-      - name: Run selected contracts
-        # Unmet requirements retain their real failure status.
+            --source "$RUNNER_TEMP/modsecurity-original" \
+            --output "$RUNNER_TEMP/json-probes"
+      - name: Run JSON profile
         run: |
           python3 test/json-baseline/tools/run_all.py \
-            --probes "$RUNNER_TEMP/probes" --profile "${{ matrix.profile }}" \
-            --output "$RUNNER_TEMP/results-${{ matrix.profile }}"
-      - uses: actions/upload-artifact@v4
+            --probes "$RUNNER_TEMP/json-probes" --profile "${{ matrix.profile }}" \
+            --output "$RUNNER_TEMP/json-results-${{ matrix.profile }}"
+      - name: Upload JSON evidence
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: json-${{ matrix.profile }}
-          if-no-files-found: error
+          name: json-${{ matrix.profile }}-${{ github.sha }}
           path: |
             ${{ runner.temp }}/modsecurity-original-preparation/
-            ${{ runner.temp }}/probes/
-            ${{ runner.temp }}/results-${{ matrix.profile }}/
+            ${{ runner.temp }}/json-probes/build-manifest.json
+            ${{ runner.temp }}/json-probes/*.log
+            ${{ runner.temp }}/json-probes/engine-logs/
+            ${{ runner.temp }}/json-probes/engine/config.log
+            ${{ runner.temp }}/json-probes/probe
+            ${{ runner.temp }}/json-probes/audit-probe
+            ${{ runner.temp }}/json-probes/extended-audit-probe
+            ${{ runner.temp }}/json-results-${{ matrix.profile }}
+          if-no-files-found: warn

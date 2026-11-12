@@ -3,7 +3,6 @@
 import argparse
 from datetime import datetime, timezone
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -11,7 +10,8 @@ import sys
 
 sys.dont_write_bytecode = True
 from build import (Blocked, PROBES, TESTS, active_canary,
-                   linked_library, runtime_environment, sha256, source_metadata)
+                   linked_library, runtime_environment, sha256, source_metadata,
+                   verify_engine_build)
 
 STATUSES = ('PASS', 'FAIL', 'SKIP', 'BLOCKED', 'XFAIL')
 
@@ -20,18 +20,41 @@ def zeros():
     return {status: 0 for status in STATUSES}
 
 
-def verify_manifest(directory):
+def read_manifest(directory):
+    """Validate JSON shape before any caller accesses manifest fields."""
     try:
         manifest = json.loads((directory / 'build-manifest.json').read_text())
     except (OSError, ValueError) as exc:
         raise Blocked('Readable build-manifest.json is required') from exc
+    if not isinstance(manifest, dict):
+        raise Blocked('Build manifest must be a JSON object')
+    source_root = manifest.get('source_root')
+    if source_root is not None and (not isinstance(source_root, str) or
+                                   not source_root or '\0' in source_root or
+                                   not Path(source_root).is_absolute()):
+        raise Blocked('Build manifest source_root must be an absolute path string')
+    return manifest
+
+
+def verify_manifest(directory):
+    manifest = read_manifest(directory)
     if manifest.get('status') != 'PASS':
         raise Blocked('Probe build did not establish a verified source')
+    if manifest.get('schema') != 2:
+        raise Blocked('Build manifest lacks fresh-build provenance; rebuild with build.py')
+    if not manifest.get('source_root'):
+        raise Blocked('Build manifest source_root is required')
+    if not isinstance(manifest.get('probes'), dict):
+        raise Blocked('Build manifest probes must be an object')
+    for name in PROBES:
+        if not isinstance(manifest['probes'].get(name), dict):
+            raise Blocked('Build manifest probe entry must be an object: ' + name)
     reference = manifest.get('original_commit')
     metadata = source_metadata(Path(manifest['source_root']), reference)
     if (metadata['source_head'] != manifest.get('source_head') or
             metadata['submodules'] != manifest.get('submodules')):
         raise Blocked('Source checkout changed after the recorded probe build')
+    verify_engine_build(manifest, Path(metadata['source_root']))
     library = Path(manifest['library']['path'])
     if sha256(library) != manifest['library']['sha256']:
         raise Blocked('libModSecurity changed after the recorded build')
@@ -53,6 +76,11 @@ def verify_manifest(directory):
 
 
 def validated_counts(report):
+    if not isinstance(report, dict):
+        raise ValueError('case report must be a JSON object')
+    for field in ('cases', 'sensitivity'):
+        if not isinstance(report.get(field, []), list):
+            raise ValueError('case report ' + field + ' must be an array')
     counts = report.get('counts')
     if not isinstance(counts, dict) or set(counts) != set(STATUSES):
         raise ValueError('report lacks a complete count summary')
@@ -63,6 +91,8 @@ def validated_counts(report):
         raise ValueError('report contains no actual cases or assertion controls')
     actual = zeros()
     for entry in entries:
+        if not isinstance(entry, dict) or entry.get('status') not in STATUSES:
+            raise ValueError('case report contains an invalid case/status')
         actual[entry['status']] += 1
     if actual != counts:
         raise ValueError('summary counts do not match individual report records')
@@ -96,13 +126,15 @@ def main():
     if options.output.is_symlink() or output.exists():
         parser.error('--output must name a new directory')
     # Source-tree and test-tree writes are not allowed, including native logs.
+    if output.is_relative_to(directory):
+        parser.error('--output must be outside the probe/build directory')
     if output.is_relative_to(TESTS.parents[1]):
         parser.error('--output must be outside the test repository')
     try:
-        source_path = json.loads((directory / 'build-manifest.json').read_text()).get('source_root')
+        source_path = read_manifest(directory).get('source_root')
         if source_path and output.is_relative_to(Path(source_path).resolve()):
             parser.error('--output must be outside the ModSecurity source tree')
-    except (OSError, ValueError):
+    except (Blocked, OSError, ValueError, RuntimeError):
         pass  # Report an absent/malformed manifest as a blocked suite below.
     output.mkdir(parents=True)
     summary = {'schema': 1, 'profile': options.profile, 'original_commit': None,

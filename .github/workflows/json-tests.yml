@@ -51,12 +51,7 @@ jobs:
           sudo apt-get install -y autoconf automake build-essential git libcurl4-openssl-dev liblmdb-dev liblzma-dev libpcre2-dev libtool libxml2-dev libyajl-dev "$LUA_DEV_PACKAGE" libmaxminddb-dev libfuzzy-dev pkg-config python3 python3-yaml
       - name: Test JSON harness verification
         run: python3 -m unittest discover -s test/json-baseline/tools -p 'test_*.py' -v
-      - name: Build complete source
-        run: |
-          sh -e ./build.sh
-          ./configure --enable-assertions=yes --enable-parser-generation=no --without-geoip --with-yajl --with-pcre2 --with-curl --with-libxml --with-lua --with-lmdb --with-maxmind --with-ssdeep=/usr
-          make -j2
-      - name: Build standalone test probes for the checked-out commit
+      - name: Build engine and probes from a fresh checkout of the CI commit
         run: |
           python3 test/json-baseline/tools/build.py \
             --source "$GITHUB_WORKSPACE" --source-ref "$GITHUB_SHA" \
@@ -72,6 +67,12 @@ jobs:
         with:
           name: json-${{ matrix.profile }}-${{ github.sha }}
           path: |
-            ${{ runner.temp }}/json-probes
+            ${{ runner.temp }}/json-probes/build-manifest.json
+            ${{ runner.temp }}/json-probes/*.log
+            ${{ runner.temp }}/json-probes/engine-logs/
+            ${{ runner.temp }}/json-probes/engine/config.log
+            ${{ runner.temp }}/json-probes/probe
+            ${{ runner.temp }}/json-probes/audit-probe
+            ${{ runner.temp }}/json-probes/extended-audit-probe
             ${{ runner.temp }}/json-results-${{ matrix.profile }}
           if-no-files-found: warn
