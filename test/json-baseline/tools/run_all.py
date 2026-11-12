@@ -50,11 +50,13 @@ def verify_manifest(directory):
         if not isinstance(manifest['probes'].get(name), dict):
             raise Blocked('Build manifest probe entry must be an object: ' + name)
     reference = manifest.get('original_commit')
-    metadata = source_metadata(Path(manifest['source_root']), reference)
+    source = Path(manifest['source_root']).resolve(strict=True)
+    provenance = verify_engine_build(manifest, source)
+    metadata = source_metadata(source, reference,
+                               generated_files=provenance.get('generated_files', {}))
     if (metadata['source_head'] != manifest.get('source_head') or
             metadata['submodules'] != manifest.get('submodules')):
         raise Blocked('Source checkout changed after the recorded probe build')
-    verify_engine_build(manifest, Path(metadata['source_root']))
     library = Path(manifest['library']['path'])
     if sha256(library) != manifest['library']['sha256']:
         raise Blocked('libModSecurity changed after the recorded build')

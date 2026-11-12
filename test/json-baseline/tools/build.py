@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shlex
 import shutil
@@ -58,7 +58,55 @@ def untracked_files(source):
             if name]
 
 
-def source_metadata(source, source_ref=ORIGINAL):
+def generated_file_path(source, relative):
+    """Accept regular generated files, never traversal or symlink aliases."""
+    if not isinstance(relative, str) or not relative or '\0' in relative:
+        raise Blocked('Invalid generated-file path')
+    path = PurePosixPath(relative)
+    if (path.is_absolute() or '..' in path.parts or '.git' in path.parts or
+            path.as_posix() != relative):
+        raise Blocked('Invalid generated-file path: ' + repr(relative))
+    candidate = source / relative
+    if (candidate.resolve(strict=True) != candidate or not candidate.is_file()):
+        raise Blocked('Generated file must be a regular in-tree file: ' + repr(relative))
+    return candidate
+
+
+def generated_file_snapshot(source, modules):
+    """Record non-ignored files created by the controlled fresh build.
+
+    This is called only after a clean checkout and successful build commands.
+    The input checkout is always checked without any generated-file allowance.
+    """
+    records = {}
+    for relative in ('', *sorted(modules)):
+        for name in untracked_files(source / relative):
+            path = (PurePosixPath(relative) / name).as_posix()
+            records[path] = sha256(generated_file_path(source, path))
+    return records
+
+
+def verify_generated_files(source, records):
+    """Keep generated additions distinct from source and detect later changes."""
+    if not isinstance(records, dict):
+        raise Blocked('Generated-file evidence must be an object')
+    for relative, digest in records.items():
+        if not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest):
+            raise Blocked('Invalid generated-file hash')
+        try:
+            actual = sha256(generated_file_path(source, relative))
+        except FileNotFoundError as error:
+            raise Blocked('Generated build file is missing: ' + repr(relative)) from error
+        if actual != digest:
+            raise Blocked('Generated build file changed: ' + repr(relative))
+
+
+def unexpected_untracked(source, relative, generated_files):
+    return [name for name in untracked_files(source / relative)
+            if (PurePosixPath(relative) / name).as_posix() not in generated_files]
+
+
+def source_metadata(source, source_ref=ORIGINAL, *, generated_files=None):
     """Verify the working tree and gitlinks against the selected immutable ref.
 
     The default retains pinned-baseline verification. CI passes its checkout
@@ -66,6 +114,8 @@ def source_metadata(source, source_ref=ORIGINAL):
     accepting uncommitted production changes or changing historical evidence.
     """
     source = Path(source).resolve(strict=True)
+    generated_files = {} if generated_files is None else generated_files
+    verify_generated_files(source, generated_files)
     if not isinstance(source_ref, str) or not re.fullmatch(r'[0-9a-f]{40}', source_ref):
         raise Blocked('Source reference must be a full lowercase commit SHA')
     if Path(git(source, 'rev-parse', '--show-toplevel')).resolve() != source:
@@ -79,7 +129,8 @@ def source_metadata(source, source_ref=ORIGINAL):
                 path.startswith('README') or path == '.gitignore')
 
     unexpected = [path for path in changes if not ancillary(path)]
-    additions = [path for path in untracked_files(source) if not ancillary(path)]
+    additions = [path for path in unexpected_untracked(source, '', generated_files)
+                 if not ancillary(path)]
     if additions:
         raise Blocked('Untracked production/build sources: ' + ', '.join(additions))
     if unexpected:
@@ -96,8 +147,10 @@ def source_metadata(source, source_ref=ORIGINAL):
             raise Blocked('Submodule is not at its selected gitlink: ' + relative)
         if git(source / relative, 'diff', '--name-only', 'HEAD', '--'):
             raise Blocked('Submodule has modified tracked sources: ' + relative)
-        if untracked_files(source / relative):
-            raise Blocked('Submodule has untracked sources: ' + relative)
+        additions = unexpected_untracked(source, relative, generated_files)
+        if additions:
+            raise Blocked('Submodule has untracked sources: ' + relative + ': ' +
+                          repr(additions))
         modules[relative] = actual
     recursive = git(source, 'submodule', 'status', '--recursive', '--', *SUBMODULES)
     for line in recursive.splitlines():
@@ -106,8 +159,10 @@ def source_metadata(source, source_ref=ORIGINAL):
             raise Blocked('A recursive submodule is uninitialized or differs from its gitlink')
         if git(source / match[3], 'diff', '--name-only', 'HEAD', '--'):
             raise Blocked('Recursive submodule has modified tracked sources: ' + match[3])
-        if untracked_files(source / match[3]):
-            raise Blocked('Recursive submodule has untracked sources: ' + match[3])
+        additions = unexpected_untracked(source, match[3], generated_files)
+        if additions:
+            raise Blocked('Recursive submodule has untracked sources: ' + match[3] +
+                          ': ' + repr(additions))
         modules[match[3]] = match[2]
     for relative in ('src', 'headers', 'configure.ac', 'test/regression/regression.cc'):
         if not (source / relative).exists():
@@ -132,6 +187,7 @@ CONFIGURE_ARGS = (
 
 def run_build_step(command, cwd, log_path, timeout):
     """Retain the real build output and never treat a failed step as provenance."""
+    print('BUILD ' + shlex.join(command) + ' (log: ' + str(log_path) + ')', flush=True)
     with log_path.open('w') as log:
         result = subprocess.run(command, cwd=cwd, stdout=log,
                                 stderr=subprocess.STDOUT, timeout=timeout,
@@ -186,13 +242,17 @@ def clean_source_build(source, source_ref, output, jobs=2):
     ]
     for command, filename in build_steps:
         run_build_step(command, target, logs / filename, 1800)
-    after = source_metadata(target, source_ref)
+    generated = generated_file_snapshot(target, before['submodules'])
+    (logs / 'generated-files.json').write_text(json.dumps(generated, indent=2) + '\n')
+    print('Recorded ' + str(len(generated)) + ' generated build files', flush=True)
+    after = source_metadata(target, source_ref, generated_files=generated)
     if after != before:
         raise Blocked('Source checkout changed during the engine build')
     provenance = {
         'schema': 1, 'method': 'fresh-git-clone', 'source_commit': source_ref,
         'source_root': str(target), 'configure_arguments': list(CONFIGURE_ARGS),
         'jobs': jobs, 'artifacts': engine_artifacts(target),
+        'generated_files': generated,
     }
     return target, after, provenance
 
@@ -207,6 +267,7 @@ def verify_engine_build(manifest, source):
             provenance.get('source_commit') != manifest.get('source_head') or
             provenance.get('source_root') != str(source)):
         raise Blocked('Engine-build provenance does not match the selected source')
+    verify_generated_files(source, provenance.get('generated_files', {}))
     recorded = provenance.get('artifacts')
     if not isinstance(recorded, dict) or recorded != engine_artifacts(source):
         raise Blocked('Engine library or native runner changed after the clean build')

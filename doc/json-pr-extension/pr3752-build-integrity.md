@@ -33,6 +33,28 @@ build rather than building twice. Evidence uploads include manifests, probe
 binaries, build logs and test reports, not the complete cloned source tree.
 Ubuntu 26.04, dynamic Lua detection and normal requirements failure status remain.
 
+## Follow-up: generated submodule files are not source changes
+
+The run of `7d043d5` stopped after compilation with
+`Submodule has untracked sources: others/libinjection`. The post-build guard
+incorrectly treated every non-ignored build output as an unexpected input.
+Autotools/Libtool can create such files inside submodules during a normal build.
+
+The input checkout and fresh clone are still checked strictly before building.
+After successful bootstrap/configure/make, the helper records generated files
+from the main tree and all verified recursive submodules, with exact paths and
+SHA-256 hashes. It saves `engine-logs/generated-files.json` and includes that
+inventory in the build manifest. Post-build and runtime source checks accept
+only those recorded files and reject changed, missing or additional files.
+Tracked source changes, wrong submodule commits, traversal and symlink aliases
+remain errors. This is not a blanket ignore rule or a change to any submodule.
+
+Both JSON workflows follow the main `ci_new.yml` checkout convention:
+`actions/checkout@v7`, full history and recursive submodules. They retain its
+dynamic Lua package discovery, include Bison/Flex and PCRE2 utilities, and pass
+`nproc` to the managed build. Each build phase prints its command and log path.
+The existing main QA workflow is unchanged.
+
 ## Malformed manifests and result reports
 
 Both manifest-read paths reject non-object JSON before accessing fields.
@@ -66,13 +88,20 @@ they do not generate clean-build provenance accepted by the profile runner.
 
 ## Validation performed for this revision
 
-All 32 new tests in `tools/test_build_integrity.py` passed locally. They include
-an actual Git/Make/C++ fixture: an input repository retains version-1 binaries
-while its source is committed as version 2. The clean build produces version 2
-in both the shared library and native executable without changing the stale
-input binaries. A real shallow detached checkout is also tested. Other controls
-cover modified artifacts, symlink escapes, failed builds, untracked sources,
+For the original build-integrity revision, all 32 new tests in
+`tools/test_build_integrity.py` passed locally. They include an actual
+Git/Make/C++ fixture: an input repository retains version-1 binaries while its
+source is committed as version 2. The clean build produces version 2 in both
+the shared library and native executable without changing the stale input
+binaries. A real shallow detached checkout is also tested. Other controls cover
+modified artifacts, symlink escapes, failed builds, untracked sources,
 malformed manifests and retention of genuine failures.
+
+The generated-file follow-up adds 12 passing local tests with real Git
+submodules (including a nested submodule), Libtool and compiled C++ fixtures.
+They reproduce the old rejection without the generated-file record, accept the
+normal build with the record, exercise profile preflight, and reject file
+modification, deletion, unexpected additions and path/symlink escapes.
 
 These tests validate the harness using small synthetic sources; they are not a
 fresh ModSecurity execution, sanitizer run or SonarQube scan. Full-engine and
