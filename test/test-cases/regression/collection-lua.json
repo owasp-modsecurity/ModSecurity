@@ -310,5 +310,220 @@
       "SecRuleEngine On",
       "SecRuleScript test-cases/data/match-getvars-args.lua \"id:2,phase:2,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar without a collection returns nil",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar: Must specify a collection using dot character.*m.setvar\\(\\) without a collection returned: nil",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar-error-nodot.lua \"id:1,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar with one argument returns nil",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar: Failed m.setvar function must have 2 arguments.*m.setvar\\(\\) with one argument returned: nil",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar-error-onearg.lua \"id:1,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar with an unknown collection returns nil",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar: Unknown collection: FOO\\..*m.setvar\\(\\) with an unknown collection returned: nil",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar-error-unknown-collection.lua \"id:1,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar sets a TX variable and returns nil",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar\\(\\) with TX returned: nil.*tx.a is now: x",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar-tx.lua \"id:1,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar with a non-string value returns nil",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar: Failed m.setvar arguments must be strings.*m.setvar\\(\\) with a table value returned: nil",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/setvar-error-table.lua \"id:1,pass\""
+    ]
   }
 ]
