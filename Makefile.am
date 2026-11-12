@@ -94,7 +94,9 @@ LOG_COMPILER=test/test-suite.sh
 
 TESTS=
 include test/test-suite.in
+if TEST_UTILITIES
 TESTS+=test/api/msc_get_tx.c
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = modsecurity.pc
