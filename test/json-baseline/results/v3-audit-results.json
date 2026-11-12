@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "id": "AUDIT-01",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 1039,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-02",
+      "layer": "Transaction audit writer",
+      "fixture": "controls",
+      "input_length": 7,
+      "input_hex": "0008090a0c0d1f",
+      "input_sha256": "5d9bfc9f9a763ebc637b6fb76afcc8a1249d9b9f1dae02e4bfc9e980b6079e3f",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 1096,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-03",
+      "layer": "Transaction audit writer",
+      "fixture": "unicode",
+      "input_length": 9,
+      "input_hex": "c2a2e282acf09f9880",
+      "input_sha256": "90089fc3a5cbc789a9b855b9bc6f55cc06a151e57854d3dcbe209697d2056ced",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 1090,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-04",
+      "layer": "Transaction audit writer",
+      "fixture": "mixed",
+      "input_length": 28,
+      "input_hex": "71756f746522736c6173685c0008090a0c0d1fc2a2e282acf09f9880",
+      "input_sha256": "6f72f8742c7aa875309cf3e23dc311cf52f998dd6348cecce2285c2c4f0fe662",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 1261,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-05",
+      "layer": "Transaction audit writer",
+      "fixture": "empty",
+      "input_length": 0,
+      "input_hex": "",
+      "input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 982,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-06",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "all",
+      "mode": "pass",
+      "headers": "duplicate",
+      "output_length": 1081,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-07",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "none",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 393,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-08",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "request",
+      "mode": "pass",
+      "headers": "unique",
+      "output_length": 548,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-09",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "all",
+      "mode": "deny",
+      "headers": "unique",
+      "output_length": 1038,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-10",
+      "layer": "Transaction audit writer",
+      "fixture": "ascii",
+      "input_length": 12,
+      "input_hex": "71756f746522736c6173685c",
+      "input_sha256": "693be466056e38721f8ea4e288f6e9b75bac2884f8ad06d2dd6c61930a605eb3",
+      "parts": "all",
+      "mode": "detect",
+      "headers": "unique",
+      "output_length": 1045,
+      "status": "PASS"
+    },
+    {
+      "id": "AUDIT-M01",
+      "layer": "assertion sensitivity",
+      "purpose": "wrong response body expectation",
+      "status": "PASS",
+      "reason": "controlled mutation rejected"
+    },
+    {
+      "id": "AUDIT-M02",
+      "layer": "assertion sensitivity",
+      "purpose": "numeric field changed to string",
+      "status": "PASS",
+      "reason": "controlled mutation rejected"
+    }
+  ],
+  "counts": {
+    "PASS": 12,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  }
+}

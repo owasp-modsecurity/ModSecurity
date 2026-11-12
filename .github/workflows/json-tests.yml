@@ -1,0 +1,54 @@
+name: JSON behavior contracts
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  json-tests:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [characterization, requirements]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool pkg-config git \
+            libyajl-dev libpcre2-dev libcurl4-openssl-dev libxml2-dev liblua5.4-dev \
+            liblmdb-dev libmaxminddb-dev libfuzzy-dev
+      - name: Build the complete source checkout
+        run: |
+          sh -e ./build.sh
+          ./configure --enable-assertions=yes --enable-parser-generation=no \
+            --without-geoip --with-yajl --with-pcre2 --with-curl --with-libxml \
+            --with-lua --with-lmdb --with-maxmind --with-ssdeep=/usr
+          make -j2
+      - name: Build standalone test probes
+        run: |
+          python3 test/json-baseline/tools/build.py \
+            --source "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/probes"
+      - name: Run selected contracts
+        # The requirements job is intentionally red while proposals are unmet.
+        # No continue-on-error or XFAIL converts those failures into success.
+        run: |
+          python3 test/json-baseline/tools/run_all.py \
+            --probes "$RUNNER_TEMP/probes" --profile "${{ matrix.profile }}" \
+            --output "$RUNNER_TEMP/results-${{ matrix.profile }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: json-${{ matrix.profile }}
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/probes/
+            ${{ runner.temp }}/results-${{ matrix.profile }}/

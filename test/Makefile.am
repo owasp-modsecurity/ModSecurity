@@ -23,7 +23,13 @@ noinst_PROGRAMS =
 EXTRA_DIST = \
 	test-cases/* \
 	custom-test-driver \
-	test-suite.sh
+	test-suite.sh \
+	json-baseline/*.cc \
+	json-baseline/*.py \
+	json-baseline/*.sh \
+	json-baseline/tools/*.py \
+	json-baseline/repository-template/.github/workflows/*.yml \
+	json-baseline/results/*.json
 
 
 # unit_tests

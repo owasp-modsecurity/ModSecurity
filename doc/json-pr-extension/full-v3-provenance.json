@@ -1,0 +1,804 @@
+{
+  "schema": 1,
+  "repositories": {
+    "origin": "https://github.com/Easton97-Jens/ModSecurity.git",
+    "upstream": "https://github.com/owasp-modsecurity/ModSecurity.git",
+    "upstream_access": "read only"
+  },
+  "retrieved_utc": "2026-10-15T15:24:31+00:00",
+  "official": {
+    "branch": "v3/master",
+    "commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "tracked_entries": 846
+  },
+  "task": {
+    "branch": "test/json-yajl-v3-master-english-20261015",
+    "worktree": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+    "base_commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "languages": [
+      "en"
+    ],
+    "root_README": "Original retained byte-identical; README.JSON-TESTS.md is the added English index."
+  },
+  "fork_refs_before_task": [
+    {
+      "ref": "refs/heads/Modsecurity/v2",
+      "commit": "7ea9fefbe0ba409d8733b4d682c8c4c059cd028d"
+    },
+    {
+      "ref": "refs/heads/V3-Modsecurity-SQL",
+      "commit": "f5a6fcd37aea3a7618408b7d1f03b94de9164637"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-and-decouple-performance-benchmark",
+      "commit": "4ecde4621e00ce6e3a7945771a7a121359d78924"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-json-alternatives-in-repository",
+      "commit": "a8337ffae717f89d1ddca918cd8637e2f2212991"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-modsecurity-v3-repository-structure",
+      "commit": "95bf92d5d2f0a2cb4c9d58cb165070024b270e59"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-yajl-removal-impact-on-modsecurity",
+      "commit": "00ada678434c02da04b4f37360b67898f2ffbeb1"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-combined-security-and-performance-audit",
+      "commit": "56a8081110e6b09b6fb9d1fb7840cdd8d4c502fc"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-complete-sonar-analysis-for-pr-3540",
+      "commit": "d6798201f46ad80b496a9c39263290988ddbc97e"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-performance-analysis-of-owasp-modsecurity",
+      "commit": "6526ef454c51f4dd8df45d279a96852c4b46a3d9"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-performance-analysis-of-owasp-modsecurity-r746ut",
+      "commit": "b03e47131bcdd0594254242b6b56e22a9561942e"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-security-analysis-on-pr-#3489",
+      "commit": "524a6f89283aa84410dca866cc0b0c1ebbedc255"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-security-audit-for-libinjection-migration",
+      "commit": "82c63f9f1ae49d70c4d9c8e6382744113ac52b8d"
+    },
+    {
+      "ref": "refs/heads/codex/create-c++20-compiler-support-documentation",
+      "commit": "5e06519f1a1acd55387caf0e6e510158c72d99e6"
+    },
+    {
+      "ref": "refs/heads/codex/create-detailed-modsecurity-repo-analysis",
+      "commit": "59e35d1162c38aa6da7936b714d774e6e6be0ed2"
+    },
+    {
+      "ref": "refs/heads/codex/create-technical-migration-documentation-for-json-libraries",
+      "commit": "473c96cbc19187e60b3cdfbc54690ff2db0941d5"
+    },
+    {
+      "ref": "refs/heads/codex/erstelle-fachartikel-uber-fuzz-testing-und-sanitizer",
+      "commit": "4c1180bb9eaa4211a8276ce1d73677baf968643e"
+    },
+    {
+      "ref": "refs/heads/codex/erstelle-lokale-regressionstests-fur-modsecurity",
+      "commit": "9bf29852fb56f9c384d6716827e5c1e0197ad99f"
+    },
+    {
+      "ref": "refs/heads/codex/evaluate-maven-integration-difficulty",
+      "commit": "7b8082018e4ab41b674160a86dea581f4502cff2"
+    },
+    {
+      "ref": "refs/heads/codex/evaluate-migration-from-c++17-to-c++20",
+      "commit": "a609fe31faf2184d98eb3a190fd44127829f91ea"
+    },
+    {
+      "ref": "refs/heads/codex/fix-afl++-fuzzing-harness-input-handling",
+      "commit": "9f0e96474b6e0def3c5838ab84b931acbd165a09"
+    },
+    {
+      "ref": "refs/heads/codex/fix-default-blocking-action-logic-k65htg",
+      "commit": "ad008574d0346e84b976a8da90f1baa8f4b91415"
+    },
+    {
+      "ref": "refs/heads/codex/fix-fragment-stripping-vulnerability-in-modsecurity",
+      "commit": "0be2f7571a3052ead47b8539c3c6ece6cf60a55c"
+    },
+    {
+      "ref": "refs/heads/codex/fix-issue-with-phase-2-rule-evaluation",
+      "commit": "bd88427f1b0073ac28438702fda2ce91336a1a44"
+    },
+    {
+      "ref": "refs/heads/codex/fix-unconditional-log-formatting-vulnerability",
+      "commit": "3db0fd1310b10562f2c6cb5f0582245cc81b29c7"
+    },
+    {
+      "ref": "refs/heads/codex/fix-visible-errors-and-regressions",
+      "commit": "bccbeb06daaa46844d1eb78e0015fbee3ebb578b"
+    },
+    {
+      "ref": "refs/heads/codex/generate-bilingual-technical-analysis-files",
+      "commit": "a3c5e85ae13e30671c8a84e98e1da553ef89fcfa"
+    },
+    {
+      "ref": "refs/heads/codex/implement-xml/json-processing-improvements",
+      "commit": "74878c9f15154f723ec363f2ee5c255e8bc34562"
+    },
+    {
+      "ref": "refs/heads/codex/improve-modsecurity/libmodsecurity-repo",
+      "commit": "733f58d78631c22d34f38bf71018023c387260f2"
+    },
+    {
+      "ref": "refs/heads/codex/investigate-ci-linker-errors-and-fix",
+      "commit": "f776bd455488f6a403edc295d81786e80d08498c"
+    },
+    {
+      "ref": "refs/heads/codex/propose-fix-for-rbl-false-negative",
+      "commit": "c67db082d7f6f19bb5b0ee7ebbf847f7ca54cbc2"
+    },
+    {
+      "ref": "refs/heads/codex/review-github-copilot-comments-for-pr-3568",
+      "commit": "8bb8ba8c36a4819b690179e836a9ff78724ef131"
+    },
+    {
+      "ref": "refs/heads/codex/review-libinjection-result-handling",
+      "commit": "383da505263f6582b75a3ed5321f21f399794077"
+    },
+    {
+      "ref": "refs/heads/codex/review-libxml2-usage-and-integration",
+      "commit": "bb4b5a77aa47c83a2bf41966d8f8b6da286f0760"
+    },
+    {
+      "ref": "refs/heads/codex/review-xss-and-sqli-privacy-risks",
+      "commit": "098ae120e2a1eaaea79b6dfb4f9868b08a034011"
+    },
+    {
+      "ref": "refs/heads/codex/systematische-behebung-offener-sonar-probleme",
+      "commit": "4d82c2f956927cc425e3dc40ff257f575780aa00"
+    },
+    {
+      "ref": "refs/heads/codex/systematische-behebung-offener-sonar-probleme-7954xf",
+      "commit": "57bf6d2e909e45c95b2d06e9b31a1535d4936aee"
+    },
+    {
+      "ref": "refs/heads/revert-79-codex/implement-xml/json-processing-improvements",
+      "commit": "084b39ac965970d5cd26d50a3c4b07975b492bff"
+    },
+    {
+      "ref": "refs/heads/test/json-yajl-baseline-v2-20261015",
+      "commit": "2739e0634ba688bc9cda9dad14eaf3ab1427e1c8"
+    },
+    {
+      "ref": "refs/heads/test/json-yajl-baseline-v3-20261015",
+      "commit": "2bfb2180d8c0fa35ae7a3f2665e999600607d896"
+    },
+    {
+      "ref": "refs/heads/test/json-yajl-english-only-20261015",
+      "commit": "90d53b44694e6c7f8b6dea7b07d4ab550708af7f"
+    },
+    {
+      "ref": "refs/heads/test/json-yajl-pr-coverage-v3-20261015",
+      "commit": "becb17e4c12679369983e664eda97eb49e0f0ff1"
+    },
+    {
+      "ref": "refs/heads/v3/master",
+      "commit": "2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641"
+    },
+    {
+      "ref": "refs/heads/v3/master-json",
+      "commit": "0131c8acfe9cf3daf995b3b5a8e3c7dd00d51968"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2",
+      "commit": "14c74afb966900a5f0153f4f289c41a149bf1deb"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2+blaze",
+      "commit": "71492d19a590936f892995781666340082c2a6fc"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2_benchmark",
+      "commit": "023f1707d4291993484deed14f7e58c79151926c"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2_test_benchmark",
+      "commit": "8c658f00394b194e06e6d04a903fd366b8f1aeaf"
+    },
+    {
+      "ref": "refs/heads/v3/master-libinjection-v4.0-final",
+      "commit": "951998de40e19f289b5ba430f4b642aff33cee86"
+    },
+    {
+      "ref": "refs/heads/v3/master-mbedtl-v4",
+      "commit": "ff9286f1014f423658804efeaf85d3e93021c1b8"
+    },
+    {
+      "ref": "refs/heads/v3/master-unittest",
+      "commit": "e6e76386830c3ccab6cedaec2c16dbb2a0c2a7d6"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows",
+      "commit": "bf50b88e886c36d9a1821f86c4344a125c3f2f6c"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows2",
+      "commit": "3f1cf6dbb68aec941ce0654eb1b82a5af89aa10f"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows3",
+      "commit": "8e09ccae6852cbbe12662901f9a2a9d2608c2e74"
+    },
+    {
+      "ref": "refs/heads/v3/master_Security",
+      "commit": "0fb4aff98b4980cf6426697d5605c424e3d5bb60"
+    },
+    {
+      "ref": "refs/heads/v3/master_pr3489",
+      "commit": "1ac4ef58a4989535c6d9b4de79c1161116528c90"
+    },
+    {
+      "ref": "refs/heads/v3/master_pr3501",
+      "commit": "018d68ce2917f8bb7ae68b441d5dd3184e8cf91d"
+    }
+  ],
+  "changed_between_historical_and_current_original": [
+    "Makefile.am",
+    "headers/modsecurity/rules_set_properties.h",
+    "src/request_body_processor/multipart.cc",
+    "test/test-cases/regression/config-upload_file_mode.json",
+    "test/test-suite.in"
+  ],
+  "preservation": {
+    "official_base": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "original_files_preserved": 846,
+    "original_unchanged_blob_files": 840,
+    "pinned_gitlinks": {
+      "bindings/python": "bc625d5bb0bac6a64bcce8dc9902208612399348",
+      "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+      "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+      "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+    },
+    "only_changed_original_files": [
+      "test/Makefile.am",
+      "test/test-cases/regression/request-body-parser-json.json"
+    ],
+    "original_JSON_cases_preserved": 6,
+    "expanded_native_JSON_cases": 11,
+    "new_English_document_files": 11,
+    "fresh_library": "/workspace/work/json-yajl-pr-expansion/full-v3-english/src/.libs/libmodsecurity.so.3.0.17",
+    "fresh_library_sha256": "d9ccbbc719645a630969680d99a4c07d36e0dc8a4b9c129095948790e29e8f21",
+    "old_library_reused": false,
+    "status": "PASS"
+  },
+  "environment_report": "full-v3-environment.json",
+  "all_submodule_status": "bc625d5bb0bac6a64bcce8dc9902208612399348 bindings/python (bc625d5)\n 211782219663f889f471650150df12b623c5766e others/libinjection (v4.0.0)\n 0fe989b6b514192783c469039edd325fd0989806 others/mbedtls (v4.1.0)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n 29160dd877d29658279fd683b2ae57b320ddcf09 others/mbedtls/tf-psa-crypto (v1.1.0)\n 5772b4f4a0105694b1203abb582273f78fa951b7 others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native (remotes/origin/main-53-g5772b4f)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/tf-psa-crypto/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n f73c73027ef49ccf99c7911744929a71d15ff419 test/test-cases/secrules-language-tests (heads/master)",
+  "module_setup": "Each required module was initialized at its recorded gitlink with --reference to the matching previous local object cache; source caches were not modified. Python binding initialized independently at its official recorded commit. No --remote updates.",
+  "original_build_and_baseline": {
+    "schema": 1,
+    "created_utc": "2026-10-15T15:33:19.622484+00:00",
+    "original_commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "source_root": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+    "source_head": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "scope": "Unmodified official current v3 source and original existing native tests before any task test/documentation overlay.",
+    "environment_report": "environment.json",
+    "production_matches_original_before_tests": true,
+    "build_steps": [
+      {
+        "command": [
+          "sh",
+          "-e",
+          "./build.sh"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+        "environment_file": "/workspace/modsecurity-env/env.sh",
+        "exit": 0,
+        "log": "bootstrap.log"
+      },
+      {
+        "command": [
+          "./configure",
+          "--prefix=/workspace/work/json-yajl-pr-expansion/full-v3-install",
+          "--enable-assertions=yes",
+          "--enable-parser-generation=no",
+          "--without-geoip",
+          "--with-yajl",
+          "--with-pcre2",
+          "--with-curl",
+          "--with-libxml",
+          "--with-lua",
+          "--with-lmdb",
+          "--with-maxmind",
+          "--with-ssdeep=/workspace/modsecurity-env/deps/usr",
+          "CXXFLAGS=-O2 -g",
+          "CPPFLAGS=-I/workspace/modsecurity-env/deps/usr/include",
+          "LDFLAGS=-L/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu -Wl,-rpath,/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+        "environment_file": "/workspace/modsecurity-env/env.sh",
+        "exit": 0,
+        "log": "configure.log"
+      },
+      {
+        "command": [
+          "make",
+          "-j3"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+        "environment_file": "/workspace/modsecurity-env/env.sh",
+        "exit": 0,
+        "log": "make.log"
+      }
+    ],
+    "library": {
+      "path": "/workspace/work/json-yajl-pr-expansion/full-v3-english/src/.libs/libmodsecurity.so.3.0.17",
+      "sha256": "d9ccbbc719645a630969680d99a4c07d36e0dc8a4b9c129095948790e29e8f21",
+      "different_from_8271_build": true
+    },
+    "native_runner": {
+      "path": "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/.libs/regression_tests",
+      "sha256": "26f7bab8dd5c8b1f84b0435e1d1c685bc03673c25bf3ab76614e3ae0617865f9",
+      "resolved_library": "/workspace/work/json-yajl-pr-expansion/full-v3-english/src/.libs/libmodsecurity.so.3.0.17"
+    },
+    "suites": [
+      {
+        "suite": "request-body-parser-json",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/request-body-parser-json.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 6,
+        "fixture_sha256": "c826accd0483954c9d0c0b4254299259b829fffb3d1c8c5d908fc1831c9df072",
+        "stdout": "request-body-parser-json.stdout.log",
+        "stderr": "request-body-parser-json.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 6 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 6,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "issue-1576",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/issue-1576.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 3,
+        "fixture_sha256": "58de6fcce2d6796986c5cb8492620227fc73280e314d60e9a43491e10b3eb15c",
+        "stdout": "issue-1576.stdout.log",
+        "stderr": "issue-1576.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 3 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 3,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "secargumentslimit",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/secargumentslimit.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 2,
+        "fixture_sha256": "b09471b24673f2a0366d5f9b5291af5dc4127d409a259555015843f6cfd60c32",
+        "stdout": "secargumentslimit.stdout.log",
+        "stderr": "secargumentslimit.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 2 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 2,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "auditlog",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/auditlog.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 15,
+        "fixture_sha256": "d231abc7b45d0f9f7d449168bd48143d23d7e3ab03b71336e567fcb80c2a4cf7",
+        "stdout": "auditlog.stdout.log",
+        "stderr": "auditlog.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 15 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 15,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "config-body_limits",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/config-body_limits.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 16,
+        "fixture_sha256": "a64165a60e60b5e5ad95d4fd96571d4da8cf3cbfad7e18ecd4d9648a610eb8be",
+        "stdout": "config-body_limits.stdout.log",
+        "stderr": "config-body_limits.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 16 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 16,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "transformations",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/transformations.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 8,
+        "fixture_sha256": "cc37266af10278a41ab6d1a8b0e4c11bc78dcbedd43a8680925eb3d889c76cfc",
+        "stdout": "transformations.stdout.log",
+        "stderr": "transformations.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 8 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 8,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      },
+      {
+        "suite": "config-upload_file_mode",
+        "command": [
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+          "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/config-upload_file_mode.json"
+        ],
+        "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+        "enabled_fixture_cases": 3,
+        "fixture_sha256": "d29ca406fb6c8e429d2196eae48f0e3568ba8d63c2220167a6968c3827066097",
+        "stdout": "config-upload_file_mode.stdout.log",
+        "stderr": "config-upload_file_mode.stderr.log",
+        "exit": 0,
+        "native_summary": "Ran a total of: 3 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+        "status": "PASS",
+        "counts": {
+          "PASS": 3,
+          "FAIL": 0,
+          "SKIP": 0,
+          "BLOCKED": 0,
+          "XFAIL": 0
+        }
+      }
+    ],
+    "counts": {
+      "PASS": 53,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "original_framework_side_effects": "Original audit fixtures use their fixed synthetic /tmp audit paths; upload fixtures keep synthetic temporary files in /tmp. Runner working directory and captured process logs are outside the source tree.",
+    "tracked_source_diff_after_tests": "",
+    "tracked_sources_unchanged": true,
+    "status": "PASS",
+    "exit": 0
+  },
+  "new_run_summary": "full-v3-validation.json",
+  "new_counts": {
+    "PASS": 405,
+    "FAIL": 20,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "limited_sanitizer": {
+    "report": "../../test/json-baseline/results/full-v3-sanitizer-results.json",
+    "counts": {
+      "PASS": 124,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "scope": "helper+json.cc instrumented only; freshDD1library+YAJL not fully instrumented; detect_leaks=0"
+  },
+  "historical_snapshot": "The inherited8271analysis and original reports retain their source/observations. Active build/report pins are updatedDD1; expected fixtures were not relaxed.",
+  "validation_commands": [
+    [
+      "source",
+      "/workspace/modsecurity-env/env.sh"
+    ],
+    [
+      "python3",
+      "test/json-baseline/tools/build.py",
+      "--source",
+      "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+      "--output",
+      "/workspace/work/json-yajl-pr-expansion/full-v3-probes"
+    ],
+    [
+      "python3",
+      "test/json-baseline/tools/run_all.py",
+      "--probes",
+      "/workspace/work/json-yajl-pr-expansion/full-v3-probes",
+      "--output",
+      "/workspace/work/json-yajl-pr-expansion/full-v3-validation",
+      "--profile",
+      "all"
+    ]
+  ],
+  "current_individual_reports": [
+    "../../test/json-baseline/results/full-v3-audit-baseline.json",
+    "../../test/json-baseline/results/full-v3-audit-expanded-characterization.json",
+    "../../test/json-baseline/results/full-v3-audit-requirements.json",
+    "../../test/json-baseline/results/full-v3-native-json.json",
+    "../../test/json-baseline/results/full-v3-request-baseline.json",
+    "../../test/json-baseline/results/full-v3-request-expanded.json",
+    "../../test/json-baseline/results/full-v3-request-requirements.json",
+    "../../test/json-baseline/results/full-v3-sanitizer-results.json"
+  ],
+  "publication": "Authorized new fork task branch; final handover records the actual remote SHA after explicit normal push/readback. Existing branches and upstream are not write targets. No self-SHA recursion.",
+  "local_only": "Compiled libraries/probes, generated build outputs and raw build/test logs remain outside tracked task files. Only synthetic fixtures and sanitized structured reports are published.",
+  "deliverable_files": [
+    {
+      "status": "A",
+      "path": ".github/workflows/json-tests.yml"
+    },
+    {
+      "status": "A",
+      "path": "README.JSON-TESTS.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/JSON-YAJL-BASELINE.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/en/JSON-YAJL-BASELINE.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/en/json-yajl-baseline-v3.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/en/json-yajl-code-analysis.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/README.en.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/catalog.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/full-v3-environment.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/full-v3-master.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/full-v3-original-baseline.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/full-v3-provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/full-v3-validation.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/matrix.en.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/repository-README.en.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-pr-extension/results-summary.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-yajl-baseline-v3.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-yajl-code-analysis.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/json-yajl-provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "doc/reference/Makefile.am"
+    },
+    {
+      "status": "A",
+      "path": "doc/reference/doxygen.cfg"
+    },
+    {
+      "status": "A",
+      "path": "doc/reference/en/ModSecurity-README.md"
+    },
+    {
+      "status": "A",
+      "path": "doc/reference/ms-doxygen-logo.png"
+    },
+    {
+      "status": "M",
+      "path": "test/Makefile.am"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/audit_probe.cc"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/build-extended-audit.sh"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/build-probes.sh"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/extended_audit_probe.cc"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/pr_cases.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/probe.cc"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/repository-template/.github/workflows/json-tests.yml"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/extended-audit-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/extended-request-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/extended-sanitizer-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-audit-baseline.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-audit-expanded-characterization.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-audit-requirements.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-native-json.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-request-baseline.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-request-expanded.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-request-requirements.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/full-v3-sanitizer-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/requirements-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/v3-audit-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/v3-request-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/v3-sanitizer-results.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/results/v3-summary.json"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/run.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/run_audit.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/run_extended.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/run_extended_audit.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/run_requirements.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/tools/build.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/tools/prepare_source.py"
+    },
+    {
+      "status": "A",
+      "path": "test/json-baseline/tools/run_all.py"
+    },
+    {
+      "status": "M",
+      "path": "test/test-cases/regression/request-body-parser-json.json"
+    }
+  ],
+  "total_tracked_files": 901,
+  "whitespace_note": "Exact original-reference copies doc/reference/doxygen.cfg, Makefile.am and en/ModSecurity-README.md retain inherited whitespace/Markdown hardbreaks. The staged check excludes those byte-identical archives and passes all other task files."
+}
