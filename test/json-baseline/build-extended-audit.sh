@@ -4,7 +4,8 @@ set -eu
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 out=${1:?usage: build-extended-audit.sh /absolute/output/dir [original/build/root]}
 build=${2:-$repo}
-mkdir -p "$out"
+out=$(python3 "$repo/test/json-baseline/tools/output_directory.py" \
+  --output "$out" --root "$repo" --root "$build")
 ${CXX:-c++} -std=c++17 -DWITH_YAJL ${CPPFLAGS:-} \
   $(pkg-config --cflags yajl) -I"$(dirname "$(pkg-config --variable=includedir yajl)")" \
   -I"$repo/headers" "$repo/test/json-baseline/extended_audit_probe.cc" \

@@ -71,6 +71,19 @@ def validated_counts(report):
     return counts.copy()
 
 
+def native_counts(cases, total, failed, skipped, disabled):
+    """Account for every fixture, including disabled cases, without masking it."""
+    if any(type(n) is not int or n < 0 for n in (total, failed, skipped, disabled)):
+        raise ValueError('Native runner contains invalid counts')
+    if failed > total:
+        raise ValueError('Native failures exceed executed tests')
+    if total + skipped + disabled != len(cases):
+        raise ValueError('Native runner did not account for every fixture')
+    counts = zeros()
+    counts.update(PASS=total-failed, FAIL=failed, SKIP=skipped, BLOCKED=disabled)
+    return counts
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--probes', type=Path, required=True)
@@ -174,12 +187,9 @@ def main():
                                                         int(match[4]), int(match[5]))
                     fixture = Path(command[1])
                     cases = json.loads(fixture.read_text())
-                    expected = sum(bool(case.get('enabled', 1)) for case in cases)
-                    counts = zeros()
-                    counts.update(PASS=total-failed, FAIL=failed, SKIP=skipped, BLOCKED=disabled)
-                    if total + skipped + disabled != expected:
-                        raise ValueError('Native runner did not account for every enabled fixture')
-                    native = {'counts': counts, 'enabled_cases': expected,
+                    counts = native_counts(cases, total, failed, skipped, disabled)
+                    native = {'counts': counts, 'fixture_cases': len(cases),
+                              'enabled_cases': sum(bool(case.get('enabled', 1)) for case in cases),
                               'production_commit': metadata['original_commit'],
                               'fixture_sha256': sha256(fixture),
                               'disabled_are_blocked': True}
@@ -195,7 +205,10 @@ def main():
                 expected_exit = counts['FAIL'] if script is None else (1 if counts['FAIL'] or counts['BLOCKED'] else 0)
                 if result.returncode < 0 or result.returncode != expected_exit:
                     raise RuntimeError('Runner crashed or returned an unexpected status: ' + str(result.returncode))
-                if result.returncode == 0 and (counts['FAIL'] or counts['BLOCKED']):
+                # The native runner exits with its failure count even when
+                # fixtures are disabled. The profile still exits nonzero below.
+                if result.returncode == 0 and (counts['FAIL'] or
+                                               (script is not None and counts['BLOCKED'])):
                     raise RuntimeError('Runner returned success despite failed/blocked cases')
                 if result.returncode and not (counts['FAIL'] or counts['BLOCKED']):
                     raise RuntimeError('Runner failed without a failed/blocked case report')

@@ -143,6 +143,43 @@ def run(probe, args):
     return child.stdout
 
 
+def object_array(value, label):
+    """Compare JSON object members structurally while preserving array order."""
+    expect(type(value) is list, label + ": expected array")
+    return [mapping(item, label) for item in value]
+
+
+def check_offset_response(raw, kind, expected=None):
+    """Check protocol and selected contract; observations retain raw evidence."""
+    if kind not in ('error', 'observation', 'json', 'single', 'transform'):
+        raise ValueError('unknown offset contract: ' + kind)
+    rc, sep, content = raw.partition(b'\n')
+    expect(sep == b'\n', "API status framing missing")
+    equal(rc, b'-1' if kind == 'error' else b'0', "API return code")
+    if kind == 'error':
+        equal(content, expected, "fixed characterization output")
+    elif kind == 'observation':
+        expect(bool(content), "successful API call produced no output")
+    else:
+        root = mapping(decode(content), "offset root")
+        if kind != 'json':
+            equal(set(root), {"match"}, "offset root fields")
+            expect(type(root['match']) is list and len(root['match']) == 1, "one match array item")
+            variable = mapping(mapping(root['match'][0], "match")['variable'], "variable")
+        if kind == 'single':
+            equal(object_array(variable['highlight'], "single range highlight"),
+                  [{'startingAt': '1', 'size': '3'}], "single range highlight")
+            equal(object_array(variable['value'], "single range value"),
+                  [{'value': 'BCD'}], "single range value")
+            equal(mapping(variable['operator'], 'operator')['value'], 'C', "operator value")
+        if kind == 'transform':
+            equal(object_array(variable['value'], "transformation chain"),
+                  [{'value': 'ABCDEF'},
+                   {'transformation': 't:lowercase', 'value': 'abcdef'}],
+                  "transformation chain")
+    return content
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("probe", type=Path)
@@ -178,16 +215,15 @@ def main():
         except (AssertionError, ValueError, OSError, TypeError, KeyError, subprocess.TimeoutExpired) as error:
             result.update(status="FAIL", reason=str(error), output_hex_prefix=raw[:192].hex())
         results.append(result)
-    # Public C++ API is a separate writer, not a request parser. Exact invalid
-    # output is characterization only; the three R cases below require a repair.
-    invalid_empty = b'{"match":[{"variable":{"highlight":[],"value":[{"value":""}],"operator":{}}]}]\n'
+    # Observe API success and preserve raw output, without requiring the old
+    # malformed representation. The R cases retain the actual JSON contracts.
     offset_cases = [
-        ("OFFSET-C01", "v1,3o1,1", "single offsets currently omitted", "raw", invalid_empty),
+        ("OFFSET-C01", "v1,3o1,1", "single-offset API success and raw output observation", "observation", None),
         ("OFFSET-C02", "v6,1v0,1", "start at byte length is rejected", "error", b"Offset is out of the content limits.\n"),
         ("OFFSET-C03", "v7,1v0,1", "start beyond byte length is rejected", "error", b"Offset is out of the content limits.\n"),
         ("OFFSET-R01", "", "empty match produces valid JSON (representation otherwise open)", "json", None),
         ("OFFSET-R02", "v1,3o1,1", "single variable range and operator range round-trip", "single", None),
-        ("OFFSET-R03", "v0,6v0,6t:lowercase", "transformation output is valid structural JSON", "transform", None),
+        ("OFFSET-R03", "v0,6t:lowercase", "transformation output is valid structural JSON", "transform", None),
     ]
     for cid, match, purpose, kind, expected in offset_cases:
         if not selected(cid): continue
@@ -195,22 +231,8 @@ def main():
         raw = b''
         try:
             raw = run(probe, ["offset", b"ABCDEF".hex(), match])
-            rc, sep, content = raw.partition(b'\n')
-            expect(sep == b'\n', "API status framing missing")
-            equal(rc, b'-1' if kind == 'error' else b'0', "API return code")
-            if kind in ('error', 'raw'): equal(content, expected, "fixed characterization output")
-            else:
-                root = mapping(decode(content), "offset root")
-                if kind != 'json':
-                    equal(set(root), {"match"}, "offset root fields")
-                    expect(type(root['match']) is list and len(root['match']) == 1, "one match array item")
-                    variable = mapping(mapping(root['match'][0], "match")['variable'], "variable")
-                if kind == 'single':
-                    equal(variable['highlight'], [Object([('startingAt', '1'), ('size', '3')])], "single range highlight")
-                    equal(variable['value'], [Object([('value', 'BCD')])], "single range value")
-                    equal(mapping(variable['operator'], 'operator')['value'], 'C', "operator value")
-                if kind == 'transform':
-                    equal(variable['value'], [Object([('value', 'ABCDEF')]), Object([('transformation', 't:lowercase'), ('value', 'abcdef')])], "transformation chain")
+            result['output_hex'] = raw.hex()
+            check_offset_response(raw, kind, expected)
             result['status'] = 'PASS'
         except DependencyBlocked as error:
             result.update(status='BLOCKED', reason=str(error))

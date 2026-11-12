@@ -43,6 +43,8 @@ class SourceVerificationTests(unittest.TestCase):
             if source != self.root:
                 return ''
             return 'src/transaction.cc' if args[2] == build.ORIGINAL else self.dirty
+        if args == ('ls-files', '--others', '--exclude-standard', '-z', '--'):
+            return ''
         if args[0] == 'ls-tree':
             return f'160000 commit {MODULE}\t{args[-1]}'
         if args[:2] == ('submodule', 'status'):

@@ -47,7 +47,7 @@ jobs:
         run: |
           sudo apt-get install -y autoconf automake build-essential git libcurl4-openssl-dev liblmdb-dev liblzma-dev libpcre2-dev libtool libxml2-dev libyajl-dev "$LUA_DEV_PACKAGE" libmaxminddb-dev libfuzzy-dev pkg-config python3 python3-yaml
       - name: Test JSON harness verification
-        run: python3 -m unittest discover -s test/json-baseline/tools -p 'test_verification.py' -v
+        run: python3 -m unittest discover -s test/json-baseline/tools -p 'test_*.py' -v
       - name: Prepare and build pinned original
         run: |
           python3 test/json-baseline/tools/prepare_source.py \

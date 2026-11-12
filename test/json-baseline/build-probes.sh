@@ -3,7 +3,8 @@
 set -eu
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 out=${1:?usage: build-probes.sh /absolute/output/directory}
-mkdir -p "$out"
+out=$(python3 "$repo/test/json-baseline/tools/output_directory.py" \
+  --output "$out" --root "$repo")
 # Honor normal caller CPPFLAGS/LDFLAGS and pkg-config relocation.
 # Intentional word splitting for compiler flag variables follows configure/make.
 ${CXX:-c++} -std=c++17 -DWITH_YAJL ${CPPFLAGS:-} \

@@ -202,6 +202,21 @@ def check(c,r):
     expected_processor='JSON' if c.select and c.engine!='Off' else ''
     eq('processor',r['PROCESSOR'],expected_processor.encode())
     eq('intervention status',max(r['STATUSES']),c.status)
+    if c.mode == 'repeat':
+        transactions = r.get('TRANSACTIONS', [])
+        eq('repeat transaction count', len(transactions), 2)
+        for i, transaction in enumerate(transactions):
+            label = 'transaction ' + str(i) + ' '
+            eq(label + 'ARGS', Counter(transaction['ARGS']), Counter(c.args))
+            eq(label + 'NAMES', Counter(transaction['NAMES']),
+               Counter((key, key) for key, value in c.args))
+            eq(label + 'GET', Counter(transaction['GET']), Counter(get))
+            eq(label + 'POST', transaction['POST'], [])
+            eq(label + 'ERROR', transaction['ERROR'], c.error.encode())
+            processor_error = c.processor_error if c.processor_error is not None else c.error
+            eq(label + 'PROCESSOR_ERROR', transaction['PROCESSOR_ERROR'], processor_error.encode())
+            eq(label + 'phase', transaction['PHASE2'], c.phase.encode())
+            eq(label + 'processor', transaction['PROCESSOR'], expected_processor.encode())
     if c.mode=='isolation':
         eq('per transaction errors',[t['ERROR'] for t in r['TRANSACTIONS']],[b'1',b'0'])
         eq('per transaction processor errors',[t['PROCESSOR_ERROR'] for t in r['TRANSACTIONS']],[b'1',b'0'])
@@ -220,13 +235,16 @@ def check(c,r):
         eq('complete',r['COMPLETE'],c.complete)
         eq('parser error present',bool(r['PARSER_ERROR']),c.complete==0)
     elif c.mode!='isolation':
-        msg=r['ERROR_MSG']
-        if c.error=='1':
-            if c.message=='depth':eq('depth class',b'Parsing depth limit exceeded' in msg,True)
-            elif c.message=='cancel':eq('callback cancellation',b'client cancelled' in msg,True)
-            elif c.message=='nofiles':eq('nofiles class',b'excluding files' in msg,True)
-            else:eq('JSON '+c.message+' error class',msg.startswith(('JSON parsing error: '+c.message+' error:').encode()),True)
-        elif c.error=='0':eq('no error message',msg,b'')
+        messages = ([t['ERROR_MSG'] for t in r.get('TRANSACTIONS', [])]
+                    if c.mode == 'repeat' else [r['ERROR_MSG']])
+        for i, msg in enumerate(messages):
+            label = 'transaction ' + str(i) + ' ' if c.mode == 'repeat' else ''
+            if c.error=='1':
+                if c.message=='depth':eq(label+'depth class',b'Parsing depth limit exceeded' in msg,True)
+                elif c.message=='cancel':eq(label+'callback cancellation',b'client cancelled' in msg,True)
+                elif c.message=='nofiles':eq(label+'nofiles class',b'excluding files' in msg,True)
+                else:eq(label+'JSON '+c.message+' error class',msg.startswith(('JSON parsing error: '+c.message+' error:').encode()),True)
+            elif c.error=='0':eq(label+'no error message',msg,b'')
     return errors
 
 def main():

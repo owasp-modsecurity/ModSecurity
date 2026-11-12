@@ -51,6 +51,13 @@ def git(source, *arguments):
     return capture(['git', '-C', str(source), *arguments])
 
 
+def untracked_files(source):
+    """List non-ignored additions without splitting quoted or unusual paths."""
+    return [name for name in git(source, 'ls-files', '--others',
+                                '--exclude-standard', '-z', '--').split('\0')
+            if name]
+
+
 def source_metadata(source, source_ref=ORIGINAL):
     """Verify the working tree and gitlinks against the selected immutable ref.
 
@@ -72,6 +79,9 @@ def source_metadata(source, source_ref=ORIGINAL):
                 path.startswith('README') or path == '.gitignore')
 
     unexpected = [path for path in changes if not ancillary(path)]
+    additions = [path for path in untracked_files(source) if not ancillary(path)]
+    if additions:
+        raise Blocked('Untracked production/build sources: ' + ', '.join(additions))
     if unexpected:
         raise Blocked('Production/build tree differs from selected commit: ' +
                       ', '.join(unexpected))
@@ -86,6 +96,8 @@ def source_metadata(source, source_ref=ORIGINAL):
             raise Blocked('Submodule is not at its selected gitlink: ' + relative)
         if git(source / relative, 'diff', '--name-only', 'HEAD', '--'):
             raise Blocked('Submodule has modified tracked sources: ' + relative)
+        if untracked_files(source / relative):
+            raise Blocked('Submodule has untracked sources: ' + relative)
         modules[relative] = actual
     recursive = git(source, 'submodule', 'status', '--recursive', '--', *SUBMODULES)
     for line in recursive.splitlines():
@@ -94,6 +106,8 @@ def source_metadata(source, source_ref=ORIGINAL):
             raise Blocked('A recursive submodule is uninitialized or differs from its gitlink')
         if git(source / match[3], 'diff', '--name-only', 'HEAD', '--'):
             raise Blocked('Recursive submodule has modified tracked sources: ' + match[3])
+        if untracked_files(source / match[3]):
+            raise Blocked('Recursive submodule has untracked sources: ' + match[3])
         modules[match[3]] = match[2]
     for relative in ('src', 'headers', 'configure.ac', 'test/regression/regression.cc'):
         if not (source / relative).exists():
@@ -138,12 +152,14 @@ def active_canary(probe, environment):
                             check=False)
     if result.returncode < 0:
         raise RuntimeError('JSON canary probe crashed: signal ' + str(-result.returncode))
-    records = [line.split('\t') for line in result.stdout.splitlines()
-               if line.split('\t', 1)[0] == 'YAJL_ACTIVE']
-    if result.returncode == 77 or records != [['YAJL_ACTIVE', '1']]:
+    if result.returncode == 77:
         raise Blocked('Actual linked library did not pass the active JSON canary')
     if result.returncode:
         raise RuntimeError('JSON canary probe failed: exit ' + str(result.returncode))
+    records = [line.split('\t') for line in result.stdout.splitlines()
+               if line.split('\t', 1)[0] == 'YAJL_ACTIVE']
+    if records != [['YAJL_ACTIVE', '1']]:
+        raise Blocked('Actual linked library did not pass the active JSON canary')
     return True
 
 

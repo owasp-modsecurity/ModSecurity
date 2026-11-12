@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#ifdef WITH_YAJL
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
@@ -62,8 +63,13 @@ void dump(const char *n, Variable *v) {
     }
 }
 }  // namespace
+#endif
 
 int main() {
+#ifndef WITH_YAJL
+    std::cerr << "BLOCKED: JSON support was not enabled\n";
+    return 77;
+#else
     try {
         const std::string mode = line();
         const std::string rulesText = unhex(line());
@@ -77,10 +83,6 @@ int main() {
             ? unhex(line()) : "{\"ok\":[1,2]}";
         modsecurity::ModSecurity engine;
         std::cout << "VERSION\t" << hex(engine.whoAmI()) << "\n";
-#ifndef WITH_YAJL
-        std::cerr << "BLOCKED: JSON support was not enabled\n";
-        return 77;
-#else
         modsecurity::RulesSet canaryRules;
         if (canaryRules.load("SecRuleEngine On\nSecRequestBodyAccess On\n"
             "SecAction \"id:99,phase:1,pass,nolog,"
@@ -217,10 +219,10 @@ int main() {
             std::free(it.url);
             std::free(it.log);
         }
-#endif
         return 0;
     } catch (const std::exception &e) {
         std::cerr << "HARNESS ERROR: " << e.what() << "\n";
         return 2;
     }
+#endif
 }

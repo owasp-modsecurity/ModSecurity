@@ -212,6 +212,7 @@ def main():
               for status in ("PASS", "FAIL", "SKIP", "BLOCKED", "XFAIL")}
     report = {"schema": 1, "cases": results, "counts": counts}
     if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, ensure_ascii=True, indent=2) + "\n")
     print(json.dumps(counts, sort_keys=True))
     return 1 if counts["FAIL"] or counts["BLOCKED"] else 0
