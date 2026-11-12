@@ -13,6 +13,7 @@
  *
  */
 
+#include <memory>
 #include <string>
 
 #include "modsecurity/actions/action.h"
@@ -23,6 +24,11 @@
 #define SRC_ACTIONS_CTL_RULE_REMOVE_TARGET_BY_TAG_H_
 
 namespace modsecurity {
+
+namespace Utils {
+class Regex;
+}
+
 namespace actions {
 namespace ctl {
 
@@ -37,6 +43,7 @@ class RuleRemoveTargetByTag : public Action {
 
     std::string m_tag;
     std::string m_target;
+    std::shared_ptr<Utils::Regex> m_regex;
 };
 
 

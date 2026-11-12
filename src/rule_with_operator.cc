@@ -166,15 +166,8 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
                 trans->m_ruleRemoveTargetById.end(),
                 [&, variable, this](const auto &m) -> bool {
-                    const auto& str1 = m.second;
-                    const auto& str2 = *variable->m_fullName.get();
-                    return m.first == m_ruleId &&
-                           str1.size() == str2.size() &&
-                           std::equal(str1.begin(), str1.end(), str2.begin(),
-                                      [](char a, char b) {
-                                          return std::tolower(static_cast<unsigned char>(a)) ==
-                                                 std::tolower(static_cast<unsigned char>(b));
-                                      }); // end-of std::equal
+                    return m.id == m_ruleId &&
+                           m.target.matchesFullName(*variable->m_fullName.get());
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
         }
@@ -182,8 +175,8 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, variable, trans, this](
                         const auto &m) -> bool {
-                        return containsTag(m.first, trans)
-                            && m.second == *variable->m_fullName.get();
+                        return containsTag(m.tag, trans)
+                            && m.target.matchesFullName(*variable->m_fullName.get());
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
             continue;
         }
@@ -266,7 +259,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](const auto &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
+                        return m.id == m_ruleId &&
+                               m.target.matchesKeyWithCollection(v->getKey(), v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
@@ -277,7 +271,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](const auto &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                        return containsTag(m.tag, trans) &&
+                               m.target.matchesKeyWithCollection(v->getKey(), v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
