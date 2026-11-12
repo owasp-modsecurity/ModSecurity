@@ -137,5 +137,46 @@
       "SecAuditLogType Serial",
       "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: !@validateByteRange keeps no offsets of a value that did not match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?a=%01%01&b=ok",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[ref \"v\\d+,2\"\\]",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"!@validateByteRange 32-126\" \"id:1,phase:2,deny,status:403,t:none\""
+    ]
   }
 ]
