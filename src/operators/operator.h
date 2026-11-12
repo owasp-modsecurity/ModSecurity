@@ -133,8 +133,28 @@ class Operator {
         return evaluate(transaction, str);
     }
 
+    /**
+     * Upper bound for the reference of a rule message. The reference is
+     * built up across every operator call, target variable and chained rule
+     * of a rule, so without a bound it grows with the input. Once it reaches
+     * this size, further entries are dropped. One entry may cross the limit.
+     */
+    static constexpr size_t MAX_REFERENCE_SIZE = 1024;
+
+    static bool referenceIsFull(const RuleMessage &ruleMessage) {
+        return ruleMessage.m_reference.size() >= MAX_REFERENCE_SIZE;
+    }
+
+    static void appendReference(RuleMessage &ruleMessage,
+        const std::string &entry) {
+        if (referenceIsFull(ruleMessage)) {
+            return;
+        }
+        ruleMessage.m_reference.append(entry);
+    }
+
     static void logOffset(RuleMessage &ruleMessage, int offset, int len) {
-        ruleMessage.m_reference.append("o"
+        appendReference(ruleMessage, "o"
             + std::to_string(offset) + ","
             + std::to_string(len));
     }

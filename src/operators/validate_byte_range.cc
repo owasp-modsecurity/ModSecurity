@@ -135,6 +135,11 @@ bool ValidateByteRange::evaluate(Transaction *transaction, RuleWithActions *rule
             //     input + " ouside range: " + param);
             logOffset(ruleMessage, i, 1);
             count++;
+            /* Only count != 0 is used: stop once the offsets can't be
+             * logged any more. */
+            if (referenceIsFull(ruleMessage)) {
+                break;
+            }
         }
     }
 
