@@ -1,30 +1,35 @@
 // Copyright 2026 ModSecurity contributors.
 // Synthetic audit-writer integration probe; no request-parser assertions here.
-#include <cstdlib>
 #include <iostream>
-#include <stdexcept>
 #include <string>
+#include <string_view>
 
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+#include "intervention_guard.h"
+#include "probe_support.h"
 
 #ifndef WITH_YAJL
 #error "Compile this probe with YAJL support enabled"
 #endif
 
 namespace {
-void discardServerLog(void *, const void *) { }
+using json_test::ProbeError;
+
+void discardServerLog(void *, const void *) {
+    // Only JSON records belong on stdout, not synthetic server-log messages.
+}
 
 void requireSuccess(int result, const char *step) {
     if (result != 1) {
-        throw std::runtime_error(std::string(step) + " did not succeed");
+        throw ProbeError(std::string(step) + " did not succeed");
     }
 }
 
-std::string fixture(const std::string &name) {
+std::string fixture(std::string_view name) {
     if (name == "ascii") {
-        return "quote\"slash\\";
+        return R"(quote"slash\)";
     }
     if (name == "controls") {
         return std::string("\0\b\t\n\f\r\x1f", 7);
@@ -38,10 +43,10 @@ std::string fixture(const std::string &name) {
     if (name == "empty") {
         return "";
     }
-    throw std::runtime_error("unknown fixture");
+    throw ProbeError("unknown fixture");
 }
 
-int parts(const std::string &selection) {
+int parts(std::string_view selection) {
     using modsecurity::audit_log::AuditLog;
     if (selection == "all") {
         return AuditLog::AAuditLogPart | AuditLog::BAuditLogPart
@@ -54,89 +59,106 @@ int parts(const std::string &selection) {
     if (selection == "none") {
         return 0;
     }
-    throw std::runtime_error("unknown part selection");
+    throw ProbeError("unknown part selection");
+}
+
+std::string configuration(std::string_view mode) {
+    return std::string("SecRuleEngine ")
+        + (mode == "detect" ? "DetectionOnly" : "On")
+        + "\nSecRequestBodyAccess On\nSecResponseBodyAccess On\n"
+          "SecResponseBodyMimeType text/plain\nSecAuditEngine Off\n"
+          "SecAction \"id:990100,phase:2,log,msg:'audit writer',tag:'fixture',"
+        + (mode == "pass" ? "pass" : "deny,status:418") + "\"\n";
+}
+
+void requestBody(modsecurity::Transaction *tx, const std::string &payload,
+    bool duplicate) {
+    requireSuccess(tx->processConnection("192.0.2.10", 12345,
+        "192.0.2.20", 8080), "processConnection");
+    tx->setRequestHostName("json-baseline.invalid");
+    requireSuccess(tx->processURI("/audit?source=fixture", "POST", "1.1"),
+        "processURI");
+    requireSuccess(tx->addRequestHeader("Content-Type",
+        "application/octet-stream"), "addRequestHeader");
+    requireSuccess(tx->addRequestHeader("Content-Length",
+        std::to_string(payload.size())), "addRequestHeader");
+    requireSuccess(tx->addRequestHeader("X-Fixture", payload),
+        "addRequestHeader");
+    requireSuccess(tx->addRequestHeader(R"(X-quote"slash\)", "name"),
+        "addRequestHeader");
+    if (duplicate) {
+        requireSuccess(tx->addRequestHeader("X-Fixture", "second"),
+            "addRequestHeader duplicate");
+    }
+    requireSuccess(tx->processRequestHeaders(), "processRequestHeaders");
+    requireSuccess(tx->appendRequestBody(
+        reinterpret_cast<const unsigned char *>(payload.data()),
+        payload.size()), "appendRequestBody");
+    requireSuccess(tx->processRequestBody(), "processRequestBody");
+}
+
+void responseBody(modsecurity::Transaction *tx, const std::string &payload,
+    bool duplicate) {
+    int responseCode = 201;
+    {
+        json_test::InterventionGuard intervention;
+        tx->intervention(&intervention.value);
+        if (intervention.value.disruptive) {
+            responseCode = intervention.value.status;
+        }
+    }
+    requireSuccess(tx->addResponseHeader("Content-Type", "text/plain"),
+        "addResponseHeader");
+    requireSuccess(tx->addResponseHeader("X-Fixture", payload),
+        "addResponseHeader");
+    requireSuccess(tx->addResponseHeader(R"(X-quote"slash\)", "name"),
+        "addResponseHeader");
+    if (duplicate) {
+        requireSuccess(tx->addResponseHeader("X-Fixture", "second"),
+            "addResponseHeader duplicate");
+    }
+    requireSuccess(tx->processResponseHeaders(responseCode, "HTTP/1.1"),
+        "processResponseHeaders");
+    requireSuccess(tx->appendResponseBody(
+        reinterpret_cast<const unsigned char *>(payload.data()),
+        payload.size()), "appendResponseBody");
+    requireSuccess(tx->processResponseBody(), "processResponseBody");
+}
+
+void run(int argc, char **argv) {
+    if (argc != 5) {
+        throw ProbeError("usage: audit-probe FIXTURE "
+            "all|request|none pass|deny|detect unique|duplicate");
+    }
+    const std::string payload = fixture(argv[1]);
+    const std::string_view mode = argv[3];
+    const std::string_view headers = argv[4];
+    const bool duplicate = headers == "duplicate";
+    if (mode != "pass" && mode != "deny" && mode != "detect") {
+        throw ProbeError("unknown rule mode");
+    }
+    if (headers != "unique" && !duplicate) {
+        throw ProbeError("unknown header mode");
+    }
+    modsecurity::ModSecurity engine;
+    engine.setConnectorInformation("json-baseline audit probe");
+    engine.setServerLogCb(discardServerLog);
+    modsecurity::RulesSet rules;
+    if (const std::string config = configuration(mode);
+        rules.load(config.c_str(), "audit-probe.conf") < 0) {
+        throw ProbeError(rules.getParserError());
+    }
+    modsecurity::Transaction tx(&engine, &rules, "audit-probe-id", nullptr);
+    requestBody(&tx, payload, duplicate);
+    responseBody(&tx, payload, duplicate);
+    const std::string json = tx.toJSON(parts(argv[2]));
+    std::cout.write(json.data(), json.size());
 }
 }  // namespace
 
 int main(int argc, char **argv) {
     try {
-        if (argc != 5) {
-            throw std::runtime_error("usage: audit-probe FIXTURE "
-                "all|request|none pass|deny|detect unique|duplicate");
-        }
-        const std::string value = fixture(argv[1]);
-        const std::string mode = argv[3];
-        const bool duplicate = std::string(argv[4]) == "duplicate";
-        if (mode != "pass" && mode != "deny" && mode != "detect") {
-            throw std::runtime_error("unknown rule mode");
-        }
-        if (std::string(argv[4]) != "unique" && !duplicate) {
-            throw std::runtime_error("unknown header mode");
-        }
-        modsecurity::ModSecurity engine;
-        engine.setConnectorInformation("json-baseline audit probe");
-        engine.setServerLogCb(discardServerLog);
-        modsecurity::RulesSet rules;
-        const std::string config = std::string("SecRuleEngine ")
-            + (mode == "detect" ? "DetectionOnly" : "On")
-            + "\nSecRequestBodyAccess On\nSecResponseBodyAccess On\n"
-              "SecResponseBodyMimeType text/plain\nSecAuditEngine Off\n"
-              "SecAction \"id:990100,phase:2,log,msg:'audit writer',"
-              "tag:'fixture',"
-            + (mode == "pass" ? "pass" : "deny,status:418") + "\"\n";
-        if (rules.load(config.c_str(), "audit-probe.conf") < 0) {
-            throw std::runtime_error(rules.getParserError());
-        }
-        modsecurity::Transaction transaction(&engine, &rules,
-            "audit-probe-id", nullptr);
-        requireSuccess(transaction.processConnection("192.0.2.10", 12345,
-            "192.0.2.20", 8080), "processConnection");
-        transaction.setRequestHostName("json-baseline.invalid");
-        requireSuccess(transaction.processURI("/audit?source=fixture", "POST",
-            "1.1"), "processURI");
-        requireSuccess(transaction.addRequestHeader("Content-Type",
-            "application/octet-stream"), "addRequestHeader");
-        requireSuccess(transaction.addRequestHeader("Content-Length",
-            std::to_string(value.size())), "addRequestHeader");
-        requireSuccess(transaction.addRequestHeader("X-Fixture", value),
-            "addRequestHeader");
-        requireSuccess(transaction.addRequestHeader("X-quote\"slash\\", "name"),
-            "addRequestHeader");
-        if (duplicate) {
-            requireSuccess(transaction.addRequestHeader("X-Fixture", "second"),
-                "addRequestHeader duplicate");
-        }
-        requireSuccess(transaction.processRequestHeaders(),
-            "processRequestHeaders");
-        requireSuccess(transaction.appendRequestBody(
-            reinterpret_cast<const unsigned char *>(value.data()),
-            value.size()), "appendRequestBody");
-        requireSuccess(transaction.processRequestBody(), "processRequestBody");
-        modsecurity::ModSecurityIntervention intervention{};
-        transaction.intervention(&intervention);
-        const int responseCode = intervention.disruptive
-            ? intervention.status : 201;
-        modsecurity::intervention::free(&intervention);
-        requireSuccess(transaction.addResponseHeader("Content-Type",
-            "text/plain"), "addResponseHeader");
-        requireSuccess(transaction.addResponseHeader("X-Fixture", value),
-            "addResponseHeader");
-        requireSuccess(transaction.addResponseHeader(
-            "X-quote\"slash\\", "name"),
-            "addResponseHeader");
-        if (duplicate) {
-            requireSuccess(transaction.addResponseHeader("X-Fixture", "second"),
-                "addResponseHeader duplicate");
-        }
-        requireSuccess(transaction.processResponseHeaders(responseCode,
-            "HTTP/1.1"), "processResponseHeaders");
-        requireSuccess(transaction.appendResponseBody(
-            reinterpret_cast<const unsigned char *>(value.data()),
-            value.size()), "appendResponseBody");
-        requireSuccess(transaction.processResponseBody(),
-            "processResponseBody");
-        const std::string json = transaction.toJSON(parts(argv[2]));
-        std::cout.write(json.data(), json.size());
+        run(argc, argv);
     } catch (const std::exception &error) {
         std::cerr << "audit probe failed: " << error.what() << '\n';
         return 2;

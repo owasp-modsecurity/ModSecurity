@@ -191,14 +191,16 @@ class OffsetContractTests(unittest.TestCase):
     def test_wrong_value_still_fails_requirement(self):
         document = self.corrected()
         document['match'][0]['variable']['value'][0]['value'] = 'WRONG'
+        raw = self.response(document)
         with self.assertRaises(AssertionError):
-            extended.check_offset_response(self.response(document), 'single')
+            extended.check_offset_response(raw, 'single')
 
     def test_wrong_range_still_fails_requirement(self):
         document = self.corrected()
         document['match'][0]['variable']['highlight'][0]['size'] = '2'
+        raw = self.response(document)
         with self.assertRaises(AssertionError):
-            extended.check_offset_response(self.response(document), 'single')
+            extended.check_offset_response(raw, 'single')
 
     def test_wrong_status_missing_framing_and_empty_output_fail_observation(self):
         for raw in (b'0', b'0\n', b'-1\nerror\n'):
@@ -212,8 +214,9 @@ class OffsetContractTests(unittest.TestCase):
             extended.check_offset_response(b'-1\nwrong\n', 'error', expected)
 
     def test_unknown_contract_is_not_silently_accepted(self):
+        raw = self.response(self.corrected())
         with self.assertRaises(ValueError):
-            extended.check_offset_response(self.response(self.corrected()), 'typo')
+            extended.check_offset_response(raw, 'typo')
 
     def test_report_preserves_raw_offset_observation(self):
         def run_probe(probe, args):

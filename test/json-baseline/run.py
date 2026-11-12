@@ -2,7 +2,7 @@
 """Explicit YAJL/ModSecurity v3 characterization matrix. Never learns expectations."""
 import argparse
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import hashlib
 import json
 from pathlib import Path
@@ -267,16 +267,31 @@ def main():
         output.append(entry);print(status,c.id, '; '.join(entry['errors'])[:700])
     if not output:
         print('BLOCKED: no cases matched filter',file=sys.stderr);return 2
-    sensitivity=[]
+    sensitivity = []
     if args.sensitivity and not blocked and not failed:
-        for id in ['B-nul','H-number-16','I-different','J-incomplete-object']:
-            c=next(c for c in cases() if c.id==id);r,_=observe(args.probe,c)
-            if id=='J-incomplete-object':c.error='0'
-            else:c.args=[pair('deliberately-wrong','wrong')]
-            ok=bool(check(c,r));sensitivity.append({'id':id,'status':'PASS' if ok else 'FAIL'})
-            print('PASS' if ok else 'FAIL','sensitivity-'+id)
-            if ok:passed+=1
-            else:failed+=1
+        for case_id in ('B-nul', 'H-number-16', 'I-different', 'J-incomplete-object'):
+            entry = {'id': case_id, 'status': 'FAIL', 'errors': []}
+            try:
+                original = next(case for case in cases() if case.id == case_id)
+                observed, _ = observe(args.probe, original)
+                if case_id == 'J-incomplete-object':
+                    wrong = replace(original, error='0')
+                else:
+                    wrong = replace(original, args=[pair('deliberately-wrong', 'wrong')])
+                if check(wrong, observed):
+                    entry['status'] = 'PASS'
+                else:
+                    entry['errors'].append('deliberately wrong expectation was accepted')
+            except Exception as error:
+                # A control must reach its assertion; a timeout/crash is not a
+                # successful rejection of the deliberately false expectation.
+                entry['errors'].append('control did not reach an assertion: ' + str(error))
+            sensitivity.append(entry)
+            print(entry['status'], 'sensitivity-' + case_id)
+            if entry['status'] == 'PASS':
+                passed += 1
+            else:
+                failed += 1
     report={'version':'v3','counts':{'PASS':passed,'FAIL':failed,'SKIP':0,'BLOCKED':blocked,'XFAIL':0},'cases':output,'sensitivity':sensitivity}
     if args.output:Path(args.output).write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report['counts']));return int(bool(failed or blocked))

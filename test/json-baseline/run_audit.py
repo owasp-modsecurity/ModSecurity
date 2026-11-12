@@ -152,6 +152,25 @@ def reject_constant(value):
     raise ValueError(f"non-JSON constant: {value}")
 
 
+class ProbeUnavailable(RuntimeError):
+    """The executable or its required runtime dependency cannot be used."""
+
+
+def execute_probe(probe, arguments):
+    try:
+        completed = subprocess.run([str(probe.resolve()), *arguments],
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   check=False, timeout=10)
+    except OSError as error:
+        raise ProbeUnavailable(str(error)) from error
+    missing_library = (completed.returncode == 127 and
+                       b'error while loading shared libraries' in completed.stderr)
+    if completed.returncode == 77 or missing_library:
+        raise ProbeUnavailable(f'probe unavailable: exit={completed.returncode}; '
+                               f'stderr={completed.stderr!r}')
+    return completed
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("probe", type=Path)
@@ -159,6 +178,7 @@ def main():
     args = parser.parse_args()
     results = []
     first_record = None
+    positive_status = None
     for case in CASES:
         case_id, fixture_name, *_ = case
         payload = FIXTURES[fixture_name][0]
@@ -167,9 +187,7 @@ def main():
                   "input_hex": payload.hex(), "input_sha256": hashlib.sha256(payload).hexdigest(),
                   "parts": case[2], "mode": case[3], "headers": case[4]}
         try:
-            completed = subprocess.run([str(args.probe.resolve()), *case[1:]],
-                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                       check=False, timeout=10)
+            completed = execute_probe(args.probe, case[1:])
             expect(completed.returncode == 0, f"probe exit {completed.returncode}: {completed.stderr.decode('utf-8', 'replace')}")
             expect(not completed.stderr, f"unexpected stderr: {completed.stderr!r}")
             raw = completed.stdout
@@ -181,17 +199,22 @@ def main():
                 first_record = record
             result["output_length"] = len(raw)
             result["status"] = "PASS"
+        except ProbeUnavailable as error:
+            result.update(status="BLOCKED", reason=str(error))
         except subprocess.TimeoutExpired:
             result.update(status="FAIL", reason="probe timeout (not a parser rejection)")
         except (AssertionError, OSError, ValueError, KeyError, TypeError) as error:
             result.update(status="FAIL", reason=str(error))
+        if case_id == "AUDIT-01":
+            positive_status = result['status']
         results.append(result)
         print(f"{result['status']} {case_id}" + (f": {result['reason']}" if "reason" in result else ""))
 
     # Deliberately incorrect expectations must fail; the actual record is kept.
     for case_id, mutation in (("AUDIT-M01", "wrong response body expectation"),
                               ("AUDIT-M02", "numeric field changed to string")):
-        status, reason = "FAIL", "positive fixture unavailable"
+        status = "BLOCKED" if positive_status == "BLOCKED" else "FAIL"
+        reason = "positive fixture unavailable"
         if first_record is not None:
             try:
                 if case_id == "AUDIT-M01":

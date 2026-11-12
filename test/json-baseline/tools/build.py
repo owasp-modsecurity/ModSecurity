@@ -19,6 +19,7 @@ SUBMODULES = ('others/libinjection', 'others/mbedtls',
               'test/test-cases/secrules-language-tests')
 PROBES = {'probe': 'probe.cc', 'audit-probe': 'audit_probe.cc',
           'extended-audit-probe': 'extended_audit_probe.cc'}
+PROBE_HEADERS = ('probe_support.h', 'intervention_guard.h')
 TESTS = Path(__file__).resolve().parent.parent
 
 
@@ -389,7 +390,8 @@ def main():
             loader = linked_library(output / name, library, environment)
             manifest['probes'][name] = {'path': str(output / name),
                 'sha256': sha256(output / name), 'source_file': filename,
-                'source_sha256': sha256(input_file), 'loader': loader}
+                'source_sha256': sha256(input_file), 'loader': loader,
+                'header_sha256': {header: sha256(TESTS / header) for header in PROBE_HEADERS}}
         verify_engine_build(manifest, source)
         manifest['active_json_canary'] = active_canary(output / 'probe', environment)
         manifest['status'] = 'PASS'

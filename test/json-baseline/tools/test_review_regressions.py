@@ -45,8 +45,9 @@ class OffsetStructureTests(unittest.TestCase):
     def test_wrong_highlight_value_is_rejected(self):
         value = self.single()
         value['highlight'][0]['size'] = '4'
+        raw = framed(value)
         with self.assertRaises(AssertionError):
-            audit.check_offset_response(framed(value), 'single')
+            audit.check_offset_response(raw, 'single')
 
     def test_duplicate_object_member_is_rejected(self):
         raw = framed(self.single()).replace(b'"size": "3"',
@@ -57,20 +58,23 @@ class OffsetStructureTests(unittest.TestCase):
     def test_object_cannot_replace_array(self):
         value = self.single()
         value['highlight'] = {'0': value['highlight'][0]}
+        raw = framed(value)
         with self.assertRaises(AssertionError):
-            audit.check_offset_response(framed(value), 'single')
+            audit.check_offset_response(raw, 'single')
 
     def test_transformation_array_order_stays_significant(self):
         value = self.transformed()
         value['value'].reverse()
+        raw = framed(value)
         with self.assertRaises(AssertionError):
-            audit.check_offset_response(framed(value), 'transform')
+            audit.check_offset_response(raw, 'transform')
 
     def test_transformation_value_stays_exact(self):
         value = self.transformed()
         value['value'][1]['value'] = 'abcdef abcdef'
+        raw = framed(value)
         with self.assertRaises(AssertionError):
-            audit.check_offset_response(framed(value), 'transform')
+            audit.check_offset_response(raw, 'transform')
 
     def test_requirement_invokes_one_transformation_range(self):
         calls = []
@@ -212,16 +216,18 @@ class CanaryExitTests(unittest.TestCase):
         for code in (1, 2, 127, -11):
             with self.subTest(code=code):
                 result = subprocess.CompletedProcess([], code, '', 'synthetic error')
+                probe = Path('probe')
                 with patch.object(build.subprocess, 'run', return_value=result):
                     with self.assertRaises(RuntimeError) as caught:
-                        build.active_canary(Path('probe'), {})
+                        build.active_canary(probe, {})
                 self.assertNotIsInstance(caught.exception, build.Blocked)
 
     def test_exit_77_remains_blocked(self):
         result = subprocess.CompletedProcess([], 77, '', 'JSON unavailable')
+        probe = Path('probe')
         with patch.object(build.subprocess, 'run', return_value=result):
             with self.assertRaises(build.Blocked):
-                build.active_canary(Path('probe'), {})
+                build.active_canary(probe, {})
 
 
 class NativeAccountingTests(unittest.TestCase):

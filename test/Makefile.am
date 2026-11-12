@@ -25,6 +25,7 @@ EXTRA_DIST = \
 	custom-test-driver \
 	test-suite.sh \
 	json-baseline/*.cc \
+	json-baseline/*.h \
 	json-baseline/*.py \
 	json-baseline/*.sh \
 	json-baseline/tools/*.py \

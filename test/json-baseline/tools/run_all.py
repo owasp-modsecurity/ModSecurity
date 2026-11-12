@@ -9,15 +9,11 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
-from build import (Blocked, PROBES, TESTS, active_canary,
+from build import (Blocked, PROBES, PROBE_HEADERS, TESTS, active_canary,
                    linked_library, runtime_environment, sha256, source_metadata,
                    verify_engine_build)
 
-STATUSES = ('PASS', 'FAIL', 'SKIP', 'BLOCKED', 'XFAIL')
-
-
-def zeros():
-    return {status: 0 for status in STATUSES}
+from result_validation import STATUSES, native_counts, validated_counts, zeros
 
 
 def read_manifest(directory):
@@ -69,51 +65,15 @@ def verify_manifest(directory):
             raise Blocked('Probe missing or changed after build: ' + name)
         if sha256(TESTS / filename) != record.get('source_sha256'):
             raise Blocked('Test source changed after probe build: ' + filename)
+        headers = {header: sha256(TESTS / header) for header in PROBE_HEADERS}
+        if record.get('header_sha256') != headers:
+            raise Blocked('Probe headers missing or changed after build: ' + name)
         loaders[name] = linked_library(executable, library, environment)
         if loaders[name]['sha256'] != manifest['library']['sha256']:
             raise Blocked('Loaded library hash differs: ' + name)
     active_canary(directory / 'probe', environment)
     environment['MODSECURITY_JSON_BUILD_MANIFEST'] = str(directory / 'build-manifest.json')
     return manifest, metadata, environment, loaders
-
-
-def validated_counts(report):
-    if not isinstance(report, dict):
-        raise ValueError('case report must be a JSON object')
-    for field in ('cases', 'sensitivity'):
-        if not isinstance(report.get(field, []), list):
-            raise ValueError('case report ' + field + ' must be an array')
-    counts = report.get('counts')
-    if not isinstance(counts, dict) or set(counts) != set(STATUSES):
-        raise ValueError('report lacks a complete count summary')
-    if any(type(number) is not int or number < 0 for number in counts.values()):
-        raise ValueError('report contains invalid counts')
-    entries = report.get('cases', []) + report.get('sensitivity', [])
-    if not entries:
-        raise ValueError('report contains no actual cases or assertion controls')
-    actual = zeros()
-    for entry in entries:
-        if not isinstance(entry, dict) or entry.get('status') not in STATUSES:
-            raise ValueError('case report contains an invalid case/status')
-        actual[entry['status']] += 1
-    if actual != counts:
-        raise ValueError('summary counts do not match individual report records')
-    if counts['XFAIL']:
-        raise ValueError('this package does not mask requirements with XFAIL')
-    return counts.copy()
-
-
-def native_counts(cases, total, failed, skipped, disabled):
-    """Account for every fixture, including disabled cases, without masking it."""
-    if any(type(n) is not int or n < 0 for n in (total, failed, skipped, disabled)):
-        raise ValueError('Native runner contains invalid counts')
-    if failed > total:
-        raise ValueError('Native failures exceed executed tests')
-    if total + skipped + disabled != len(cases):
-        raise ValueError('Native runner did not account for every fixture')
-    counts = zeros()
-    counts.update(PASS=total-failed, FAIL=failed, SKIP=skipped, BLOCKED=disabled)
-    return counts
 
 
 def main():

@@ -317,13 +317,15 @@ class CaseReportShapeTests(unittest.TestCase):
     def test_non_array_case_records_are_rejected(self):
         for field in ('cases', 'sensitivity'):
             for value in (None, {}, 2):
+                report = {'counts': run_all.zeros(), 'cases': [{'status': 'PASS'}], field: value}
                 with self.subTest(field=field, value=value), self.assertRaises(ValueError):
-                    run_all.validated_counts({'counts': run_all.zeros(), field: value})
+                    run_all.validated_counts(report)
 
     def test_invalid_case_entries_or_status_are_rejected(self):
         for value in (None, [], '', {}, {'status': 'UNKNOWN'}):
+            report = {'counts': run_all.zeros(), 'cases': [value]}
             with self.subTest(value=value), self.assertRaises(ValueError):
-                run_all.validated_counts({'counts': run_all.zeros(), 'cases': [value]})
+                run_all.validated_counts(report)
 
     def test_real_failure_remains_failure(self):
         counts = run_all.zeros()

@@ -11,11 +11,13 @@ The current preparation helper instead selects `1ebdc390b47ab033c8267130ce83130f
 Unmet requirements remain ordinary failures, including explicitly undecided policy proposals. No XFAIL hides them. Use newly generated reports and their verified source metadata for claims about a new execution.
 
 ```sh
-python3 test/json-baseline/tools/prepare_source.py --destination ../modsecurity-original --build
+python3 test/json-baseline/tools/prepare_source.py --destination ../modsecurity-original
 python3 test/json-baseline/tools/build.py --source ../modsecurity-original --output ../json-probes
 python3 test/json-baseline/tools/run_all.py --probes ../json-probes --output ../json-results --profile characterization
 python3 test/json-baseline/tools/run_all.py --probes ../json-probes --output ../json-requirements --profile requirements
 ```
+
+`prepare_source.py` only prepares the source here. `build.py` performs the required engine and probe build in a fresh checkout; a separate `--build` preparation would compile an unused engine twice.
 
 The historical requirements run returned exit 1 on its recorded source. The current command also retains a nonzero exit for unmet requirements or blocked execution; its outcome must be read from the new run. See the linked guide for dependencies, build details, status classes and unchanged historical reports. The CI template runs the profiles separately without suppressing requirements failures.
 
