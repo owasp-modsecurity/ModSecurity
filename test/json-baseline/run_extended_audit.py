@@ -14,6 +14,7 @@ from pathlib import Path
 import subprocess
 import sys
 from run_audit import Object, equal, expect, headers, mapping, reject_constant
+from report_metadata import production_commit
 
 A, B, C, D, E, F, G, H, I, J, K, Z = (2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
 ALL = A | B | C | E | F | H
@@ -149,6 +150,7 @@ def main():
     parser.add_argument("--suite", choices=("characterization", "requirements", "all"), default="all")
     args = parser.parse_args()
     probe = args.probe.resolve()
+    source_commit = production_commit(probe)
     results, first = [], None
     def selected(cid):
         requirement = '-R' in cid
@@ -256,7 +258,7 @@ def main():
                           ("assertion_sensitivity", [r for r in results if '-M' in r['id']])):
         contract_counts[label] = {status: sum(r['status'] == status for r in subset)
                                   for status in ('PASS', 'FAIL', 'SKIP', 'BLOCKED', 'XFAIL')}
-    report = {"schema": 1, "selected_suite": args.suite, "contract_counts": contract_counts, "production_base": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd", "cases": results, "counts": counts}
+    report = {"schema": 1, "selected_suite": args.suite, "contract_counts": contract_counts, "production_base": source_commit, "cases": results, "counts": counts}
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=True, indent=2) + '\n')
     for r in results: print(r['status'], r['id'], r.get('reason', ''))

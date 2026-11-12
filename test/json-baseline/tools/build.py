@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build test probes against a separately built, pinned ModSecurity v3 tree."""
+"""Build probes against a verified pinned baseline or an explicit CI commit."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -51,32 +51,39 @@ def git(source, *arguments):
     return capture(['git', '-C', str(source), *arguments])
 
 
-def source_metadata(source):
-    """Compare the actual working tree, not merely HEAD, with the original."""
+def source_metadata(source, source_ref=ORIGINAL):
+    """Verify the working tree and gitlinks against the selected immutable ref.
+
+    The default retains pinned-baseline verification. CI passes its checkout
+    SHA explicitly, so committed production changes can be tested without
+    accepting uncommitted production changes or changing historical evidence.
+    """
     source = Path(source).resolve(strict=True)
+    if not isinstance(source_ref, str) or not re.fullmatch(r'[0-9a-f]{40}', source_ref):
+        raise Blocked('Source reference must be a full lowercase commit SHA')
     if Path(git(source, 'rev-parse', '--show-toplevel')).resolve() != source:
         raise Blocked('--source must name the ModSecurity repository root')
-    if git(source, 'rev-parse', ORIGINAL + '^{commit}') != ORIGINAL:
-        raise Blocked('Pinned original commit is unavailable')
-    changes = git(source, 'diff', '--name-only', ORIGINAL, '--').splitlines()
-    # The supplied baseline fork may contain tests/documentation, but the
-    # engine, public headers, build files and gitlinks must match the original.
+    if git(source, 'rev-parse', '--verify', source_ref + '^{commit}') != source_ref:
+        raise Blocked('Selected source commit is unavailable')
+    changes = git(source, 'diff', '--name-only', source_ref, '--').splitlines()
+
     def ancillary(path):
         return (path.startswith(('test/', 'doc/', '.github/')) or
                 path.startswith('README') or path == '.gitignore')
+
     unexpected = [path for path in changes if not ancillary(path)]
     if unexpected:
-        raise Blocked('Production/build tree differs from original: ' +
+        raise Blocked('Production/build tree differs from selected commit: ' +
                       ', '.join(unexpected))
     modules = {}
     for relative in SUBMODULES:
-        entry = git(source, 'ls-tree', ORIGINAL, '--', relative).split()
+        entry = git(source, 'ls-tree', source_ref, '--', relative).split()
         if len(entry) < 3 or entry[0] != '160000':
-            raise Blocked('Pinned submodule gitlink missing: ' + relative)
+            raise Blocked('Selected submodule gitlink missing: ' + relative)
         expected = entry[2]
         actual = git(source / relative, 'rev-parse', 'HEAD')
         if actual != expected:
-            raise Blocked('Submodule is not at its pinned commit: ' + relative)
+            raise Blocked('Submodule is not at its selected gitlink: ' + relative)
         if git(source / relative, 'diff', '--name-only', 'HEAD', '--'):
             raise Blocked('Submodule has modified tracked sources: ' + relative)
         modules[relative] = actual
@@ -85,11 +92,13 @@ def source_metadata(source):
         match = re.match(r'^([ +U-]?)([0-9a-f]{40}) (\S+)', line)
         if not match or match[1] not in ('', ' '):
             raise Blocked('A recursive submodule is uninitialized or differs from its gitlink')
+        if git(source / match[3], 'diff', '--name-only', 'HEAD', '--'):
+            raise Blocked('Recursive submodule has modified tracked sources: ' + match[3])
         modules[match[3]] = match[2]
     for relative in ('src', 'headers', 'configure.ac', 'test/regression/regression.cc'):
         if not (source / relative).exists():
-            raise Blocked('Required original source missing: ' + relative)
-    return {'source_root': str(source), 'original_commit': ORIGINAL,
+            raise Blocked('Required source missing: ' + relative)
+    return {'source_root': str(source), 'original_commit': source_ref,
             'source_head': git(source, 'rev-parse', 'HEAD'),
             'production_matches_original': True, 'submodules': modules,
             'ancillary_differences': changes}
@@ -129,7 +138,9 @@ def active_canary(probe, environment):
                             check=False)
     if result.returncode < 0:
         raise RuntimeError('JSON canary probe crashed: signal ' + str(-result.returncode))
-    if result.returncode == 77 or 'YAJL_ACTIVE\t1' not in result.stdout:
+    records = [line.split('\t') for line in result.stdout.splitlines()
+               if line.split('\t', 1)[0] == 'YAJL_ACTIVE']
+    if result.returncode == 77 or records != [['YAJL_ACTIVE', '1']]:
         raise Blocked('Actual linked library did not pass the active JSON canary')
     if result.returncode:
         raise RuntimeError('JSON canary probe failed: exit ' + str(result.returncode))
@@ -139,6 +150,8 @@ def active_canary(probe, environment):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, required=True)
+    parser.add_argument('--source-ref', default=ORIGINAL,
+                        help='full source commit SHA; defaults to the pinned baseline')
     parser.add_argument('--output', type=Path, required=True,
                         help='new directory outside the source tree')
     options = parser.parse_args()
@@ -150,9 +163,10 @@ def main():
     output.mkdir(parents=True)
     manifest = {'schema': 1, 'status': 'BLOCKED',
                 'created_utc': datetime.now(timezone.utc).isoformat(),
-                'probe_sources_root': str(TESTS), 'original_commit': ORIGINAL}
+                'probe_sources_root': str(TESTS), 'original_commit': None,
+                'requested_source_ref': options.source_ref}
     try:
-        manifest.update(source_metadata(source))
+        manifest.update(source_metadata(source, options.source_ref))
         library = (source / 'src/.libs/libmodsecurity.so').resolve(strict=True)
         manifest['library'] = {'path': str(library), 'sha256': sha256(library),
                                'directory': str(source / 'src/.libs')}

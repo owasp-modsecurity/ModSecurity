@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
-from build import (Blocked, ORIGINAL, PROBES, TESTS, active_canary,
+from build import (Blocked, PROBES, TESTS, active_canary,
                    linked_library, runtime_environment, sha256, source_metadata)
 
 STATUSES = ('PASS', 'FAIL', 'SKIP', 'BLOCKED', 'XFAIL')
@@ -25,9 +25,13 @@ def verify_manifest(directory):
         manifest = json.loads((directory / 'build-manifest.json').read_text())
     except (OSError, ValueError) as exc:
         raise Blocked('Readable build-manifest.json is required') from exc
-    if manifest.get('status') != 'PASS' or manifest.get('original_commit') != ORIGINAL:
-        raise Blocked('Probe build did not establish the pinned original baseline')
-    metadata = source_metadata(Path(manifest['source_root']))
+    if manifest.get('status') != 'PASS':
+        raise Blocked('Probe build did not establish a verified source')
+    reference = manifest.get('original_commit')
+    metadata = source_metadata(Path(manifest['source_root']), reference)
+    if (metadata['source_head'] != manifest.get('source_head') or
+            metadata['submodules'] != manifest.get('submodules')):
+        raise Blocked('Source checkout changed after the recorded probe build')
     library = Path(manifest['library']['path'])
     if sha256(library) != manifest['library']['sha256']:
         raise Blocked('libModSecurity changed after the recorded build')
@@ -44,6 +48,7 @@ def verify_manifest(directory):
         if loaders[name]['sha256'] != manifest['library']['sha256']:
             raise Blocked('Loaded library hash differs: ' + name)
     active_canary(directory / 'probe', environment)
+    environment['MODSECURITY_JSON_BUILD_MANIFEST'] = str(directory / 'build-manifest.json')
     return manifest, metadata, environment, loaders
 
 
@@ -87,7 +92,7 @@ def main():
     except (OSError, ValueError):
         pass  # Report an absent/malformed manifest as a blocked suite below.
     output.mkdir(parents=True)
-    summary = {'schema': 1, 'profile': options.profile, 'original_commit': ORIGINAL,
+    summary = {'schema': 1, 'profile': options.profile, 'original_commit': None,
                'created_utc': datetime.now(timezone.utc).isoformat(),
                'counts': zeros(), 'suites': [],
                'count_scope': 'Individual case/assertion-control counts; a suite-level BLOCKED/FAIL is explicitly labelled when no valid case report exists.'}
@@ -108,6 +113,7 @@ def main():
         source = Path(metadata['source_root'])
         if output.is_relative_to(source):
             raise Blocked('--output must be outside the ModSecurity source tree')
+        summary['original_commit'] = metadata['original_commit']
         summary['build_manifest'] = manifest
         summary['runtime_verification'] = {'source': metadata, 'loaders': loaders,
                                            'active_json_canary': True}
@@ -174,6 +180,7 @@ def main():
                     if total + skipped + disabled != expected:
                         raise ValueError('Native runner did not account for every enabled fixture')
                     native = {'counts': counts, 'enabled_cases': expected,
+                              'production_commit': metadata['original_commit'],
                               'fixture_sha256': sha256(fixture),
                               'disabled_are_blocked': True}
                     report_path.write_text(json.dumps(native, indent=2) + '\n')

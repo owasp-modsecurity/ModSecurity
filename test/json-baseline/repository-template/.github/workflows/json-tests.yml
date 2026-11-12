@@ -1,4 +1,4 @@
-name: JSON behavior contracts
+name: JSON behavior contracts (pinned replay)
 
 on:
   push:
@@ -10,30 +10,54 @@ permissions:
 
 jobs:
   json-tests:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
         profile: [characterization, requirements]
     steps:
       - uses: actions/checkout@v4
-      - name: Install build dependencies
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential autoconf automake libtool pkg-config git \
-            libyajl-dev libpcre2-dev libcurl4-openssl-dev libxml2-dev liblua5.4-dev \
-            liblmdb-dev libmaxminddb-dev libfuzzy-dev
+          set -euo pipefail
+          sudo apt-get update -y -qq
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+          if [ -z "$CANDIDATES" ]; then
+            echo "::error::No libluaX.Y-dev package found"
+            exit 1
+          fi
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+          if [ -z "$BEST_PKG" ]; then
+            echo "::error::Failed to determine Lua package"
+            exit 1
+          fi
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
+      - name: Install dependencies
+        env:
+          LUA_DEV_PACKAGE: ${{ steps.detect_lua.outputs.lua_pkg }}
+        run: |
+          sudo apt-get install -y autoconf automake build-essential git libcurl4-openssl-dev liblmdb-dev liblzma-dev libpcre2-dev libtool libxml2-dev libyajl-dev "$LUA_DEV_PACKAGE" libmaxminddb-dev libfuzzy-dev pkg-config python3 python3-yaml
+      - name: Test JSON harness verification
+        run: python3 -m unittest discover -s test/json-baseline/tools -p 'test_verification.py' -v
       - name: Prepare and build pinned original
         run: |
           python3 test/json-baseline/tools/prepare_source.py \
             --destination "$RUNNER_TEMP/modsecurity-original" --build
-      - name: Build standalone test probes
+      - name: Build standalone test probes against the pinned original
         run: |
           python3 test/json-baseline/tools/build.py \
             --source "$RUNNER_TEMP/modsecurity-original" --output "$RUNNER_TEMP/probes"
       - name: Run selected contracts
-        # The requirements job is intentionally red while proposals are unmet.
-        # No continue-on-error or XFAIL converts those failures into success.
+        # Unmet requirements retain their real failure status.
         run: |
           python3 test/json-baseline/tools/run_all.py \
             --probes "$RUNNER_TEMP/probes" --profile "${{ matrix.profile }}" \

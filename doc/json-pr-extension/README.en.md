@@ -18,6 +18,14 @@ The remainder of this extension report preserves the earlier investigation's
 `8271c9d3` reference, observations and counts. The new current-source results are
 recorded separately; no older PASS is silently assigned to the newer source.
 
+> **November PR revision:** the source descriptions and results below are
+> historical. The current `prepare_source.py` defaults to `1ebdc390b47a`, not
+> either historical source. Its command below starts a new run on that reference;
+> it does not reproduce the recorded October results. For the October 15 run,
+> use the complete helper/test snapshot at `dd63a59e3a993faf4e74b08979e39986e1df4d2c`
+> and its `full-v3-master.md` instructions. Current-checkout CI instead passes
+> its checkout SHA explicitly. See [the CI review revision](pr3752-ci-review.md).
+
 ## Original reference and scope
 
 The tested production reference remains official commit
@@ -117,6 +125,8 @@ ModSecurity additionally needs its documented Autotools/parser and library
 dependencies. The executed environment is recorded in provenance; no Apache or
 nginx service is needed for these API tests.
 
+**With the current helpers, the following commands test `1ebdc390b47a`.**
+This is a new execution, not reproduction of this document's historical counts.
 From the companion or task repository root, choose new output directories:
 
 ```sh

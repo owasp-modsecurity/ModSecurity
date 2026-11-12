@@ -16,6 +16,7 @@ import sys
 
 from run import check, config, pair
 from pr_cases import cases, requirements
+from report_metadata import production_commit
 
 _COLLECTIONS = ('ARGS','GET','POST','NAMES','PRE_ARGS')
 _VALUES = ('ERROR','PROCESSOR_ERROR','ERROR_MSG','PROCESSOR_ERROR_MSG',
@@ -50,6 +51,8 @@ def observe(probe, case):
             current.update(CHUNK=[],STATUSES=[],APPEND=[],PROCESS=[])
             transactions.append(current)
         elif name in ('CONFIG','YAJL_ACTIVE'):
+            if len(bits) != 2 or bits[1] not in ('0', '1') or name in globals_:
+                raise ProbeFailure('malformed-protocol', 'invalid or duplicate ' + name)
             globals_[name]=int(bits[1])
         elif name in ('VERSION','CONFIG_ERROR'):
             globals_[name]=bytes.fromhex(bits[1])
@@ -133,6 +136,7 @@ def main(default_suite='characterization'):
     parser.add_argument('--suite',choices=['characterization','requirements'],default=default_suite)
     parser.add_argument('--sensitivity',action='store_true')
     opts=parser.parse_args()
+    source_commit = production_commit(opts.probe)
     available=cases() if opts.suite=='characterization' else requirements()
     selected=[case for case in available if opts.filter in case.id]
     if not selected:
@@ -181,7 +185,7 @@ def main(default_suite='characterization'):
                 'purpose':'The correct observation must reject one deliberately wrong expectation.'})
             counts[status]+=1
             print(status,'sensitivity-'+id)
-    report={'version':'v3','production_commit':'dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd',
+    report={'version':'v3','production_commit':source_commit,
         'suite':opts.suite,'counts':counts,'cases':output,'sensitivity':sensitivity,
         'interpretation': 'Policy proposals remain FAIL if unmet; they are neither XFAIL nor adopted compatibility requirements.' if opts.suite=='requirements' else 'Current behavior characterization; a PASS does not endorse questionable behavior.'}
     if opts.output:Path(opts.output).write_text(json.dumps(report,indent=2)+'\n')

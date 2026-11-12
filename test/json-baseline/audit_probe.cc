@@ -1,4 +1,5 @@
-/* Synthetic audit-writer integration probe; no request-parser assertions here. */
+// Copyright 2026 ModSecurity contributors.
+// Synthetic audit-writer integration probe; no request-parser assertions here.
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -13,7 +14,6 @@
 #endif
 
 namespace {
-
 void discardServerLog(void *, const void *) { }
 
 void requireSuccess(int result, const char *step) {
@@ -56,14 +56,13 @@ int parts(const std::string &selection) {
     }
     throw std::runtime_error("unknown part selection");
 }
-
 }  // namespace
 
 int main(int argc, char **argv) {
     try {
         if (argc != 5) {
-            throw std::runtime_error(
-                "usage: audit-probe FIXTURE all|request|none pass|deny|detect unique|duplicate");
+            throw std::runtime_error("usage: audit-probe FIXTURE "
+                "all|request|none pass|deny|detect unique|duplicate");
         }
         const std::string value = fixture(argv[1]);
         const std::string mode = argv[3];
@@ -74,7 +73,6 @@ int main(int argc, char **argv) {
         if (std::string(argv[4]) != "unique" && !duplicate) {
             throw std::runtime_error("unknown header mode");
         }
-
         modsecurity::ModSecurity engine;
         engine.setConnectorInformation("json-baseline audit probe");
         engine.setServerLogCb(discardServerLog);
@@ -83,7 +81,8 @@ int main(int argc, char **argv) {
             + (mode == "detect" ? "DetectionOnly" : "On")
             + "\nSecRequestBodyAccess On\nSecResponseBodyAccess On\n"
               "SecResponseBodyMimeType text/plain\nSecAuditEngine Off\n"
-              "SecAction \"id:990100,phase:2,log,msg:'audit writer',tag:'fixture',"
+              "SecAction \"id:990100,phase:2,log,msg:'audit writer',"
+              "tag:'fixture',"
             + (mode == "pass" ? "pass" : "deny,status:418") + "\"\n";
         if (rules.load(config.c_str(), "audit-probe.conf") < 0) {
             throw std::runtime_error(rules.getParserError());
@@ -113,27 +112,29 @@ int main(int argc, char **argv) {
             reinterpret_cast<const unsigned char *>(value.data()),
             value.size()), "appendRequestBody");
         requireSuccess(transaction.processRequestBody(), "processRequestBody");
-
         modsecurity::ModSecurityIntervention intervention{};
         transaction.intervention(&intervention);
-        const int responseCode = intervention.disruptive ? intervention.status : 201;
+        const int responseCode = intervention.disruptive
+            ? intervention.status : 201;
         modsecurity::intervention::free(&intervention);
-        requireSuccess(transaction.addResponseHeader("Content-Type", "text/plain"),
-            "addResponseHeader");
+        requireSuccess(transaction.addResponseHeader("Content-Type",
+            "text/plain"), "addResponseHeader");
         requireSuccess(transaction.addResponseHeader("X-Fixture", value),
             "addResponseHeader");
-        requireSuccess(transaction.addResponseHeader("X-quote\"slash\\", "name"),
+        requireSuccess(transaction.addResponseHeader(
+            "X-quote\"slash\\", "name"),
             "addResponseHeader");
         if (duplicate) {
             requireSuccess(transaction.addResponseHeader("X-Fixture", "second"),
                 "addResponseHeader duplicate");
         }
-        requireSuccess(transaction.processResponseHeaders(responseCode, "HTTP/1.1"),
-            "processResponseHeaders");
+        requireSuccess(transaction.processResponseHeaders(responseCode,
+            "HTTP/1.1"), "processResponseHeaders");
         requireSuccess(transaction.appendResponseBody(
             reinterpret_cast<const unsigned char *>(value.data()),
             value.size()), "appendResponseBody");
-        requireSuccess(transaction.processResponseBody(), "processResponseBody");
+        requireSuccess(transaction.processResponseBody(),
+            "processResponseBody");
         const std::string json = transaction.toJSON(parts(argv[2]));
         std::cout.write(json.data(), json.size());
     } catch (const std::exception &error) {
