@@ -31,6 +31,11 @@ void DebugLogWriter::close(const std::string& fileName) {
 }
 
 
+bool DebugLogWriter::reopen(const std::string& fileName, std::string *error) {
+    return utils::SharedFiles::getInstance().reopen(fileName, error);
+}
+
+
 void DebugLogWriter::write_log(const std::string& fileName,
     const std::string &msg) {
     std::string err;

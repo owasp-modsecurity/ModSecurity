@@ -16,8 +16,14 @@
 #include "src/utils/shared_files.h"
 
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #include <algorithm>
+#endif
+
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
+#define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
 
@@ -76,6 +82,43 @@ bool SharedFiles::open(const std::string& fileName, std::string *error) {
     }
 
     it->second.cnt++;
+
+    return true;
+}
+
+
+bool SharedFiles::reopen(const std::string& fileName, std::string *error) {
+    auto it = m_handlers.find(fileName);
+    if (it == m_handlers.end()) {
+        error->assign("Cannot find open file to reopen: " + fileName);
+        return false;
+    }
+
+    struct stat target_stat;
+    struct stat current_stat;
+
+    if (
+        stat(fileName.c_str(), &target_stat) == 0 &&
+        fstat(fileno(it->second.fp), &current_stat) == 0 &&
+        current_stat.st_dev == target_stat.st_dev &&
+        current_stat.st_ino == target_stat.st_ino
+    ) {
+        return true;
+    }
+
+    FILE *fp;
+#ifdef WIN32
+    fopen_s(&fp, fileName.c_str(), "a");
+#else
+    fp = fopen(fileName.c_str(), "a");
+#endif
+    if (fp == nullptr) {
+        error->assign("Failed to reopen file: " + fileName);
+        return false;
+    }
+
+    fclose(it->second.fp);
+    it->second.fp = fp;
 
     return true;
 }
