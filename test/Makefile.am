@@ -196,3 +196,16 @@ rules_optimization_CPPFLAGS = \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
+
+
+# C API
+
+noinst_PROGRAMS += api_tests
+api_tests_SOURCES = \
+        api/msc_get_tx.c
+
+api_tests_LDADD = $(rules_optimization_LDADD)
+api_tests_LDFLAGS = $(rules_optimization_LDFLAGS)
+api_tests_CPPFLAGS = \
+	-I$(top_builddir)/headers \
+	$(GLOBAL_CPPFLAGS)

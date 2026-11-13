@@ -1,3 +1,9 @@
+v3.x.y - YYYY-MMM-DD (to be released)
+-------------------------------------
+
+  - feat: add msc_get_tx() and msc_free() to read TX collection values
+    from connectors
+
 v3.0.17 - 2026-Sep-29
 ---------------------
 

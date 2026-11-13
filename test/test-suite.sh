@@ -25,6 +25,13 @@ then
         fi
         echo $VALGRIND $PARAM ./regression_tests ../$FILE:$i
     done;
+elif [[ $FILE == *"test/api/"* ]]
+then
+    $VALGRIND $PARAM ./api_tests
+    RET=$?
+    if [ $RET -ne 0 ]; then
+        echo ":test-result: FAIL possible segfault/$RET: ../$FILE"
+    fi
 else
       $VALGRIND $PARAM ./unit_tests ../$FILE
       RET=$?

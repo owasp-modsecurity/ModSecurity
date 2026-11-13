@@ -670,6 +670,9 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
 
 #endif
 
+/* msc_get_tx() and msc_free() are available */
+#define MSC_HAVE_GET_TX 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -755,6 +758,13 @@ int msc_process_logging(Transaction *transaction);
 
 /** @ingroup ModSecurity_C_API */
 int msc_update_status_code(Transaction *transaction, int status);
+
+/** @ingroup ModSecurity_C_API */
+int msc_get_tx(Transaction *transaction, const char *name, char **value,
+    size_t *len);
+
+/** @ingroup ModSecurity_C_API */
+void msc_free(void *ptr);
 
 /** @ingroup ModSecurity_C_API */
 int msc_set_request_hostname(Transaction *transaction, const unsigned char *hostname);
