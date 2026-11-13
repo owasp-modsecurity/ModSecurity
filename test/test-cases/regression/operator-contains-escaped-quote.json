@@ -1,0 +1,178 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "contains operator with escaped double quotes in parameter",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "21"
+      },
+      "uri": "/test.pl",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "test=test()\"quote\""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Rule returned 1",
+      "http_code": 500
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains test()\\\"quote\\\"\" \"phase:2,id:999,deny,status:500\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "contains operator with escaped double quotes does not match when the unescaped parameter is absent",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "23"
+      },
+      "uri": "/test.pl",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "test=test()noquotehere"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Rule returned 0",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains test()\\\"quote\\\"\" \"phase:2,id:999,deny,status:500\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "rx operator parameter keeps backslash escapes after escaped-quote handling",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "9"
+      },
+      "uri": "/test.pl",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "test=1234"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Rule returned 1",
+      "http_code": 500
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@rx ^\\d+$\" \"phase:2,id:999,deny,status:500\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "default (rx) operator with escaped double quotes in parameter",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "21"
+      },
+      "uri": "/test.pl",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "test=test()\"quote\""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/xml; charset=utf-8\n\r",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Rule returned 1",
+      "http_code": 500
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"test\\(\\)\\\"quote\\\"\" \"phase:2,id:999,deny,status:500\""
+    ]
+  }
+]
