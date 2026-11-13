@@ -258,7 +258,7 @@ def main():
             else:passed+=1
             entry={'id':c.id,'status':status,'body_length':len(c.body),'body_hex':c.body.hex(),'body_sha256':hashlib.sha256(c.body).hexdigest(),'config':config(c),'uri':c.uri,'content_type':c.content_type,'mode':c.mode,'chunks':c.chunks,'expected_args_hex':[[k.hex(),v.hex()] for k,v in c.args],'expected_error':c.error,'expected':{'processor_error':c.processor_error if c.processor_error is not None else c.error,'inbound':c.inbound,'phase2':c.phase,'http_intervention':c.status,'message_class':c.message,'config_accepted':c.config_ok,'complete':c.complete if c.mode=='parser' else None,'chunk_results':c.chunk_results if c.mode=='parser' else None},'note':c.note,'errors':errors,'observed_tsv':raw}
         except Exception as e:
-            is_blocked=isinstance(e,FileNotFoundError) or 'probe exit=77:' in str(e)
+            is_blocked=isinstance(e,OSError) or 'probe exit=77:' in str(e)
             status='BLOCKED' if is_blocked else 'FAIL'
             if is_blocked:blocked+=1
             else:failed+=1

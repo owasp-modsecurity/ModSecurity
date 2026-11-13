@@ -4,6 +4,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef WITH_YAJL
@@ -103,7 +104,7 @@ bool jsonAvailable(modsecurity::ModSecurity *engine) {
 }
 
 void prepareTransaction(modsecurity::Transaction *tx, const Request &request,
-    const std::string &body) {
+    std::string_view body) {
     tx->processConnection("127.0.0.1", 12345, "127.0.0.1", 80);
     tx->processURI(request.uri.c_str(), "POST", "1.1");
     tx->addRequestHeader("Host", "baseline.invalid");
@@ -122,7 +123,7 @@ void checkChunk(size_t size, size_t position, size_t length) {
 
 void processParser(modsecurity::Transaction *tx,
     const modsecurity::RulesSet &rules, const Request &request,
-    const std::string &body) {
+    std::string_view body) {
     modsecurity::RequestBodyProcessor::JSON parser(tx);
     if (rules.m_requestBodyJsonDepthLimit.m_set) {
         parser.setMaxDepth(rules.m_requestBodyJsonDepthLimit.m_value);
@@ -152,7 +153,7 @@ void processParser(modsecurity::Transaction *tx,
 }
 
 void appendBody(modsecurity::Transaction *tx, const Request &request,
-    const std::string &body) {
+    std::string_view body) {
     size_t position = 0;
     size_t size = 0;
     std::istringstream chunks(request.chunks);
@@ -171,7 +172,7 @@ void appendBody(modsecurity::Transaction *tx, const Request &request,
 }
 
 void processBody(modsecurity::Transaction *tx, const Request &request,
-    const std::string &body) {
+    std::string_view body) {
     if (request.mode != "absent") {
         appendBody(tx, request, body);
     }

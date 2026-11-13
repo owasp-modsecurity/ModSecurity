@@ -136,6 +136,9 @@ def main(default_suite='characterization'):
     parser.add_argument('--suite',choices=['characterization','requirements'],default=default_suite)
     parser.add_argument('--sensitivity',action='store_true')
     opts=parser.parse_args()
+    if opts.sensitivity and opts.suite != 'characterization':
+        print('--sensitivity is only supported for characterization', file=sys.stderr)
+        return 2
     source_commit = production_commit(opts.probe)
     available=cases() if opts.suite=='characterization' else requirements()
     selected=[case for case in available if opts.filter in case.id]
@@ -156,18 +159,18 @@ def main(default_suite='characterization'):
             errors=check_extended(case,globals_,transactions)
             entry.update(status='FAIL' if errors else 'PASS',errors=errors,
                          failure_kind='assertion' if errors else '',observed_tsv=raw)
-        except (FileNotFoundError,ProbeFailure,subprocess.TimeoutExpired,ValueError,KeyError) as exc:
-            blocked=isinstance(exc,FileNotFoundError) or (isinstance(exc,ProbeFailure) and exc.kind=='json-support-unavailable')
-            kind='missing-probe' if isinstance(exc,FileNotFoundError) else 'timeout' if isinstance(exc,subprocess.TimeoutExpired) else getattr(exc,'kind','malformed-protocol')
+        except (OSError,ProbeFailure,subprocess.TimeoutExpired,ValueError,KeyError) as exc:
+            blocked=isinstance(exc,OSError) or (isinstance(exc,ProbeFailure) and exc.kind=='json-support-unavailable')
+            if isinstance(exc, OSError):
+                kind = 'missing-probe' if isinstance(exc, FileNotFoundError) else 'probe-unavailable'
+            else:
+                kind = 'timeout' if isinstance(exc, subprocess.TimeoutExpired) else getattr(exc, 'kind', 'malformed-protocol')
             entry.update(status='BLOCKED' if blocked else 'FAIL',failure_kind=kind,errors=[str(exc)])
         counts[entry['status']]+=1
         output.append(entry)
         print(entry['status'],case.id,'; '.join(entry['errors'])[:300])
     sensitivity=[]
-    if opts.sensitivity:
-        if opts.suite!='characterization':
-            print('--sensitivity is only supported for characterization',file=sys.stderr)
-            return 2
+    if opts.sensitivity and not counts['BLOCKED'] and not counts['FAIL']:
         for id in ['PR-N-token-kinds','PR-B-nested-nul','PR-C-root-number-split-000','PR-J-syntax-colon']:
             source=next(case for case in available if case.id==id)
             bad=deepcopy(source)
