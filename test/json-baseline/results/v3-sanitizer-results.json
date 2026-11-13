@@ -1,0 +1,263 @@
+{
+  "version": "v3",
+  "counts": {
+    "PASS": 7,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "cases": [
+    {
+      "id": "L-parser-token",
+      "status": "PASS",
+      "body_length": 11,
+      "body_hex": "7b226e223a31452b30327d",
+      "body_sha256": "b43fa301519b4124f3f3b8fa038c406e161fe8ad1f456eaf7339a85bfd885e17",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "6 1 1 1",
+      "expected_args_hex": [
+        [
+          "6a736f6e2e6e",
+          "31452b3032"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "",
+        "config_accepted": true,
+        "complete": 1,
+        "chunk_results": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nPRE_ARGS\t6a736f6e2e6e\t31452b3032\nCOMPLETE\t1\nPARSER_ERROR\t\nNAMES\t6a736f6e2e6e\t6a736f6e2e6e\nARGS\t6a736f6e2e6e\t31452b3032\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-utf8",
+      "status": "PASS",
+      "body_length": 17,
+      "body_hex": "7b2278223a22c3a9e282acf09f9880227d",
+      "body_sha256": "feb1816ba8cbdcc55380bc399f8cd00785a89a33c74c9ce2adc7a9ff97bb99c0",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "7 1 1 1 1 1 1",
+      "expected_args_hex": [
+        [
+          "6a736f6e2e78",
+          "c3a9e282acf09f9880"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "",
+        "config_accepted": true,
+        "complete": 1,
+        "chunk_results": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nPRE_ARGS\t6a736f6e2e78\tc3a9e282acf09f9880\nCOMPLETE\t1\nPARSER_ERROR\t\nNAMES\t6a736f6e2e78\t6a736f6e2e78\nARGS\t6a736f6e2e78\tc3a9e282acf09f9880\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-escape",
+      "status": "PASS",
+      "body_length": 20,
+      "body_hex": "7b2278223a225c75643833645c7564653030227d",
+      "body_sha256": "e8bdea870b7483653c3900736165e4d4bf321ee81cb80032a8334fa1867870af",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "7 3 3 2",
+      "expected_args_hex": [
+        [
+          "6a736f6e2e78",
+          "f09f9880"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "",
+        "config_accepted": true,
+        "complete": 1,
+        "chunk_results": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nCHUNK\t1\nPRE_ARGS\t6a736f6e2e78\tf09f9880\nCOMPLETE\t1\nPARSER_ERROR\t\nNAMES\t6a736f6e2e78\t6a736f6e2e78\nARGS\t6a736f6e2e78\tf09f9880\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-incomplete",
+      "status": "PASS",
+      "body_length": 7,
+      "body_hex": "7b2261223a312c",
+      "body_sha256": "880e9c79fdec2261160585730499727d63cd811a6d0792dcc04b46bce307d259",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "3 4",
+      "expected_args_hex": [
+        [
+          "6a736f6e2e61",
+          "31"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "parser",
+        "config_accepted": true,
+        "complete": 0,
+        "chunk_results": [
+          1,
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCHUNK\t1\nPRE_ARGS\t6a736f6e2e61\t31\nCOMPLETE\t0\nPARSER_ERROR\t7061727365206572726f723a207072656d617475726520454f460a\nNAMES\t6a736f6e2e61\t6a736f6e2e61\nARGS\t6a736f6e2e61\t31\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-trailing",
+      "status": "PASS",
+      "body_length": 8,
+      "body_hex": "7b2261223a317d78",
+      "body_sha256": "e3de6add675ec69cc38526eb2dd586a2f9ce66fe7e14616a9dee6180b131b7d3",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "7 1",
+      "expected_args_hex": [
+        [
+          "6a736f6e2e61",
+          "31"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "parser",
+        "config_accepted": true,
+        "complete": 0,
+        "chunk_results": [
+          1,
+          0
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCHUNK\t0\nPRE_ARGS\t6a736f6e2e61\t31\nCOMPLETE\t0\nPARSER_ERROR\t7061727365206572726f723a20747261696c696e6720676172626167650a\nNAMES\t6a736f6e2e61\t6a736f6e2e61\nARGS\t6a736f6e2e61\t31\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-empty",
+      "status": "PASS",
+      "body_length": 0,
+      "body_hex": "",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "0",
+      "expected_args_hex": [],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "parser",
+        "config_accepted": true,
+        "complete": 0,
+        "chunk_results": [
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCOMPLETE\t0\nPARSER_ERROR\t7061727365206572726f723a207072656d617475726520454f460a\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    },
+    {
+      "id": "L-parser-root-number",
+      "status": "PASS",
+      "body_length": 1,
+      "body_hex": "31",
+      "body_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "config": "SecRuleEngine On\nSecRequestBodyAccess On\nSecAuditEngine Off\nSecAction \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"\nSecAction \"id:2,phase:2,pass,nolog,setvar:tx.phase2=1\"\n\n\n",
+      "uri": "/",
+      "content_type": "application/json",
+      "mode": "parser",
+      "chunks": "1",
+      "expected_args_hex": [
+        [
+          "6a736f6e",
+          "31"
+        ]
+      ],
+      "expected_error": "",
+      "expected": {
+        "processor_error": "",
+        "inbound": "",
+        "phase2": "",
+        "http_intervention": 200,
+        "message_class": "",
+        "config_accepted": true,
+        "complete": 1,
+        "chunk_results": [
+          1
+        ]
+      },
+      "note": "",
+      "errors": [],
+      "observed_tsv": "VERSION\t4d6f6453656375726974792076332e302e313720284c696e757829\nYAJL_ACTIVE\t1\nCONFIG\t1\nTRANSACTION\t0\nCHUNK\t1\nCOMPLETE\t1\nPARSER_ERROR\t\nNAMES\t6a736f6e\t6a736f6e\nARGS\t6a736f6e\t31\nERROR\t\nPROCESSOR_ERROR\t\nERROR_MSG\t\nPROCESSOR_ERROR_MSG\t\nPROCESSOR\t4a534f4e\nINBOUND\t\nREQUEST_BODY\t\nPHASE2\t\nVALUE_SEEN\t\nINTERVENTION\t0\t200\n"
+    }
+  ],
+  "sensitivity": []
+}

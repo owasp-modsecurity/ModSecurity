@@ -1,0 +1,722 @@
+{
+  "schema_version": 1,
+  "retrieved_at": "2026-10-15T12:22:19+00:00",
+  "user_timezone": "Europe/Berlin",
+  "repositories": {
+    "origin": "https://github.com/Easton97-Jens/ModSecurity.git",
+    "upstream": "https://github.com/owasp-modsecurity/ModSecurity.git",
+    "upstream_usage": "read-only; no pull, merge, rebase, push, tags or PR"
+  },
+  "initial_state": {
+    "clone": "/workspace/ModSecurity",
+    "branch": "work",
+    "commit": "48e561b2ba44d35eec799176608720129c678777",
+    "tracked_diff": "empty",
+    "untracked_nonignored": "empty",
+    "shallow": false,
+    "worktrees": [
+      "/workspace/ModSecurity"
+    ],
+    "agents_files_found": [],
+    "identity": "pre-existing repository identity; no user identity invented, no global config changed"
+  },
+  "originals": {
+    "v2": {
+      "branch": "v2/master",
+      "commit": "151074aca78a416764b12ba1221e61a17a6c714d",
+      "task_branch": "test/json-yajl-baseline-v2-20261015",
+      "worktree": "/workspace/work/json-yajl-baseline/v2",
+      "submodules": {
+        "apache2/others/libinjection": "211782219663f889f471650150df12b623c5766e"
+      },
+      "observed_submodules": [
+        {
+          "commit": "211782219663f889f471650150df12b623c5766e",
+          "path": "apache2/others/libinjection",
+          "initialized": true,
+          "status": " "
+        }
+      ]
+    },
+    "v3": {
+      "branch": "v3/master",
+      "commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+      "task_branch": "test/json-yajl-baseline-v3-20261015",
+      "worktree": "/workspace/work/json-yajl-baseline/v3",
+      "submodules": {
+        "bindings/python": "bc625d5bb0bac6a64bcce8dc9902208612399348",
+        "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+        "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+        "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+      },
+      "observed_submodules": [
+        {
+          "commit": "bc625d5bb0bac6a64bcce8dc9902208612399348",
+          "path": "bindings/python",
+          "initialized": false,
+          "status": "-"
+        },
+        {
+          "commit": "211782219663f889f471650150df12b623c5766e",
+          "path": "others/libinjection",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "0fe989b6b514192783c469039edd325fd0989806",
+          "path": "others/mbedtls",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "dff9da04438d712f7647fd995bc90fadd0c0e2ce",
+          "path": "others/mbedtls/framework",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "29160dd877d29658279fd683b2ae57b320ddcf09",
+          "path": "others/mbedtls/tf-psa-crypto",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "5772b4f4a0105694b1203abb582273f78fa951b7",
+          "path": "others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "dff9da04438d712f7647fd995bc90fadd0c0e2ce",
+          "path": "others/mbedtls/tf-psa-crypto/framework",
+          "initialized": true,
+          "status": " "
+        },
+        {
+          "commit": "f73c73027ef49ccf99c7911744929a71d15ff419",
+          "path": "test/test-cases/secrules-language-tests",
+          "initialized": true,
+          "status": " "
+        }
+      ]
+    }
+  },
+  "fork_refs_before": [
+    {
+      "ref": "refs/heads/Modsecurity/v2",
+      "commit": "7ea9fefbe0ba409d8733b4d682c8c4c059cd028d"
+    },
+    {
+      "ref": "refs/heads/V3-Modsecurity-SQL",
+      "commit": "f5a6fcd37aea3a7618408b7d1f03b94de9164637"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-and-decouple-performance-benchmark",
+      "commit": "4ecde4621e00ce6e3a7945771a7a121359d78924"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-json-alternatives-in-repository",
+      "commit": "a8337ffae717f89d1ddca918cd8637e2f2212991"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-modsecurity-v3-repository-structure",
+      "commit": "95bf92d5d2f0a2cb4c9d58cb165070024b270e59"
+    },
+    {
+      "ref": "refs/heads/codex/analyze-yajl-removal-impact-on-modsecurity",
+      "commit": "00ada678434c02da04b4f37360b67898f2ffbeb1"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-combined-security-and-performance-audit",
+      "commit": "56a8081110e6b09b6fb9d1fb7840cdd8d4c502fc"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-complete-sonar-analysis-for-pr-3540",
+      "commit": "d6798201f46ad80b496a9c39263290988ddbc97e"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-performance-analysis-of-owasp-modsecurity",
+      "commit": "6526ef454c51f4dd8df45d279a96852c4b46a3d9"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-performance-analysis-of-owasp-modsecurity-r746ut",
+      "commit": "b03e47131bcdd0594254242b6b56e22a9561942e"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-security-analysis-on-pr-#3489",
+      "commit": "524a6f89283aa84410dca866cc0b0c1ebbedc255"
+    },
+    {
+      "ref": "refs/heads/codex/conduct-security-audit-for-libinjection-migration",
+      "commit": "82c63f9f1ae49d70c4d9c8e6382744113ac52b8d"
+    },
+    {
+      "ref": "refs/heads/codex/create-c++20-compiler-support-documentation",
+      "commit": "5e06519f1a1acd55387caf0e6e510158c72d99e6"
+    },
+    {
+      "ref": "refs/heads/codex/create-detailed-modsecurity-repo-analysis",
+      "commit": "59e35d1162c38aa6da7936b714d774e6e6be0ed2"
+    },
+    {
+      "ref": "refs/heads/codex/create-technical-migration-documentation-for-json-libraries",
+      "commit": "473c96cbc19187e60b3cdfbc54690ff2db0941d5"
+    },
+    {
+      "ref": "refs/heads/codex/erstelle-fachartikel-uber-fuzz-testing-und-sanitizer",
+      "commit": "4c1180bb9eaa4211a8276ce1d73677baf968643e"
+    },
+    {
+      "ref": "refs/heads/codex/erstelle-lokale-regressionstests-fur-modsecurity",
+      "commit": "9bf29852fb56f9c384d6716827e5c1e0197ad99f"
+    },
+    {
+      "ref": "refs/heads/codex/evaluate-maven-integration-difficulty",
+      "commit": "7b8082018e4ab41b674160a86dea581f4502cff2"
+    },
+    {
+      "ref": "refs/heads/codex/evaluate-migration-from-c++17-to-c++20",
+      "commit": "a609fe31faf2184d98eb3a190fd44127829f91ea"
+    },
+    {
+      "ref": "refs/heads/codex/fix-afl++-fuzzing-harness-input-handling",
+      "commit": "9f0e96474b6e0def3c5838ab84b931acbd165a09"
+    },
+    {
+      "ref": "refs/heads/codex/fix-default-blocking-action-logic-k65htg",
+      "commit": "ad008574d0346e84b976a8da90f1baa8f4b91415"
+    },
+    {
+      "ref": "refs/heads/codex/fix-fragment-stripping-vulnerability-in-modsecurity",
+      "commit": "0be2f7571a3052ead47b8539c3c6ece6cf60a55c"
+    },
+    {
+      "ref": "refs/heads/codex/fix-issue-with-phase-2-rule-evaluation",
+      "commit": "bd88427f1b0073ac28438702fda2ce91336a1a44"
+    },
+    {
+      "ref": "refs/heads/codex/fix-unconditional-log-formatting-vulnerability",
+      "commit": "3db0fd1310b10562f2c6cb5f0582245cc81b29c7"
+    },
+    {
+      "ref": "refs/heads/codex/fix-visible-errors-and-regressions",
+      "commit": "bccbeb06daaa46844d1eb78e0015fbee3ebb578b"
+    },
+    {
+      "ref": "refs/heads/codex/generate-bilingual-technical-analysis-files",
+      "commit": "a3c5e85ae13e30671c8a84e98e1da553ef89fcfa"
+    },
+    {
+      "ref": "refs/heads/codex/implement-xml/json-processing-improvements",
+      "commit": "74878c9f15154f723ec363f2ee5c255e8bc34562"
+    },
+    {
+      "ref": "refs/heads/codex/improve-modsecurity/libmodsecurity-repo",
+      "commit": "733f58d78631c22d34f38bf71018023c387260f2"
+    },
+    {
+      "ref": "refs/heads/codex/investigate-ci-linker-errors-and-fix",
+      "commit": "f776bd455488f6a403edc295d81786e80d08498c"
+    },
+    {
+      "ref": "refs/heads/codex/propose-fix-for-rbl-false-negative",
+      "commit": "c67db082d7f6f19bb5b0ee7ebbf847f7ca54cbc2"
+    },
+    {
+      "ref": "refs/heads/codex/review-github-copilot-comments-for-pr-3568",
+      "commit": "8bb8ba8c36a4819b690179e836a9ff78724ef131"
+    },
+    {
+      "ref": "refs/heads/codex/review-libinjection-result-handling",
+      "commit": "383da505263f6582b75a3ed5321f21f399794077"
+    },
+    {
+      "ref": "refs/heads/codex/review-libxml2-usage-and-integration",
+      "commit": "bb4b5a77aa47c83a2bf41966d8f8b6da286f0760"
+    },
+    {
+      "ref": "refs/heads/codex/review-xss-and-sqli-privacy-risks",
+      "commit": "098ae120e2a1eaaea79b6dfb4f9868b08a034011"
+    },
+    {
+      "ref": "refs/heads/codex/systematische-behebung-offener-sonar-probleme",
+      "commit": "4d82c2f956927cc425e3dc40ff257f575780aa00"
+    },
+    {
+      "ref": "refs/heads/codex/systematische-behebung-offener-sonar-probleme-7954xf",
+      "commit": "57bf6d2e909e45c95b2d06e9b31a1535d4936aee"
+    },
+    {
+      "ref": "refs/heads/revert-79-codex/implement-xml/json-processing-improvements",
+      "commit": "084b39ac965970d5cd26d50a3c4b07975b492bff"
+    },
+    {
+      "ref": "refs/heads/v3/master",
+      "commit": "48e561b2ba44d35eec799176608720129c678777"
+    },
+    {
+      "ref": "refs/heads/v3/master-json",
+      "commit": "0131c8acfe9cf3daf995b3b5a8e3c7dd00d51968"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2",
+      "commit": "14c74afb966900a5f0153f4f289c41a149bf1deb"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2+blaze",
+      "commit": "71492d19a590936f892995781666340082c2a6fc"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2_benchmark",
+      "commit": "023f1707d4291993484deed14f7e58c79151926c"
+    },
+    {
+      "ref": "refs/heads/v3/master-json2_test_benchmark",
+      "commit": "8c658f00394b194e06e6d04a903fd366b8f1aeaf"
+    },
+    {
+      "ref": "refs/heads/v3/master-libinjection-v4.0-final",
+      "commit": "951998de40e19f289b5ba430f4b642aff33cee86"
+    },
+    {
+      "ref": "refs/heads/v3/master-mbedtl-v4",
+      "commit": "ff9286f1014f423658804efeaf85d3e93021c1b8"
+    },
+    {
+      "ref": "refs/heads/v3/master-unittest",
+      "commit": "e6e76386830c3ccab6cedaec2c16dbb2a0c2a7d6"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows",
+      "commit": "bf50b88e886c36d9a1821f86c4344a125c3f2f6c"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows2",
+      "commit": "3f1cf6dbb68aec941ce0654eb1b82a5af89aa10f"
+    },
+    {
+      "ref": "refs/heads/v3/master-workflows3",
+      "commit": "8e09ccae6852cbbe12662901f9a2a9d2608c2e74"
+    },
+    {
+      "ref": "refs/heads/v3/master_Security",
+      "commit": "0fb4aff98b4980cf6426697d5605c424e3d5bb60"
+    },
+    {
+      "ref": "refs/heads/v3/master_pr3489",
+      "commit": "1ac4ef58a4989535c6d9b4de79c1161116528c90"
+    },
+    {
+      "ref": "refs/heads/v3/master_pr3501",
+      "commit": "018d68ce2917f8bb7ae68b441d5dd3184e8cf91d"
+    }
+  ],
+  "compared_fork_refs": [
+    {
+      "ref": "refs/remotes/origin/v3/master",
+      "commit": "48e561b2ba44d35eec799176608720129c678777",
+      "official_only_commits": 4,
+      "fork_only_commits": 0,
+      "diff_scope": "full tree",
+      "changed_paths": [
+        "README.md",
+        "SECURITY.md",
+        "headers/modsecurity/transaction.h"
+      ],
+      "assessment": "fork behind official by four commits; JSON processor identical; no fork commits imported"
+    },
+    {
+      "ref": "refs/remotes/origin/v3/master-json",
+      "commit": "0131c8acfe9cf3daf995b3b5a8e3c7dd00d51968",
+      "official_only_commits": 177,
+      "fork_only_commits": 15,
+      "merge_base": "e5d00df2a324f25d29ee841f7719872ac70fc6e5",
+      "diff_scope": "configure.ac, src/request_body_processor/json.{cc,h}, src/transaction.cc",
+      "assessment": "JSON processor files identical in direct comparison; build and transaction differences; no prior work imported"
+    },
+    {
+      "ref": "refs/remotes/origin/v3/master-json2",
+      "commit": "14c74afb966900a5f0153f4f289c41a149bf1deb",
+      "official_only_commits": 164,
+      "fork_only_commits": 13,
+      "merge_base": "19195735395f9304910aa76e9996b176d5c33e78",
+      "diff_scope": "configure.ac, src/request_body_processor/, src/transaction.cc",
+      "assessment": "contains alternative backend/adapters and substantial parser changes; excluded from original baseline"
+    },
+    {
+      "ref": "refs/remotes/origin/Modsecurity/v2",
+      "commit": "7ea9fefbe0ba409d8733b4d682c8c4c059cd028d",
+      "diff_scope": "top-level tree plus v2 parser/test/build paths",
+      "assessment": "branch name misleading: tree is v3.0.16, apache2/msc_json.c and tests/regression/rule/15-json.t absent; excluded"
+    },
+    {
+      "ref": "refs/heads/v2/master",
+      "commit": null,
+      "assessment": "absent from remote fork at initial listing; v2 task derived from official v2 commit"
+    }
+  ],
+  "fetch_notes": [
+    "Initial default recursive fetch of older fork refs returned failure for unavailable historical Python/secrules submodule commits. Parent refs arrived. Repeated explicit parent fetch with fetch.recurseSubmodules=false succeeded. No source substitution.",
+    "No upstream refs refreshed after pinning; ref listings and fetch time recorded.",
+    "Default shell network refused proxy; network-enabled sandbox execution used supported proxy with TLS verification unchanged."
+  ],
+  "environment": {
+    "system": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+    "build_details": "See per-version reports for commands, flags, exact YAJL version, distribution packages and source hashes.",
+    "distribution": "Debian GNU/Linux 13 (trixie)",
+    "architecture": "x86_64",
+    "yajl_package": "2.1.0-5+b2",
+    "yajl_source_package": "2.1.0-5",
+    "distribution_patches_from_changelog": [
+      "CVE-2017-16516",
+      "CVE-2022-24795",
+      "CVE-2023-33460 (corrected incomplete fix)"
+    ],
+    "shared_dependencies_source": "/workspace/modsecurity-env/deps (existing, read-only reuse)",
+    "yajl_library_sha256": "d135395a83acc7ba944ff0d9e49614c8b824866f9ff61d844ad85a34c17838a9"
+  },
+  "publication": {
+    "v2": {
+      "status": "published tests verified; final documentation tip recorded in closing handover",
+      "branch": "test/json-yajl-baseline-v2-20261015",
+      "verified_ref": "refs/heads/test/json-yajl-baseline-v2-20261015",
+      "verified_test_commit": "a37f9b531d9ba8dd2d60f17eb4f3984668b34c50",
+      "verified_at": "2026-10-15T12:45:32.245915+00:00",
+      "remote": "origin",
+      "url": "https://github.com/Easton97-Jens/ModSecurity/tree/test/json-yajl-baseline-v2-20261015"
+    },
+    "v3": {
+      "status": "published tests verified; final documentation tip recorded in closing handover",
+      "branch": "test/json-yajl-baseline-v3-20261015",
+      "verified_ref": "refs/heads/test/json-yajl-baseline-v3-20261015",
+      "verified_test_commit": "57a42a31b4be6f6754dbb0fde662fbee9114cf9e",
+      "verified_at": "2026-10-15T12:45:38.776251+00:00",
+      "remote": "origin",
+      "url": "https://github.com/Easton97-Jens/ModSecurity/tree/test/json-yajl-baseline-v3-20261015"
+    }
+  },
+  "additional_read_only_sources": {
+    "nginx_connector": {
+      "repository": "https://github.com/owasp-modsecurity/ModSecurity-nginx",
+      "commit": "b7cf44e57bc386bc5c15e5c9319e6b6b719357f2",
+      "scope": "config read via GitHub connector; not built or modified"
+    },
+    "normative": "https://www.rfc-editor.org/rfc/rfc8259.html",
+    "yajl_api": "YAJL 2.1.0 parse callbacks/options documentation; distribution headers used for actual build"
+  },
+  "builds": {
+    "v2": {
+      "configure_options": "--with-apxs=/workspace/work/json-yajl-baseline/v2-env/deps/usr/bin/apxs --with-apr=/workspace/work/json-yajl-baseline/v2-env/deps/usr/bin/apr-1-config --with-apu=/workspace/work/json-yajl-baseline/v2-env/deps/usr/bin/apu-1-config --with-yajl=/workspace/modsecurity-env/deps/usr --with-libxml=/workspace/modsecurity-env/deps/usr/bin/xml2-config --without-lua --without-curl --enable-assertions CPPFLAGS=-I/workspace/modsecurity-env/deps/usr/include PKG_CONFIG_PATH=/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu/pkgconfig:/workspace/modsecurity-env/install/lib/pkgconfig",
+      "active_yajl": "Debian 2.1.0-5+b2",
+      "original_head": "151074aca78a416764b12ba1221e61a17a6c714d",
+      "apache": "2.4.68 (Debian 2.4.68-1~deb13u1)",
+      "apr": "1.7.5",
+      "apr_util": "1.6.3"
+    },
+    "v3": {
+      "configure_options": "--prefix=/workspace/work/json-yajl-baseline/v3-install --enable-assertions=yes --enable-parser-generation=no --without-geoip --with-yajl --with-pcre2 --with-curl --with-libxml --with-lua --with-lmdb --with-maxmind --with-ssdeep=/workspace/modsecurity-env/deps/usr 'CXXFLAGS=-O2 -g' CPPFLAGS=-I/workspace/modsecurity-env/deps/usr/include 'LDFLAGS=-L/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu -Wl,-rpath,/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu' PKG_CONFIG_PATH=/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu/pkgconfig:/workspace/modsecurity-env/install/lib/pkgconfig",
+      "active_yajl": "Debian 2.1.0-5+b2",
+      "original_head": "8271c9d3bc0abcbd1189f5414c196c336c959047"
+    }
+  },
+  "deliverable_files": {
+    "v2": [
+      "doc/JSON-YAJL-BASELINE.md",
+      "doc/json-yajl-baseline-v2.md",
+      "doc/json-yajl-code-analysis.md",
+      "doc/json-yajl-provenance.json",
+      "doc/json-yajl-v2-audit-results.json",
+      "doc/json-yajl-v2-config-results.json",
+      "doc/json-yajl-v2-processor-results.json",
+      "doc/json-yajl-v2-results.json",
+      "doc/json-yajl-v2-sanitizer-results.json",
+      "tests/json-yajl-audit-v2.py",
+      "tests/json-yajl-baseline/build-processor.sh",
+      "tests/json-yajl-baseline/cases.py",
+      "tests/json-yajl-baseline/processor.c",
+      "tests/json-yajl-baseline/run-config.py",
+      "tests/json-yajl-baseline/run-processor.py",
+      "tests/json-yajl-baseline/run.py",
+      "tests/regression/rule/15-json.t"
+    ],
+    "v3": [
+      "doc/JSON-YAJL-BASELINE.md",
+      "doc/json-yajl-baseline-v3.md",
+      "doc/json-yajl-code-analysis.md",
+      "doc/json-yajl-provenance.json",
+      "test/Makefile.am",
+      "test/json-baseline/audit_probe.cc",
+      "test/json-baseline/build-probes.sh",
+      "test/json-baseline/probe.cc",
+      "test/json-baseline/results/v3-audit-results.json",
+      "test/json-baseline/results/v3-request-results.json",
+      "test/json-baseline/results/v3-sanitizer-results.json",
+      "test/json-baseline/results/v3-summary.json",
+      "test/json-baseline/run.py",
+      "test/json-baseline/run_audit.py",
+      "test/test-cases/regression/request-body-parser-json.json"
+    ]
+  },
+  "local_only_untracked_artifacts": {
+    "v2": [
+      "apache2/.libs/mod_security2.lai",
+      "apache2/modsecurity_config_auto.h",
+      "apache2/modsecurity_config_auto.h.in",
+      "apache2/stamp-h1",
+      "build/apxs-wrapper",
+      "build/ar-lib",
+      "build/config.guess",
+      "build/config.sub",
+      "build/depcomp",
+      "build/install-sh",
+      "build/libtool.m4",
+      "build/ltmain.sh",
+      "build/ltoptions.m4",
+      "build/ltsugar.m4",
+      "build/ltversion.m4",
+      "build/lt~obsolete.m4",
+      "build/missing",
+      "build/test-driver",
+      "libtool",
+      "tests/json-yajl-baseline/__pycache__/cases.cpython-312.pyc",
+      "tests/json-yajl-baseline/__pycache__/run-processor.cpython-312.pyc",
+      "tests/json-yajl-baseline/__pycache__/run.cpython-312.pyc",
+      "tests/msc_test",
+      "tools/rules-updater.pl"
+    ],
+    "v3": []
+  },
+  "local_only_note": "Generated build files/binaries, caches and raw logs are excluded; ignored build outputs also remain local. No required fixture is excluded. Both task branches published separately; fallback patches unnecessary.",
+  "results": {
+    "v2": {
+      "original_json": {
+        "PASS": 7,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "original_units": {
+        "PASS": 4245,
+        "FAIL": 1,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "extended_native": {
+        "PASS": 11,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "integration": {
+        "PASS": 145,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "processor_chunks": {
+        "PASS": 611,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "configuration": {
+        "PASS": 14,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "audit": {
+        "PASS": 5,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "bounded_asan_ubsan": {
+        "PASS": 611,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "leak_detection": {
+        "PASS": 0,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 1,
+        "XFAIL": 0
+      },
+      "note": "Original unit failure ipMatch invalid CIDR assertion predates task; non-overlapping requirements must not be inferred from sums of repeated runs."
+    },
+    "v3": {
+      "original_relevant": {
+        "PASS": 50,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "extended_native": {
+        "PASS": 9,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "request_including_mutations": {
+        "PASS": 163,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "audit_including_mutations": {
+        "PASS": 12,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "bounded_asan_ubsan": {
+        "PASS": 7,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "leak_detection": {
+        "PASS": 0,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 6,
+        "XFAIL": 0
+      },
+      "note": "LSan raw runner initially FAIL6; diagnosed environment BLOCKED6, not six proved leaks. Request=159cases+4mutations, audit=10+2."
+    }
+  },
+  "v2_dependency_archive_sha256": [
+    {
+      "file": "libclone-perl_0.47-1+b1_amd64.deb",
+      "sha256": "c1ca65f05a5fb68b04b4fb0c9f1bd1210c80041c98b0ea7848d80be8bc7a72a5"
+    },
+    {
+      "file": "liblwp-mediatypes-perl_6.04-2_all.deb",
+      "sha256": "c3ae8bca625ab6e16d6257698de402090135b5eca511df2c8086b0c23eefbaff"
+    },
+    {
+      "file": "libio-html-perl_1.004-3_all.deb",
+      "sha256": "66c87e3e92460b9dcf56257fd6a48cc7fd1283790acb365a111ecb9d74e9ea43"
+    },
+    {
+      "file": "apache2-bin_2.4.68-1~deb13u1_amd64.deb",
+      "sha256": "9018cac8b54a5fedc1bf3643bde7147dad4859677e9e0a8f6c7cfe1daa2ac01b"
+    },
+    {
+      "file": "libaprutil1-dev_1.6.3-3+deb13u1_amd64.deb",
+      "sha256": "43f3a839ef08ef7e62e8a56eda086c134996a3f43eeea2b18edf745d0eafe451"
+    },
+    {
+      "file": "libtry-tiny-perl_0.32-1_all.deb",
+      "sha256": "f160af736fa67df5a5f6ec222d28e6c188b5b87965bd649956a6bea8795c1d3a"
+    },
+    {
+      "file": "libsctp1_1.0.21+dfsg-1_amd64.deb",
+      "sha256": "0a21ab1b6bcb8277ae62b20f41dc29bbbf87e8cd5899c93d29ebfa1f17a0e811"
+    },
+    {
+      "file": "libencode-locale-perl_1.05-3_all.deb",
+      "sha256": "071bff2a1d193ec1b0d71e1a1ba7e718909866874e600f19d99a6f8c5ae30bcd"
+    },
+    {
+      "file": "libapache2-mod-perl2-dev_2.0.13-2_all.deb",
+      "sha256": "0e54bb397a850dd5589492daae36bab2d2ca4169c1dc2c134e3376f69ff0500c"
+    },
+    {
+      "file": "apache2-data_2.4.68-1~deb13u1_all.deb",
+      "sha256": "ad70d0bd76799b7e2fa9b18f82fa01be941b66363eee5d1f43506289d881b458"
+    },
+    {
+      "file": "libhttp-date-perl_6.06-1_all.deb",
+      "sha256": "b46bf28a321e344be21b3161969c613abeddc63b1ff627ee94487a0ee4b53eda"
+    },
+    {
+      "file": "liburi-perl_5.30-1_all.deb",
+      "sha256": "33957bd8218ddd3a86cc19fdf3bf7832b0640337a4be6cf23b2714b73d220220"
+    },
+    {
+      "file": "libldap2_2.6.10+dfsg-1_amd64.deb",
+      "sha256": "60069e4a550ca890113fa89d3001417781b18e146ec5d637d31e368dec9909bd"
+    },
+    {
+      "file": "libapr1-dev_1.7.5-1_amd64.deb",
+      "sha256": "aa6f7c87f63f6dfca412d4585d45d8914b045300a758a8c48ff6152befa6938b"
+    },
+    {
+      "file": "libhttp-cookies-perl_6.11-1_all.deb",
+      "sha256": "f3a57264a6704bd22397c644b1b91ed6055bdb190bd4d5d995cdf92840d049ed"
+    },
+    {
+      "file": "libhttp-negotiate-perl_6.01-2_all.deb",
+      "sha256": "b2770aaf4d638283d9b4f713005702fbab42304be169cb4d6761e8537f724261"
+    },
+    {
+      "file": "libwww-robotrules-perl_6.02-1_all.deb",
+      "sha256": "be69cda8c2a860e64c43396bf2ff1c7145259cb85753ded14e0434f15ed647a0"
+    },
+    {
+      "file": "libapr1t64_1.7.5-1_amd64.deb",
+      "sha256": "8e35d423cf67eaf426eedfff85767edcfb93aa9bcc805f5e4711175b0880367e"
+    },
+    {
+      "file": "libapache2-mod-perl2_2.0.13-2+b2_amd64.deb",
+      "sha256": "155631901e62eab67bd12ff56fa3076127f696c2ed5531937db444ad14cfcc8f"
+    },
+    {
+      "file": "libwww-perl_6.78-1_all.deb",
+      "sha256": "ddcecf6d01b33f14faf6ebd511deb114fcb0c043bb4291e4b45c82cbe7b4ec88"
+    },
+    {
+      "file": "apache2-dev_2.4.68-1~deb13u1_amd64.deb",
+      "sha256": "959fa78c664a3801ee497bb16e4ac7a24c950d8586b657b25f396a2fe2137c8f"
+    },
+    {
+      "file": "libnet-http-perl_6.23-1_all.deb",
+      "sha256": "ef8220824939149b88ff230081e4bd686d1d92f0a233c4f80d1e14115ab1b510"
+    },
+    {
+      "file": "libldap-dev_2.6.10+dfsg-1_amd64.deb",
+      "sha256": "f8543c82b923b0e137a0843e57d6fb96e3b9ca3f2e98fdb6d65e8b6d9c20e592"
+    },
+    {
+      "file": "libhttp-message-perl_7.00-2_all.deb",
+      "sha256": "e55e830b16af9c2b5269000c4dd9b93fd24b304a0675aeb0ab83438c566d2ca7"
+    },
+    {
+      "file": "libfile-listing-perl_6.16-1_all.deb",
+      "sha256": "171410be7be03a39e6ad531b19d3b95049d43dae9f19076fe250b3b7bcc30574"
+    },
+    {
+      "file": "libaprutil1t64_1.6.3-3+deb13u1_amd64.deb",
+      "sha256": "3942c90183043c2bfd461f7ced5a535537cb4428cb7f134c279e95df45403572"
+    },
+    {
+      "file": "libsctp-dev_1.0.21+dfsg-1_amd64.deb",
+      "sha256": "c83b78606a0f59dcae35b934068d16119f96c7fc88b049733b59f9e31423cf67"
+    }
+  ],
+  "root_final_verification_logs": "/workspace/work/json-yajl-baseline/root-verification",
+  "english_export": {
+    "source_commit": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+    "source_url": "https://github.com/Easton97-Jens/ModSecurity/blob/2bfb2180d8c0fa35ae7a3f2665e999600607d896/doc/json-yajl-provenance.json",
+    "original_sha256": "8a9152ec5f3219a0ff89feb928ab03eb5e7f67e14e44ac82c1b6fb59be2f481d",
+    "human_prose_translations": [],
+    "note": "The original manifest human-readable prose is already English. All historical SHAs, references, paths, fixtures and observations are preserved, including literal branch names in other languages."
+  }
+}

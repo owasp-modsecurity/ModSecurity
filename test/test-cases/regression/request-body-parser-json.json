@@ -299,5 +299,247 @@
       "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:'200001',phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
       "SecRule REQBODY_ERROR \"!@eq 0\" \"id:'200002', phase:2,t:none,log,deny,status:403,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "V3-BASELINE-NATIVE-NUMBER: count names post and exact number text",
+    "request": {
+      "headers": {
+        "Host": "baseline.invalid",
+        "Content-Type": "application/json",
+        "Content-Length": "11"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"x\":1E+02}"
+      ]
+    },
+    "expected": {
+      "http_code": 418,
+      "error_log": "V3-BASELINE-NATIVE-NUMBER"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecAction \"id:900001,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule &ARGS \"@eq 1\" \"id:900002,phase:2,t:none,deny,status:418,log,msg:'V3-BASELINE-NATIVE-NUMBER',chain\"",
+      "SecRule ARGS:json.x \"@streq 31452b3032\" \"t:none,t:hexEncode,chain\"",
+      "SecRule ARGS_NAMES \"@streq json.x\" \"t:none,chain\"",
+      "SecRule &ARGS_POST \"@eq 0\" \"t:none,chain\"",
+      "SecRule REQBODY_ERROR \"@eq 0\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "V3-BASELINE-NATIVE-DUPLICATES: both values names and count",
+    "request": {
+      "headers": {
+        "Host": "baseline.invalid",
+        "Content-Type": "application/json",
+        "Content-Length": "17"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"x\":\"a\",\"x\":\"b\"}"
+      ]
+    },
+    "expected": {
+      "http_code": 418,
+      "error_log": "V3-BASELINE-NATIVE-DUPLICATES"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecAction \"id:900001,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule &ARGS \"@eq 2\" \"id:900003,phase:2,t:none,deny,status:418,log,msg:'V3-BASELINE-NATIVE-DUPLICATES',chain\"",
+      "SecRule ARGS:json.x \"@streq a\" \"t:none,chain\"",
+      "SecRule ARGS:json.x \"@streq b\" \"t:none,chain\"",
+      "SecRule &ARGS_NAMES \"@eq 2\" \"t:none,chain\"",
+      "SecRule REQBODY_ERROR \"@eq 0\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "V3-BASELINE-NATIVE-DEPTH: partial argument and error flags",
+    "request": {
+      "headers": {
+        "Host": "baseline.invalid",
+        "Content-Type": "application/json",
+        "Content-Length": "19"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"a\":1,\"x\":{\"y\":2}}"
+      ]
+    },
+    "expected": {
+      "http_code": 418,
+      "error_log": "V3-BASELINE-NATIVE-DEPTH"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecAction \"id:900001,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRequestBodyJsonDepthLimit 1",
+      "SecRule &ARGS \"@eq 1\" \"id:900004,phase:2,t:none,deny,status:418,log,msg:'V3-BASELINE-NATIVE-DEPTH',chain\"",
+      "SecRule ARGS:json.a \"@streq 1\" \"t:none,chain\"",
+      "SecRule REQBODY_ERROR \"@eq 1\" \"t:none,chain\"",
+      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 1\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "V3-PR-NATIVE-NUMBER-TEXT",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "baseline.invalid",
+        "Content-Type": "application/json",
+        "Content-Length": "48"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"12\":\"34\",\"n\":1E+02,\"s\":\"1e+02\",\"items\":[-0.0]}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 418,
+      "error_log": "V3-PR-NATIVE-NUMBER-TEXT"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecAction \"id:900001,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule &ARGS \"@eq 4\" \"id:900005,phase:2,t:none,deny,status:418,log,msg:'V3-PR-NATIVE-NUMBER-TEXT',chain\"",
+      "SecRule ARGS:json.12 \"@streq 34\" \"t:none,chain\"",
+      "SecRule ARGS:json.n \"@streq 31452b3032\" \"t:none,t:hexEncode,chain\"",
+      "SecRule ARGS:json.s \"@streq 1e+02\" \"t:none,chain\"",
+      "SecRule ARGS:json.items.array_0 \"@streq -0.0\" \"t:none,chain\"",
+      "SecRule &ARGS_NAMES \"@eq 4\" \"t:none,chain\"",
+      "SecRule &ARGS_POST \"@eq 0\" \"t:none,chain\"",
+      "SecRule REQBODY_ERROR \"@eq 0\" \"t:none,chain\"",
+      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 0\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "V3-PR-NATIVE-DOTTED-PARENT",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "baseline.invalid",
+        "Content-Type": "application/json",
+        "Content-Length": "32"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"parent.key\":{\"v\":1},\"after\":2}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 418,
+      "error_log": "V3-PR-NATIVE-DOTTED-PARENT"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecAction \"id:900001,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule &ARGS \"@eq 2\" \"id:900006,phase:2,t:none,deny,status:418,log,msg:'V3-PR-NATIVE-DOTTED-PARENT',chain\"",
+      "SecRule ARGS:json.parent.key.v \"@streq 1\" \"t:none,chain\"",
+      "SecRule ARGS:json.after \"@streq 2\" \"t:none,chain\"",
+      "SecRule &ARGS:json.parent.after \"@eq 0\" \"t:none,chain\"",
+      "SecRule &ARGS_NAMES \"@eq 2\" \"t:none,chain\"",
+      "SecRule &ARGS_POST \"@eq 0\" \"t:none,chain\"",
+      "SecRule REQBODY_ERROR \"@eq 0\" \"t:none,chain\"",
+      "SecRule REQBODY_PROCESSOR_ERROR \"@eq 0\" \"t:none\""
+    ]
   }
 ]

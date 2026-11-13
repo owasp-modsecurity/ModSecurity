@@ -1,0 +1,129 @@
+{
+  "base": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+  "original": [
+    {
+      "suite": "request-body-parser-json.json",
+      "stage": "original-before-additions",
+      "PASS": 6,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    },
+    {
+      "suite": "issue-1576.json",
+      "stage": "original-before-additions",
+      "PASS": 3,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    },
+    {
+      "suite": "secargumentslimit.json",
+      "stage": "original-before-additions",
+      "PASS": 2,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    },
+    {
+      "suite": "auditlog.json",
+      "stage": "original-before-additions",
+      "PASS": 15,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    },
+    {
+      "suite": "config-body_limits.json",
+      "stage": "original-before-additions",
+      "PASS": 16,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    },
+    {
+      "suite": "transformations.json",
+      "stage": "original-before-additions",
+      "PASS": 8,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "disabled": 0
+    }
+  ],
+  "extended_native": {
+    "request-body-parser-json.json": {
+      "PASS": 9,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0
+    }
+  },
+  "request": "v3-request-results.json",
+  "audit": "v3-audit-results.json",
+  "sanitizer": {
+    "instrumented": [
+      "test/json-baseline/probe.cc",
+      "original src/request_body_processor/json.cc"
+    ],
+    "not_instrumented": [
+      "remaining libmodsecurity",
+      "YAJL",
+      "system libraries"
+    ],
+    "asan_ubsan": {
+      "PASS": 7,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "leak_detection": false
+    },
+    "lsan_attempt": {
+      "reason": "LeakSanitizer fatal environment error: does not work under ptrace",
+      "interpretation": "Leak check blocked by sandbox, not six demonstrated application leaks",
+      "raw_runner_counts": {
+        "PASS": 0,
+        "FAIL": 6,
+        "BLOCKED": 0
+      },
+      "diagnosed_counts": {
+        "PASS": 0,
+        "FAIL": 0,
+        "BLOCKED": 6
+      }
+    }
+  },
+  "request_counts": {
+    "PASS": 163,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "request_groups": {
+    "A": 6,
+    "B": 9,
+    "C": 14,
+    "D": 9,
+    "E": 16,
+    "F": 16,
+    "G": 20,
+    "H": 27,
+    "I": 5,
+    "J": 8,
+    "K": 22,
+    "L": 7
+  },
+  "audit_counts": {
+    "PASS": 12,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  }
+}
