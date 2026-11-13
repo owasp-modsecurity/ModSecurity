@@ -353,41 +353,41 @@ RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>
 int Regex::search(const std::string& s, SMatch *match) const {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
-    int ret = 0;
+    pcre2_match_data *match_data = pcre2_match_data_create(1, nullptr);
+    int rc = 0;
     if (m_pcje == 0) {
-        ret = pcre2_match(m_pc, pcre2_s, s.length(),
-            0, 0, match_data, nullptr) > 0;
+        rc = pcre2_match(m_pc, pcre2_s, s.length(),
+            0, 0, match_data, nullptr);
     } 
     
-    if (m_pcje != 0 || ret == PCRE2_ERROR_JIT_STACKLIMIT) {
-        ret = pcre2_match(m_pc, pcre2_s, s.length(),
-            0, PCRE2_NO_JIT, match_data, nullptr) > 0;
+    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        rc = pcre2_match(m_pc, pcre2_s, s.length(),
+            0, PCRE2_NO_JIT, match_data, nullptr);
     }
-    if (ret > 0) { // match
+    if (rc >= 0) { // match
         PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 #else
     int ovector[OVECCOUNT];
-    int ret = pcre_exec(m_pc, m_pce, s.c_str(),
-        s.size(), 0, 0, ovector, OVECCOUNT) > 0;
+    int rc = pcre_exec(m_pc, m_pce, s.c_str(),
+        s.size(), 0, 0, ovector, OVECCOUNT);
 
-    if (ret > 0) {
+    if (rc >= 0) {
 #endif
         *match = SMatch(
-            std::string(s, ovector[ret-1], ovector[ret] - ovector[ret-1]),
+            std::string(s, ovector[0], ovector[1] - ovector[0]),
             0);
     }
 
 #ifndef WITH_PCRE
     pcre2_match_data_free(match_data);
 #endif
-    return ret;
+    return rc >= 0;
 }
 
 int Regex::search(const std::string& s) const {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+    pcre2_match_data *match_data = pcre2_match_data_create(1, nullptr);
     int rc = 0;
     if (m_pcje == 0) {
         rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, nullptr);
@@ -397,11 +397,7 @@ int Regex::search(const std::string& s) const {
         rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, nullptr);
     }
     pcre2_match_data_free(match_data);
-    if (rc > 0) {
-        return 1; // match
-    } else {
-        return 0; // no match
-    }
+    return rc >= 0;
 #else
     int ovector[OVECCOUNT];
     return pcre_exec(m_pc, m_pce, s.c_str(),
