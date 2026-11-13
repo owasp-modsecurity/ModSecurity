@@ -50,27 +50,6 @@ extern "C" {
  */
 
 /**
- * Returns length of given string for parser's encoding
- */
-static size_t acmp_strlen(ACMP *parser, const char *str) {
-    return strlen(str);
-}
-
-/**
- * Turns string to array of ucs values, depending on parser's encoding
- *       str - string to convert, doesn't have to be NULL-terminated
- * ucs_chars - where to write ucs values
- *       len - length of input string
- */
-static void acmp_strtoucs(ACMP *parser, const char *str, long *ucs_chars, int len) {
-    const char *c = str;
-
-    for (int i = 0;i < len;i++) {
-        *(ucs_chars++) = *(c++);
-    }
-}
-
-/**
  * Returns node with given letter, or null if not found
  */
 static acmp_node_t *acmp_child_for_code(acmp_node_t *parent_node, long ucs_code) {
@@ -363,20 +342,16 @@ int acmp_prepare(ACMP *parser) {
 int acmp_add_pattern(ACMP *parser, const char *pattern,
         acmp_callback_t callback, void *data, size_t len)
 {
-    size_t length, i, j;
-    long *ucs_chars;
+    size_t i, j;
     acmp_node_t *parent, *child;
 
-if (parser->is_active != 0) return -1;
-    length = (len == 0) ? acmp_strlen(parser, pattern) : len;
-    ucs_chars = (long *)calloc(1, length * sizeof(long));
-    /* ENH: Check alloc succeded */
+    if (parser->is_active != 0) return -1;
 
     parent = parser->root_node;
-    acmp_strtoucs(parser, pattern, ucs_chars, length);
 
-    for (i = 0; i < length; i++) {
-        long letter = ucs_chars[i];
+    len = (len == 0) ? strlen(pattern) : len;
+    for (i = 0; i < len; i++) {
+        long letter = (unsigned char)pattern[i];
         if (parser->is_case_sensitive == 0) {
             letter = tolower(letter);
         }
@@ -393,14 +368,14 @@ if (parser->is_active != 0) return -1;
                 child->text[j] = pattern[j];
             }
         }
-        if (i == length - 1) {
+        if (i == len - 1) {
             if (child->is_last == 0) {
                 parser->dict_count++;
                 child->is_last = 1;
-                child->pattern = (char *)calloc(1, length + 1);
+                child->pattern = (char *)calloc(1, len + 1);
                 /* ENH: Check alloc succeded */
-                memcpy(child->pattern, pattern, length);
-                child->pattern[length] = '\0';
+                memcpy(child->pattern, pattern, len);
+                child->pattern[len] = '\0';
             }
             child->callback = callback;
             child->callback_data = data;
@@ -408,9 +383,8 @@ if (parser->is_active != 0) return -1;
         acmp_add_node_to_parent(parent, child);
         parent = child;
     }
-    if (length > parser->longest_entry) parser->longest_entry = length;
+    if (len > parser->longest_entry) parser->longest_entry = len;
     parser->is_failtree_done = 0;
-    free(ucs_chars);
     return 1;
 }
 
