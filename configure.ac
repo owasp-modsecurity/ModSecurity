@@ -294,6 +294,11 @@ fi
 
 if test $buildParser = true; then
     AC_PROG_YACC
+    AS_IF([test "x$YACC" = "xbison -y"], [
+        YACC="bison"
+    ])
+    AC_SUBST([YACC])
+
     AC_PROG_LEX(noyywrap)
     AC_PATH_PROG([FLEX], [flex])
     test "x$FLEX" = "x" && AC_MSG_ERROR([flex is needed to build ModSecurity])

@@ -62,7 +62,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
     node = yajl_tree_parse((const char *) str.c_str(), errbuf, sizeof(errbuf));
     if (node == NULL) {
         std::cout << "Problems parsing file: " << file << std::endl;
-        if (strlen(errbuf) > 0) {
+        if (errbuf[0] != '\0') {
             std::cout << errbuf << std::endl;
         }
         return false;

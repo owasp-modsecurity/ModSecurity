@@ -1,0 +1,265 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: ARGS_RAW double-encoded value",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?q=%253Cscript%253E",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"%253Cscript%253E\"",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_RAW:q \"@streq %253Cscript%253E\" \"id:1001,phase:2,pass,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: ARGS cooked value remains single-decoded",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?q=%253Cscript%253E",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"%3Cscript%3E\"",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:q \"@streq %3Cscript%3E\" \"id:1002,phase:2,pass,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: ARGS_RAW keeps %2500 literal",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?p=%2500",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Target value: \"%2500\"",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_RAW:p \"@streq %2500\" \"id:1003,phase:2,pass,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: RAW GET/POST separation and union",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "6",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "uri": "/?g=G%2521",
+      "method": "POST",
+      "body": [
+        "p=P%2521"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[id \"1004\"\\].*\\[id \"1005\"\\].*\\[id \"1006\"\\]",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET_RAW:g \"@streq G%2521\" \"id:1004,phase:2,pass,t:none\"",
+      "SecRule ARGS_POST_RAW:p \"@streq P%2521\" \"id:1005,phase:2,pass,t:none\"",
+      "SecRule ARGS_RAW:p \"@streq P%2521\" \"id:1006,phase:2,pass,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: ARGS_NAMES_RAW encoded name",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?na%6De=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[id \"1007\"\\].*\\[id \"1008\"\\]",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_NAMES_RAW \"@contains na%6De\" \"id:1007,phase:2,pass,t:none\"",
+      "SecRule ARGS_NAMES \"@contains name\" \"id:1008,phase:2,pass,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Variables :: RAW duplicate keys and empty values",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=1&a=2&a=&b",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[id \"1009\"\\].*\\[id \"1010\"\\]",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_RAW:a \"@eq 0\" \"id:1009,phase:2,pass,t:none,t:length\"",
+      "SecRule ARGS_RAW:b \"@eq 0\" \"id:1010,phase:2,pass,t:none,t:length\""
+    ]
+  }
+]
