@@ -153,7 +153,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Saving msg: the second message",
+      "debug_log": "^(?!.*Saving msg: the first message).*Saving msg: the second message",
       "http_code": 200
     },
     "rules": [
@@ -195,7 +195,7 @@
       ]
     },
     "expected": {
-      "error_log": "\\[data \"the second data\"\\] \\[severity \"2\"\\]",
+      "error_log": "^(?!.*the first data)(?!.*\\[severity \"5\"\\]).*\\[data \"the second data\"\\] \\[severity \"2\"\\]",
       "http_code": 200
     },
     "rules": [
