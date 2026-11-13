@@ -110,10 +110,18 @@ void Operator::reportRegexSearchError(Transaction *transaction,
 
 bool Operator::evaluateInternal(Transaction *transaction,
     RuleWithActions *rule, const std::string& a, RuleMessage &ruleMessage) {
+    const size_t referenceSize = ruleMessage.m_reference.size();
     bool res = evaluate(transaction, rule, a, ruleMessage);
 
     if (m_negation) {
-        return !res;
+        res = !res;
+    }
+
+    /* Offsets logged by an evaluation that is not a match (a negated
+     * operator that found something) must not end up in the reference of
+     * the next value that does match. */
+    if (!res) {
+        ruleMessage.m_reference.resize(referenceSize);
     }
 
     return res;
