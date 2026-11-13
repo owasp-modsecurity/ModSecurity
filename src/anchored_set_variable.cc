@@ -17,6 +17,7 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -67,11 +68,31 @@ void AnchoredSetVariable::set(const std::string &key,
 }
 
 
+
+namespace {
+// Puts `found` in front of `l`, the last first (as inserting each at the
+// front did), without a step that can throw once the room is there: the
+// copies stay owned by `found` until then (no leak on bad_alloc).
+void moveToFront(std::vector<const VariableValue *> *l,
+    std::vector<std::unique_ptr<VariableValue>> *found) {
+    l->reserve(l->size() + found->size());
+    l->insert(l->begin(), found->size(), nullptr);
+    for (size_t i = 0; i < found->size(); i++) {
+        (*l)[i] = (*found)[found->size() - 1 - i].release();
+    }
+}
+}  // namespace
+
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l) const {
+    // Each value went to the front of `l` (O(n^2) over n arguments);
+    // collected first, then put in front at once in the same order.
+    std::vector<std::unique_ptr<VariableValue>> found;
+    found.reserve(size());
     for (const auto& x : *this) {
-        l->insert(l->begin(), new VariableValue(x.second));
+        found.push_back(std::make_unique<VariableValue>(x.second));
     }
+    moveToFront(l, &found);
 }
 
 
@@ -84,14 +105,17 @@ void AnchoredSetVariable::resolve(
 void AnchoredSetVariable::resolve(
     std::vector<const VariableValue *> *l,
     const variables::KeyExclusions &ke) const {
+    std::vector<std::unique_ptr<VariableValue>> found;
+    found.reserve(size());
     for (const auto& x : *this) {
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            found.push_back(std::make_unique<VariableValue>(x.second));
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    moveToFront(l, &found);
 }
 
 
@@ -124,13 +148,15 @@ std::unique_ptr<std::string> AnchoredSetVariable::resolveFirst(
 // cppcheck-suppress constParameterPointer  -  keep the old signatures for ABI compatibility
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l) const {
+    std::vector<std::unique_ptr<VariableValue>> found;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
-        l->insert(l->begin(), new VariableValue(x.second));
+        found.push_back(std::make_unique<VariableValue>(x.second));
     }
+    moveToFront(l, &found);
 }
 
 
@@ -143,18 +169,20 @@ void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
 void AnchoredSetVariable::resolveRegularExpression(Utils::Regex *r,
     std::vector<const VariableValue *> *l,
     const variables::KeyExclusions &ke) const {
+    std::vector<std::unique_ptr<VariableValue>> found;
     for (const auto& x : *this) {
         int ret = Utils::regex_search(x.first, *r);
         if (ret <= 0) {
             continue;
         }
         if (!ke.toOmit(x.first)) {
-            l->insert(l->begin(), new VariableValue(x.second));
+            found.push_back(std::make_unique<VariableValue>(x.second));
         } else {
             ms_dbg_a(m_transaction, 7, "Excluding key: " + x.first
                 + " from target value.");
         }
     }
+    moveToFront(l, &found);
 }
 
 
