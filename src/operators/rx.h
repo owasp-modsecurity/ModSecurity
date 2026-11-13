@@ -37,8 +37,7 @@ class Rx : public Operator {
  public:
     /** @ingroup ModSecurity_Operator */
     explicit Rx(std::unique_ptr<RunTimeString> param)
-        : m_re(nullptr),
-        Operator("Rx", std::move(param)) {
+        : Operator("Rx", std::move(param)) {
             m_couldContainsMacro = true;
         }
 
@@ -59,7 +58,7 @@ class Rx : public Operator {
     bool init(const std::string &arg, std::string *error) override;
 
  private:
-    Regex *m_re;
+    Regex *m_re = nullptr;
 };
 
 
