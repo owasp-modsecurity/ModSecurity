@@ -208,12 +208,13 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     /*
      * A rule that is not part of a chain logs every target it matches, and a
      * chain starter with multiMatch logs every match once the chain has
-     * matched. The messages of all but the last match are kept here until
-     * the rule's actions have run.
+     * matched. These matches are kept here until the rule's actions have
+     * run. For a rule that is not chained, the last match is not kept: it
+     * goes on as the rule's own message.
      */
     const bool logsEachMatch = m_chainedRuleParent == nullptr
         && (!isChained() || hasMultimatch());
-    std::list<RuleMessage> earlierMatches;
+    std::list<RuleMessage> keptMatches;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -328,7 +329,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                         if (hasMsg()) {
                             ruleMessage.m_message = msg(trans);
                         }
-                        earlierMatches.push_back(ruleMessage);
+                        keptMatches.push_back(ruleMessage);
                         ruleMessage.reset(false);
                     }
 
@@ -348,14 +349,14 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     }
     ms_dbg_a(trans, 4, "Rule returned 1.");
 
-    if (logsEachMatch) {
+    if (logsEachMatch && !isChained()) {
         /* The last match goes on as the rule's own message. */
-        const RuleMessage &last = earlierMatches.back();
+        const RuleMessage &last = keptMatches.back();
         ruleMessage.m_match = last.m_match;
         ruleMessage.m_reference = last.m_reference;
         ruleMessage.m_data = last.m_data;
         ruleMessage.m_message = last.m_message;
-        earlierMatches.pop_back();
+        keptMatches.pop_back();
     }
 
     if (this->isChained() == false) {
@@ -383,15 +384,18 @@ end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
     /*
-     * The earlier matches take what the rule's actions decided about logging
-     * from the rule's message. The disruptive action ran once, for the last
-     * match, so the earlier ones are logged as warnings.
+     * The kept matches take everything the rule's actions set from the
+     * rule's message, and only describe their own match. The disruptive
+     * action ran once, for the rule's message, so they are logged as
+     * warnings.
      */
-    for (auto &m : earlierMatches) {
-        m.m_saveMessage = ruleMessage.m_saveMessage;
-        m.m_noAuditLog = ruleMessage.m_noAuditLog;
-        m.m_severity = ruleMessage.m_severity;
-        m.m_tags = ruleMessage.m_tags;
+    for (auto &e : keptMatches) {
+        RuleMessage m(ruleMessage);
+        m.m_match = std::move(e.m_match);
+        m.m_reference = std::move(e.m_reference);
+        m.m_data = std::move(e.m_data);
+        m.m_message = std::move(e.m_message);
+        m.m_isDisruptive = false;
         performLogging(trans, m, true, true);
     }
 

@@ -54,7 +54,7 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
-    "title": "Testing Issue #2672 - chain with multiMatch logs every match of the starter once the chain completes, the last one as the denial",
+    "title": "Testing Issue #2672 - chain with multiMatch logs every match of the starter, then the chain with the denial",
     "client": {
       "ip": "200.249.12.31",
       "port": 2313
@@ -69,7 +69,7 @@
         "User-Agent": "Mozilla/5.0",
         "Content-Length": "0"
       },
-      "uri": "/?a=Y0&b=Y0y1",
+      "uri": "/?a=Y0&b=y0&c=y1",
       "method": "GET",
       "http_version": 1.1,
       "body": [
@@ -86,7 +86,7 @@
     },
     "expected": {
       "debug_log": "Saving this request as part of the audit logs",
-      "audit_log": "Warning\\.[^\\n]*\\[msg \"chain starter\"\\] \\[data \"starter ARGS:a\"\\][\\s\\S]*Access denied with code 403[^\\n]*\\[msg \"chain starter\"\\]",
+      "audit_log": "Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\][\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\][\\s\\S]*Access denied with code 403[^\\n]*\\[data \"starter ARGS:c\"\\]",
       "http_code": 403
     },
     "rules": [
