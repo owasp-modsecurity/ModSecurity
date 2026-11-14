@@ -25,6 +25,7 @@
 #include <sstream>
 #include <iterator>
 #include <iostream>
+#include <stdexcept>
 
 #include "modsecurity/variable_value.h"
 #include "modsecurity/modsecurity.h"
@@ -266,7 +267,15 @@ int Lua::getvar(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    std::string var = variables::Variable::stringMatchResolve(t, varname);
+    std::string var;
+    try {
+        var = variables::Variable::stringMatchResolve(t, varname);
+    } catch (const std::invalid_argument &) {
+        ms_dbg_a(t, 2, "Lua: m.getvar(): unknown variable: "
+            + utils::string::toHexIfNeeded(varname) + ".");
+        lua_pushnil(L);
+        return 1;
+    }
     applyTransformations(L, t, 2, var);
 
     if (var.size() == 0) {
@@ -294,7 +303,14 @@ int Lua::getvars(lua_State *L) {
     z = const_cast<void *>(lua_topointer(L, -1));
     t = reinterpret_cast<Transaction *>(z);
 
-    variables::Variable::stringMatchResolveMulti(t, varname, &l);
+    try {
+        variables::Variable::stringMatchResolveMulti(t, varname, &l);
+    } catch (const std::invalid_argument &) {
+        ms_dbg_a(t, 2, "Lua: m.getvars(): unknown variable: "
+            + utils::string::toHexIfNeeded(varname) + ".");
+        lua_newtable(L);
+        return 1;
+    }
 
     lua_newtable(L);
     for (auto i : l) {
