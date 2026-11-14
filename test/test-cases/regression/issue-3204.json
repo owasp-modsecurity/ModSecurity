@@ -229,5 +229,93 @@
       "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,log,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',chain\"",
       "SecRule REQUEST_METHOD \"@streq GET\" \"t:none\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - every target gets the logdata of SecDefaultAction",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\[data \"default ARGS:a\"\\][\\s\\S]*\\[data \"default ARGS:b\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:1,log,pass,logdata:'default %{MATCHED_VAR_NAME}'\"",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,msg:'every target'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - every target gets the logdata of SecRuleUpdateActionById",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\[data \"updated ARGS:a\"\\][\\s\\S]*\\[data \"updated ARGS:b\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,log,msg:'every target'\"",
+      "SecRuleUpdateActionById 3204 \"logdata:'updated %{MATCHED_VAR_NAME}'\""
+    ]
   }
 ]

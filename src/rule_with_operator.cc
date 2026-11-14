@@ -47,6 +47,42 @@ namespace modsecurity {
 
 using operators::Operator;
 using actions::Action;
+
+namespace {
+
+/*
+ * Expands msg and logdata for one match of a rule, from the same sources
+ * and in the same order as RuleWithActions::executeActionsAfterFullMatch():
+ * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
+ */
+void expandMatchMetadata(RuleWithOperator *rule, Transaction *trans,
+    RuleMessage &ruleMessage) {
+    auto expand = [&](Action *a) {
+        if (*a->m_name == "msg" || *a->m_name == "logdata") {
+            a->evaluate(rule, trans, ruleMessage);
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[rule->getPhase()]) {
+        if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
+            expand(a.get());
+        }
+    }
+    for (const auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (b.first == rule->m_ruleId) {
+            expand(b.second.get());
+        }
+    }
+    if (rule->hasLogData()) {
+        ruleMessage.m_data = rule->logData(trans);
+    }
+    if (rule->hasMsg()) {
+        ruleMessage.m_message = rule->msg(trans);
+    }
+}
+
+}  // namespace
 using variables::Variable;
 using actions::transformations::None;
 
@@ -323,12 +359,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                          * Expand msg and logdata now, while MATCHED_VAR and
                          * the captures still belong to this match.
                          */
-                        if (hasLogData()) {
-                            ruleMessage.m_data = logData(trans);
-                        }
-                        if (hasMsg()) {
-                            ruleMessage.m_message = msg(trans);
-                        }
+                        expandMatchMetadata(this, trans, ruleMessage);
                         keptMatches.push_back(ruleMessage);
                         ruleMessage.reset(false);
                     }
