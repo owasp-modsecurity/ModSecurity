@@ -47,6 +47,42 @@ namespace modsecurity {
 
 using operators::Operator;
 using actions::Action;
+
+namespace {
+
+/*
+ * Expands msg and logdata for one match of a rule, from the same sources
+ * and in the same order as RuleWithActions::executeActionsAfterFullMatch():
+ * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
+ */
+void expandMatchMetadata(RuleWithOperator *rule, Transaction *trans,
+    RuleMessage &ruleMessage) {
+    auto expand = [&](Action *a) {
+        if (*a->m_name == "msg" || *a->m_name == "logdata") {
+            a->evaluate(rule, trans, ruleMessage);
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[rule->getPhase()]) {
+        if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
+            expand(a.get());
+        }
+    }
+    for (const auto &b :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (b.first == rule->m_ruleId) {
+            expand(b.second.get());
+        }
+    }
+    if (rule->hasLogData()) {
+        ruleMessage.m_data = rule->logData(trans);
+    }
+    if (rule->hasMsg()) {
+        ruleMessage.m_message = rule->msg(trans);
+    }
+}
+
+}  // namespace
 using variables::Variable;
 using actions::transformations::None;
 
@@ -205,6 +241,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     variables::Variables vars;
     vars.reserve(4);
     variables::Variables exclusion;
+    /*
+     * A rule that is not part of a chain logs every target it matches, and a
+     * chain starter with multiMatch logs every match once the chain has
+     * matched. These matches are kept here until the rule's actions have
+     * run. For a rule that is not chained, the last match is not kept: it
+     * goes on as the rule's own message.
+     */
+    const bool logsEachMatch = m_chainedRuleParent == nullptr
+        && (!isChained() || hasMultimatch());
+    std::list<RuleMessage> keptMatches;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -308,7 +354,15 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    performLogging(trans, ruleMessage, false);
+                    if (logsEachMatch) {
+                        /*
+                         * Expand msg and logdata now, while MATCHED_VAR and
+                         * the captures still belong to this match.
+                         */
+                        expandMatchMetadata(this, trans, ruleMessage);
+                        keptMatches.push_back(ruleMessage);
+                        ruleMessage.reset(false);
+                    }
 
                     globalRet = true;
                 }
@@ -325,6 +379,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         goto end_clean;
     }
     ms_dbg_a(trans, 4, "Rule returned 1.");
+
+    if (logsEachMatch && !isChained()) {
+        /* The last match goes on as the rule's own message. */
+        const RuleMessage &last = keptMatches.back();
+        ruleMessage.m_match = last.m_match;
+        ruleMessage.m_reference = last.m_reference;
+        ruleMessage.m_data = last.m_data;
+        ruleMessage.m_message = last.m_message;
+        keptMatches.pop_back();
+    }
 
     if (this->isChained() == false) {
         goto end_exec;
@@ -349,6 +413,22 @@ end_clean:
 
 end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
+
+    /*
+     * The kept matches take everything the rule's actions set from the
+     * rule's message, and only describe their own match. The disruptive
+     * action ran once, for the rule's message, so they are logged as
+     * warnings.
+     */
+    for (auto &e : keptMatches) {
+        RuleMessage m(ruleMessage);
+        m.m_match = std::move(e.m_match);
+        m.m_reference = std::move(e.m_reference);
+        m.m_data = std::move(e.m_data);
+        m.m_message = std::move(e.m_message);
+        m.m_isDisruptive = false;
+        performLogging(trans, m, true, true);
+    }
 
     /* last rule in the chain. */
     performLogging(trans, ruleMessage, true, true);
