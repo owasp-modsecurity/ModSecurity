@@ -298,10 +298,12 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     ruleMessage.m_match = m_operator->resolveMatchMessage(trans,
                         key, value);
                     for (const auto &i : v->getOrigin()) {
-                        ruleMessage.m_reference.append(i.toText());
+                        operators::Operator::appendReference(ruleMessage,
+                            i.toText());
                     }
 
-                    ruleMessage.m_reference.append(*valueTemp.second);
+                    operators::Operator::appendReference(ruleMessage,
+                        *valueTemp.second);
                     updateMatchedVars(trans, key, valueAfterTrans);
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
