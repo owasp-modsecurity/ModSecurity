@@ -22,9 +22,6 @@ shiftNegative:src/utils/msc_tree.cc
 // 
 // ModSecurity v3 code...
 // 
-variableScope:src/operators/rx.cc
-variableScope:src/operators/rx_global.cc
-
 noExplicitConstructor:seclang-parser.hh
 constParameter:seclang-parser.hh
 accessMoved:seclang-parser.hh
@@ -33,9 +30,6 @@ duplInheritedMember:seclang-parser.hh
 constVariableReference:seclang-parser.hh
 uninitMemberVar:seclang-parser.hh
 
-
-unreadVariable:src/operators/rx.cc
-unreadVariable:src/operators/rx_global.cc
 
 noExplicitConstructor:src/collection/backend/collection_data.h
 stlIfStrFind:src/collection/backend/collection_data.cc

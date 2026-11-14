@@ -1,0 +1,324 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (1/7) :: exec, m.getvar(\"RULE.id\")",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: RULE.id.*RULE.id is not available from Lua."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:100,phase:2,pass,exec:test-cases/data/lua-getvar-rule-id.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (2/7) :: SecRuleScript, m.getvar(\"RULE.id\")",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: RULE.id.*RULE.id is not available from Lua."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-getvar-rule-id.lua \"id:101,phase:2,pass\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (3/7) :: exec, m.getvar(\"UNKNOWN_VARIABLE\")",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: UNKNOWN_VARIABLE.*UNKNOWN_VARIABLE is not available from Lua."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:102,phase:2,pass,exec:test-cases/data/lua-getvar-unknown.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (4/7) :: exec, m.getvars(\"RULE\")",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: RULE\\..*RULE from Lua: 0 value\\(s\\)."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:103,phase:2,pass,exec:test-cases/data/lua-getvars-rule.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (5/7) :: exec, m.getvars(\"RULE.id\")",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: RULE.id.*RULE.id from Lua: 0 value\\(s\\)."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:104,phase:2,pass,exec:test-cases/data/lua-getvars-rule-id.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (6/7) :: exec, RULE.id copied to TX with setvar",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Called from rule 105."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:105,phase:2,pass,setvar:tx.rule_id=%{RULE.id},exec:test-cases/data/lua-getvar-tx-rule-id.lua\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Lua :: unknown variable in m.getvar()/m.getvars() (7/7) :: exec, name with a newline from the request",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?param1=value1&name=FOO%0ABAR",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "unknown variable: FOO\\\\x0aBAR\\..*The variable named in the request is not available from Lua\\."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:param1 \"@streq value1\" \"id:106,phase:2,pass,exec:test-cases/data/lua-getvar-name-from-request.lua\""
+    ]
+  }
+]

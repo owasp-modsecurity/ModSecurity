@@ -48,7 +48,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\"\"id:1,phase:2,deny,t:none,chain\"",
+      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\" \"id:1,phase:2,deny,t:none,chain\"",
       "SecRule MULTIPART_FILENAME_CHARSET \"!@within utf-8,iso-8859-1,us-ascii\" \"t:lowercase\""
     ]
   },
@@ -101,7 +101,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\"\"id:1,phase:2,deny,t:none,chain\"",
+      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\" \"id:1,phase:2,deny,t:none,chain\"",
       "SecRule MULTIPART_FILENAME_CHARSET \"!@rx ^(?:utf-8|iso-8859-1|us-ascii)$\" \"t:lowercase\""
     ]
   },
@@ -154,7 +154,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\"\"id:1,phase:2,deny,t:none,chain\"",
+      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\" \"id:1,phase:2,deny,t:none,chain\"",
       "SecRule MULTIPART_FILENAME_CHARSET \"!@rx ^(?:utf-8|iso-8859-1|us-ascii)$\" \"t:lowercase\""
     ]
   },
@@ -634,7 +634,7 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule &MULTIPART_FILENAME_CHARSET \"&gt 0\" \"id:1,phase:2,deny,t:none,chain\"",
+      "SecRule &MULTIPART_FILENAME_CHARSET \"@gt 0\" \"id:1,phase:2,deny,t:none,chain\"",
       "SecRule MULTIPART_FILENAME_CHARSET \"!@rx ^(?:utf-8|iso-8859-1|us-ascii)$\" \"t:none,t:lowercase\""
     ]
   }

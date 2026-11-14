@@ -432,8 +432,12 @@ class Transaction : public TransactionAnchoredVariables, public TransactionSecMa
      * @note There is space for performance improvement. This value don't
 	 *       need to be filled if there is no rule using the variable
 	 *       `duration'.
+     *
+     * @note Must be a floating point type: utils::cpu_seconds() returns a
+     *       double and storing it in an integer type (as the former clock_t
+     *       did) truncated the fractional seconds, making `duration' wrong.
      */
-    const clock_t m_creationTimeStamp;
+    const double m_creationTimeStamp;
 
     /**
      * Holds the client IP address.

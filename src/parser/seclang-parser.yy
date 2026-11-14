@@ -1715,7 +1715,8 @@ expression:
         for (std::set<std::string>::iterator it=tokens.begin();
             it!=tokens.end(); ++it)
         {
-            driver.m_responseBodyTypeToBeInspected.m_value.insert(*it);
+            driver.m_responseBodyTypeToBeInspected.m_value.insert(
+                utils::string::tolower(*it));
         }
       }
     | CONGIG_DIR_RESPONSE_BODY_MP_CLEAR
