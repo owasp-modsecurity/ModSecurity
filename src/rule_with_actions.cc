@@ -224,22 +224,6 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
             a->evaluate(this, trans, ruleMessage);
         }
     }
-
-    if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr) {
-        if (m_severity) {
-            m_severity->evaluate(this, trans, ruleMessage);
-        }
-        if (m_logData) {
-            m_logData->evaluate(this, trans, ruleMessage);
-        }
-        if (m_msg) {
-            m_msg->evaluate(this, trans, ruleMessage);
-        }
-        for (actions::Tag *a : m_actionsTag) {
-            a->evaluate(this, trans, ruleMessage);
-        }
-    }
-
 }
 
 
@@ -493,7 +477,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
 }
 
 void RuleWithActions::performLogging(Transaction *trans,
-    RuleMessage &ruleMessage,
+    RuleMessage &ruleMessage,  // cppcheck-suppress constParameterReference
     bool lastLog,
     bool chainedParentNull) const {
 
@@ -514,7 +498,7 @@ void RuleWithActions::performLogging(Transaction *trans,
     if (lastLog) {
         if (chainedParentNull) {
             isItToBeLogged = (ruleMessage.m_saveMessage && (m_chainedRuleParent == nullptr));
-            if (isItToBeLogged && !hasMultimatch()) {
+            if (isItToBeLogged) {
                 /* warn */
                 trans->m_rulesMessages.push_back(ruleMessage);
 
@@ -541,18 +525,6 @@ void RuleWithActions::performLogging(Transaction *trans,
                     trans->serverLog(ruleMessage);
                 }
             }
-        }
-    } else {
-        if (hasMultimatch() && isItToBeLogged) {
-            /* warn */
-            trans->m_rulesMessages.push_back(ruleMessage);
-
-            /* error */
-            if (!ruleMessage.m_isDisruptive) {
-                trans->serverLog(ruleMessage);
-            }
-
-            ruleMessage.reset(false);
         }
     }
 }

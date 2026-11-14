@@ -1,0 +1,233 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - every target a rule matches is logged in the error log",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\][\\s\\S]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,log,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',setvar:tx.score=+3\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - every target a rule matches has its own message in the audit log",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "audit_log": "\"reference\":\"o0,6v8,9\",[^}]*\"data\":\"seen ARGS:a=attackone\"[\\s\\S]*\"reference\":\"o0,6v20,9\",[^}]*\"data\":\"seen ARGS:b=attacktwo\""
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,log,auditlog,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',setvar:tx.score=+3\"",
+      "SecAuditEngine On",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLogFormat JSON",
+      "SecAuditLog /tmp/test/modsec_audit_issue_3204_2.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - the earlier targets of a denying rule are logged as warnings",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403,
+      "error_log": "ModSecurity: Warning\\.[^\\n]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\]",
+      "audit_log": "ModSecurity: Warning\\.[^\\n]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\][\\s\\S]*ModSecurity: Access denied with code 403[^\\n]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,deny,status:403,log,auditlog,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',setvar:tx.score=+3\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/test/modsec_audit_issue_3204_3.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - nolog applies to every target",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "^(?![\\s\\S]*\\[id \"3204\"\\])"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,nolog,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',setvar:tx.score=+3\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - a chain starter matching two targets still logs one message",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "^(?![\\s\\S]*\\[id \"3204\"\\][\\s\\S]*\\[id \"3204\"\\])[\\s\\S]*\\[data \"seen REQUEST_METHOD=GET\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,pass,log,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',chain\"",
+      "SecRule REQUEST_METHOD \"@streq GET\" \"t:none\""
+    ]
+  }
+]

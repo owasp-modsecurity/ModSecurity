@@ -205,6 +205,15 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     variables::Variables vars;
     vars.reserve(4);
     variables::Variables exclusion;
+    /*
+     * A rule that is not part of a chain logs every target it matches, and a
+     * chain starter with multiMatch logs every match once the chain has
+     * matched. The messages of all but the last match are kept here until
+     * the rule's actions have run.
+     */
+    const bool logsEachMatch = m_chainedRuleParent == nullptr
+        && (!isChained() || hasMultimatch());
+    std::list<RuleMessage> earlierMatches;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -308,7 +317,20 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    performLogging(trans, ruleMessage, false);
+                    if (logsEachMatch) {
+                        /*
+                         * Expand msg and logdata now, while MATCHED_VAR and
+                         * the captures still belong to this match.
+                         */
+                        if (hasLogData()) {
+                            ruleMessage.m_data = logData(trans);
+                        }
+                        if (hasMsg()) {
+                            ruleMessage.m_message = msg(trans);
+                        }
+                        earlierMatches.push_back(ruleMessage);
+                        ruleMessage.reset(false);
+                    }
 
                     globalRet = true;
                 }
@@ -325,6 +347,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         goto end_clean;
     }
     ms_dbg_a(trans, 4, "Rule returned 1.");
+
+    if (logsEachMatch) {
+        /* The last match goes on as the rule's own message. */
+        const RuleMessage &last = earlierMatches.back();
+        ruleMessage.m_match = last.m_match;
+        ruleMessage.m_reference = last.m_reference;
+        ruleMessage.m_data = last.m_data;
+        ruleMessage.m_message = last.m_message;
+        earlierMatches.pop_back();
+    }
 
     if (this->isChained() == false) {
         goto end_exec;
@@ -349,6 +381,19 @@ end_clean:
 
 end_exec:
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
+
+    /*
+     * The earlier matches take what the rule's actions decided about logging
+     * from the rule's message. The disruptive action ran once, for the last
+     * match, so the earlier ones are logged as warnings.
+     */
+    for (auto &m : earlierMatches) {
+        m.m_saveMessage = ruleMessage.m_saveMessage;
+        m.m_noAuditLog = ruleMessage.m_noAuditLog;
+        m.m_severity = ruleMessage.m_severity;
+        m.m_tags = ruleMessage.m_tags;
+        performLogging(trans, m, true, true);
+    }
 
     /* last rule in the chain. */
     performLogging(trans, ruleMessage, true, true);
