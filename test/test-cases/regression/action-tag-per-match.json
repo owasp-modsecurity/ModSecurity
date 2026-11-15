@@ -86,7 +86,7 @@
       "SecAuditEngine On",
       "SecAuditLogParts ABCFHZ",
       "SecAuditLogFormat JSON",
-      "SecAuditLog /tmp/test/modsec_audit_action_tag_per_match_2.log",
+      "SecAuditLog /tmp/modsec_audit_action_tag_per_match_2.log",
       "SecAuditLogDirMode 0766",
       "SecAuditLogFileMode 0666",
       "SecAuditLogType Serial"

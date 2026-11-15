@@ -86,7 +86,7 @@
       "SecAuditEngine On",
       "SecAuditLogParts ABCFHZ",
       "SecAuditLogFormat JSON",
-      "SecAuditLog /tmp/test/modsec_audit_issue_3204_2.log",
+      "SecAuditLog /tmp/modsec_audit_issue_3204_2.log",
       "SecAuditLogDirMode 0766",
       "SecAuditLogFileMode 0666",
       "SecAuditLogType Serial"
@@ -136,7 +136,7 @@
       "SecRule ARGS \"@beginsWith attack\" \"id:3204,phase:1,deny,status:403,log,auditlog,msg:'every target',logdata:'seen %{MATCHED_VAR_NAME}=%{MATCHED_VAR}',setvar:tx.score=+3\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogParts ABCFHZ",
-      "SecAuditLog /tmp/test/modsec_audit_issue_3204_3.log",
+      "SecAuditLog /tmp/modsec_audit_issue_3204_3.log",
       "SecAuditLogDirMode 0766",
       "SecAuditLogFileMode 0666",
       "SecAuditLogType Serial",
