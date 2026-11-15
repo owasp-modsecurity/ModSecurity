@@ -311,9 +311,9 @@ void RuleWithActions::expandMatchMetadata(Transaction *trans,
     for (actions::Tag *a : m_actionsTag) {
         a->evaluate(this, trans, ruleMessage);
     }
-    const auto updates = trans->m_rules->m_exceptions
+    const auto [first, last] = trans->m_rules->m_exceptions
         .m_action_pos_update_target_by_id.equal_range(m_ruleId);
-    for (auto it = updates.first; it != updates.second; ++it) {
+    for (auto it = first; it != last; ++it) {
         expand(it->second.get());
     }
     if (m_logData) {
@@ -524,7 +524,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
 }
 
 void RuleWithActions::performLogging(Transaction *trans,
-    RuleMessage &ruleMessage,  // cppcheck-suppress constParameterReference
+    RuleMessage &ruleMessage,  // cppcheck-suppress constParameterReference ; NOSONAR, public ABI
     bool lastLog,
     bool chainedParentNull) const {
 
