@@ -280,6 +280,53 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
 }
 
 
+/*
+ * Expands tag, msg and logdata for one match of a rule that logs each match,
+ * from the same sources and in the same order as
+ * executeActionsAfterFullMatch(): SecDefaultAction, the rule's own tags,
+ * SecRuleUpdateActionById, then the rule's own logdata and msg. No other
+ * action runs. *hasData and *hasMessage tell whether a logdata or a msg
+ * action applied to the match.
+ */
+void RuleWithActions::expandMatchMetadata(Transaction *trans,
+    RuleMessage &ruleMessage, bool *hasData, bool *hasMessage) {
+    auto expand = [&](actions::Action *a) {
+        const std::string &name = *a->m_name;
+        if (name == "tag") {
+            a->evaluate(this, trans, ruleMessage);
+        } else if (name == "logdata") {
+            a->evaluate(this, trans, ruleMessage);
+            *hasData = true;
+        } else if (name == "msg") {
+            a->evaluate(this, trans, ruleMessage);
+            *hasMessage = true;
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+        if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            expand(a.get());
+        }
+    }
+    for (actions::Tag *a : m_actionsTag) {
+        a->evaluate(this, trans, ruleMessage);
+    }
+    const auto updates = trans->m_rules->m_exceptions
+        .m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = updates.first; it != updates.second; ++it) {
+        expand(it->second.get());
+    }
+    if (m_logData) {
+        m_logData->evaluate(this, trans, ruleMessage);
+        *hasData = true;
+    }
+    if (m_msg) {
+        m_msg->evaluate(this, trans, ruleMessage);
+        *hasMessage = true;
+    }
+}
+
+
 void RuleWithActions::executeAction(Transaction *trans,
     bool containsBlock, RuleMessage &ruleMessage,
     Action *a, bool defaultContext) {

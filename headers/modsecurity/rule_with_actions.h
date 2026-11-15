@@ -108,6 +108,10 @@ class RuleWithActions : public Rule {
     std::shared_ptr<RuleWithActions> m_chainedRuleChild;
     RuleWithActions *m_chainedRuleParent;
 
+ protected:
+    void expandMatchMetadata(Transaction *trans, RuleMessage &ruleMessage,
+        bool *hasData, bool *hasMessage);
+
  private:
     inline void executeTransformation(
         const actions::transformations::Transformation &a,

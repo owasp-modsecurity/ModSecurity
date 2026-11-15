@@ -23,6 +23,7 @@ TESTS+=test/test-cases/regression/action-setuid.json
 TESTS+=test/test-cases/regression/actions.json
 TESTS+=test/test-cases/regression/action-skip.json
 TESTS+=test/test-cases/regression/action-tag.json
+TESTS+=test/test-cases/regression/action-tag-per-match.json
 TESTS+=test/test-cases/regression/action-tnf-base64.json
 TESTS+=test/test-cases/regression/action-xmlns.json
 TESTS+=test/test-cases/regression/auditlog.json

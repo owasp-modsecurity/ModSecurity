@@ -57,52 +57,25 @@ struct KeptMatch {
     std::string reference;
     std::string data;
     std::string message;
+    std::list<std::string> tags;
     bool hasData = false;
     bool hasMessage = false;
 };
 
 /*
- * Takes the match text and the reference of one match out of the rule
- * message, and expands msg and logdata for that match from the same sources
- * and in the same order as RuleWithActions::executeActionsAfterFullMatch():
- * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
+ * Takes what one match added to the rule message out of it, once its tags,
+ * msg and logdata have been expanded, and resets the message for the next
+ * match.
  */
-KeptMatch keepMatch(RuleWithOperator *rule, Transaction *trans,
-    RuleMessage &ruleMessage) {
+KeptMatch takeMatch(RuleMessage &ruleMessage, bool hasData, bool hasMessage) {
     KeptMatch kept;
-    auto expand = [&](Action *a) {
-        if (*a->m_name == "logdata") {
-            a->evaluate(rule, trans, ruleMessage);
-            kept.hasData = true;
-        } else if (*a->m_name == "msg") {
-            a->evaluate(rule, trans, ruleMessage);
-            kept.hasMessage = true;
-        }
-    };
-
-    for (const auto &a : trans->m_rules->m_defaultActions[rule->getPhase()]) {
-        if (a->action_kind == Action::Kind::RunTimeOnlyIfMatchKind) {
-            expand(a.get());
-        }
-    }
-    const auto updates = trans->m_rules->m_exceptions
-        .m_action_pos_update_target_by_id.equal_range(rule->m_ruleId);
-    for (auto it = updates.first; it != updates.second; ++it) {
-        expand(it->second.get());
-    }
-    if (rule->hasLogData()) {
-        ruleMessage.m_data = rule->logData(trans);
-        kept.hasData = true;
-    }
-    if (rule->hasMsg()) {
-        ruleMessage.m_message = rule->msg(trans);
-        kept.hasMessage = true;
-    }
-
     kept.match = std::move(ruleMessage.m_match);
     kept.reference = std::move(ruleMessage.m_reference);
     kept.data = std::move(ruleMessage.m_data);
     kept.message = std::move(ruleMessage.m_message);
+    kept.tags = std::move(ruleMessage.m_tags);
+    kept.hasData = hasData;
+    kept.hasMessage = hasMessage;
     ruleMessage.reset(false);
     return kept;
 }
@@ -381,11 +354,15 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
                     if (logsEachMatch) {
                         /*
-                         * Expand msg and logdata now, while MATCHED_VAR and
-                         * the captures still belong to this match.
+                         * Expand tag, msg and logdata now, while MATCHED_VAR
+                         * and the captures still belong to this match.
                          */
-                        keptMatches.push_back(
-                            keepMatch(this, trans, ruleMessage));
+                        bool hasData = false;
+                        bool hasMessage = false;
+                        expandMatchMetadata(trans, ruleMessage, &hasData,
+                            &hasMessage);
+                        keptMatches.push_back(takeMatch(ruleMessage, hasData,
+                            hasMessage));
                     }
 
                     globalRet = true;
@@ -406,8 +383,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
     if (logsEachMatch && !isChained()) {
         /*
-         * The last match goes on as the rule's own message. Its msg and
-         * logdata are expanded again by executeActionsAfterFullMatch().
+         * The last match goes on as the rule's own message. Its tags, msg
+         * and logdata are expanded again by executeActionsAfterFullMatch().
          */
         ruleMessage.m_match = std::move(keptMatches.back().match);
         ruleMessage.m_reference = std::move(keptMatches.back().reference);
@@ -441,14 +418,20 @@ end_exec:
     /*
      * The kept matches take everything the rule's actions set from the
      * rule's message, and only describe their own match. A msg or logdata
-     * that only a chained rule has stays as the chain set it. The disruptive
-     * action ran once, for the rule's message, so they are logged as
-     * warnings.
+     * that only a chained rule has stays as the chain set it. The rule's own
+     * tags are the last ones executeActionsAfterFullMatch() added, after
+     * those of any chained rule, so each kept match replaces them with its
+     * own. The disruptive action ran once, for the rule's message, so the
+     * kept matches are logged as warnings.
      */
     for (auto &kept : keptMatches) {
         RuleMessage m(ruleMessage);
         m.m_match = std::move(kept.match);
         m.m_reference = std::move(kept.reference);
+        for (size_t i = 0; i < kept.tags.size() && !m.m_tags.empty(); i++) {
+            m.m_tags.pop_back();
+        }
+        m.m_tags.splice(m.m_tags.end(), kept.tags);
         if (kept.hasData) {
             m.m_data = std::move(kept.data);
         }
