@@ -138,7 +138,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"1001\"\\])"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -182,7 +182,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"1001\"\\])"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -275,7 +275,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"1001\"\\])"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -320,7 +320,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"1001\"\\][\\s\\S]*\\[id \"1001\"\\])[\\s\\S]*\\[msg \"chain starter\"\\]"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\][\\s\\S]*\\[id \"1001\"\\])[\\s\\S]*\\[msg \"chain starter\"\\]"
     },
     "rules": [
       "SecRuleEngine On",

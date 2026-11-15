@@ -179,7 +179,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"3204\"\\])"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"3204\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -222,7 +222,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "^(?![\\s\\S]*\\[id \"3204\"\\][\\s\\S]*\\[id \"3204\"\\])[\\s\\S]*\\[data \"seen REQUEST_METHOD=GET\"\\]"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"3204\"\\][\\s\\S]*\\[id \"3204\"\\])[\\s\\S]*\\[data \"seen REQUEST_METHOD=GET\"\\]"
     },
     "rules": [
       "SecRuleEngine On",
