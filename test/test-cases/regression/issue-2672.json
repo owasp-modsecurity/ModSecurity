@@ -86,7 +86,7 @@
     },
     "expected": {
       "debug_log": "Saving this request as part of the audit logs",
-      "audit_log": "Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\][\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\][\\s\\S]*Access denied with code 403[^\\n]*\\[data \"starter ARGS:c\"\\]",
+      "audit_log": "\\A(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\])(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\])(?=[\\s\\S]*Access denied with code 403[^\\n]*\\[data \"starter ARGS:c\"\\])",
       "http_code": 403
     },
     "rules": [

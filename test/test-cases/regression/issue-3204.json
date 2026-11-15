@@ -35,7 +35,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\][\\s\\S]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\]"
+      "error_log": "\\A(?=[\\s\\S]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\])(?=[\\s\\S]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -78,7 +78,7 @@
     },
     "expected": {
       "http_code": 200,
-      "audit_log": "\"reference\":\"o0,6v8,9\",[^}]*\"data\":\"seen ARGS:a=attackone\"[\\s\\S]*\"reference\":\"o0,6v20,9\",[^}]*\"data\":\"seen ARGS:b=attacktwo\""
+      "audit_log": "\\A(?=[\\s\\S]*\"reference\":\"o0,6v8,9\",[^}]*\"data\":\"seen ARGS:a=attackone\")(?=[\\s\\S]*\"reference\":\"o0,6v20,9\",[^}]*\"data\":\"seen ARGS:b=attacktwo\")"
     },
     "rules": [
       "SecRuleEngine On",
@@ -128,8 +128,8 @@
     },
     "expected": {
       "http_code": 403,
-      "error_log": "ModSecurity: Warning\\.[^\\n]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\]",
-      "audit_log": "ModSecurity: Warning\\.[^\\n]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\][\\s\\S]*ModSecurity: Access denied with code 403[^\\n]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\]"
+      "error_log": "\\A(?=[\\s\\S]*ModSecurity: Warning\\.[^\\n]*\\[id \"3204\"\\])",
+      "audit_log": "\\A(?=[\\s\\S]*ModSecurity: Warning\\.[^\\n]*\\[id \"3204\"\\])(?=[\\s\\S]*ModSecurity: Access denied with code 403[^\\n]*\\[id \"3204\"\\])(?=[\\s\\S]*\\[data \"seen ARGS:a=attackone\"\\][^\\n]*\\[ref \"o0,6v8,9\"\\])(?=[\\s\\S]*\\[data \"seen ARGS:b=attacktwo\"\\][^\\n]*\\[ref \"o0,6v20,9\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -266,7 +266,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "\\[data \"default ARGS:a\"\\][\\s\\S]*\\[data \"default ARGS:b\"\\]"
+      "error_log": "\\A(?=[\\s\\S]*\\[data \"default ARGS:a\"\\])(?=[\\s\\S]*\\[data \"default ARGS:b\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
@@ -310,7 +310,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "\\[data \"updated ARGS:a\"\\][\\s\\S]*\\[data \"updated ARGS:b\"\\]"
+      "error_log": "\\A(?=[\\s\\S]*\\[data \"updated ARGS:a\"\\])(?=[\\s\\S]*\\[data \"updated ARGS:b\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
