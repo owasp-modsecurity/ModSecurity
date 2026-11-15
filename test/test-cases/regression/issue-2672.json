@@ -333,6 +333,50 @@
     "enabled": 1,
     "version_min": 300000,
     "version_max": 0,
+    "title": "Testing Issue #2672 - the matches of a multiMatch chain starter keep the msg of a chained rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0&c=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "(?:[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\]){3}"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none,msg:'chained msg'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
     "title": "Testing Issue #2672 - a failed multiMatch chain does not raise HIGHEST_SEVERITY",
     "client": {
       "ip": "200.249.12.31",

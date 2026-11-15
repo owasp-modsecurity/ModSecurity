@@ -24,6 +24,7 @@
 #include <list>
 #include <utility>
 #include <memory>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"
@@ -50,16 +51,32 @@ using actions::Action;
 
 namespace {
 
+/* What one match of a rule adds to the rule's message. */
+struct KeptMatch {
+    std::string match;
+    std::string reference;
+    std::string data;
+    std::string message;
+    bool hasData = false;
+    bool hasMessage = false;
+};
+
 /*
- * Expands msg and logdata for one match of a rule, from the same sources
+ * Takes the match text and the reference of one match out of the rule
+ * message, and expands msg and logdata for that match from the same sources
  * and in the same order as RuleWithActions::executeActionsAfterFullMatch():
  * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
  */
-void expandMatchMetadata(RuleWithOperator *rule, Transaction *trans,
+KeptMatch keepMatch(RuleWithOperator *rule, Transaction *trans,
     RuleMessage &ruleMessage) {
+    KeptMatch kept;
     auto expand = [&](Action *a) {
-        if (*a->m_name == "msg" || *a->m_name == "logdata") {
+        if (*a->m_name == "logdata") {
             a->evaluate(rule, trans, ruleMessage);
+            kept.hasData = true;
+        } else if (*a->m_name == "msg") {
+            a->evaluate(rule, trans, ruleMessage);
+            kept.hasMessage = true;
         }
     };
 
@@ -68,18 +85,26 @@ void expandMatchMetadata(RuleWithOperator *rule, Transaction *trans,
             expand(a.get());
         }
     }
-    for (const auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (b.first == rule->m_ruleId) {
-            expand(b.second.get());
-        }
+    const auto updates = trans->m_rules->m_exceptions
+        .m_action_pos_update_target_by_id.equal_range(rule->m_ruleId);
+    for (auto it = updates.first; it != updates.second; ++it) {
+        expand(it->second.get());
     }
     if (rule->hasLogData()) {
         ruleMessage.m_data = rule->logData(trans);
+        kept.hasData = true;
     }
     if (rule->hasMsg()) {
         ruleMessage.m_message = rule->msg(trans);
+        kept.hasMessage = true;
     }
+
+    kept.match = std::move(ruleMessage.m_match);
+    kept.reference = std::move(ruleMessage.m_reference);
+    kept.data = std::move(ruleMessage.m_data);
+    kept.message = std::move(ruleMessage.m_message);
+    ruleMessage.reset(false);
+    return kept;
 }
 
 }  // namespace
@@ -250,7 +275,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
      */
     const bool logsEachMatch = m_chainedRuleParent == nullptr
         && (!isChained() || hasMultimatch());
-    std::list<RuleMessage> keptMatches;
+    std::vector<KeptMatch> keptMatches;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -359,9 +384,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                          * Expand msg and logdata now, while MATCHED_VAR and
                          * the captures still belong to this match.
                          */
-                        expandMatchMetadata(this, trans, ruleMessage);
-                        keptMatches.push_back(ruleMessage);
-                        ruleMessage.reset(false);
+                        keptMatches.push_back(
+                            keepMatch(this, trans, ruleMessage));
                     }
 
                     globalRet = true;
@@ -381,12 +405,12 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     ms_dbg_a(trans, 4, "Rule returned 1.");
 
     if (logsEachMatch && !isChained()) {
-        /* The last match goes on as the rule's own message. */
-        const RuleMessage &last = keptMatches.back();
-        ruleMessage.m_match = last.m_match;
-        ruleMessage.m_reference = last.m_reference;
-        ruleMessage.m_data = last.m_data;
-        ruleMessage.m_message = last.m_message;
+        /*
+         * The last match goes on as the rule's own message. Its msg and
+         * logdata are expanded again by executeActionsAfterFullMatch().
+         */
+        ruleMessage.m_match = std::move(keptMatches.back().match);
+        ruleMessage.m_reference = std::move(keptMatches.back().reference);
         keptMatches.pop_back();
     }
 
@@ -416,16 +440,21 @@ end_exec:
 
     /*
      * The kept matches take everything the rule's actions set from the
-     * rule's message, and only describe their own match. The disruptive
+     * rule's message, and only describe their own match. A msg or logdata
+     * that only a chained rule has stays as the chain set it. The disruptive
      * action ran once, for the rule's message, so they are logged as
      * warnings.
      */
-    for (auto &e : keptMatches) {
+    for (auto &kept : keptMatches) {
         RuleMessage m(ruleMessage);
-        m.m_match = std::move(e.m_match);
-        m.m_reference = std::move(e.m_reference);
-        m.m_data = std::move(e.m_data);
-        m.m_message = std::move(e.m_message);
+        m.m_match = std::move(kept.match);
+        m.m_reference = std::move(kept.reference);
+        if (kept.hasData) {
+            m.m_data = std::move(kept.data);
+        }
+        if (kept.hasMessage) {
+            m.m_message = std::move(kept.message);
+        }
         m.m_isDisruptive = false;
         performLogging(trans, m, true, true);
     }

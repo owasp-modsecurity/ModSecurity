@@ -135,8 +135,9 @@ class Operator {
 
     /**
      * Upper bound for the reference of a rule message. The reference is
-     * built up across every operator call, target variable and chained rule
-     * of a rule, so without a bound it grows with the input. Once it reaches
+     * built up across the operator calls of a match and, for a chain that
+     * logs one message, across its target variables and chained rules, so
+     * without a bound it grows with the input. Once it reaches
      * this size, further entries are dropped. One entry may cross the limit.
      */
     static constexpr size_t MAX_REFERENCE_SIZE = 1024;
