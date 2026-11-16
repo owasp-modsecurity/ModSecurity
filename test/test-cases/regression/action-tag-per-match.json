@@ -259,7 +259,7 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "\\A(?=[\\s\\S]*\\[tag \"chained\"\\] \\[tag \"starter-ARGS:a\"\\])(?=[\\s\\S]*\\[tag \"chained\"\\] \\[tag \"starter-ARGS:b\"\\])"
+      "error_log": "\\A(?=[\\s\\S]*\\[tag \"chained\"\\] \\[tag \"starter-ARGS:a\"\\])(?![\\s\\S]*\\[tag \"starter-ARGS:a\"\\][\\s\\S]*\\[tag \"starter-ARGS:a\"\\])(?=[\\s\\S]*\\[tag \"chained\"\\] \\[tag \"starter-ARGS:b\"\\])(?![\\s\\S]*\\[tag \"starter-ARGS:b\"\\][\\s\\S]*\\[tag \"starter-ARGS:b\"\\])(?=[\\s\\S]*\\[tag \"chained\"\\] \\[tag \"starter-ARGS:c\"\\])(?![\\s\\S]*\\[tag \"starter-ARGS:c\"\\][\\s\\S]*\\[tag \"starter-ARGS:c\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
