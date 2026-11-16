@@ -450,5 +450,91 @@
       "SecRuleUpdateActionById 3204 \"nolog\"",
       "SecRule TX:score \"@eq 6\" \"id:3205,phase:1,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - the later targets of a rule with log see HIGHEST_SEVERITY as it was before the rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=255&b=255",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@eq %{HIGHEST_SEVERITY}\" \"id:3204,phase:1,pass,log,severity:2,msg:'every target',setvar:tx.n=+1\"",
+      "SecRule TX:n \"@eq 2\" \"id:3205,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Issue #3204 - the later targets of a rule with nolog see HIGHEST_SEVERITY as it was before the rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=255&b=255",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@eq %{HIGHEST_SEVERITY}\" \"id:3204,phase:1,pass,nolog,severity:2,msg:'every target',setvar:tx.n=+1\"",
+      "SecRule TX:n \"@eq 2\" \"id:3205,phase:1,deny,status:403\""
+    ]
   }
 ]

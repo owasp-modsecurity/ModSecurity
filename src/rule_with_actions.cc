@@ -228,6 +228,16 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
             a->evaluate(this, trans, ruleMessage);
         }
     }
+
+    /*
+     * A multiMatch rule that is not chained raises HIGHEST_SEVERITY at each
+     * match, whether it is logged or not. A chain starter waits for the
+     * chain, so that a failed chain changes nothing.
+     */
+    if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr
+        && !isChained() && m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
+    }
 }
 
 
@@ -289,15 +299,18 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
  * from the same sources and in the same order as
  * executeActionsAfterFullMatch(): SecDefaultAction, the rule's own tags,
  * SecRuleUpdateActionById, then the rule's own severity, logdata and msg.
- * For a rule that is not chained, the match is a full match, so its severity
- * is applied too, before logdata and msg, which may read HIGHEST_SEVERITY. A
- * chain starter's severity waits for the chain. No other action runs.
+ * For a rule that is not chained, the match is a full match, so logdata and
+ * msg see HIGHEST_SEVERITY with the rule's severity applied, as they do after
+ * the full match. The transaction's severity is restored afterwards: whether
+ * a rule is logged must not change what its later targets and actions see.
+ * A chain starter's severity waits for the chain. No other action runs.
  * *hasData and *hasMessage tell whether a logdata or a msg action applied to
  * the match.
  */
 void RuleWithActions::expandMatchMetadata(Transaction *trans,
     RuleMessage &ruleMessage, bool *hasData, bool *hasMessage) {
     const bool fullMatch = !isChained();
+    const int highestSeverity = trans->m_highestSeverityAction;
     auto expand = [&](actions::Action *a) {
         if (dynamic_cast<actions::Tag *>(a)) {
             a->evaluate(this, trans, ruleMessage);
@@ -336,6 +349,7 @@ void RuleWithActions::expandMatchMetadata(Transaction *trans,
         m_msg->evaluate(this, trans, ruleMessage);
         *hasMessage = true;
     }
+    trans->m_highestSeverityAction = highestSeverity;
 }
 
 

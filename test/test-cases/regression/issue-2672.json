@@ -506,5 +506,91 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,logdata:'%{MATCHED_VAR_NAME} %{HIGHEST_SEVERITY}'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch rule with log raises HIGHEST_SEVERITY at each match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,setvar:tx.seen=%{HIGHEST_SEVERITY}\"",
+      "SecRule TX:seen \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch rule with nolog raises HIGHEST_SEVERITY at each match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,nolog,severity:2,setvar:tx.seen=%{HIGHEST_SEVERITY}\"",
+      "SecRule TX:seen \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
+    ]
   }
 ]
