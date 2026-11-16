@@ -1178,6 +1178,15 @@ int Transaction::processResponseBody() {
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
     int current_size = this->m_responseBody.tellp();
 
+    if (m_rules->m_secResponseBodyAccess == RulesSetProperties::FalseConfigBoolean) {
+        /* With access explicitly off the body is never inspected, so do not
+         * keep a copy either; it would only end up in audit log part E
+         * (#2425). */
+        ms_dbg(4, "Not appending response body. " \
+            "Response body access is disabled.");
+        return true;
+    }
+
     const std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
     auto t = bi.find(utils::string::tolower(m_variableResponseContentType.m_value));
