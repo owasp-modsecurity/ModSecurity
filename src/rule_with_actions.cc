@@ -43,6 +43,10 @@
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
+#include "src/actions/log.h"
+#include "src/actions/no_log.h"
+#include "src/actions/audit_log.h"
+#include "src/actions/no_audit_log.h"
 #include "src/variables/variable.h"
 
 
@@ -284,22 +288,27 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
  * Expands tag, msg and logdata for one match of a rule that logs each match,
  * from the same sources and in the same order as
  * executeActionsAfterFullMatch(): SecDefaultAction, the rule's own tags,
- * SecRuleUpdateActionById, then the rule's own logdata and msg. No other
- * action runs. *hasData and *hasMessage tell whether a logdata or a msg
- * action applied to the match.
+ * SecRuleUpdateActionById, then the rule's own severity, logdata and msg.
+ * For a rule that is not chained, the match is a full match, so its severity
+ * is applied too, before logdata and msg, which may read HIGHEST_SEVERITY. A
+ * chain starter's severity waits for the chain. No other action runs.
+ * *hasData and *hasMessage tell whether a logdata or a msg action applied to
+ * the match.
  */
 void RuleWithActions::expandMatchMetadata(Transaction *trans,
     RuleMessage &ruleMessage, bool *hasData, bool *hasMessage) {
+    const bool fullMatch = !isChained();
     auto expand = [&](actions::Action *a) {
-        const std::string &name = *a->m_name;
-        if (name == "tag") {
+        if (dynamic_cast<actions::Tag *>(a)) {
             a->evaluate(this, trans, ruleMessage);
-        } else if (name == "logdata") {
+        } else if (dynamic_cast<actions::LogData *>(a)) {
             a->evaluate(this, trans, ruleMessage);
             *hasData = true;
-        } else if (name == "msg") {
+        } else if (dynamic_cast<actions::Msg *>(a)) {
             a->evaluate(this, trans, ruleMessage);
             *hasMessage = true;
+        } else if (fullMatch && dynamic_cast<actions::Severity *>(a)) {
+            a->evaluate(this, trans, ruleMessage);
         }
     };
 
@@ -316,6 +325,9 @@ void RuleWithActions::expandMatchMetadata(Transaction *trans,
     for (auto it = first; it != last; ++it) {
         expand(it->second.get());
     }
+    if (fullMatch && m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
+    }
     if (m_logData) {
         m_logData->evaluate(this, trans, ruleMessage);
         *hasData = true;
@@ -324,6 +336,41 @@ void RuleWithActions::expandMatchMetadata(Transaction *trans,
         m_msg->evaluate(this, trans, ruleMessage);
         *hasMessage = true;
     }
+}
+
+
+/*
+ * Tells whether the message of this rule will be saved: runs the log,
+ * nolog, auditlog and noauditlog actions on a scratch message, from the same
+ * sources and in the same order as executeActionsAfterFullMatch():
+ * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
+ * These actions only set RuleMessage::m_saveMessage.
+ */
+bool RuleWithActions::savesMessage(Transaction *trans) {
+    RuleMessage probe(*this, *trans);
+    auto apply = [&](actions::Action *a) {
+        if (dynamic_cast<actions::Log *>(a)
+            || dynamic_cast<actions::NoLog *>(a)
+            || dynamic_cast<actions::AuditLog *>(a)
+            || dynamic_cast<actions::NoAuditLog *>(a)) {
+            a->evaluate(this, trans, probe);
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+        if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            apply(a.get());
+        }
+    }
+    const auto [first, last] = trans->m_rules->m_exceptions
+        .m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = first; it != last; ++it) {
+        apply(it->second.get());
+    }
+    for (Action *a : m_actionsRuntimePos) {
+        apply(a);
+    }
+    return probe.m_saveMessage;
 }
 
 

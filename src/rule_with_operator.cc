@@ -249,6 +249,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     const bool logsEachMatch = m_chainedRuleParent == nullptr
         && (!isChained() || hasMultimatch());
     std::vector<KeptMatch> keptMatches;
+    /* Whether the rule's message will be saved, known at the first match. */
+    int savesMessages = -1;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -352,7 +354,10 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    if (logsEachMatch) {
+                    if (logsEachMatch && savesMessages < 0) {
+                        savesMessages = savesMessage(trans) ? 1 : 0;
+                    }
+                    if (logsEachMatch && savesMessages == 1) {
                         /*
                          * Expand tag, msg and logdata now, while MATCHED_VAR
                          * and the captures still belong to this match.
@@ -363,6 +368,15 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                             &hasMessage);
                         keptMatches.push_back(takeMatch(ruleMessage, hasData,
                             hasMessage));
+                    } else if (logsEachMatch && !isChained()) {
+                        /*
+                         * Nothing of this rule is logged (nolog): keep only
+                         * the match and reference of the last match, which
+                         * go on as the rule's own message.
+                         */
+                        keptMatches.clear();
+                        keptMatches.push_back(takeMatch(ruleMessage, false,
+                            false));
                     }
 
                     globalRet = true;

@@ -463,5 +463,48 @@
       "SecRuleEngine On",
       "SecAction \"id:1003,phase:1,pass,log,multiMatch,msg:'unconditional'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - every match of a multiMatch rule sees its severity in HIGHEST_SEVERITY",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\A(?![\\s\\S]*\\[data \"ARGS:[ab] 255\"\\])(?=[\\s\\S]*\\[data \"ARGS:a 2\"\\])(?=[\\s\\S]*\\[data \"ARGS:b 2\"\\])"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,logdata:'%{MATCHED_VAR_NAME} %{HIGHEST_SEVERITY}'\""
+    ]
   }
 ]
