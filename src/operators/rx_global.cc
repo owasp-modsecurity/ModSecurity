@@ -105,14 +105,13 @@ bool RxGlobal::evaluate(Transaction *transaction, RuleWithActions *rule,
     }
 
     for (const auto & capture : captures) {
+        if (referenceIsFull(ruleMessage)) {
+            break;
+        }
         logOffset(ruleMessage, capture.m_offset, capture.m_length);
     }
 
-    if (captures.size() > 0) {
-        return true;
-    }
-
-    return false;
+    return !captures.empty();
 }
 
 
