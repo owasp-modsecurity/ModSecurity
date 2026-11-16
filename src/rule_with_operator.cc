@@ -413,24 +413,24 @@ end_clean:
     return false;
 
 end_exec:
+    const size_t tagsBeforeRuleActions = ruleMessage.m_tags.size();
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
     /*
      * The kept matches take everything the rule's actions set from the
      * rule's message, and only describe their own match. A msg or logdata
-     * that only a chained rule has stays as the chain set it. The rule's own
-     * tags are the last ones executeActionsAfterFullMatch() added, after
-     * those of any chained rule, so each kept match replaces them with its
-     * own. The disruptive action ran once, for the rule's message, so the
-     * kept matches are logged as warnings.
+     * that only a chained rule has stays as the chain set it. Each kept
+     * match keeps the tags the message had before the rule's own actions
+     * ran, which are those of any chained rule, and takes its own tags
+     * instead of the ones executeActionsAfterFullMatch() expanded for the
+     * last match. The disruptive action ran once, for the rule's message, so
+     * the kept matches are logged as warnings.
      */
     for (auto &kept : keptMatches) {
         RuleMessage m(ruleMessage);
         m.m_match = std::move(kept.match);
         m.m_reference = std::move(kept.reference);
-        for (size_t i = 0; i < kept.tags.size() && !m.m_tags.empty(); i++) {
-            m.m_tags.pop_back();
-        }
+        m.m_tags.resize(tagsBeforeRuleActions);
         m.m_tags.splice(m.m_tags.end(), kept.tags);
         if (kept.hasData) {
             m.m_data = std::move(kept.data);

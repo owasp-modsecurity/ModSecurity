@@ -86,7 +86,7 @@
     },
     "expected": {
       "debug_log": "Saving this request as part of the audit logs",
-      "audit_log": "\\A(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\])(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\])(?=[\\s\\S]*Access denied with code 403[^\\n]*\\[data \"starter ARGS:c\"\\])",
+      "audit_log": "\\A(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\])(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\])(?=[\\s\\S]*Access denied with code 403[^\\n]*\\[id \"1001\"\\])",
       "http_code": 403
     },
     "rules": [
@@ -137,13 +137,14 @@
       ]
     },
     "expected": {
-      "http_code": 200,
+      "http_code": 403,
       "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,nolog,msg:'chain starter',chain\"",
-      "SecRule ARGS \"@contains y1\" \"t:none\""
+      "SecRule ARGS \"@contains y1\" \"t:none,setvar:tx.chain=1\"",
+      "SecRule TX:chain \"@eq 1\" \"id:1002,phase:2,deny,status:403\""
     ]
   },
   {
@@ -181,12 +182,13 @@
       ]
     },
     "expected": {
-      "http_code": 200,
+      "http_code": 403,
       "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,nolog,msg:'multiMatch'\""
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,nolog,msg:'multiMatch',setvar:tx.score=+1\"",
+      "SecRule TX:score \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
     ]
   },
   {
@@ -275,7 +277,8 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])",
+      "debug_log": "Executing chained rule\\.[\\s\\S]*Executing chained rule\\."
     },
     "rules": [
       "SecRuleEngine On",
@@ -365,11 +368,11 @@
     },
     "expected": {
       "http_code": 200,
-      "error_log": "(?:[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\]){3}"
+      "error_log": "\\A(?=[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\][^\\n]*\\[data \"m ARGS:a\"\\])(?=[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\][^\\n]*\\[data \"m ARGS:b\"\\])(?:[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\]){3}"
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,chain\"",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,logdata:'m %{MATCHED_VAR_NAME}',chain\"",
       "SecRule ARGS \"@contains y1\" \"t:none,msg:'chained msg'\""
     ]
   },
@@ -408,13 +411,57 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 200,
+      "debug_log": "Executing chained rule\\."
     },
     "rules": [
       "SecRuleEngine On",
       "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,severity:2,chain\"",
       "SecRule ARGS \"@contains y1\" \"t:none\"",
       "SecRule HIGHEST_SEVERITY \"@le 2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - an unconditional rule with multiMatch is logged",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\[id \"1003\"\\][^\\n]*\\[msg \"unconditional\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1003,phase:1,pass,log,multiMatch,msg:'unconditional'\""
     ]
   }
 ]

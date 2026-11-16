@@ -542,35 +542,40 @@ void RuleWithActions::performLogging(Transaction *trans,
     * FIXME: Study an way to avoid the copy.
     *
     **/
-    if (lastLog) {
-        if (chainedParentNull) {
-            isItToBeLogged = (ruleMessage.m_saveMessage && (m_chainedRuleParent == nullptr));
-            if (isItToBeLogged) {
-                /* warn */
-                trans->m_rulesMessages.push_back(ruleMessage);
+    /*
+     * Every caller logs a rule once, after its actions have run. A message
+     * that is not the last one of a rule is not logged.
+     */
+    if (!lastLog) {
+        return;
+    }
 
-                /* error */
-                if (!ruleMessage.m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
-            }
-        } else if (hasBlockAction() && !hasMultimatch()) {
+    if (chainedParentNull) {
+        isItToBeLogged = (ruleMessage.m_saveMessage && (m_chainedRuleParent == nullptr));
+        if (isItToBeLogged) {
             /* warn */
             trans->m_rulesMessages.push_back(ruleMessage);
+
             /* error */
             if (!ruleMessage.m_isDisruptive) {
                 trans->serverLog(ruleMessage);
             }
-        } else {
-            if (isItToBeLogged && !hasMultimatch()
-                && !ruleMessage.m_message.empty()) {
-                /* warn */
-                trans->m_rulesMessages.push_back(ruleMessage);
+        }
+    } else if (hasBlockAction()) {
+        /* warn */
+        trans->m_rulesMessages.push_back(ruleMessage);
+        /* error */
+        if (!ruleMessage.m_isDisruptive) {
+            trans->serverLog(ruleMessage);
+        }
+    } else {
+        if (isItToBeLogged && !ruleMessage.m_message.empty()) {
+            /* warn */
+            trans->m_rulesMessages.push_back(ruleMessage);
 
-                /* error */
-                if (!ruleMessage.m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
+            /* error */
+            if (!ruleMessage.m_isDisruptive) {
+                trans->serverLog(ruleMessage);
             }
         }
     }
