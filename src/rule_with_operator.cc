@@ -198,6 +198,9 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
 
 bool RuleWithOperator::evaluate(Transaction *trans,
     RuleMessage &ruleMessage) {
+    if (trans == nullptr || trans->m_rules == nullptr) {
+        return false;
+    }
     bool globalRet = false;
     bool recursiveGlobalRet;
     bool containsBlock = hasBlockAction();
@@ -229,7 +232,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 #ifndef NO_LOGS
     // The operator parameter below is needed only for this debug message.
     // Do not evaluate macros or build strings when the message is disabled.
-    if (trans && trans->m_rules && trans->m_rules->m_debugLog
+    if (trans->m_rules->m_debugLog != nullptr
         && trans->m_rules->m_debugLog->m_debugLevel >= 4) {
         if (m_operator->m_string) {
             std::string eparam = m_operator->m_string->evaluate(trans);

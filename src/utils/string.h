@@ -122,7 +122,7 @@ inline std::string toHexIfNeeded(const std::string &str, bool escape_spec = fals
     for (auto it = first; it != str.end(); ++it) {
         const auto c = static_cast<unsigned char>(*it);
         if (needsEscape(c)) {
-            const char escaped[] = {'\\', 'x', hex[c >> 4], hex[c & 0x0f]};
+            const char escaped[] = {'\\', 'x', hex[c / 16], hex[c % 16]};
             res.append(escaped, sizeof(escaped));
         } else {
             res.push_back(*it);
