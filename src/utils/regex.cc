@@ -17,6 +17,7 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 #include <fstream>
 #include <iostream>
@@ -59,6 +60,60 @@ class Pcre2MatchContextPtr {
 
 namespace modsecurity {
 namespace Utils {
+
+#ifndef WITH_PCRE
+namespace {
+
+/*
+ * Per-thread match data reused by the JIT matching paths.
+ *
+ * pcre2_match_data_create_from_pattern() allocates (and the caller frees) a
+ * block on every match. The block only holds the ovector, it is not tied to
+ * a pattern, so one block per thread can serve every pattern as long as it
+ * has room for the pattern's capture groups. Only the JIT path uses it: JIT
+ * matching runs on its own stack and does not keep heap frames inside the
+ * match data, so the cached block stays small. The interpreter fallback keeps
+ * the original allocate/free behaviour.
+ */
+class ThreadMatchData {
+ public:
+    ThreadMatchData() : m_md(nullptr), m_pairs(0) { }
+    ThreadMatchData(const ThreadMatchData&) = delete;
+    ThreadMatchData& operator=(const ThreadMatchData&) = delete;
+    ~ThreadMatchData() {
+        if (m_md != nullptr) {
+            pcre2_match_data_free(m_md);
+        }
+    }
+
+    pcre2_match_data *get(const pcre2_code *pc) {
+        uint32_t captureCount = 0;
+        pcre2_pattern_info(pc, PCRE2_INFO_CAPTURECOUNT, &captureCount);
+        // Same size pcre2_match_data_create_from_pattern() would use.
+        const uint32_t pairs = captureCount + 1;
+        if (m_md == nullptr || pairs > m_pairs) {
+            pcre2_match_data *md = pcre2_match_data_create(pairs, nullptr);
+            if (md == nullptr) {
+                return nullptr;
+            }
+            if (m_md != nullptr) {
+                pcre2_match_data_free(m_md);
+            }
+            m_md = md;
+            m_pairs = pairs;
+        }
+        return m_md;
+    }
+
+ private:
+    pcre2_match_data *m_md;
+    uint32_t m_pairs;
+};
+
+thread_local ThreadMatchData t_matchData;
+
+}  // namespace
+#endif
 
 // Helper function to tell us if the current config indicates CRLF is a valid newline sequence
 bool crlfIsNewline() {
@@ -144,14 +199,26 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
     PCRE2_SIZE offset = 0;
 
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+    pcre2_match_data *match_data = nullptr;
+    pcre2_match_data *own_match_data = nullptr;
+    if (m_pcje == 0) {
+        match_data = t_matchData.get(m_pc);
+    }
+    if (match_data == nullptr) {
+        own_match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+        match_data = own_match_data;
+    }
     do {
-        if (m_pcje == 0) {
+        if (own_match_data == nullptr) {
             rc = pcre2_jit_match(m_pc, pcre2_s, s.length(),
                             offset, 0, match_data, nullptr);
-        } 
-        
-        if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        }
+
+        if (own_match_data != nullptr || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+            if (own_match_data == nullptr) {
+                own_match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+                match_data = own_match_data;
+            }
             rc = pcre2_match(m_pc, pcre2_s, s.length(),
                             offset, PCRE2_NO_JIT, match_data, nullptr);
         }
@@ -185,28 +252,41 @@ std::list<SMatch> Regex::searchAll(const std::string& s) const {
     } while (rc > 0);
 
 #ifndef WITH_PCRE
-    pcre2_match_data_free(match_data);
+    if (own_match_data != nullptr) {
+        pcre2_match_data_free(own_match_data);
+    }
 #endif
     return retList;
 }
 
 RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCapture>& captures, unsigned long match_limit) const {
 #ifndef WITH_PCRE
-    Pcre2MatchContextPtr match_context;
+    // A default match context behaves exactly like passing nullptr, so it is
+    // only created when a match limit has to be set.
+    std::unique_ptr<Pcre2MatchContextPtr> match_context_holder;
+    pcre2_match_context *match_context = nullptr;
     if (match_limit > 0) {
+        match_context_holder = std::make_unique<Pcre2MatchContextPtr>();
+        match_context = static_cast<pcre2_match_context*>(*match_context_holder);
         // TODO: What if setting the match limit fails?
-        pcre2_set_match_limit(static_cast<pcre2_match_context*>(match_context), match_limit);
+        pcre2_set_match_limit(match_context, match_limit);
     }
 
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+    pcre2_match_data *match_data = nullptr;
+    pcre2_match_data *own_match_data = nullptr;
     int rc = 0;
     if (m_pcje == 0) {
-        rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, static_cast<pcre2_match_context*>(match_context));
-    } 
-    
-    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
-        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, static_cast<pcre2_match_context*>(match_context));
+        match_data = t_matchData.get(m_pc);
+    }
+    if (match_data != nullptr) {
+        rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, match_context);
+    }
+
+    if (match_data == nullptr || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        own_match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+        match_data = own_match_data;
+        rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, match_context);
     }
     const PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 #else
@@ -237,7 +317,9 @@ RegexResult Regex::searchOneMatch(const std::string& s, std::vector<SMatchCaptur
     }
 
 #ifndef WITH_PCRE
-    pcre2_match_data_free(match_data);
+    if (own_match_data != nullptr) {
+        pcre2_match_data_free(own_match_data);
+    }
 #endif
     return to_regex_result(rc);
 }
@@ -353,17 +435,24 @@ RegexResult Regex::searchGlobal(const std::string& s, std::vector<SMatchCapture>
 int Regex::search(const std::string& s, SMatch *match) const {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
-    int ret = 0;
+    pcre2_match_data *match_data = nullptr;
+    pcre2_match_data *own_match_data = nullptr;
+    int rc = 0;
     if (m_pcje == 0) {
-        ret = pcre2_match(m_pc, pcre2_s, s.length(),
-            0, 0, match_data, nullptr) > 0;
-    } 
-    
-    if (m_pcje != 0 || ret == PCRE2_ERROR_JIT_STACKLIMIT) {
-        ret = pcre2_match(m_pc, pcre2_s, s.length(),
-            0, PCRE2_NO_JIT, match_data, nullptr) > 0;
+        match_data = t_matchData.get(m_pc);
     }
+    if (match_data != nullptr) {
+        rc = pcre2_jit_match(m_pc, pcre2_s, s.length(),
+            0, 0, match_data, nullptr);
+    }
+
+    if (match_data == nullptr || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        own_match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+        match_data = own_match_data;
+        rc = pcre2_match(m_pc, pcre2_s, s.length(),
+            0, PCRE2_NO_JIT, match_data, nullptr);
+    }
+    int ret = rc > 0;
     if (ret > 0) { // match
         PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
 #else
@@ -379,7 +468,9 @@ int Regex::search(const std::string& s, SMatch *match) const {
     }
 
 #ifndef WITH_PCRE
-    pcre2_match_data_free(match_data);
+    if (own_match_data != nullptr) {
+        pcre2_match_data_free(own_match_data);
+    }
 #endif
     return ret;
 }
@@ -387,16 +478,20 @@ int Regex::search(const std::string& s, SMatch *match) const {
 int Regex::search(const std::string& s) const {
 #ifndef WITH_PCRE
     PCRE2_SPTR pcre2_s = reinterpret_cast<PCRE2_SPTR>(s.c_str());
-    pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
+    pcre2_match_data *match_data = nullptr;
     int rc = 0;
     if (m_pcje == 0) {
+        match_data = t_matchData.get(m_pc);
+    }
+    if (match_data != nullptr) {
         rc = pcre2_jit_match(m_pc, pcre2_s, s.length(), 0, 0, match_data, nullptr);
     }
 
-    if (m_pcje != 0 || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+    if (match_data == nullptr || rc == PCRE2_ERROR_JIT_STACKLIMIT) {
+        match_data = pcre2_match_data_create_from_pattern(m_pc, nullptr);
         rc = pcre2_match(m_pc, pcre2_s, s.length(), 0, PCRE2_NO_JIT, match_data, nullptr);
+        pcre2_match_data_free(match_data);
     }
-    pcre2_match_data_free(match_data);
     if (rc > 0) {
         return 1; // match
     } else {
