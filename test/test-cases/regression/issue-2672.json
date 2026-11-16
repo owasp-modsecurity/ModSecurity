@@ -546,8 +546,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,setvar:tx.seen=%{HIGHEST_SEVERITY}\"",
-      "SecRule TX:seen \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,setvar:'tx.seen=%{tx.seen}-%{HIGHEST_SEVERITY}'\"",
+      "SecRule TX:seen \"@streq -255-2\" \"id:1002,phase:2,deny,status:403\""
     ]
   },
   {
@@ -589,8 +589,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,nolog,severity:2,setvar:tx.seen=%{HIGHEST_SEVERITY}\"",
-      "SecRule TX:seen \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,nolog,severity:2,setvar:'tx.seen=%{tx.seen}-%{HIGHEST_SEVERITY}'\"",
+      "SecRule TX:seen \"@streq -255-2\" \"id:1002,phase:2,deny,status:403\""
     ]
   }
 ]
