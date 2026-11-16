@@ -148,7 +148,17 @@ void InMemoryPerProcess::resolveSingleMatch(const std::string& var,
 void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
     std::vector<const VariableValue *> *l, variables::KeyExclusions &ke) {
     const auto keySize = var.size();
-    l->reserve(15);
+    // Whole-collection queries may return many values. For an exact key,
+    // let the vector grow only when a matching value is actually found.
+    if (keySize == 0) {
+        l->reserve(15);
+    } else if (ke.toOmit(var)) {
+        // For an exact key every candidate has the same name, so the
+        // exclusion check does not depend on the map entry. If the key is
+        // excluded no value is returned and no expired entry is collected,
+        // which is what the loop below did one entry at a time.
+        return;
+    }
     std::list<std::string> expiredVars;
 
     {
@@ -171,9 +181,6 @@ void InMemoryPerProcess::resolveMultiMatches(const std::string& var,
         } else {
             const auto range = m_map.equal_range(var);
             for (auto it = range.first; it != range.second; ++it) {
-                if (ke.toOmit(var)) {
-                    continue;
-                }
                 if (it->second.isExpired()) {
                     expiredVars.push_back(it->first);
                 } else if (it->second.hasValue() == false) {
