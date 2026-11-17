@@ -69,6 +69,30 @@ class Collection {
         std::vector<const VariableValue *> *l,
         variables::KeyExclusions &ke) = 0;
 
+    /* incrementFirst: add `delta` to the integer stored under `key` (missing,
+     * expired or non-numeric values count as 0) and return the new value.
+     * Backends do the read-modify-write as one atomic step; this default is
+     * only a non-atomic fallback for backends that do not override it. */
+    virtual int incrementFirst(const std::string &key, int delta) {
+        int value = 0;
+        if (auto current = resolveFirst(key)) {
+            try {
+                value = std::stoi(*current);
+            } catch (...) {
+                value = 0;
+            }
+        }
+        value += delta;
+        storeOrUpdateFirst(key, std::to_string(value));
+        return value;
+    }
+
+    virtual int incrementFirst(const std::string &key,
+        std::string compartment, std::string compartment2, int delta) {
+        std::string nkey = compartment + "::" + compartment2 + "::" + key;
+        return incrementFirst(nkey, delta);
+    }
+
 
     /* storeOrUpdateFirst */
     virtual bool storeOrUpdateFirst(const std::string &key,
