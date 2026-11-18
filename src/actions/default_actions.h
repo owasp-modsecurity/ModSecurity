@@ -15,7 +15,7 @@
 
 #include <array>
 #include <memory>
-#include <string>
+#include <utility>
 #include <vector>
 
 #include "modsecurity/actions/action.h"
@@ -48,26 +48,23 @@ class DefaultActionsScope {
 
 
 /**
- * The default actions a rule takes. The parser puts one at the front of the
- * action list of every rule it builds: a SecDefaultAction applies only to
- * the rules of its phase defined after it (#3766).
+ * The default actions a rule takes: a SecDefaultAction applies only to the
+ * rules of its phase defined after it (#3766). Parser::Driver attaches one to
+ * every rule it adds, except chained members, which take the defaults of
+ * their chain starter.
  *
  * In a load that has a SecDefaultAction for the rule's phase, the rule takes
  * it if it was defined after it, and nothing if it was defined before it. In
  * a load without one, the rule takes the defaults of the rule set at run
  * time, as before: those of the other loads into the same rule set, and those
  * a connector merges in from an enclosing configuration context.
- *
- * The action itself does nothing; RuleWithActions finds it at the front of
- * its run-time actions and skips it there.
  */
-class DefaultActions : public Action {
+class DefaultActions {
  public:
     using List = DefaultActionsScope::List;
 
     explicit DefaultActions(std::shared_ptr<const DefaultActionsScope> scope)
-        : Action("DefaultActions", Kind::RunTimeOnlyIfMatchKind),
-        m_scope(std::move(scope)),
+        : m_scope(std::move(scope)),
         m_definedBefore(m_scope->m_defined) { }
 
     /**

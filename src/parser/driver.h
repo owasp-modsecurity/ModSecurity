@@ -64,11 +64,6 @@ class Driver : public RulesSetProperties {
     int addSecMarker(const std::string& marker, const std::string &fileName, int lineNumber);
     int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
-    /* The default actions of a rule being built; see DefaultActions. */
-    actions::Action *newDefaultActions() const;
-    /* Called once a SecDefaultAction for the phase has been stored. */
-    void defaultActionsDefined(int phase);
-
     bool scan_begin();
     void scan_end();
     bool trace_scanning;
@@ -97,6 +92,12 @@ class Driver : public RulesSetProperties {
     // Ordinarily other solutions would have been preferable, but location.hh is a
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
+
+ private:
+    /* Gives a rule being added the default actions in force; see DefaultActions. */
+    void attachDefaultActions(RuleWithActions *rule);
+    /* Copies the SecDefaultAction lists stored so far into the scope. */
+    void syncDefaultActionsScope();
 
     /* The SecDefaultAction lists of this load; see DefaultActions. */
     std::shared_ptr<actions::DefaultActionsScope> m_defaultActionsScope =

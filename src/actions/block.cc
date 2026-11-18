@@ -29,15 +29,16 @@ namespace modsecurity {
 namespace actions {
 
 
-bool Block::evaluate(RuleWithActions *rule, Transaction *transaction,
-    RuleMessage &ruleMessage) {
+bool Block::evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) {
     ms_dbg_a(transaction, 8, "Marking request as disruptive.");
 
-    /*
-     * The disruptive action of the SecDefaultAction in force for the rule is
-     * run by RuleWithActions::executeAction(), which knows which default
-     * applies to the rule.
-     */
+    /* The disruptive action of the default in force for the rule. */
+    for (auto &a : rule->defaultActions(transaction)) {
+        if (a->isDisruptive() == false) {
+            continue;
+        }
+        a->evaluate(rule, transaction, ruleMessage);
+    }
 
     return true;
 }

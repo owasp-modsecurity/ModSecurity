@@ -58,37 +58,6 @@ using actions::transformations::Transformation;
 
 namespace {
 
-/* A chained rule takes the default actions of its chain starter. */
-const RuleWithActions *chainStarter(const RuleWithActions *rule) {
-    while (rule->m_chainedRuleParent != nullptr) {
-        rule = rule->m_chainedRuleParent;
-    }
-    return rule;
-}
-
-
-/*
- * The SecDefaultAction list of the phase that applies to a rule, given the
- * run-time actions of its chain starter. The parser puts an
- * actions::DefaultActions at the front of the run-time actions of every rule
- * it builds; without one, or when it has no list of its own for the phase,
- * the rule takes the defaults of the rule set.
- */
-const actions::DefaultActions::List &defaultActionsOf(
-    const MatchActions &starterActions, const Transaction *trans, int phase) {
-    if (!starterActions.empty()) {
-        const auto *d = dynamic_cast<const actions::DefaultActions *>(
-            starterActions.front());
-        const actions::DefaultActions::List *l =
-            d != nullptr ? d->forPhase(phase) : nullptr;
-        if (l != nullptr) {
-            return *l;
-        }
-    }
-    return trans->m_rules->m_defaultActions[phase];
-}
-
-
 /*
  * The default actions that run at each match rather than after the full
  * match. As if written on the rule: of its own run-time actions, only setvar
@@ -111,19 +80,35 @@ void runDefaultActionsAtMatch(RuleWithActions *rule,
     }
 }
 
+}  // namespace
 
-/* `block' takes the disruptive action of the default in force. */
-void runDefaultDisruptiveAction(RuleWithActions *rule,
-    const actions::DefaultActions::List &defaults, Transaction *trans,
-    RuleMessage &ruleMessage) {
-    for (const auto &d : defaults) {
-        if (d->isDisruptive()) {
-            d->evaluate(rule, trans, ruleMessage);
+
+/*
+ * Without an actions::DefaultActions (a rule not built by the parser), or
+ * when the rule's load has no SecDefaultAction for the phase, the rule takes
+ * the defaults of the rule set.
+ */
+const actions::DefaultActions::List &RuleWithActions::defaultActions(
+    const Transaction *trans) const {
+    const RuleWithActions *starter = this;
+    while (starter->m_chainedRuleParent != nullptr) {
+        starter = starter->m_chainedRuleParent;
+    }
+    if (starter->m_defaultActions != nullptr) {
+        const actions::DefaultActions::List *l =
+            starter->m_defaultActions->forPhase(getPhase());
+        if (l != nullptr) {
+            return *l;
         }
     }
+    return trans->m_rules->m_defaultActions[getPhase()];
 }
 
-}  // namespace
+
+void RuleWithActions::setDefaultActions(
+    std::shared_ptr<const actions::DefaultActions> defaultActions) {
+    m_defaultActions = std::move(defaultActions);
+}
 
 
 
@@ -145,6 +130,7 @@ RuleWithActions::RuleWithActions(
     m_msg(nullptr),
     m_severity(nullptr),
     m_actionsRuntimePos(),
+    m_defaultActions(),
     m_actionsSetVar(),
     m_actionsTag(),
     m_transformations(transformations != NULL ? *transformations : Transformations()),
@@ -279,8 +265,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
      * (#3765). A chained rule keeps running them after the full match.
      */
     if (m_chainedRuleParent == nullptr) {
-        runDefaultActionsAtMatch(this,
-            defaultActionsOf(m_actionsRuntimePos, trans, getPhase()), trans);
+        runDefaultActionsAtMatch(this, defaultActions(trans), trans);
     }
 
     for (actions::SetVar *a : m_actionsSetVar) {
@@ -328,8 +313,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, RuleMessage &ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (const auto &a : defaultActionsOf(
-        chainStarter(this)->m_actionsRuntimePos, trans, getPhase())) {
+    for (const auto &a : defaultActions(trans)) {
         if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
             continue;
         }
@@ -369,13 +353,11 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         m_msg->evaluate(this, trans, ruleMessage);
     }
     for (Action *a : this->m_actionsRuntimePos) {
-        if (a->isDisruptive()
-                || dynamic_cast<actions::DefaultActions *>(a) != nullptr
-                || (disruptiveAlreadyExecuted
-                && dynamic_cast<actions::Block *>(a) != nullptr)) {
-            continue;
+        if (!a->isDisruptive()
+                && !(disruptiveAlreadyExecuted
+                && dynamic_cast<actions::Block *>(a))) {
+            executeAction(trans, containsBlock, ruleMessage, a, false);
         }
-        executeAction(trans, containsBlock, ruleMessage, a, false);
     }
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
         executeAction(trans, containsBlock, ruleMessage,
@@ -404,11 +386,6 @@ void RuleWithActions::executeAction(Transaction *trans,
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
         a->evaluate(this, trans, ruleMessage);
-        if (dynamic_cast<actions::Block *>(a) != nullptr) {
-            runDefaultDisruptiveAction(this, defaultActionsOf(
-                chainStarter(this)->m_actionsRuntimePos, trans, getPhase()),
-                trans, ruleMessage);
-        }
         return;
     }
 
@@ -466,8 +443,7 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : defaultActionsOf(
-            chainStarter(this)->m_actionsRuntimePos, trans, getPhase())) {
+        for (auto &a : defaultActions(trans)) {
             if (a->action_kind \
                 != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;

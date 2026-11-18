@@ -33,6 +33,9 @@
 #ifdef __cplusplus
 
 namespace modsecurity {
+namespace actions {
+class DefaultActions;
+}  // namespace actions
 
 
 class RuleWithActions : public Rule {
@@ -97,6 +100,15 @@ class RuleWithActions : public Rule {
     inline bool hasSeverity() const { return m_severity != NULL; }
     int severity() const;
 
+    /*
+     * The SecDefaultAction list of the rule's phase that applies to the rule;
+     * a chained rule takes the one of its chain starter.
+     */
+    const std::vector<std::shared_ptr<actions::Action>> &defaultActions(
+        const Transaction *trans) const;
+    void setDefaultActions(
+        std::shared_ptr<const actions::DefaultActions> defaultActions);
+
     std::string m_rev;
     std::string m_ver;
     int m_accuracy;
@@ -123,6 +135,8 @@ class RuleWithActions : public Rule {
     actions::Msg *m_msg;
     actions::Severity *m_severity;
     MatchActions m_actionsRuntimePos;
+    /* Set by the parser; see actions::DefaultActions. */
+    std::shared_ptr<const actions::DefaultActions> m_defaultActions;
     SetVars m_actionsSetVar;
     Tags m_actionsTag;
 
