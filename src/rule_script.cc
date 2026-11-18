@@ -29,12 +29,15 @@ bool RuleScript::evaluate(Transaction *trans,
 
     bool containsDisruptive = false;
 
-    executeActionsIndependentOfChainedRuleResult(trans,
-        &containsDisruptive, ruleMessage);
-
     bool ret = m_lua.run(trans);
 
+    /*
+     * A script has no targets: its actions, the default and the own setvar
+     * included, run only when it matches.
+     */
     if (ret) {
+        executeActionsIndependentOfChainedRuleResult(trans,
+            &containsDisruptive, ruleMessage);
         executeActionsAfterFullMatch(trans, containsDisruptive, ruleMessage);
     }
 

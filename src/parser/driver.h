@@ -98,8 +98,9 @@ class Driver : public RulesSetProperties {
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
 
- private:
-    std::shared_ptr<actions::DefaultActionsScope> m_defaultActionsScope;
+    /* The SecDefaultAction lists of this load; see DefaultActions. */
+    std::shared_ptr<actions::DefaultActionsScope> m_defaultActionsScope =
+        std::make_shared<actions::DefaultActionsScope>();
 };
 
 

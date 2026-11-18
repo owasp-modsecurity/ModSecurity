@@ -245,5 +245,88 @@
       "SecDefaultAction \"phase:1,log,deny,status:418\"",
       "SecRule ARGS:a \"@streq attackone\" \"id:1,phase:2,block\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: a deny rule defined before it does not take its status",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:a \"@beginsWith attack\" \"id:1,phase:2,deny\"",
+      "SecDefaultAction \"phase:2,log,pass,status:418\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: a chained rule takes the defaults of its chain starter",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS:a \"@beginsWith attack\" \"id:1,phase:2,deny,chain\"",
+      "SecDefaultAction \"phase:2,log,pass,status:418\"",
+      "  SecRule ARGS:a \"@beginsWith attack\" \"t:none\""
+    ]
   }
 ]

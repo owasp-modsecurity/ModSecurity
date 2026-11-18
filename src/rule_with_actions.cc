@@ -44,6 +44,10 @@
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
 #include "src/actions/default_actions.h"
+#include "src/actions/init_col.h"
+#include "src/actions/set_rsc.h"
+#include "src/actions/set_sid.h"
+#include "src/actions/set_uid.h"
 #include "src/variables/variable.h"
 
 
@@ -58,21 +62,73 @@ using actions::transformations::Transformation;
 
 namespace {
 
+/* A chained rule takes the default actions of its chain starter. */
+const RuleWithActions *chainStarter(const RuleWithActions *rule) {
+    while (rule->m_chainedRuleParent != nullptr) {
+        rule = rule->m_chainedRuleParent;
+    }
+    return rule;
+}
+
+
 /*
- * The SecDefaultAction list of the phase that applies to a rule. The parser
- * puts an actions::DefaultActions at the front of the run-time actions of
- * every rule it builds; a rule without one takes the defaults of the rule set.
+ * The SecDefaultAction list of the phase that applies to a rule, given the
+ * run-time actions of its chain starter. The parser puts an
+ * actions::DefaultActions at the front of the run-time actions of every rule
+ * it builds; without one, or when it has no list of its own for the phase,
+ * the rule takes the defaults of the rule set.
  */
 const actions::DefaultActions::List &defaultActionsOf(
-    const MatchActions &runtimeActions, const Transaction *trans, int phase) {
-    if (!runtimeActions.empty()) {
+    const MatchActions &starterActions, const Transaction *trans, int phase) {
+    if (!starterActions.empty()) {
         const auto *d = dynamic_cast<const actions::DefaultActions *>(
-            runtimeActions.front());
-        if (d != nullptr) {
-            return d->forPhase(trans, phase);
+            starterActions.front());
+        const actions::DefaultActions::List *l =
+            d != nullptr ? d->forPhase(phase) : nullptr;
+        if (l != nullptr) {
+            return *l;
         }
     }
     return trans->m_rules->m_defaultActions[phase];
+}
+
+
+/*
+ * The default actions that run at each match rather than after the full
+ * match: setvar, and the actions that set the key of a persistent collection
+ * a setvar may write to.
+ */
+bool runsAtEachMatch(const actions::Action *a) {
+    return dynamic_cast<const actions::SetVar *>(a) != nullptr
+        || dynamic_cast<const actions::InitCol *>(a) != nullptr
+        || dynamic_cast<const actions::SetSID *>(a) != nullptr
+        || dynamic_cast<const actions::SetUID *>(a) != nullptr
+        || dynamic_cast<const actions::SetRSC *>(a) != nullptr;
+}
+
+
+void runDefaultActionsAtMatch(RuleWithActions *rule,
+    const actions::DefaultActions::List &defaults, Transaction *trans) {
+    for (const auto &a : defaults) {
+        if (!runsAtEachMatch(a.get())) {
+            continue;
+        }
+        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
+            "action: " + *a->m_name.get());
+        a->evaluate(rule, trans);
+    }
+}
+
+
+/* `block' takes the disruptive action of the default in force. */
+void runDefaultDisruptiveAction(RuleWithActions *rule,
+    const actions::DefaultActions::List &defaults, Transaction *trans,
+    RuleMessage &ruleMessage) {
+    for (const auto &d : defaults) {
+        if (d->isDisruptive()) {
+            d->evaluate(rule, trans, ruleMessage);
+        }
+    }
 }
 
 }  // namespace
@@ -231,16 +287,8 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
      * (#3765). A chained rule keeps running them after the full match.
      */
     if (m_chainedRuleParent == nullptr) {
-        for (const auto &a :
-            defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
-            auto *sv = dynamic_cast<actions::SetVar *>(a.get());
-            if (sv == nullptr) {
-                continue;
-            }
-            ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
-                "action: " + *a->m_name.get());
-            sv->evaluate(this, trans);
-        }
+        runDefaultActionsAtMatch(this,
+            defaultActionsOf(m_actionsRuntimePos, trans, getPhase()), trans);
     }
 
     for (actions::SetVar *a : m_actionsSetVar) {
@@ -288,13 +336,12 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, RuleMessage &ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (const auto &a :
-        defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
+    for (const auto &a : defaultActionsOf(
+        chainStarter(this)->m_actionsRuntimePos, trans, getPhase())) {
         if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
             continue;
         }
-        if (m_chainedRuleParent == nullptr
-            && dynamic_cast<actions::SetVar *>(a.get())) {
+        if (m_chainedRuleParent == nullptr && runsAtEachMatch(a.get())) {
             /* already run at each match */
             continue;
         }
@@ -330,14 +377,13 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         m_msg->evaluate(this, trans, ruleMessage);
     }
     for (Action *a : this->m_actionsRuntimePos) {
-        if (dynamic_cast<actions::DefaultActions *>(a)) {
+        if (a->isDisruptive()
+                || dynamic_cast<actions::DefaultActions *>(a) != nullptr
+                || (disruptiveAlreadyExecuted
+                && dynamic_cast<actions::Block *>(a) != nullptr)) {
             continue;
         }
-        if (!a->isDisruptive()
-                && !(disruptiveAlreadyExecuted
-                && dynamic_cast<actions::Block *>(a))) {
-            executeAction(trans, containsBlock, ruleMessage, a, false);
-        }
+        executeAction(trans, containsBlock, ruleMessage, a, false);
     }
     if (!disruptiveAlreadyExecuted && m_disruptiveAction != nullptr) {
         executeAction(trans, containsBlock, ruleMessage,
@@ -366,14 +412,10 @@ void RuleWithActions::executeAction(Transaction *trans,
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
         a->evaluate(this, trans, ruleMessage);
-        if (dynamic_cast<actions::Block *>(a)) {
-            /* `block' takes the disruptive action of the default in force */
-            for (const auto &d :
-                defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
-                if (d->isDisruptive()) {
-                    d->evaluate(this, trans, ruleMessage);
-                }
-            }
+        if (dynamic_cast<actions::Block *>(a) != nullptr) {
+            runDefaultDisruptiveAction(this, defaultActionsOf(
+                chainStarter(this)->m_actionsRuntimePos, trans, getPhase()),
+                trans, ruleMessage);
         }
         return;
     }
@@ -432,8 +474,8 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a :
-            defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
+        for (auto &a : defaultActionsOf(
+            chainStarter(this)->m_actionsRuntimePos, trans, getPhase())) {
             if (a->action_kind \
                 != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;
