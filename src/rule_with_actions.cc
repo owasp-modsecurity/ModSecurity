@@ -43,6 +43,10 @@
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
+#include "src/actions/log.h"
+#include "src/actions/no_log.h"
+#include "src/actions/audit_log.h"
+#include "src/actions/no_audit_log.h"
 #include "src/variables/variable.h"
 
 
@@ -225,21 +229,15 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         }
     }
 
-    if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr) {
-        if (m_severity) {
-            m_severity->evaluate(this, trans, ruleMessage);
-        }
-        if (m_logData) {
-            m_logData->evaluate(this, trans, ruleMessage);
-        }
-        if (m_msg) {
-            m_msg->evaluate(this, trans, ruleMessage);
-        }
-        for (actions::Tag *a : m_actionsTag) {
-            a->evaluate(this, trans, ruleMessage);
-        }
+    /*
+     * A multiMatch rule that is not chained raises HIGHEST_SEVERITY at each
+     * match, whether it is logged or not. A chain starter waits for the
+     * chain, so that a failed chain changes nothing.
+     */
+    if (m_containsMultiMatchAction && m_chainedRuleParent == nullptr
+        && !isChained() && m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
     }
-
 }
 
 
@@ -293,6 +291,100 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         executeAction(trans, containsBlock, ruleMessage,
             m_disruptiveAction, false);
     }
+}
+
+
+/*
+ * Expands tag, msg and logdata for one match of a rule that logs each match,
+ * from the same sources and in the same order as
+ * executeActionsAfterFullMatch(): SecDefaultAction, the rule's own tags,
+ * SecRuleUpdateActionById, then the rule's own severity, logdata and msg.
+ * For a rule that is not chained, the match is a full match, so logdata and
+ * msg see HIGHEST_SEVERITY with the rule's severity applied, as they do after
+ * the full match. The transaction's severity is restored afterwards: whether
+ * a rule is logged must not change what its later targets and actions see.
+ * A chain starter's severity waits for the chain. No other action runs.
+ * *hasData and *hasMessage tell whether a logdata or a msg action applied to
+ * the match.
+ */
+void RuleWithActions::expandMatchMetadata(Transaction *trans,
+    RuleMessage &ruleMessage, bool *hasData, bool *hasMessage) {
+    const bool fullMatch = !isChained();
+    const int highestSeverity = trans->m_highestSeverityAction;
+    auto expand = [&](actions::Action *a) {
+        if (dynamic_cast<actions::Tag *>(a)) {
+            a->evaluate(this, trans, ruleMessage);
+        } else if (dynamic_cast<actions::LogData *>(a)) {
+            a->evaluate(this, trans, ruleMessage);
+            *hasData = true;
+        } else if (dynamic_cast<actions::Msg *>(a)) {
+            a->evaluate(this, trans, ruleMessage);
+            *hasMessage = true;
+        } else if (fullMatch && dynamic_cast<actions::Severity *>(a)) {
+            a->evaluate(this, trans, ruleMessage);
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+        if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            expand(a.get());
+        }
+    }
+    for (actions::Tag *a : m_actionsTag) {
+        a->evaluate(this, trans, ruleMessage);
+    }
+    const auto [first, last] = trans->m_rules->m_exceptions
+        .m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = first; it != last; ++it) {
+        expand(it->second.get());
+    }
+    if (fullMatch && m_severity) {
+        m_severity->evaluate(this, trans, ruleMessage);
+    }
+    if (m_logData) {
+        m_logData->evaluate(this, trans, ruleMessage);
+        *hasData = true;
+    }
+    if (m_msg) {
+        m_msg->evaluate(this, trans, ruleMessage);
+        *hasMessage = true;
+    }
+    trans->m_highestSeverityAction = highestSeverity;
+}
+
+
+/*
+ * Tells whether the message of this rule will be saved: runs the log,
+ * nolog, auditlog and noauditlog actions on a scratch message, from the same
+ * sources and in the same order as executeActionsAfterFullMatch():
+ * SecDefaultAction, SecRuleUpdateActionById, then the rule's own actions.
+ * These actions only set RuleMessage::m_saveMessage.
+ */
+bool RuleWithActions::savesMessage(Transaction *trans) {
+    RuleMessage probe(*this, *trans);
+    auto apply = [&](actions::Action *a) {
+        if (dynamic_cast<actions::Log *>(a)
+            || dynamic_cast<actions::NoLog *>(a)
+            || dynamic_cast<actions::AuditLog *>(a)
+            || dynamic_cast<actions::NoAuditLog *>(a)) {
+            a->evaluate(this, trans, probe);
+        }
+    };
+
+    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+        if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            apply(a.get());
+        }
+    }
+    const auto [first, last] = trans->m_rules->m_exceptions
+        .m_action_pos_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = first; it != last; ++it) {
+        apply(it->second.get());
+    }
+    for (Action *a : m_actionsRuntimePos) {
+        apply(a);
+    }
+    return probe.m_saveMessage;
 }
 
 
@@ -493,7 +585,7 @@ std::vector<actions::Action *> RuleWithActions::getActionsByName(const std::stri
 }
 
 void RuleWithActions::performLogging(Transaction *trans,
-    RuleMessage &ruleMessage,
+    RuleMessage &ruleMessage,  // cppcheck-suppress constParameterReference ; NOSONAR, public ABI
     bool lastLog,
     bool chainedParentNull) const {
 
@@ -511,39 +603,34 @@ void RuleWithActions::performLogging(Transaction *trans,
     * FIXME: Study an way to avoid the copy.
     *
     **/
-    if (lastLog) {
-        if (chainedParentNull) {
-            isItToBeLogged = (ruleMessage.m_saveMessage && (m_chainedRuleParent == nullptr));
-            if (isItToBeLogged && !hasMultimatch()) {
-                /* warn */
-                trans->m_rulesMessages.push_back(ruleMessage);
+    /*
+     * Every caller logs a rule once, after its actions have run. A message
+     * that is not the last one of a rule is not logged.
+     */
+    if (!lastLog) {
+        return;
+    }
 
-                /* error */
-                if (!ruleMessage.m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
-            }
-        } else if (hasBlockAction() && !hasMultimatch()) {
+    if (chainedParentNull) {
+        isItToBeLogged = (ruleMessage.m_saveMessage && (m_chainedRuleParent == nullptr));
+        if (isItToBeLogged) {
             /* warn */
             trans->m_rulesMessages.push_back(ruleMessage);
+
             /* error */
             if (!ruleMessage.m_isDisruptive) {
                 trans->serverLog(ruleMessage);
-            }
-        } else {
-            if (isItToBeLogged && !hasMultimatch()
-                && !ruleMessage.m_message.empty()) {
-                /* warn */
-                trans->m_rulesMessages.push_back(ruleMessage);
-
-                /* error */
-                if (!ruleMessage.m_isDisruptive) {
-                    trans->serverLog(ruleMessage);
-                }
             }
         }
+    } else if (hasBlockAction()) {
+        /* warn */
+        trans->m_rulesMessages.push_back(ruleMessage);
+        /* error */
+        if (!ruleMessage.m_isDisruptive) {
+            trans->serverLog(ruleMessage);
+        }
     } else {
-        if (hasMultimatch() && isItToBeLogged) {
+        if (isItToBeLogged && !ruleMessage.m_message.empty()) {
             /* warn */
             trans->m_rulesMessages.push_back(ruleMessage);
 
@@ -551,8 +638,6 @@ void RuleWithActions::performLogging(Transaction *trans,
             if (!ruleMessage.m_isDisruptive) {
                 trans->serverLog(ruleMessage);
             }
-
-            ruleMessage.reset(false);
         }
     }
 }

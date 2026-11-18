@@ -24,6 +24,7 @@
 #include <list>
 #include <utility>
 #include <memory>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"
@@ -47,6 +48,39 @@ namespace modsecurity {
 
 using operators::Operator;
 using actions::Action;
+
+namespace {
+
+/* What one match of a rule adds to the rule's message. */
+struct KeptMatch {
+    std::string match;
+    std::string reference;
+    std::string data;
+    std::string message;
+    std::list<std::string> tags;
+    bool hasData = false;
+    bool hasMessage = false;
+};
+
+/*
+ * Takes what one match added to the rule message out of it, once its tags,
+ * msg and logdata have been expanded, and resets the message for the next
+ * match.
+ */
+KeptMatch takeMatch(RuleMessage &ruleMessage, bool hasData, bool hasMessage) {
+    KeptMatch kept;
+    kept.match = std::move(ruleMessage.m_match);
+    kept.reference = std::move(ruleMessage.m_reference);
+    kept.data = std::move(ruleMessage.m_data);
+    kept.message = std::move(ruleMessage.m_message);
+    kept.tags = std::move(ruleMessage.m_tags);
+    kept.hasData = hasData;
+    kept.hasMessage = hasMessage;
+    ruleMessage.reset(false);
+    return kept;
+}
+
+}  // namespace
 using variables::Variable;
 using actions::transformations::None;
 
@@ -205,6 +239,18 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     variables::Variables vars;
     vars.reserve(4);
     variables::Variables exclusion;
+    /*
+     * A rule that is not part of a chain logs every target it matches, and a
+     * chain starter with multiMatch logs every match once the chain has
+     * matched. These matches are kept here until the rule's actions have
+     * run. For a rule that is not chained, the last match is not kept: it
+     * goes on as the rule's own message.
+     */
+    const bool logsEachMatch = m_chainedRuleParent == nullptr
+        && (!isChained() || hasMultimatch());
+    std::vector<KeptMatch> keptMatches;
+    /* Whether the rule's message will be saved, known at the first match. */
+    int savesMessages = -1;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -308,7 +354,30 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    performLogging(trans, ruleMessage, false);
+                    if (logsEachMatch && savesMessages < 0) {
+                        savesMessages = savesMessage(trans) ? 1 : 0;
+                    }
+                    if (logsEachMatch && savesMessages == 1) {
+                        /*
+                         * Expand tag, msg and logdata now, while MATCHED_VAR
+                         * and the captures still belong to this match.
+                         */
+                        bool hasData = false;
+                        bool hasMessage = false;
+                        expandMatchMetadata(trans, ruleMessage, &hasData,
+                            &hasMessage);
+                        keptMatches.push_back(takeMatch(ruleMessage, hasData,
+                            hasMessage));
+                    } else if (logsEachMatch && !isChained()) {
+                        /*
+                         * Nothing of this rule is logged (nolog): keep only
+                         * the match and reference of the last match, which
+                         * go on as the rule's own message.
+                         */
+                        keptMatches.clear();
+                        keptMatches.push_back(takeMatch(ruleMessage, false,
+                            false));
+                    }
 
                     globalRet = true;
                 }
@@ -325,6 +394,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
         goto end_clean;
     }
     ms_dbg_a(trans, 4, "Rule returned 1.");
+
+    if (logsEachMatch && !isChained()) {
+        /*
+         * The last match goes on as the rule's own message. Its tags, msg
+         * and logdata are expanded again by executeActionsAfterFullMatch().
+         */
+        ruleMessage.m_match = std::move(keptMatches.back().match);
+        ruleMessage.m_reference = std::move(keptMatches.back().reference);
+        keptMatches.pop_back();
+    }
 
     if (this->isChained() == false) {
         goto end_exec;
@@ -348,7 +427,34 @@ end_clean:
     return false;
 
 end_exec:
+    const size_t tagsBeforeRuleActions = ruleMessage.m_tags.size();
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
+
+    /*
+     * The kept matches take everything the rule's actions set from the
+     * rule's message, and only describe their own match. A msg or logdata
+     * that only a chained rule has stays as the chain set it. Each kept
+     * match keeps the tags the message had before the rule's own actions
+     * ran, which are those of any chained rule, and takes its own tags
+     * instead of the ones executeActionsAfterFullMatch() expanded for the
+     * last match. The disruptive action ran once, for the rule's message, so
+     * the kept matches are logged as warnings.
+     */
+    for (auto &kept : keptMatches) {
+        RuleMessage m(ruleMessage);
+        m.m_match = std::move(kept.match);
+        m.m_reference = std::move(kept.reference);
+        m.m_tags.resize(tagsBeforeRuleActions);
+        m.m_tags.splice(m.m_tags.end(), kept.tags);
+        if (kept.hasData) {
+            m.m_data = std::move(kept.data);
+        }
+        if (kept.hasMessage) {
+            m.m_message = std::move(kept.message);
+        }
+        m.m_isDisruptive = false;
+        performLogging(trans, m, true, true);
+    }
 
     /* last rule in the chain. */
     performLogging(trans, ruleMessage, true, true);

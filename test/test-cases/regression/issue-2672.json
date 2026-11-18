@@ -1,0 +1,596 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - chain with multiMatch does not mark the audit log relevant when the chain fails",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Return code `200' is not interesting to audit logs",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,log,deny,status:403,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/modsec_audit_issue_2672_1.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - chain with multiMatch logs every match of the starter, then the chain with the denial",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=y0&c=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "debug_log": "Saving this request as part of the audit logs",
+      "audit_log": "\\A(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:a\"\\])(?=[\\s\\S]*Warning\\.[^\\n]*\\[data \"starter ARGS:b\"\\])(?=[\\s\\S]*Access denied with code 403[^\\n]*\\[id \"1001\"\\])",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,log,deny,status:403,msg:'chain starter',logdata:'starter %{MATCHED_VAR_NAME}',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/modsec_audit_issue_2672_2.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - nolog applies to a multiMatch chain starter",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403,
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,nolog,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none,setvar:tx.chain=1\"",
+      "SecRule TX:chain \"@eq 1\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - nolog applies to a multiMatch rule that is not chained",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403,
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,nolog,msg:'multiMatch',setvar:tx.score=+1\"",
+      "SecRule TX:score \"@eq 2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a denying multiMatch rule logs the denial",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403,
+      "audit_log": "Access denied with code 403[^\\n]*\\[id \"1001\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,log,deny,status:403,msg:'multiMatch'\"",
+      "SecAuditEngine RelevantOnly",
+      "SecAuditLogParts ABCFHZ",
+      "SecAuditLog /tmp/modsec_audit_issue_2672_5.log",
+      "SecAuditLogDirMode 0766",
+      "SecAuditLogFileMode 0666",
+      "SecAuditLogType Serial",
+      "SecAuditLogRelevantStatus \"^(?:5|4(?!04))\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch middle rule logs nothing when the chain fails",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\])",
+      "debug_log": "Executing chained rule\\.[\\s\\S]*Executing chained rule\\."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:lowercase,pass,log,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:urlDecode,t:lowercase,multiMatch,chain\"",
+      "SecRule ARGS \"@contains nomatch\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch middle rule logs the chain once when it completes",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=Y0&b=Y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\A(?![\\s\\S]*\\[id \"1001\"\\][\\s\\S]*\\[id \"1001\"\\])[\\s\\S]*\\[msg \"chain starter\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:lowercase,pass,log,msg:'chain starter',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:urlDecode,t:lowercase,multiMatch,chain\"",
+      "SecRule REQUEST_METHOD \"@streq GET\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - the matches of a multiMatch chain starter keep the msg of a chained rule",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0&c=y1",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\A(?=[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\][^\\n]*\\[data \"m ARGS:a\"\\])(?=[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\][^\\n]*\\[data \"m ARGS:b\"\\])(?:[\\s\\S]*\\[id \"1001\"\\][^\\n]*\\[msg \"chained msg\"\\]){3}"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,logdata:'m %{MATCHED_VAR_NAME}',chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none,msg:'chained msg'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a failed multiMatch chain does not raise HIGHEST_SEVERITY",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "debug_log": "Executing chained rule\\."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:urlDecode,t:lowercase,multiMatch,pass,log,severity:2,chain\"",
+      "SecRule ARGS \"@contains y1\" \"t:none\"",
+      "SecRule HIGHEST_SEVERITY \"@le 2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - an unconditional rule with multiMatch is logged",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\[id \"1003\"\\][^\\n]*\\[msg \"unconditional\"\\]"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1003,phase:1,pass,log,multiMatch,msg:'unconditional'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - every match of a multiMatch rule sees its severity in HIGHEST_SEVERITY",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "error_log": "\\A(?![\\s\\S]*\\[data \"ARGS:[ab] 255\"\\])(?=[\\s\\S]*\\[data \"ARGS:a 2\"\\])(?=[\\s\\S]*\\[data \"ARGS:b 2\"\\])"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,logdata:'%{MATCHED_VAR_NAME} %{HIGHEST_SEVERITY}'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch rule with log raises HIGHEST_SEVERITY at each match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,log,severity:2,setvar:'tx.seen=%{tx.seen}-%{HIGHEST_SEVERITY}'\"",
+      "SecRule TX:seen \"@streq -255-2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing Issue #2672 - a multiMatch rule with nolog raises HIGHEST_SEVERITY at each match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "www.modsecurity.org",
+        "User-Agent": "Mozilla/5.0",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=y0&b=y0",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains y0\" \"id:1001,phase:2,t:none,multiMatch,pass,nolog,severity:2,setvar:'tx.seen=%{tx.seen}-%{HIGHEST_SEVERITY}'\"",
+      "SecRule TX:seen \"@streq -255-2\" \"id:1002,phase:2,deny,status:403\""
+    ]
+  }
+]

@@ -93,7 +93,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "Testing Operator :: @validateByteRange limits the reference across target variables",
+    "title": "Testing Operator :: @validateByteRange limits the reference across the target variables of a chain starter",
     "client": {
       "ip": "200.249.12.31",
       "port": 123
@@ -128,7 +128,8 @@
     },
     "rules": [
       "SecRuleEngine On",
-      "SecRule ARGS \"@validateByteRange 32-126\" \"id:1,phase:2,deny,status:403,t:none,auditlog\"",
+      "SecRule ARGS \"@validateByteRange 32-126\" \"id:1,phase:2,deny,status:403,t:none,auditlog,chain\"",
+      "SecRule REQUEST_METHOD \"@streq GET\" \"t:none\"",
       "SecAuditEngine RelevantOnly",
       "SecAuditLogFormat JSON",
       "SecAuditLogParts ABCFHZ",

@@ -2337,7 +2337,8 @@ extern "C" int msc_set_request_hostname(Transaction *transaction,
  * Returns the size of Transaction::m_rulesMessages: the number of
  * RuleMessage records that were selected to be logged on the
  * transaction. This is not necessarily the total number of rules that
- * matched!
+ * matched! A rule that matches several targets has one record for each
+ * of them, so the same rule id can be counted more than once.
  *
  * @param transaction ModSecurity transaction.
  *
@@ -2354,7 +2355,9 @@ extern "C" size_t msc_get_rules_messages_size(const Transaction *transaction) {
  * @brief   Copy the rule ids from Transaction::m_rulesMessages into a buffer.
  *
  * Copies the rule id of each RuleMessage into the caller-provided buffer.
- * Only rule messages that were selected to be logged are included.
+ * Only rule messages that were selected to be logged are included. A rule
+ * that matches several targets has one record for each of them, so the
+ * same rule id can appear more than once.
  *
  * The caller is expected to size the buffer using
  * msc_get_rules_messages_size. If @p ids_len is smaller than the number
