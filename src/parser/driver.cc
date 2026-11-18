@@ -33,6 +33,31 @@ Driver::Driver()
   m_lastRule(nullptr) { }
 
 
+/*
+ * The parser stores a SecDefaultAction in m_defaultActions, and a phase can
+ * have only one per load, with a disruptive action, so a non-empty list means
+ * the load has one. The scope is synced when a rule is added, so the rule
+ * sees which defaults came before it, and at the end of the load, so the
+ * rules defined before a default see that the load has one.
+ */
+void Driver::syncDefaultActionsScope() {
+    for (int i = 0; i < modsecurity::Phases::NUMBER_OF_PHASES; i++) {
+        if (!m_defaultActionsScope->m_defined[i]
+                && !m_defaultActions[i].empty()) {
+            m_defaultActionsScope->m_actions[i] = m_defaultActions[i];
+            m_defaultActionsScope->m_defined[i] = true;
+        }
+    }
+}
+
+
+void Driver::attachDefaultActions(RuleWithActions *rule) {
+    syncDefaultActionsScope();
+    rule->setDefaultActions(
+        std::make_shared<const actions::DefaultActions>(m_defaultActionsScope));
+}
+
+
 Driver::~Driver() {
 
     while (loc.empty() == false) {
@@ -61,6 +86,7 @@ int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
         return false;
     }
 
+    attachDefaultActions(rule.get());
     m_rulesSetPhases.insert(std::move(rule));
 
     return true;
@@ -68,6 +94,7 @@ int Driver::addSecAction(std::unique_ptr<RuleWithActions> rule) {
 
 
 int Driver::addSecRuleScript(std::unique_ptr<RuleScript> rule) {
+    attachDefaultActions(rule.get());
     m_rulesSetPhases.insert(std::move(rule));
     return true;
 }
@@ -118,6 +145,7 @@ int Driver::addSecRule(std::unique_ptr<RuleWithActions> r) {
         }
     }
 
+    attachDefaultActions(rule.get());
     m_lastRule = rule.get();
     m_rulesSetPhases.insert(rule);
 
@@ -153,6 +181,7 @@ int Driver::parse(const std::string &f, const std::string &ref) {
         return 1;
     }
     scan_end();
+    syncDefaultActionsScope();
 
     /*
      * need to check for rules marked as chained but without

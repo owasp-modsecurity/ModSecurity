@@ -30,6 +30,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/audit_log.h"
 #include "src/rule_script.h"
+#include "src/actions/default_actions.h"
 #ifndef MS_CPPCHECK_DISABLED_FOR_PARSER
 #include "src/parser/seclang-parser.hh"
 #endif
@@ -91,6 +92,16 @@ class Driver : public RulesSetProperties {
     // Ordinarily other solutions would have been preferable, but location.hh is a
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
+
+ private:
+    /* Gives a rule being added the default actions in force; see DefaultActions. */
+    void attachDefaultActions(RuleWithActions *rule);
+    /* Copies the SecDefaultAction lists stored so far into the scope. */
+    void syncDefaultActionsScope();
+
+    /* The SecDefaultAction lists of this load; see DefaultActions. */
+    std::shared_ptr<actions::DefaultActionsScope> m_defaultActionsScope =
+        std::make_shared<actions::DefaultActionsScope>();
 };
 
 

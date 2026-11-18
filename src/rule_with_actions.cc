@@ -43,6 +43,7 @@
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
+#include "src/actions/default_actions.h"
 #include "src/variables/variable.h"
 
 
@@ -53,6 +54,61 @@ using actions::Action;
 using variables::Variable;
 using actions::transformations::None;
 using actions::transformations::Transformation;
+
+
+namespace {
+
+/*
+ * The default actions that run at each match rather than after the full
+ * match. As if written on the rule: of its own run-time actions, only setvar
+ * runs at each match.
+ */
+bool runsAtEachMatch(const actions::Action *a) {
+    return dynamic_cast<const actions::SetVar *>(a) != nullptr;
+}
+
+
+void runDefaultActionsAtMatch(RuleWithActions *rule,
+    const actions::DefaultActions::List &defaults, Transaction *trans) {
+    for (const auto &a : defaults) {
+        if (!runsAtEachMatch(a.get())) {
+            continue;
+        }
+        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
+            "action: " + *a->m_name.get());
+        a->evaluate(rule, trans);
+    }
+}
+
+}  // namespace
+
+
+/*
+ * Without an actions::DefaultActions (a rule not built by the parser), or
+ * when the rule's load has no SecDefaultAction for the phase, the rule takes
+ * the defaults of the rule set.
+ */
+const actions::DefaultActions::List &RuleWithActions::defaultActions(
+    const Transaction *trans) const {
+    const RuleWithActions *starter = this;
+    while (starter->m_chainedRuleParent != nullptr) {
+        starter = starter->m_chainedRuleParent;
+    }
+    if (starter->m_defaultActions != nullptr) {
+        const actions::DefaultActions::List *l =
+            starter->m_defaultActions->forPhase(getPhase());
+        if (l != nullptr) {
+            return *l;
+        }
+    }
+    return trans->m_rules->m_defaultActions[getPhase()];
+}
+
+
+void RuleWithActions::setDefaultActions(
+    std::shared_ptr<const actions::DefaultActions> defaultActions) {
+    m_defaultActions = std::move(defaultActions);
+}
 
 
 
@@ -74,6 +130,7 @@ RuleWithActions::RuleWithActions(
     m_msg(nullptr),
     m_severity(nullptr),
     m_actionsRuntimePos(),
+    m_defaultActions(),
     m_actionsSetVar(),
     m_actionsTag(),
     m_transformations(transformations != NULL ? *transformations : Transformations()),
@@ -202,6 +259,15 @@ bool RuleWithActions::evaluate(Transaction *transaction,
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, RuleMessage &ruleMessage) {
 
+    /*
+     * The setvar actions of SecDefaultAction run with the rule's own, at
+     * each match and before them, as if they were written on the rule
+     * (#3765). A chained rule keeps running them after the full match.
+     */
+    if (m_chainedRuleParent == nullptr) {
+        runDefaultActionsAtMatch(this, defaultActions(trans), trans);
+    }
+
     for (actions::SetVar *a : m_actionsSetVar) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
@@ -247,8 +313,12 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, RuleMessage &ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+    for (const auto &a : defaultActions(trans)) {
         if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            continue;
+        }
+        if (m_chainedRuleParent == nullptr && runsAtEachMatch(a.get())) {
+            /* already run at each match */
             continue;
         }
         if (!a.get()->isDisruptive()) {
@@ -373,7 +443,7 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+        for (auto &a : defaultActions(trans)) {
             if (a->action_kind \
                 != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;
