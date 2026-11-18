@@ -1,0 +1,40 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,9 +13,6 @@
+ # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ 
+ CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
+-if(POLICY CMP0026)
+-    cmake_policy(SET CMP0026 OLD)
+-endif()
+ 
+ PROJECT(YetAnotherJSONParser C)
+ 
+--- a/reformatter/CMakeLists.txt
++++ b/reformatter/CMakeLists.txt
+@@ -35,9 +35,8 @@
+ ENDIF (NOT WIN32)
+ 
+ # copy the binary into the output directory
+-GET_TARGET_PROPERTY(binPath json_reformat LOCATION)
+-
+ ADD_CUSTOM_COMMAND(TARGET json_reformat POST_BUILD
+-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${binPath} ${binDir})
++    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:json_reformat>" "${binDir}"
++    VERBATIM)
+ 
+ INSTALL(TARGETS json_reformat RUNTIME DESTINATION bin)
+--- a/verify/CMakeLists.txt
++++ b/verify/CMakeLists.txt
+@@ -29,9 +29,8 @@
+ TARGET_LINK_LIBRARIES(json_verify yajl_s)
+ 
+ # copy in the binary
+-GET_TARGET_PROPERTY(binPath json_verify LOCATION)
+-
+ ADD_CUSTOM_COMMAND(TARGET json_verify POST_BUILD
+-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${binPath} ${binDir})
++    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:json_verify>" "${binDir}"
++    VERBATIM)
+ 
+ INSTALL(TARGETS json_verify RUNTIME DESTINATION bin)
