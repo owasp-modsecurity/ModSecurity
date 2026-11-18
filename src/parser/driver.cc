@@ -30,7 +30,19 @@ Driver::Driver()
   : RulesSetProperties(),
   trace_scanning(false),
   trace_parsing(false),
-  m_lastRule(nullptr) { }
+  m_lastRule(nullptr),
+  m_defaultActionsScope(std::make_shared<actions::DefaultActionsScope>()) { }
+
+
+actions::Action *Driver::newDefaultActions() const {
+    return new actions::DefaultActions(m_defaultActionsScope,
+        m_defaultActions);
+}
+
+
+void Driver::defaultActionsDefined(int phase) {
+    m_defaultActionsScope->m_defined[phase] = true;
+}
 
 
 Driver::~Driver() {

@@ -43,6 +43,7 @@
 #include "src/actions/multi_match.h"
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
+#include "src/actions/default_actions.h"
 #include "src/variables/variable.h"
 
 
@@ -53,6 +54,28 @@ using actions::Action;
 using variables::Variable;
 using actions::transformations::None;
 using actions::transformations::Transformation;
+
+
+namespace {
+
+/*
+ * The SecDefaultAction list of the phase that applies to a rule. The parser
+ * puts an actions::DefaultActions at the front of the run-time actions of
+ * every rule it builds; a rule without one takes the defaults of the rule set.
+ */
+const actions::DefaultActions::List &defaultActionsOf(
+    const MatchActions &runtimeActions, const Transaction *trans, int phase) {
+    if (!runtimeActions.empty()) {
+        const auto *d = dynamic_cast<const actions::DefaultActions *>(
+            runtimeActions.front());
+        if (d != nullptr) {
+            return d->forPhase(trans, phase);
+        }
+    }
+    return trans->m_rules->m_defaultActions[phase];
+}
+
+}  // namespace
 
 
 
@@ -247,7 +270,8 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     bool containsBlock, RuleMessage &ruleMessage) {
     bool disruptiveAlreadyExecuted = false;
 
-    for (const auto &a : trans->m_rules->m_defaultActions[getPhase()]) { // cppcheck-suppress ctunullpointer
+    for (const auto &a :
+        defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
         if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
             continue;
         }
@@ -283,6 +307,9 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         m_msg->evaluate(this, trans, ruleMessage);
     }
     for (Action *a : this->m_actionsRuntimePos) {
+        if (dynamic_cast<actions::DefaultActions *>(a)) {
+            continue;
+        }
         if (!a->isDisruptive()
                 && !(disruptiveAlreadyExecuted
                 && dynamic_cast<actions::Block *>(a))) {
@@ -316,6 +343,15 @@ void RuleWithActions::executeAction(Transaction *trans,
         ms_dbg_a(trans, 4, "Running (disruptive)     action: " + *a->m_name.get() + \
             ".");
         a->evaluate(this, trans, ruleMessage);
+        if (dynamic_cast<actions::Block *>(a)) {
+            /* `block' takes the disruptive action of the default in force */
+            for (const auto &d :
+                defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
+                if (d->isDisruptive()) {
+                    d->evaluate(this, trans, ruleMessage);
+                }
+            }
+        }
         return;
     }
 
@@ -373,7 +409,8 @@ void RuleWithActions::executeTransformations(
     // Notice that first we make sure that won't be a t:none
     // on the target rule.
     if (none == 0) {
-        for (auto &a : trans->m_rules->m_defaultActions[getPhase()]) {
+        for (auto &a :
+            defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
             if (a->action_kind \
                 != actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
                 continue;

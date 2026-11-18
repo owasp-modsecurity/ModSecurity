@@ -1119,6 +1119,7 @@ expression:
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        a->push_back(driver.newDefaultActions());
         for (auto &i : *$4.get()) {
             if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(pt);
@@ -1153,10 +1154,13 @@ expression:
             v->push_back(i.release());
         }
 
+        std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
+        a->push_back(driver.newDefaultActions());
+
         std::unique_ptr<RuleWithOperator> rule(new RuleWithOperator(
             /* op */ $3.release(),
             /* variables */ v,
-            /* actions */ NULL,
+            /* actions */ a,
             /* transformations */ NULL,
             /* file name */ std::string(*@1.end.filename),
             /* line number */ @1.end.line
@@ -1169,6 +1173,7 @@ expression:
       {
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        a->push_back(driver.newDefaultActions());
         for (auto &i : *$2.get()) {
             if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(pt);
@@ -1190,6 +1195,7 @@ expression:
         std::string err;
         std::vector<actions::Action *> *a = new std::vector<actions::Action *>();
         std::vector<actions::transformations::Transformation *> *t = new std::vector<actions::transformations::Transformation *>();
+        a->push_back(driver.newDefaultActions());
         for (auto &i : *$2.get()) {
             if (auto pt = dynamic_cast<actions::transformations::Transformation *>(i.get())) {
               t->push_back(pt);
@@ -1268,6 +1274,7 @@ expression:
             driver.m_defaultActions[definedPhase].push_back(
                 std::unique_ptr<actions::Action>(a));
         }
+        driver.defaultActionsDefined(definedPhase);
 
         delete actions;
       }

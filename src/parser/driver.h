@@ -30,6 +30,7 @@
 #include "modsecurity/rules_set_properties.h"
 #include "modsecurity/audit_log.h"
 #include "src/rule_script.h"
+#include "src/actions/default_actions.h"
 #ifndef MS_CPPCHECK_DISABLED_FOR_PARSER
 #include "src/parser/seclang-parser.hh"
 #endif
@@ -63,6 +64,11 @@ class Driver : public RulesSetProperties {
     int addSecMarker(const std::string& marker, const std::string &fileName, int lineNumber);
     int addSecRuleScript(std::unique_ptr<RuleScript> rule);
 
+    /* The default actions of a rule being built; see DefaultActions. */
+    actions::Action *newDefaultActions() const;
+    /* Called once a SecDefaultAction for the phase has been stored. */
+    void defaultActionsDefined(int phase);
+
     bool scan_begin();
     void scan_end();
     bool trace_scanning;
@@ -91,6 +97,9 @@ class Driver : public RulesSetProperties {
     // Ordinarily other solutions would have been preferable, but location.hh is a
     // bison-generated file, which makes some alternative solutions impractical.
     std::list<std::string> m_filenames;
+
+ private:
+    std::shared_ptr<actions::DefaultActionsScope> m_defaultActionsScope;
 };
 
 
