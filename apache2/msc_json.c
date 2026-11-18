@@ -187,7 +187,7 @@ static int yajl_start_array(void *ctx) {
     msr->json->current_depth++;
     if (msr->json->current_depth > msr->txcfg->reqbody_json_depth_limit) {
         msr->json->depth_limit_exceeded = 1;
-	return 0;
+        return 0;
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -262,7 +262,7 @@ static int yajl_start_map(void *ctx)
     msr->json->current_depth++;
     if (msr->json->current_depth > msr->txcfg->reqbody_json_depth_limit) {
         msr->json->depth_limit_exceeded = 1;
-	return 0;
+        return 0;
     }
 
     if (msr->txcfg->debuglog_level >= 9) {
@@ -367,6 +367,10 @@ int json_init(modsec_rec *msr, char **error_msg) {
     return 1;
 }
 
+void json_allow_partial_values(modsec_rec *msr) {
+    (void)yajl_config(msr->json->handle, yajl_allow_partial_values, 1);
+}
+
 /**
  * Feed one chunk of data to the JSON parser.
  */
@@ -380,16 +384,16 @@ int json_process_chunk(modsec_rec *msr, const char *buf, unsigned int size, char
     /* Feed our parser and catch any errors */
     msr->json->status = yajl_parse(msr->json->handle, buf, size);
     if (msr->json->status != yajl_status_ok) {
-	if (msr->json->depth_limit_exceeded) {
-           *error_msg = "JSON depth limit exceeded";
-	} else {
-        if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
-        else {
-             char* yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
-             *error_msg = apr_pstrdup(msr->mp, yajl_err);
-             yajl_free_error(msr->json->handle, yajl_err);
+        if (msr->json->depth_limit_exceeded) {
+             *error_msg = "JSON depth limit exceeded";
+        } else {
+            if (msr->json->yajl_error) *error_msg = msr->json->yajl_error;
+            else {
+                 char* yajl_err = yajl_get_error(msr->json->handle, 0, buf, size);
+                 *error_msg = apr_pstrdup(msr->mp, yajl_err);
+                 yajl_free_error(msr->json->handle, yajl_err);
+            }
         }
-	}
         return -1;
     }
 
@@ -409,13 +413,13 @@ int json_complete(modsec_rec *msr, char **error_msg) {
     /* Wrap up the parsing process */
     msr->json->status = yajl_complete_parse(msr->json->handle);
     if (msr->json->status != yajl_status_ok) {
-	if (msr->json->depth_limit_exceeded) {
-           *error_msg = "JSON depth limit exceeded";
-	} else {
-           char *yajl_err = yajl_get_error(msr->json->handle, 0, NULL, 0);
-           *error_msg = apr_pstrdup(msr->mp, yajl_err);
-           yajl_free_error(msr->json->handle, yajl_err);
-	}
+        if (msr->json->depth_limit_exceeded) {
+             *error_msg = "JSON depth limit exceeded";
+        } else {
+             char *yajl_err = yajl_get_error(msr->json->handle, 0, NULL, 0);
+             *error_msg = apr_pstrdup(msr->mp, yajl_err);
+             yajl_free_error(msr->json->handle, yajl_err);
+        }
 
         return -1;
     }
