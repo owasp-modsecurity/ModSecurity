@@ -299,47 +299,5 @@
       "SecRuleScript test-cases/data/match.lua \"id:1,phase:2,setvar:tx.seq=%{tx.seq}O\"",
       "SecRule TX:seq \"@streq DO\" \"id:2,phase:2,deny,status:403\""
     ]
-  },
-  {
-    "enabled": 1,
-    "version_min": 300000,
-    "title": "SecDefaultAction: its initcol runs at each match, before its setvar",
-    "client": {
-      "ip": "200.249.12.31",
-      "port": 123
-    },
-    "server": {
-      "ip": "200.249.12.31",
-      "port": 80
-    },
-    "request": {
-      "headers": {
-        "Host": "localhost",
-        "Content-Length": "0"
-      },
-      "uri": "/?a=attackone&b=attacktwo",
-      "method": "GET",
-      "body": [
-        ""
-      ]
-    },
-    "response": {
-      "headers": {
-        "Content-Type": "text/html",
-        "Content-Length": "8"
-      },
-      "body": [
-        "no need."
-      ]
-    },
-    "expected": {
-      "http_code": 403
-    },
-    "rules": [
-      "SecRuleEngine On",
-      "SecDefaultAction \"phase:2,log,pass,initcol:ip=%{REMOTE_ADDR},setvar:ip.c=+1\"",
-      "SecRule ARGS \"@beginsWith attack\" \"id:1,phase:2\"",
-      "SecRule IP:c \"@eq 2\" \"id:2,phase:2,deny,status:403\""
-    ]
   }
 ]

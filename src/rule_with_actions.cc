@@ -44,10 +44,6 @@
 #include "src/actions/set_var.h"
 #include "src/actions/block.h"
 #include "src/actions/default_actions.h"
-#include "src/actions/init_col.h"
-#include "src/actions/set_rsc.h"
-#include "src/actions/set_sid.h"
-#include "src/actions/set_uid.h"
 #include "src/variables/variable.h"
 
 
@@ -95,15 +91,11 @@ const actions::DefaultActions::List &defaultActionsOf(
 
 /*
  * The default actions that run at each match rather than after the full
- * match: setvar, and the actions that set the key of a persistent collection
- * a setvar may write to.
+ * match. As if written on the rule: of its own run-time actions, only setvar
+ * runs at each match.
  */
 bool runsAtEachMatch(const actions::Action *a) {
-    return dynamic_cast<const actions::SetVar *>(a) != nullptr
-        || dynamic_cast<const actions::InitCol *>(a) != nullptr
-        || dynamic_cast<const actions::SetSID *>(a) != nullptr
-        || dynamic_cast<const actions::SetUID *>(a) != nullptr
-        || dynamic_cast<const actions::SetRSC *>(a) != nullptr;
+    return dynamic_cast<const actions::SetVar *>(a) != nullptr;
 }
 
 
