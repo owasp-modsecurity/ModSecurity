@@ -506,5 +506,93 @@
       "SecRuleUpdateActionById 30 \"setvar:'tx.seq=%{tx.seq}U'\"",
       "SecRule TX:seq \"@streq OUOU\" \"id:997,phase:2,deny,status:403,log\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (12/n) - updated setvar on a script does not run when the script does not match",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p1=value1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/lua-getvars-rule.lua \"id:40,phase:2,pass\"",
+      "SecRuleUpdateActionById 40 \"setvar:tx.flag=1\"",
+      "SecRule TX:flag \"@eq 1\" \"id:996,phase:2,deny,status:403,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateActionById (13/n) - updated setvar on a script runs when the script matches",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?p1=value1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleScript test-cases/data/match.lua \"id:40,phase:2,pass\"",
+      "SecRuleUpdateActionById 40 \"setvar:tx.flag=1\"",
+      "SecRule TX:flag \"@eq 1\" \"id:996,phase:2,deny,status:403,log\""
+    ]
   }
 ]

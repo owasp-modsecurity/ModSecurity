@@ -199,6 +199,24 @@ bool RuleWithActions::evaluate(Transaction *transaction,
 }
 
 
+namespace {
+
+/* A setvar added by SecRuleUpdateActionById runs after the rule's own. */
+void runUpdatedSetVars(RuleWithActions *rule, Transaction *trans) {
+    for (const auto &[id, a] :
+        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
+        if (id != rule->m_ruleId || *a->m_name.get() != "setvar") {
+            continue;
+        }
+        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
+            "action: " + *a->m_name.get());
+        a->evaluate(rule, trans);
+    }
+}
+
+}  // namespace
+
+
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, RuleMessage &ruleMessage) {
 
@@ -209,19 +227,7 @@ void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *
         a->evaluate(this, trans);
     }
 
-    for (auto &b :
-        trans->m_rules->m_exceptions.m_action_pos_update_target_by_id) {
-        if (m_ruleId != b.first) {
-            continue;
-        }
-        auto *a = dynamic_cast<actions::SetVar *>(b.second.get());
-        if (a == nullptr) {
-            continue;
-        }
-        ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
-            "action: " + *a->m_name.get());
-        a->evaluate(this, trans);
-    }
+    runUpdatedSetVars(this, trans);
 
     for (auto &b :
         trans->m_rules->m_exceptions.m_action_pre_update_target_by_id) {
@@ -283,7 +289,7 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
         }
         actions::Action *a = b.second.get();
         // Already run in executeActionsIndependentOfChainedRuleResult.
-        if (dynamic_cast<actions::SetVar *>(a) != nullptr) {
+        if (*a->m_name.get() == "setvar") {
             continue;
         }
         executeAction(trans, containsBlock, ruleMessage, a, false);
