@@ -225,6 +225,24 @@ bool RuleWithActions::evaluate(Transaction *transaction,
 void RuleWithActions::executeActionsIndependentOfChainedRuleResult(Transaction *trans,
     bool *containsBlock, RuleMessage &ruleMessage) {
 
+    /*
+     * The setvar actions of SecDefaultAction run with the rule's own, at
+     * each match and before them, as if they were written on the rule
+     * (#3765). A chained rule keeps running them after the full match.
+     */
+    if (m_chainedRuleParent == nullptr) {
+        for (const auto &a :
+            defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
+            auto *sv = dynamic_cast<actions::SetVar *>(a.get());
+            if (sv == nullptr) {
+                continue;
+            }
+            ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
+                "action: " + *a->m_name.get());
+            sv->evaluate(this, trans);
+        }
+    }
+
     for (actions::SetVar *a : m_actionsSetVar) {
         ms_dbg_a(trans, 4, "Running [independent] (non-disruptive) " \
             "action: " + *a->m_name.get());
@@ -273,6 +291,11 @@ void RuleWithActions::executeActionsAfterFullMatch(Transaction *trans,
     for (const auto &a :
         defaultActionsOf(m_actionsRuntimePos, trans, getPhase())) {
         if (a.get()->action_kind != actions::Action::Kind::RunTimeOnlyIfMatchKind) {
+            continue;
+        }
+        if (m_chainedRuleParent == nullptr
+            && dynamic_cast<actions::SetVar *>(a.get())) {
+            /* already run at each match */
             continue;
         }
         if (!a.get()->isDisruptive()) {

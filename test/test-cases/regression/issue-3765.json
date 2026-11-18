@@ -1,0 +1,216 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: its setvar runs at every match of the rule (log)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,log,pass,setvar:tx.d=+1\"",
+      "SecRule ARGS \"@beginsWith attack\" \"id:1,phase:2,setvar:tx.o=+1\"",
+      "SecRule TX:d \"@eq 2\" \"id:2,phase:2,deny,status:403,chain\"",
+      "  SecRule TX:o \"@eq 2\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: its setvar runs at every match of the rule (nolog)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,nolog,pass,setvar:tx.d=+1\"",
+      "SecRule ARGS \"@beginsWith attack\" \"id:1,phase:2,setvar:tx.o=+1\"",
+      "SecRule TX:d \"@eq 2\" \"id:2,phase:2,deny,status:403,chain\"",
+      "  SecRule TX:o \"@eq 2\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: its setvar runs before the rule's own, at each match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,log,pass,setvar:tx.seq=%{tx.seq}D\"",
+      "SecRule ARGS \"@beginsWith attack\" \"id:1,phase:2,setvar:tx.seq=%{tx.seq}O\"",
+      "SecRule TX:seq \"@streq DODO\" \"id:2,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: its setvar runs at each match of a chain starter, also when the chain fails",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,log,pass,setvar:tx.d=+1\"",
+      "SecRule ARGS \"@beginsWith attack\" \"id:1,phase:2,setvar:tx.o=+1,chain\"",
+      "  SecRule ARGS:c \"@streq x\" \"t:none\"",
+      "SecRule TX:d \"@eq 2\" \"id:2,phase:2,deny,status:403,chain\"",
+      "  SecRule TX:o \"@eq 2\" \"t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecDefaultAction: its setvar does not run when the rule does not match",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attackone&b=attacktwo",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,log,pass,setvar:tx.d=+1\"",
+      "SecRule ARGS \"@streq nomatch\" \"id:1,phase:2\"",
+      "SecRule &TX:d \"@eq 0\" \"id:2,phase:2,deny,status:403\""
+    ]
+  }
+]
