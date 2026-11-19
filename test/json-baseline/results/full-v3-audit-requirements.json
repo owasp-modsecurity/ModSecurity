@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "selected_suite": "requirements",
+  "contract_counts": {
+    "requirements": {
+      "PASS": 0,
+      "FAIL": 4,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "characterization": {
+      "PASS": 0,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "assertion_sensitivity": {
+      "PASS": 0,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    }
+  },
+  "production_base": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+  "cases": [
+    {
+      "id": "AUDX-R01",
+      "layer": "Transaction audit writer",
+      "contract": "desired requirement",
+      "purpose": "response writer output is valid UTF-8 JSON",
+      "fixture": "invalid-utf8",
+      "input_length": 17,
+      "input_hex": "70726580c0afeda080f4908080706f7374",
+      "input_sha256": "e3346c3c699552d0a9dd252b39ab0e64309fe4782a7dbed08698bd352bd69d34",
+      "parts_mask": 96,
+      "lifecycle": "single",
+      "status": "FAIL",
+      "reason": "'utf-8' codec can't decode byte 0x80 in position 387: invalid start byte",
+      "output_hex_prefix": "7b227472616e73616374696f6e223a7b22636c69656e745f6970223a223139322e302e322e3331222c2274696d655f7374616d70223a22546875204f63742031352031353a33353a30332032303236222c227365727665725f6964223a2230363464383332393436613736333837343632616139333235396439626234616234613566613066222c22636c69656e745f706f7274223a31303030312c22686f73745f6970223a223139322e302e322e3332222c22686f73745f706f7274223a38"
+    },
+    {
+      "id": "OFFSET-R01",
+      "layer": "public ModSecurity.processContentOffset writer",
+      "contract": "desired requirement",
+      "purpose": "empty match produces valid JSON (representation otherwise open)",
+      "input_hex": "414243444546",
+      "input_length": 6,
+      "match_string": "",
+      "status": "FAIL",
+      "reason": "Expecting ',' delimiter: line 1 column 76 (char 75)",
+      "output_hex_prefix": "300a7b226d61746368223a5b7b227661726961626c65223a7b22686967686c69676874223a5b5d2c2276616c7565223a5b7b2276616c7565223a22227d5d2c226f70657261746f72223a7b7d7d5d7d5d0a"
+    },
+    {
+      "id": "OFFSET-R02",
+      "layer": "public ModSecurity.processContentOffset writer",
+      "contract": "desired requirement",
+      "purpose": "single variable range and operator range round-trip",
+      "input_hex": "414243444546",
+      "input_length": 6,
+      "match_string": "v1,3o1,1",
+      "status": "FAIL",
+      "reason": "Expecting ',' delimiter: line 1 column 76 (char 75)",
+      "output_hex_prefix": "300a7b226d61746368223a5b7b227661726961626c65223a7b22686967686c69676874223a5b5d2c2276616c7565223a5b7b2276616c7565223a22227d5d2c226f70657261746f72223a7b7d7d5d7d5d0a"
+    },
+    {
+      "id": "OFFSET-R03",
+      "layer": "public ModSecurity.processContentOffset writer",
+      "contract": "desired requirement",
+      "purpose": "transformation output is valid structural JSON",
+      "input_hex": "414243444546",
+      "input_length": 6,
+      "match_string": "v0,6v0,6t:lowercase",
+      "status": "FAIL",
+      "reason": "Expecting ',' delimiter: line 1 column 161 (char 160)",
+      "output_hex_prefix": "300a7b226d61746368223a5b7b227661726961626c65223a7b22686967686c69676874223a5b7b227374617274696e674174223a2230222c2273697a65223a2236227d5d2c2276616c7565223a5b7b2276616c7565223a22414243444546227d2c7b227472616e73666f726d6174696f6e223a22743a6c6f77657263617365222c2276616c7565223a22616263646566227d5d2c226f70657261746f72223a7b7d7d5d7d5d0a"
+    }
+  ],
+  "counts": {
+    "PASS": 0,
+    "FAIL": 4,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "execution_context": {
+    "original_commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+    "source_root": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+    "library_sha256": "d9ccbbc719645a630969680d99a4c07d36e0dc8a4b9c129095948790e29e8f21",
+    "historical_expectation_origin": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+    "note": "Fresh execution of fixed existing expectations on the new original. Historical reports retain their original names and references."
+  }
+}

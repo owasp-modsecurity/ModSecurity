@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-15T15:33:19.622484+00:00",
+  "original_commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+  "source_root": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+  "source_head": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+  "scope": "Unmodified official current v3 source and original existing native tests before any task test/documentation overlay.",
+  "environment_report": "environment.json",
+  "production_matches_original_before_tests": true,
+  "build_steps": [
+    {
+      "command": [
+        "sh",
+        "-e",
+        "./build.sh"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+      "environment_file": "/workspace/modsecurity-env/env.sh",
+      "exit": 0,
+      "log": "bootstrap.log"
+    },
+    {
+      "command": [
+        "./configure",
+        "--prefix=/workspace/work/json-yajl-pr-expansion/full-v3-install",
+        "--enable-assertions=yes",
+        "--enable-parser-generation=no",
+        "--without-geoip",
+        "--with-yajl",
+        "--with-pcre2",
+        "--with-curl",
+        "--with-libxml",
+        "--with-lua",
+        "--with-lmdb",
+        "--with-maxmind",
+        "--with-ssdeep=/workspace/modsecurity-env/deps/usr",
+        "CXXFLAGS=-O2 -g",
+        "CPPFLAGS=-I/workspace/modsecurity-env/deps/usr/include",
+        "LDFLAGS=-L/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu -Wl,-rpath,/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+      "environment_file": "/workspace/modsecurity-env/env.sh",
+      "exit": 0,
+      "log": "configure.log"
+    },
+    {
+      "command": [
+        "make",
+        "-j3"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+      "environment_file": "/workspace/modsecurity-env/env.sh",
+      "exit": 0,
+      "log": "make.log"
+    }
+  ],
+  "library": {
+    "path": "/workspace/work/json-yajl-pr-expansion/full-v3-english/src/.libs/libmodsecurity.so.3.0.17",
+    "sha256": "d9ccbbc719645a630969680d99a4c07d36e0dc8a4b9c129095948790e29e8f21",
+    "different_from_8271_build": true
+  },
+  "native_runner": {
+    "path": "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/.libs/regression_tests",
+    "sha256": "26f7bab8dd5c8b1f84b0435e1d1c685bc03673c25bf3ab76614e3ae0617865f9",
+    "resolved_library": "/workspace/work/json-yajl-pr-expansion/full-v3-english/src/.libs/libmodsecurity.so.3.0.17"
+  },
+  "suites": [
+    {
+      "suite": "request-body-parser-json",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/request-body-parser-json.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 6,
+      "fixture_sha256": "c826accd0483954c9d0c0b4254299259b829fffb3d1c8c5d908fc1831c9df072",
+      "stdout": "request-body-parser-json.stdout.log",
+      "stderr": "request-body-parser-json.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 6 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 6,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "issue-1576",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/issue-1576.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 3,
+      "fixture_sha256": "58de6fcce2d6796986c5cb8492620227fc73280e314d60e9a43491e10b3eb15c",
+      "stdout": "issue-1576.stdout.log",
+      "stderr": "issue-1576.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 3 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 3,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "secargumentslimit",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/secargumentslimit.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 2,
+      "fixture_sha256": "b09471b24673f2a0366d5f9b5291af5dc4127d409a259555015843f6cfd60c32",
+      "stdout": "secargumentslimit.stdout.log",
+      "stderr": "secargumentslimit.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 2 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "auditlog",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/auditlog.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 15,
+      "fixture_sha256": "d231abc7b45d0f9f7d449168bd48143d23d7e3ab03b71336e567fcb80c2a4cf7",
+      "stdout": "auditlog.stdout.log",
+      "stderr": "auditlog.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 15 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 15,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "config-body_limits",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/config-body_limits.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 16,
+      "fixture_sha256": "a64165a60e60b5e5ad95d4fd96571d4da8cf3cbfad7e18ecd4d9648a610eb8be",
+      "stdout": "config-body_limits.stdout.log",
+      "stderr": "config-body_limits.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 16 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 16,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "transformations",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/transformations.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 8,
+      "fixture_sha256": "cc37266af10278a41ab6d1a8b0e4c11bc78dcbedd43a8680925eb3d889c76cfc",
+      "stdout": "transformations.stdout.log",
+      "stderr": "transformations.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 8 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 8,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    },
+    {
+      "suite": "config-upload_file_mode",
+      "command": [
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/regression_tests",
+        "/workspace/work/json-yajl-pr-expansion/full-v3-english/test/test-cases/regression/config-upload_file_mode.json"
+      ],
+      "cwd": "/workspace/work/json-yajl-pr-expansion/full-v3-build-logs/native-working",
+      "enabled_fixture_cases": 3,
+      "fixture_sha256": "d29ca406fb6c8e429d2196eae48f0e3568ba8d63c2220167a6968c3827066097",
+      "stdout": "config-upload_file_mode.stdout.log",
+      "stderr": "config-upload_file_mode.stderr.log",
+      "exit": 0,
+      "native_summary": "Ran a total of: 3 regression tests - All tests passed. 0 skipped test(s). 0 disabled test(s).",
+      "status": "PASS",
+      "counts": {
+        "PASS": 3,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      }
+    }
+  ],
+  "counts": {
+    "PASS": 53,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "original_framework_side_effects": "Original audit fixtures use their fixed synthetic /tmp audit paths; upload fixtures keep synthetic temporary files in /tmp. Runner working directory and captured process logs are outside the source tree.",
+  "tracked_source_diff_after_tests": "",
+  "tracked_sources_unchanged": true,
+  "status": "PASS",
+  "exit": 0
+}

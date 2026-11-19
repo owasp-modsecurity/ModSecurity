@@ -1,0 +1,801 @@
+{
+  "schema": 1,
+  "production_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+  "profile_counts": {
+    "characterization": {
+      "PASS": 399,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "requirements": {
+      "PASS": 6,
+      "FAIL": 20,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "all": {
+      "PASS": 405,
+      "FAIL": 20,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    }
+  },
+  "profiles": {
+    "characterization": {
+      "schema": 1,
+      "profile": "characterization",
+      "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+      "created_utc": "2026-10-15T14:26:26.376432+00:00",
+      "counts": {
+        "PASS": 399,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "suites": [
+        {
+          "name": "request-baseline",
+          "counts": {
+            "PASS": 163,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-baseline.json",
+          "stdout": "request-baseline.stdout.log",
+          "stderr": "request-baseline.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-characterization-01/request-baseline.json",
+            "--sensitivity"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "request-expanded",
+          "counts": {
+            "PASS": 192,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-expanded.json",
+          "stdout": "request-expanded.stdout.log",
+          "stderr": "request-expanded.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-characterization-01/request-expanded.json",
+            "--sensitivity"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "audit-baseline",
+          "counts": {
+            "PASS": 12,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-baseline.json",
+          "stdout": "audit-baseline.stdout.log",
+          "stderr": "audit-baseline.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-characterization-01/audit-baseline.json"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "audit-expanded-characterization",
+          "counts": {
+            "PASS": 21,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-expanded-characterization.json",
+          "stdout": "audit-expanded-characterization.stdout.log",
+          "stderr": "audit-expanded-characterization.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/extended-audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-characterization-01/audit-expanded-characterization.json",
+            "--suite",
+            "characterization"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "native-json",
+          "counts": {
+            "PASS": 11,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "native-json.json",
+          "stdout": "native-json.stdout.log",
+          "stderr": "native-json.stderr.log",
+          "command": [
+            "/workspace/work/json-yajl-baseline/v3/test/regression_tests",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/test-cases/regression/request-body-parser-json.json"
+          ],
+          "loader": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "count_scope": "Individual case/assertion-control counts; a suite-level BLOCKED/FAIL is explicitly labelled when no valid case report exists.",
+      "build_manifest": {
+        "schema": 1,
+        "status": "PASS",
+        "created_utc": "2026-10-15T14:25:05.429157+00:00",
+        "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline",
+        "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+        "source_root": "/workspace/work/json-yajl-baseline/v3",
+        "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+        "production_matches_original": true,
+        "submodules": {
+          "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+          "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+          "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+        },
+        "ancillary_differences": [
+          "doc/JSON-YAJL-BASELINE.md",
+          "doc/json-yajl-baseline-v3.md",
+          "doc/json-yajl-code-analysis.md",
+          "doc/json-yajl-provenance.json",
+          "test/Makefile.am",
+          "test/json-baseline/audit_probe.cc",
+          "test/json-baseline/build-probes.sh",
+          "test/json-baseline/probe.cc",
+          "test/json-baseline/results/v3-audit-results.json",
+          "test/json-baseline/results/v3-request-results.json",
+          "test/json-baseline/results/v3-sanitizer-results.json",
+          "test/json-baseline/results/v3-summary.json",
+          "test/json-baseline/run.py",
+          "test/json-baseline/run_audit.py",
+          "test/test-cases/regression/request-body-parser-json.json"
+        ],
+        "library": {
+          "path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+          "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20",
+          "directory": "/workspace/work/json-yajl-baseline/v3/src/.libs"
+        },
+        "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+        "yajl_version": "2.1.0",
+        "build_options": {
+          "standard": "c++17",
+          "WITH_YAJL": true,
+          "extra_cppflag_count": 0,
+          "extra_ldflag_count": 0
+        },
+        "probes": {
+          "probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/probe",
+            "sha256": "10fd166b0a69c3d1d5ec3cc628e8c40aa0954726e05965070af4e74276dd7dce",
+            "source_file": "probe.cc",
+            "source_sha256": "9000dcda7fdebbb672ff09547972fc48678e14224b89c929fbfa4f543f971636",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/audit-probe",
+            "sha256": "2a8724b8b01598092fcd6189170694b3c286d22e08fc62e74f9bf6225def3de8",
+            "source_file": "audit_probe.cc",
+            "source_sha256": "6ae5ee00f780da28b96071ed54868d6883e1dd3910be43358a13fccd6bf07a7c",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "extended-audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/extended-audit-probe",
+            "sha256": "10f9faa81c8f9e75938f9ff3f0f3305de295ad05eedc419babfa89869800975e",
+            "source_file": "extended_audit_probe.cc",
+            "source_sha256": "83fbeefad30a534ab1b44d6283160d760c1b32dc37ad655f15858ef2c313c08d",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          }
+        },
+        "active_json_canary": true
+      },
+      "runtime_verification": {
+        "source": {
+          "source_root": "/workspace/work/json-yajl-baseline/v3",
+          "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+          "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+          "production_matches_original": true,
+          "submodules": {
+            "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+            "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+            "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+          },
+          "ancillary_differences": [
+            "doc/JSON-YAJL-BASELINE.md",
+            "doc/json-yajl-baseline-v3.md",
+            "doc/json-yajl-code-analysis.md",
+            "doc/json-yajl-provenance.json",
+            "test/Makefile.am",
+            "test/json-baseline/audit_probe.cc",
+            "test/json-baseline/build-probes.sh",
+            "test/json-baseline/probe.cc",
+            "test/json-baseline/results/v3-audit-results.json",
+            "test/json-baseline/results/v3-request-results.json",
+            "test/json-baseline/results/v3-sanitizer-results.json",
+            "test/json-baseline/results/v3-summary.json",
+            "test/json-baseline/run.py",
+            "test/json-baseline/run_audit.py",
+            "test/test-cases/regression/request-body-parser-json.json"
+          ]
+        },
+        "loaders": {
+          "probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "extended-audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          }
+        },
+        "active_json_canary": true
+      },
+      "exit": 0
+    },
+    "requirements": {
+      "schema": 1,
+      "profile": "requirements",
+      "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+      "created_utc": "2026-10-15T14:26:26.381140+00:00",
+      "counts": {
+        "PASS": 6,
+        "FAIL": 20,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "suites": [
+        {
+          "name": "request-requirements",
+          "counts": {
+            "PASS": 6,
+            "FAIL": 16,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-requirements.json",
+          "stdout": "request-requirements.stdout.log",
+          "stderr": "request-requirements.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_requirements.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-requirements-01/request-requirements.json"
+          ],
+          "exit": 1,
+          "status": "FAIL"
+        },
+        {
+          "name": "audit-requirements",
+          "counts": {
+            "PASS": 0,
+            "FAIL": 4,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-requirements.json",
+          "stdout": "audit-requirements.stdout.log",
+          "stderr": "audit-requirements.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-01/extended-audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-requirements-01/audit-requirements.json",
+            "--suite",
+            "requirements"
+          ],
+          "exit": 1,
+          "status": "FAIL"
+        }
+      ],
+      "count_scope": "Individual case/assertion-control counts; a suite-level BLOCKED/FAIL is explicitly labelled when no valid case report exists.",
+      "build_manifest": {
+        "schema": 1,
+        "status": "PASS",
+        "created_utc": "2026-10-15T14:25:05.429157+00:00",
+        "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline",
+        "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+        "source_root": "/workspace/work/json-yajl-baseline/v3",
+        "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+        "production_matches_original": true,
+        "submodules": {
+          "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+          "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+          "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+        },
+        "ancillary_differences": [
+          "doc/JSON-YAJL-BASELINE.md",
+          "doc/json-yajl-baseline-v3.md",
+          "doc/json-yajl-code-analysis.md",
+          "doc/json-yajl-provenance.json",
+          "test/Makefile.am",
+          "test/json-baseline/audit_probe.cc",
+          "test/json-baseline/build-probes.sh",
+          "test/json-baseline/probe.cc",
+          "test/json-baseline/results/v3-audit-results.json",
+          "test/json-baseline/results/v3-request-results.json",
+          "test/json-baseline/results/v3-sanitizer-results.json",
+          "test/json-baseline/results/v3-summary.json",
+          "test/json-baseline/run.py",
+          "test/json-baseline/run_audit.py",
+          "test/test-cases/regression/request-body-parser-json.json"
+        ],
+        "library": {
+          "path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+          "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20",
+          "directory": "/workspace/work/json-yajl-baseline/v3/src/.libs"
+        },
+        "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+        "yajl_version": "2.1.0",
+        "build_options": {
+          "standard": "c++17",
+          "WITH_YAJL": true,
+          "extra_cppflag_count": 0,
+          "extra_ldflag_count": 0
+        },
+        "probes": {
+          "probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/probe",
+            "sha256": "10fd166b0a69c3d1d5ec3cc628e8c40aa0954726e05965070af4e74276dd7dce",
+            "source_file": "probe.cc",
+            "source_sha256": "9000dcda7fdebbb672ff09547972fc48678e14224b89c929fbfa4f543f971636",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/audit-probe",
+            "sha256": "2a8724b8b01598092fcd6189170694b3c286d22e08fc62e74f9bf6225def3de8",
+            "source_file": "audit_probe.cc",
+            "source_sha256": "6ae5ee00f780da28b96071ed54868d6883e1dd3910be43358a13fccd6bf07a7c",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "extended-audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-01/extended-audit-probe",
+            "sha256": "10f9faa81c8f9e75938f9ff3f0f3305de295ad05eedc419babfa89869800975e",
+            "source_file": "extended_audit_probe.cc",
+            "source_sha256": "83fbeefad30a534ab1b44d6283160d760c1b32dc37ad655f15858ef2c313c08d",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          }
+        },
+        "active_json_canary": true
+      },
+      "runtime_verification": {
+        "source": {
+          "source_root": "/workspace/work/json-yajl-baseline/v3",
+          "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+          "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+          "production_matches_original": true,
+          "submodules": {
+            "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+            "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+            "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419"
+          },
+          "ancillary_differences": [
+            "doc/JSON-YAJL-BASELINE.md",
+            "doc/json-yajl-baseline-v3.md",
+            "doc/json-yajl-code-analysis.md",
+            "doc/json-yajl-provenance.json",
+            "test/Makefile.am",
+            "test/json-baseline/audit_probe.cc",
+            "test/json-baseline/build-probes.sh",
+            "test/json-baseline/probe.cc",
+            "test/json-baseline/results/v3-audit-results.json",
+            "test/json-baseline/results/v3-request-results.json",
+            "test/json-baseline/results/v3-sanitizer-results.json",
+            "test/json-baseline/results/v3-summary.json",
+            "test/json-baseline/run.py",
+            "test/json-baseline/run_audit.py",
+            "test/test-cases/regression/request-body-parser-json.json"
+          ]
+        },
+        "loaders": {
+          "probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "extended-audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          }
+        },
+        "active_json_canary": true
+      },
+      "exit": 1
+    },
+    "all": {
+      "schema": 1,
+      "profile": "all",
+      "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+      "created_utc": "2026-10-15T14:32:22.401119+00:00",
+      "counts": {
+        "PASS": 405,
+        "FAIL": 20,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "suites": [
+        {
+          "name": "request-baseline",
+          "counts": {
+            "PASS": 163,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-baseline.json",
+          "stdout": "request-baseline.stdout.log",
+          "stderr": "request-baseline.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/request-baseline.json",
+            "--sensitivity"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "request-expanded",
+          "counts": {
+            "PASS": 192,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-expanded.json",
+          "stdout": "request-expanded.stdout.log",
+          "stderr": "request-expanded.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/request-expanded.json",
+            "--sensitivity"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "audit-baseline",
+          "counts": {
+            "PASS": 12,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-baseline.json",
+          "stdout": "audit-baseline.stdout.log",
+          "stderr": "audit-baseline.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/audit-baseline.json"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "audit-expanded-characterization",
+          "counts": {
+            "PASS": 21,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-expanded-characterization.json",
+          "stdout": "audit-expanded-characterization.stdout.log",
+          "stderr": "audit-expanded-characterization.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/audit-expanded-characterization.json",
+            "--suite",
+            "characterization"
+          ],
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "native-json",
+          "counts": {
+            "PASS": 11,
+            "FAIL": 0,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "native-json.json",
+          "stdout": "native-json.stdout.log",
+          "stderr": "native-json.stderr.log",
+          "command": [
+            "/workspace/work/json-yajl-baseline/v3/test/regression_tests",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/test-cases/regression/request-body-parser-json.json"
+          ],
+          "loader": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "exit": 0,
+          "status": "PASS"
+        },
+        {
+          "name": "request-requirements",
+          "counts": {
+            "PASS": 6,
+            "FAIL": 16,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "request-requirements.json",
+          "stdout": "request-requirements.stdout.log",
+          "stderr": "request-requirements.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_requirements.py",
+            "--probe",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
+            "--output",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/request-requirements.json"
+          ],
+          "exit": 1,
+          "status": "FAIL"
+        },
+        {
+          "name": "audit-requirements",
+          "counts": {
+            "PASS": 0,
+            "FAIL": 4,
+            "SKIP": 0,
+            "BLOCKED": 0,
+            "XFAIL": 0
+          },
+          "report": "audit-requirements.json",
+          "stdout": "audit-requirements.stdout.log",
+          "stderr": "audit-requirements.stderr.log",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline/run_extended_audit.py",
+            "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
+            "--report",
+            "/workspace/work/json-yajl-pr-expansion/portable-all-02/audit-requirements.json",
+            "--suite",
+            "requirements"
+          ],
+          "exit": 1,
+          "status": "FAIL"
+        }
+      ],
+      "count_scope": "Individual case/assertion-control counts; a suite-level BLOCKED/FAIL is explicitly labelled when no valid case report exists.",
+      "build_manifest": {
+        "schema": 1,
+        "status": "PASS",
+        "created_utc": "2026-10-15T14:32:01.981907+00:00",
+        "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline",
+        "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+        "source_root": "/workspace/work/json-yajl-baseline/v3",
+        "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+        "production_matches_original": true,
+        "submodules": {
+          "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+          "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+          "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419",
+          "others/mbedtls/framework": "dff9da04438d712f7647fd995bc90fadd0c0e2ce",
+          "others/mbedtls/tf-psa-crypto": "29160dd877d29658279fd683b2ae57b320ddcf09",
+          "others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native": "5772b4f4a0105694b1203abb582273f78fa951b7",
+          "others/mbedtls/tf-psa-crypto/framework": "dff9da04438d712f7647fd995bc90fadd0c0e2ce"
+        },
+        "ancillary_differences": [
+          "doc/JSON-YAJL-BASELINE.md",
+          "doc/json-yajl-baseline-v3.md",
+          "doc/json-yajl-code-analysis.md",
+          "doc/json-yajl-provenance.json",
+          "test/Makefile.am",
+          "test/json-baseline/audit_probe.cc",
+          "test/json-baseline/build-probes.sh",
+          "test/json-baseline/probe.cc",
+          "test/json-baseline/results/v3-audit-results.json",
+          "test/json-baseline/results/v3-request-results.json",
+          "test/json-baseline/results/v3-sanitizer-results.json",
+          "test/json-baseline/results/v3-summary.json",
+          "test/json-baseline/run.py",
+          "test/json-baseline/run_audit.py",
+          "test/test-cases/regression/request-body-parser-json.json"
+        ],
+        "library": {
+          "path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+          "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20",
+          "directory": "/workspace/work/json-yajl-baseline/v3/src/.libs"
+        },
+        "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+        "yajl_version": "2.1.0",
+        "build_options": {
+          "standard": "c++17",
+          "WITH_YAJL": true,
+          "extra_cppflag_count": 0,
+          "extra_ldflag_count": 0
+        },
+        "probes": {
+          "probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
+            "sha256": "10fd166b0a69c3d1d5ec3cc628e8c40aa0954726e05965070af4e74276dd7dce",
+            "source_file": "probe.cc",
+            "source_sha256": "9000dcda7fdebbb672ff09547972fc48678e14224b89c929fbfa4f543f971636",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
+            "sha256": "2a8724b8b01598092fcd6189170694b3c286d22e08fc62e74f9bf6225def3de8",
+            "source_file": "audit_probe.cc",
+            "source_sha256": "6ae5ee00f780da28b96071ed54868d6883e1dd3910be43358a13fccd6bf07a7c",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          },
+          "extended-audit-probe": {
+            "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
+            "sha256": "10f9faa81c8f9e75938f9ff3f0f3305de295ad05eedc419babfa89869800975e",
+            "source_file": "extended_audit_probe.cc",
+            "source_sha256": "83fbeefad30a534ab1b44d6283160d760c1b32dc37ad655f15858ef2c313c08d",
+            "loader": {
+              "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+              "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+            }
+          }
+        },
+        "active_json_canary": true
+      },
+      "runtime_verification": {
+        "source": {
+          "source_root": "/workspace/work/json-yajl-baseline/v3",
+          "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
+          "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+          "production_matches_original": true,
+          "submodules": {
+            "others/libinjection": "211782219663f889f471650150df12b623c5766e",
+            "others/mbedtls": "0fe989b6b514192783c469039edd325fd0989806",
+            "test/test-cases/secrules-language-tests": "f73c73027ef49ccf99c7911744929a71d15ff419",
+            "others/mbedtls/framework": "dff9da04438d712f7647fd995bc90fadd0c0e2ce",
+            "others/mbedtls/tf-psa-crypto": "29160dd877d29658279fd683b2ae57b320ddcf09",
+            "others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native": "5772b4f4a0105694b1203abb582273f78fa951b7",
+            "others/mbedtls/tf-psa-crypto/framework": "dff9da04438d712f7647fd995bc90fadd0c0e2ce"
+          },
+          "ancillary_differences": [
+            "doc/JSON-YAJL-BASELINE.md",
+            "doc/json-yajl-baseline-v3.md",
+            "doc/json-yajl-code-analysis.md",
+            "doc/json-yajl-provenance.json",
+            "test/Makefile.am",
+            "test/json-baseline/audit_probe.cc",
+            "test/json-baseline/build-probes.sh",
+            "test/json-baseline/probe.cc",
+            "test/json-baseline/results/v3-audit-results.json",
+            "test/json-baseline/results/v3-request-results.json",
+            "test/json-baseline/results/v3-sanitizer-results.json",
+            "test/json-baseline/results/v3-summary.json",
+            "test/json-baseline/run.py",
+            "test/json-baseline/run_audit.py",
+            "test/test-cases/regression/request-body-parser-json.json"
+          ]
+        },
+        "loaders": {
+          "probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          },
+          "extended-audit-probe": {
+            "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
+            "sha256": "e369e83186e9004bf39d9309a4490b40f06179905535763a80109467c9630d20"
+          }
+        },
+        "active_json_canary": true
+      },
+      "exit": 1
+    }
+  },
+  "limited_sanitizer": {
+    "report": "../../test/json-baseline/results/extended-sanitizer-results.json",
+    "counts": {
+      "PASS": 124,
+      "FAIL": 0,
+      "SKIP": 0,
+      "BLOCKED": 0,
+      "XFAIL": 0
+    },
+    "scope": "test helper + unchanged json.cc; linked engine and YAJL not fully instrumented; detect_leaks=0"
+  },
+  "interpretation": {
+    "characterization": "Existing behavior, including questionable behavior; PASS is not policy approval.",
+    "requirements": "Ordinary unmet assertions; includes explicitly proposed Unicode/rollback policies. Exit 1 is retained.",
+    "counting": "Controls included; profiles all repeats the other two profiles, sanitizers repeat selected cases. Do not sum repeated executions as unique requirements."
+  }
+}

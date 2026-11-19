@@ -1,0 +1,41 @@
+{
+  "created_utc": "2026-10-15T15:29:43.840136+00:00",
+  "source": "/workspace/work/json-yajl-pr-expansion/full-v3-english",
+  "source_commit": "dd1d0f82672ecf7d0f014a0c3fc4fd0ab40b3bdd",
+  "source_status_after_configure": "",
+  "submodules": "211782219663f889f471650150df12b623c5766e others/libinjection (v4.0.0)\n 0fe989b6b514192783c469039edd325fd0989806 others/mbedtls (v4.1.0)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n 29160dd877d29658279fd683b2ae57b320ddcf09 others/mbedtls/tf-psa-crypto (v1.1.0)\n 5772b4f4a0105694b1203abb582273f78fa951b7 others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native (remotes/origin/main-53-g5772b4f)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/tf-psa-crypto/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n f73c73027ef49ccf99c7911744929a71d15ff419 test/test-cases/secrules-language-tests (heads/master)",
+  "system": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "distribution": {
+    "NAME": "Debian GNU/Linux",
+    "ID": "debian",
+    "PRETTY_NAME": "Debian GNU/Linux 13 (trixie)",
+    "VERSION_ID": "13",
+    "VERSION": "13 (trixie)",
+    "VERSION_CODENAME": "trixie",
+    "DEBIAN_VERSION_FULL": "13.6",
+    "HOME_URL": "https://www.debian.org/",
+    "SUPPORT_URL": "https://www.debian.org/support",
+    "BUG_REPORT_URL": "https://bugs.debian.org/"
+  },
+  "c_compiler": "cc (Debian 14.2.0-19) 14.2.0",
+  "cxx_compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+  "python": "3.12.14",
+  "yajl_pkg_config": {
+    "exit": 0,
+    "stdout": "2.1.0",
+    "stderr": ""
+  },
+  "pkg_config_flags_yajl": {
+    "exit": 0,
+    "stdout": "-I/workspace/modsecurity-env/deps/usr/include/yajl -L/workspace/modsecurity-env/deps/usr/lib/x86_64-linux-gnu -lyajl",
+    "stderr": ""
+  },
+  "environment_file": "/workspace/modsecurity-env/env.sh",
+  "dependency_note": "Same pre-existing relocated dependencies as the earlier 8271 baseline; no new package installation.",
+  "debian_yajl_package_hash_records": [
+    "d0069e988f68b05eae42bce7a66bf54dc43863c6ed6b259619951b2a70f8f39b  ./libyajl-dev_2.1.0-5+b2_amd64.deb",
+    "98497e30d6672298111b74e59890b3232b947abe4ecf04e39f480413b755e4f5  ./libyajl2_2.1.0-5+b2_amd64.deb"
+  ],
+  "final_pinned_submodule_status": "bc625d5bb0bac6a64bcce8dc9902208612399348 bindings/python (bc625d5)\n 211782219663f889f471650150df12b623c5766e others/libinjection (v4.0.0)\n 0fe989b6b514192783c469039edd325fd0989806 others/mbedtls (v4.1.0)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n 29160dd877d29658279fd683b2ae57b320ddcf09 others/mbedtls/tf-psa-crypto (v1.1.0)\n 5772b4f4a0105694b1203abb582273f78fa951b7 others/mbedtls/tf-psa-crypto/drivers/pqcp/mldsa-native (remotes/origin/main-53-g5772b4f)\n dff9da04438d712f7647fd995bc90fadd0c0e2ce others/mbedtls/tf-psa-crypto/framework (mbedtls-4.1.0_tf-psa-crypto-1.1.0)\n f73c73027ef49ccf99c7911744929a71d15ff419 test/test-cases/secrules-language-tests (heads/master)",
+  "all_direct_submodules_initialized": true
+}
