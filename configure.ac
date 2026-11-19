@@ -81,7 +81,6 @@ AC_MSG_ERROR([\
 fi
 # Libinjection version
 AC_DEFUN([LIBINJECTION_VERSION], m4_esyscmd_s(cd "others/libinjection" && git describe --tags --match 'v[[0-9]]*' && cd ../..))
-AC_SUBST([LIBINJECTION_VERSION])
 
 # Check for Mbed TLS
 if ! test -f "${srcdir}/others/mbedtls/tf-psa-crypto/utilities/base64.c"; then
