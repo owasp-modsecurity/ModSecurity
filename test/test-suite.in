@@ -265,3 +265,4 @@ TESTS+=test/test-cases/secrules-language-tests/transformations/urlDecode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/urlDecodeUni.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/urlEncode.json
 TESTS+=test/test-cases/secrules-language-tests/transformations/utf8toUnicode.json
+TESTS+=test/test-cases/regression/runtime-string-equals.json

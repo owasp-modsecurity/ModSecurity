@@ -38,6 +38,12 @@ class Tag : public Action {
 
     std::string getName(Transaction *transaction);
 
+    // Same result as getName(transaction) == name, without allocating
+    // when the tag contains no macros.
+    bool nameEquals(const std::string &name, Transaction *transaction) {
+        return m_string->equals(name, transaction);
+    }
+
     bool evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) override;
 
  protected:

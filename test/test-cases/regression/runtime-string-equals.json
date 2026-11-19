@@ -1,0 +1,273 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - exact tag and msg match without macros (1/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Skipped rule id '101'. Removed by a SecRuleRemoveByTag directive.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleRemoveByTag attack-sqli",
+      "SecRuleRemoveByMsg \"SQL Injection Attack\"",
+      "SecRule ARGS \"@contains value\" \"id:101,phase:2,pass,t:none,tag:'attack-sqli'\"",
+      "SecRule ARGS \"@contains value\" \"id:102,phase:2,pass,t:none,msg:'SQL Injection Attack'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - longer target mismatch does not skip rule (2/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleRemoveByTag attack-sqli-extra",
+      "SecRuleRemoveByMsg \"SQL Injection Attack Extra\"",
+      "SecRule ARGS:key \"@streq value\" \"id:201,phase:2,deny,status:403,t:none,tag:'attack-sqli',msg:'SQL Injection Attack'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - shorter prefix mismatch does not skip rule (3/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleRemoveByTag attack",
+      "SecRuleRemoveByMsg \"SQL Injection\"",
+      "SecRule ARGS:key \"@streq value\" \"id:301,phase:2,deny,status:403,t:none,tag:'attack-sqli',msg:'SQL Injection Attack'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - equal-length content mismatch does not skip rule (4/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleRemoveByTag attack-xss",
+      "SecRuleRemoveByMsg \"SQL Injection xxxxxx\"",
+      "SecRule ARGS:key \"@streq value\" \"id:401,phase:2,deny,status:403,t:none,tag:'attack-sqli',msg:'SQL Injection Attack'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - multi-segment string without macros (5/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Skipped rule id '501'. Removed by a SecRuleRemoveByMsg directive.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleRemoveByMsg \"\\'part1\\'part2\"",
+      "SecRule ARGS \"@contains value\" \"id:501,phase:2,pass,t:none,msg:'\\'part1\\'part2'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "RunTimeString::equals - macro evaluation fallback (6/6)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?key=value",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Skipped rule id '601'. Removed by a SecRuleRemoveByTag directive.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleRemoveByTag attack-value",
+      "SecRuleRemoveByMsg \"Detected value\"",
+      "SecRule ARGS \"@contains value\" \"id:601,phase:2,pass,t:none,tag:'attack-%{ARGS.key}'\"",
+      "SecRule ARGS \"@contains value\" \"id:602,phase:2,pass,t:none,msg:'Detected %{ARGS.key}'\""
+    ]
+  }
+]

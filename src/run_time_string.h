@@ -53,6 +53,13 @@ class RunTimeString {
     std::string evaluate() {
         return evaluate(NULL);
     }
+    /*
+     * Compares the evaluated string with `other`. When the string has no
+     * macros its value is fixed, so it is compared piece by piece without
+     * building a temporary std::string. Otherwise it falls back to
+     * evaluate(), keeping the original behaviour.
+     */
+    bool equals(const std::string &other, Transaction *t);
     inline bool containsMacro() const { return m_containsMacro; }
     bool m_containsMacro;
 

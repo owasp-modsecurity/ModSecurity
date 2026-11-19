@@ -72,4 +72,21 @@ std::string RunTimeString::evaluate(Transaction *t, Rule *r) {
     return s;
 }
 
+bool RunTimeString::equals(const std::string &other, Transaction *t) {
+    if (m_containsMacro) {
+        return evaluate(t) == other;
+    }
+
+    std::string::size_type pos = 0;
+    for (const auto &z : m_elements) {
+        const std::string &s = z->m_string;
+        if (s.size() > other.size() - pos
+            || other.compare(pos, s.size(), s) != 0) {
+            return false;
+        }
+        pos += s.size();
+    }
+    return pos == other.size();
+}
+
 }  // namespace modsecurity
