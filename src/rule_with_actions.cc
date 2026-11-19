@@ -341,7 +341,8 @@ inline void RuleWithActions::executeTransformation(
     if (path.empty()) {
         path.append(*a.m_name.get());
     } else {
-        path.append("," + *a.m_name.get());
+        path.push_back(',');
+        path.append(*a.m_name.get());
     }
 
     ms_dbg_a(trans, 9, " T (" + \
@@ -435,8 +436,9 @@ void RuleWithActions::executeTransformations(
     }
 
     if (!m_containsMultiMatchAction) {
-        ret.emplace_back(value,
-                       std::make_shared<std::string>(path));
+        // Last use of value and path: move them instead of copying.
+        ret.emplace_back(std::move(value),
+                       std::make_shared<std::string>(std::move(path)));
     }
 }
 
