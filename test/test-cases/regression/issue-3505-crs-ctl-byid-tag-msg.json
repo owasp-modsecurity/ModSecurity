@@ -1,0 +1,44 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS-style SQLi JSON: FP scope-out ruleRemoveTargetById + regex SearchQuery — expect 200 (not 403)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "47"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetById=942100;ARGS:/^json[.]array_[0-9]+[.]SearchQuery$/\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942100,phase:2,deny,status:403,log,tag:'crs-sqli-test',msg:'crs sqli fp msg'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "CRS-style SQLi JSON: FP scope-out ruleRemoveTargetByTag + regex SearchQuery — expect 200 (not 403)",
+    "client": {"ip": "200.249.12.31", "port": 123},
+    "server": {"ip": "200.249.12.31", "port": 80},
+    "request": {
+      "headers": {"Host": "localhost", "User-Agent": "curl/7.38.0", "Accept": "*/*", "Content-Type": "application/json", "Content-Length": "47"},
+      "uri": "/api/search",
+      "method": "POST",
+      "body": ["[{\"SearchQuery\":\"1' OR '1'='1\",\"Other\":\"safe\"}]"]
+    },
+    "response": {"headers": {"Content-Length": "0"}, "body": [""]},
+    "expected": {"http_code": 200},
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"@rx (?:application/json|application/graphql)\" \"id:900100,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON,ctl:ruleRemoveTargetByTag=crs-bytag-fp;ARGS:/^json[.]array_[0-9]+[.]SearchQuery$/\"",
+      "SecRule ARGS \"@detectSQLi\" \"id:942101,phase:2,deny,status:403,log,tag:'crs-bytag-fp',msg:'bytag baseline'\""
+    ]
+  }
+]
