@@ -369,5 +369,47 @@
       "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"phase:2,id:1,block\"",
       "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none,block\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing action :: SecDefaultAction: without a disruptive action",
+    "client": {
+      "ip": "",
+      "port": 0
+    },
+    "server": {
+      "ip": "",
+      "port": 0
+    },
+    "request": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "uri": "",
+      "method": "",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "SecDefaultAction must specify a disruptive action."
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecDefaultAction \"phase:2,log,auditlog,t:lowercase,t:urlDecode\"",
+      "SecRule REQUEST_HEADERS \"@contains PHPSESSID\" \"id:1,t:lowercase,t:none,msg:'This is a test'\"",
+      "SecRule TX \"@contains to_test\" \"id:2,t:lowercase,t:none\""
+    ]
   }
 ]
