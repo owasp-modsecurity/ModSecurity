@@ -119,6 +119,10 @@ std::unique_ptr<RegressionTest> RegressionTest::from_yajl_node(const yajl_val &n
         set_string_from_yajl(u->url, "url", key, val);
         set_string_from_yajl(u->resource, "resource", key, val);
         set_opt_int_from_yajl(u->github_issue, "github_issue", key, val);
+        set_opt_int_from_yajl(u->intervention_log_payload_enabled,
+            "intervention_log_payload_enabled", key, val);
+        set_string_from_yajl(u->intervention_log_payload_api,
+            "intervention_log_payload_api", key, val);
         if (strcmp(key, "client") == 0) {
             u->update_client_from_yajl_node(val);
         }
@@ -211,6 +215,8 @@ void RegressionTest::update_expected_from_yajl_node(const yajl_val &val) {
         set_string_from_yajl(error_log, "error_log", key2, val2);
         set_int_from_yajl(http_code, "http_code", key2, val2);
         set_string_from_yajl(redirect_url, "redirect_url", key2, val2);
+        set_opt_int_from_yajl(intervention_log_payload_present,
+            "intervention_log_payload_present", key2, val2);
         set_string_from_yajl(parser_error, "parser_error", key2, val2);
     }
 }
@@ -385,6 +391,10 @@ std::string RegressionTests::toJSON() const {
         gen_key_str_if_non_empty(g, "url", t->url);
         gen_key_str_if_non_empty(g, "resource", t->resource);
         gen_key_opt_int(g, "github_issue", t->github_issue);
+        gen_key_opt_int(g, "intervention_log_payload_enabled",
+            t->intervention_log_payload_enabled);
+        gen_key_str_if_non_empty(g, "intervention_log_payload_api",
+            t->intervention_log_payload_api);
 
         gen_string_view(g, "client");
         yajl_gen_map_open(g);
@@ -435,6 +445,8 @@ std::string RegressionTests::toJSON() const {
         gen_key_str_if_non_empty(g, "error_log", t->error_log);
         gen_key_int(g, "http_code", t->http_code);
         gen_key_str_if_non_empty(g, "redirect_url", t->redirect_url);
+        gen_key_opt_int(g, "intervention_log_payload_present",
+            t->intervention_log_payload_present);
         gen_key_str_if_non_empty(g, "parser_error", t->parser_error);
         yajl_gen_map_close(g);
 

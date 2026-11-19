@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "modsecurity/transaction.h"
+#include "src/intervention_log.h"
 #include "src/utils/string.h"
 
 namespace modsecurity {
@@ -46,10 +47,8 @@ bool Redirect::evaluate(RuleWithActions *rule, Transaction *transaction,
     intervention::freeUrl(&transaction->m_it);
     transaction->m_it.url = strdup(m_urlExpanded.c_str());
     transaction->m_it.disruptive = true;
-    intervention::freeLog(&transaction->m_it);
     ruleMessage.m_isDisruptive = true;
-    transaction->m_it.log = strdup(
-        ruleMessage.log(RuleMessage::LogMessageInfo::ClientLogMessageInfo).c_str());
+    intervention::setLogPayload(transaction, ruleMessage);
 
     return true;
 }
