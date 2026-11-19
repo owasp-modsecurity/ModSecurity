@@ -155,7 +155,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
     KeyExclusions() {
     }
 
-    bool toOmit(std::string a) const {
+    bool toOmit(const std::string &a) const {
         for (auto &z : *this) {
             if (z->match(a)) {
                 return true;
@@ -164,7 +164,7 @@ class KeyExclusions : public std::deque<std::unique_ptr<KeyExclusion>> {
         return false;
     }
 
-    bool toOmit(std::string a) { // cppcheck-suppress passedByValue
+    bool toOmit(const std::string &a) {
         return static_cast<const KeyExclusions&>(*this).toOmit(a);
     }
 };

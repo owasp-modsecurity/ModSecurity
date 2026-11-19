@@ -54,7 +54,7 @@ struct MyEqual {
         return Left.size() == Right.size()
              && std::equal(Left.begin(), Left.end(), Right.begin(),
             [](char a, char b) {
-            return tolower(a) == tolower(b);
+            return a == b || tolower(a) == tolower(b);
         });
     }
 };
@@ -62,10 +62,15 @@ struct MyEqual {
 struct MyHash{
     size_t operator()(const std::string& Keyval) const {
         // You might need a better hash function than this
-        size_t h = 0;
-        std::for_each(Keyval.begin(), Keyval.end(), [&](char c) {
-            h += tolower(c);
-        });
+        // FNV-1a over the lower-cased characters. It stays consistent with
+        // MyEqual (keys equal ignoring case hash the same) but, unlike the
+        // previous sum of characters, it does not map most keys with similar
+        // names and lengths to the same bucket.
+        size_t h = static_cast<size_t>(14695981039346656037ULL);
+        for (const char c : Keyval) {
+            h ^= static_cast<size_t>(tolower(c));
+            h *= static_cast<size_t>(1099511628211ULL);
+        }
         return h;
     }
 };
