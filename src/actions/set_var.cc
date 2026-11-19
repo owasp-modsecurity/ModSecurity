@@ -106,10 +106,13 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
             if (l.size() == 0) {
                 value = 0;
             } else {
-                value = stoi(l[0]->getValue());
+                /* copy: the VariableValue objects are deleted below */
+                // cppcheck-suppress redundantCopyLocalConst
+                const std::string currentValue(l[0]->getValue());
                 for (auto &i : l) {
                     delete i;
                 }
+                value = stoi(currentValue);
             }
         } catch (...) {
             value = 0;
