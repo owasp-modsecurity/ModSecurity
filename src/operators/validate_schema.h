@@ -100,7 +100,6 @@ class ValidateSchema : public Operator {
 
  private:
     std::string m_resource;
-    std::string m_err;
 #endif
 };
 
