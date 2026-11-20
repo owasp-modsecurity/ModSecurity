@@ -288,8 +288,10 @@ class VariableMonkeyResolution {
         } else if (comp(variable, "FILES_COMBINED_SIZE")) {
             t->m_variableFilesCombinedSize.evaluate(l);
         } else if (comp(variable, "FULL_REQUEST")) {
+            t->buildFullRequest();
             t->m_variableFullRequest.evaluate(l);
         } else if (comp(variable, "FULL_REQUEST_LENGTH")) {
+            t->buildFullRequest();
             t->m_variableFullRequestLength.evaluate(l);
         } else if (comp(variable, "INBOUND_DATA_ERROR")) {
             t->m_variableInboundDataError.evaluate(l);
@@ -405,8 +407,10 @@ class VariableMonkeyResolution {
             } else if (comp(variable, "FILES_COMBINED_SIZE")) {
                 vv = t->m_variableFilesCombinedSize.resolveFirst();
             } else if (comp(variable, "FULL_REQUEST")) {
+                t->buildFullRequest();
                 vv = t->m_variableFullRequest.resolveFirst();
             } else if (comp(variable, "FULL_REQUEST_LENGTH")) {
+                t->buildFullRequest();
                 vv = t->m_variableFullRequestLength.resolveFirst();
             } else if (comp(variable, "INBOUND_DATA_ERROR")) {
                 vv = t->m_variableInboundDataError.resolveFirst();

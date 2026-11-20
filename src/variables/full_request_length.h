@@ -30,9 +30,18 @@ class Transaction;
 namespace variables {
 
 
-DEFINE_VARIABLE(FullRequestLength, FULL_REQUEST_LENGTH,
-    m_variableFullRequestLength)
 
+class FullRequestLength : public Variable {
+ public:
+    FullRequestLength() : Variable("FULL_REQUEST_LENGTH") { }
+
+    void evaluate(Transaction *transaction,
+        RuleWithActions *rule,
+        std::vector<const VariableValue *> *l) override {
+        transaction->buildFullRequest();
+        transaction->m_variableFullRequestLength.evaluate(l);
+    }
+};
 
 }  // namespace variables
 }  // namespace modsecurity
