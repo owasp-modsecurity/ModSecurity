@@ -3461,7 +3461,7 @@
       ]
     },
     "expected": {
-      "debug_log": "Multipart: Invalid Content-Disposition header \\(-15\\): form-data; name=\"file\"; filename=\"1.jsp",
+      "debug_log": "Multipart: Invalid Content-Disposition header \\(-15: closing quote not found\\): form-data; name=\"file\"; filename=\"1.jsp",
       "http_code": 403
     },
     "rules": [

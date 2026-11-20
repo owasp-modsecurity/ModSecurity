@@ -163,6 +163,40 @@ class MultipartPart {
 };
 
 
+
+/* Return codes of Multipart::parse_content_disposition(). The numeric
+ * values are the ones ModSecurity v2 (msc_multipart.c) uses and they are
+ * part of the REQBODY_ERROR_MSG text, so keep them stable; add new codes
+ * at the end. Use contentDispositionErrorMessage() for the description.
+ */
+enum ContentDispositionError {
+    CD_ERR_NOT_FORM_DATA = -1,
+    CD_ERR_SEMICOLON_EXPECTED = -2,
+    CD_ERR_PARAMETER_MISSING = -3,
+    CD_ERR_VALUE_MISSING = -4,
+    CD_ERR_EQUALS_MISSING = -5,
+    CD_ERR_VALUE_EMPTY = -6,
+    CD_ERR_QUOTE_EMPTY_UNTERMINATED = -7,
+    CD_ERR_ESCAPE_INCOMPLETE = -8,
+    /* -9 and -10 are unused: v2 reserved them for improper escaping and
+     * an unquoted empty value, which v3 tolerates. */
+    CD_ERR_UNKNOWN_PARAMETER = -11,
+    CD_ERR_SEMICOLON_EXPECTED_AFTER_VALUE = -12,
+    CD_ERR_EQUALS_EXPECTED = -13,
+    CD_ERR_DUPLICATE_NAME = -14,
+    CD_ERR_QUOTE_UNTERMINATED = -15,
+    CD_ERR_FILENAME_STAR_CHARSET = -16,
+    CD_ERR_FILENAME_STAR_LANGUAGE = -17,
+    CD_ERR_FILENAME_STAR_PCT_ENCODING = -18,
+    CD_ERR_FILENAME_STAR_CHARACTER = -19,
+    CD_ERR_DUPLICATE_FILENAME = -20,
+    CD_ERR_DUPLICATE_FILENAME_STAR = -21,
+    CD_ERR_EXCEPTION = -99,
+};
+
+const char *contentDispositionErrorMessage(int rc);
+
+
 class Multipart {
  public:
     Multipart(const std::string &header, Transaction *transaction);

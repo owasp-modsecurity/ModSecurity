@@ -310,5 +310,50 @@
       "SecRuleEngine On",
       "SecRuleScript test-cases/data/match-getvars-args.lua \"id:2,phase:2,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing LUA :: m.setvar with wrong number of arguments does not break the script",
+    "resource": "lua",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "My sweet little browser",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/whee?res=1",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "m.setvar: Failed m.setvar funtion must has 2 arguments",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,pass,setvar:TX.lua_set_var=1\"",
+      "SecRuleScript test-cases/data/setvar-bad-args.lua \"id:2,pass\"",
+      "SecRule TX.lua_set_var \"!@eq 1\" \"id:3,phase:2,deny,status:500,t:none\""
+    ]
   }
 ]
