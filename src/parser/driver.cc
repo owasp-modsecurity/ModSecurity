@@ -150,7 +150,7 @@ int Driver::parse(const std::string &f, const std::string &ref) {
     } catch (...) {
         scan_end();
         m_parserError << "Parser exception caught during rule parsing." << std::endl;
-        return 1;
+        return 0;
     }
     scan_end();
 
