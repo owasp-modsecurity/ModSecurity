@@ -84,6 +84,7 @@ TESTS+=test/test-cases/regression/misc-escaped-quote-after-macro-expansion.json
 TESTS+=test/test-cases/regression/misc-lua-getvar-unknown-variable.json
 TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 TESTS+=test/test-cases/regression/offset-variable.json
+TESTS+=test/test-cases/regression/operator-contains-escaped-quote.json
 TESTS+=test/test-cases/regression/operator-detectsqli.json
 TESTS+=test/test-cases/regression/operator-detectxss.json
 TESTS+=test/test-cases/regression/operator-fuzzyhash.json

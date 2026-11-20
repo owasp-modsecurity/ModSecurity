@@ -22,6 +22,31 @@ static const char* find_separator(const char *s) {
     return (*s) ? s + 1 : s;
 }
 
+// Within a double quoted operator parameter, an escaped double quote (\"),
+// when not preceded by another backslash, stands for a literal quote
+// character; the escape backslash must be removed before the parameter
+// reaches the operators (issue #3750).
+static std::string unescapeOperatorParam(const char *text) {
+    std::string out;
+    out.reserve(strlen(text));
+    bool escaped = false;
+    for (const char *p = text; *p; p++) {
+        if (*p == '\\' && !escaped) {
+            escaped = true;
+            out.push_back(*p);
+            continue;
+        }
+        if (*p == '"' && escaped) {
+            out.pop_back();
+            out.push_back('"');
+        } else {
+            out.push_back(*p);
+        }
+        escaped = false;
+    }
+    return out;
+}
+
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
 // not conform to C89.  See Debian bug 333231
@@ -1183,8 +1208,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 <NO_OP_INFORMED_ENDS_WITH_QUOTE>{
 ["]                                             { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE} { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE} { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(unescapeOperatorParam(yytext), *driver.loc.back()); }
+{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(unescapeOperatorParam(yytext), *driver.loc.back()); }
 }
 
 <NO_OP_INFORMED_ENDS_WITH_SPACE>{
@@ -1198,8 +1223,8 @@ EQUALS_MINUS                            (?i:=\-)
 
 <EXPECTING_PARAMETER_ENDS_WITH_QUOTE>{
 ["]                                             { BEGIN(TRANSACTION_FROM_OPERATOR_PARAMETERS_TO_ACTIONS); }
-{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE} { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
-{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(yytext, *driver.loc.back()); }
+{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION_LEADING_ESCAPE} { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(unescapeOperatorParam(yytext), *driver.loc.back()); }
+{FREE_TEXT_DOUBLE_QUOTE_MACRO_EXPANSION}        { return p::make_FREE_TEXT_QUOTE_MACRO_EXPANSION(unescapeOperatorParam(yytext), *driver.loc.back()); }
 }
 
 <EXPECTING_PARAMETER_ENDS_WITH_SPACE>{
