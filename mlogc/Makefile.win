@@ -2,6 +2,7 @@
 ### You Will need to modify the following variables for your system
 ###########################################################################
 ###########################################################################
+# Note: ModSecurity v2 uses PCRE2 by default (not legacy PCRE). Set PCRE to your pcre2 build directory.
 
 # Path to Apache httpd installation
 BASE = %APACHE%
@@ -13,7 +14,7 @@ CURL = %CURL%
 # Linking libraries
 LIBS = $(BASE)\lib\libapr-1.lib \
        $(BASE)\lib\libaprutil-1.lib \
-       $(PCRE)\pcre.lib \
+       $(PCRE)\pcre2-8.lib \
        $(CURL)\libcurl.lib \
        wsock32.lib
 
