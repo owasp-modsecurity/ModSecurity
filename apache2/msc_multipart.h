@@ -137,6 +137,7 @@ struct multipart_data {
     int                      flag_lf_line;
     int                      flag_crlf_line;
     int                      flag_unmatched_boundary;
+    int                      flag_unmatched_boundary_preamble;
     int                      flag_boundary_whitespace;
     int                      flag_missing_semicolon;
     int                      flag_invalid_quoting;
