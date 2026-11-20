@@ -347,3 +347,39 @@ extern "C" int msc_rules_cleanup(RulesSet *rules) {
 
 }  // namespace modsecurity
 
+
+extern "C" int msc_rules_reopen_logs(modsecurity::RulesSet *rules,
+    const char **error) {
+    bool succeeded = true;
+    std::string errorStr;
+
+    if (rules->m_auditLog != nullptr) {
+        std::string auditError;
+        if (!rules->m_auditLog->reopen(&auditError)) {
+            succeeded = false;
+            errorStr += auditError;
+        }
+    }
+
+    if (rules->m_debugLog != nullptr) {
+        std::string debugError;
+        if (!rules->m_debugLog->reopenDebugLogFile(&debugError)) {
+            succeeded = false;
+            if (!errorStr.empty()) {
+                errorStr += " ";
+            }
+            errorStr += debugError;
+        }
+    }
+
+    if (!succeeded) {
+        if (!errorStr.empty()) {
+            *error = strdup(errorStr.c_str());
+        } else {
+            *error = strdup("Unknown error reopening logs");
+        }
+    }
+
+    return succeeded ? 0 : -1;
+}
+
