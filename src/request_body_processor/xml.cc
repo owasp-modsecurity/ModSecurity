@@ -15,6 +15,8 @@
 
 #include "src/request_body_processor/xml.h"
 
+#include <algorithm>
+#include <cctype>
 #include <list>
 #include <iostream>
 #include <string>
@@ -149,6 +151,30 @@ extern "C" {
         MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
         handler->onCharacters(userData, ch, len);
     }
+}
+
+
+/* Build the error text from libxml2's last error on this context, so the
+ * actual parse failure ("Extra content at the end of the document", a tag
+ * mismatch, ...) reaches REQBODY_ERROR_MSG and the debug log instead of a
+ * fixed string. Falls back to "XML: <what>." when libxml2 has no message.
+ * xmlCtxtGetLastError() keeps working under XML_PARSE_NOERROR. */
+static std::string parseError(xmlParserCtxtPtr ctx, const std::string &what) {
+    const xmlError *e = (ctx != NULL) ? xmlCtxtGetLastError(ctx) : NULL;
+    if (e == NULL || e->message == NULL || *e->message == '\0') {
+        return "XML: " + what + ".";
+    }
+    /* Some messages span lines (libxml2 2.9's "Input is not proper UTF-8,
+     * indicate encoding !\nBytes: ..."); keep the result on one line. */
+    std::string detail(e->message);
+    std::replace(detail.begin(), detail.end(), '\n', ' ');
+    std::replace(detail.begin(), detail.end(), '\r', ' ');
+    while (!detail.empty()
+        && isspace(static_cast<unsigned char>(detail.back()))) {
+        detail.pop_back();
+    }
+    return "XML: " + what + ": " + detail + " (line " + std::to_string(e->line)
+        + ", column " + std::to_string(e->int2) + ")";
 }
 
 XML::XML(Transaction *transaction)
@@ -287,8 +313,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
         xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
         m_data.xml_parser_state->parsing_ctx_arg = m_data.parsing_ctx_arg;
         if (m_data.parsing_ctx->wellFormed != 1) {
-            error->assign("XML: Failed to parse document.");
-            ms_dbg_a(m_transaction, 4, "XML: Failed to parse document.");
+            error->assign(parseError(m_data.parsing_ctx,
+                "Failed to parse document"));
+            ms_dbg_a(m_transaction, 4, *error);
             return false;
         }
     }
@@ -303,8 +330,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
         ) {
         xmlParseChunk(m_data.parsing_ctx_arg, buf, size, 0);
         if (m_data.parsing_ctx_arg->wellFormed != 1) {
-            error->assign("XML: Failed to parse document for ARGS.");
-            ms_dbg_a(m_transaction, 4, "XML: Failed to parse document for ARGS.");
+            error->assign(parseError(m_data.parsing_ctx_arg,
+                "Failed to parse document for ARGS"));
+            ms_dbg_a(m_transaction, 4, *error);
             return false;
         }
     }
@@ -325,6 +353,11 @@ bool XML::complete(std::string *error) {
             /* Preserve the results for our reference. */
             m_data.well_formed = m_data.parsing_ctx->wellFormed;
             m_data.doc = m_data.parsing_ctx->myDoc;
+            std::string parse_error;
+            if (m_data.well_formed != 1) {
+                parse_error = parseError(m_data.parsing_ctx,
+                    "Failed to parse document");
+            }
 
             /* Clean up everything else. */
             xmlFreeParserCtxt(m_data.parsing_ctx);
@@ -333,8 +366,8 @@ bool XML::complete(std::string *error) {
                 + std::to_string(m_data.well_formed) + ").");
 
             if (m_data.well_formed != 1) {
-                error->assign("XML: Failed to parse document.");
-                ms_dbg_a(m_transaction, 4, "XML: Failed to parse document.");
+                error->assign(parse_error);
+                ms_dbg_a(m_transaction, 4, *error);
                 return false;
             }
         }
@@ -352,7 +385,8 @@ bool XML::complete(std::string *error) {
                     error->assign(m_data.xml_error);
                 }
                 else {
-                    error->assign("XML: Failed to parse document for ARGS.");
+                    error->assign(parseError(m_data.parsing_ctx_arg,
+                        "Failed to parse document for ARGS"));
                 }
                 xmlFreeParserCtxt(m_data.parsing_ctx_arg);
                 m_data.parsing_ctx_arg = NULL;
