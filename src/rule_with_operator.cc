@@ -23,6 +23,7 @@
 #include <cstring>
 #include <list>
 #include <utility>
+#include <vector>
 #include <memory>
 
 #include "modsecurity/rules_set.h"
@@ -205,6 +206,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
     variables::Variables vars;
     vars.reserve(4);
     variables::Variables exclusion;
+    /* multiMatch messages of a chain starter, logged only if the chain matches */
+    std::vector<RuleMessage> pendingMessages;
 
     RuleWithActions::evaluate(trans, ruleMessage);
 
@@ -308,7 +311,14 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                     executeActionsIndependentOfChainedRuleResult(trans,
                         &containsBlock, ruleMessage);
 
-                    performLogging(trans, ruleMessage, false);
+                    if (hasMultimatch() && isChained()) {
+                        if (ruleMessage.m_saveMessage) {
+                            pendingMessages.push_back(ruleMessage);
+                            ruleMessage.reset(false);
+                        }
+                    } else {
+                        performLogging(trans, ruleMessage, false);
+                    }
 
                     globalRet = true;
                 }
@@ -348,6 +358,12 @@ end_clean:
     return false;
 
 end_exec:
+    for (const auto &m : pendingMessages) {
+        trans->m_rulesMessages.push_back(m);
+        if (!m.m_isDisruptive) {
+            trans->serverLog(m);
+        }
+    }
     executeActionsAfterFullMatch(trans, containsBlock, ruleMessage);
 
     /* last rule in the chain. */
