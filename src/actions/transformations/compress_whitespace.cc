@@ -38,8 +38,8 @@ bool CompressWhitespace::transform(std::string &value, const Transaction *trans)
         }
     }
 
-    const auto new_len = d - value.c_str();
-    const auto changed = new_len != value.length();
+    const auto new_len = static_cast<std::string::size_type>(d - value.data());
+    const bool changed = new_len != value.length();
     value.resize(new_len);
     return changed;
 }

@@ -268,8 +268,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             size.size());
         yajl_gen_map_close(g);
 
-        if (stoi(startingAt) >= len) {
+        if (static_cast<size_t>(stoi(startingAt)) >= len) {
             *err = "Offset is out of the content limits.";
+            yajl_gen_free(g);
             return -1;
         }
 
@@ -347,8 +348,9 @@ int ModSecurity::processContentOffset(const char *content, size_t len,
             size.size());
         yajl_gen_map_close(g);
 
-        if (stoi(startingAt) >= varValue.size()) {
+        if (static_cast<size_t>(stoi(startingAt)) >= varValue.size()) {
             *err = "Offset is out of the variable limits.";
+            yajl_gen_free(g);
             return -1;
         }
         yajl_gen_string(g,

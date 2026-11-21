@@ -298,7 +298,7 @@ int InsertNetmask(TreeNode *node, TreeNode *parent, TreeNode *new_node,
 TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree *tree, unsigned char netmask)   {
     unsigned char *buffer = NULL;
     unsigned char bitlen = 0;
-    int bit_validation = 0, test_bit = 0;
+    unsigned int bit_validation = 0, test_bit = 0;
     size_t i = 0;
     unsigned int x, y;
     TreeNode *node = NULL, *new_node = NULL;
@@ -357,7 +357,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
     else
         bit_validation = bitlen;
 
-    for (i = 0; (i * NETMASK_8) < bit_validation; i++) {
+    for (i = 0; (i * NETMASK_8) < static_cast<size_t>(bit_validation); i++) {
         int net = 0, div = 0;
         int cnt = 0;
         int temp;
@@ -483,8 +483,8 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
 
         if (node->netmasks != NULL) {
             i = 0;
-            int j;
-            while(i < node->count) {
+            size_t j;
+            while (i < static_cast<size_t>(node->count)) {
                 if (node->netmasks[i] < test_bit + 1)
                     break;
                 i++;
@@ -501,7 +501,7 @@ TreeNode *CPTAddElement(unsigned char *ipdata, unsigned int ip_bitmask, CPTTree 
             }
 
             j = 0;
-            while (j < (node->count - i))   {
+            while (j < static_cast<size_t>(node->count) - i) {
                 i_node->netmasks[j] = node->netmasks[i + j];
                 j++;
             }
@@ -833,19 +833,22 @@ TreeNode *CPTIpMatch(unsigned char *ipdata, CPTTree *tree, int type)   {
 }
 
 TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
-    unsigned long ip;
     int ret;
     unsigned char netmask_v4 = NETMASK_32, netmask_v6 = NETMASK_128;
     char ip_strv4[NETMASK_32], ip_strv6[NETMASK_128];
     struct in_addr addr4;
     struct in6_addr addr6;
-    int pos = 0;
+    const char *slash = NULL;
+    size_t pos = 0;
     char *ptr = NULL;
 
     if(tree == NULL)
         return NULL;
 
-    pos = strchr(buffer, '/') - buffer;
+    slash = strchr(buffer, '/');
+    if (slash != NULL) {
+        pos = static_cast<size_t>(slash - buffer);
+    }
 
     switch(type)    {
 
@@ -871,7 +874,7 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
             if (netmask_v4 == 0) {
                 return NULL;
             }
-            else if (pos < strlen(ip_strv4)) {
+            else if (slash != NULL && pos < strlen(ip_strv4)) {
                 ip_strv4[pos] = '\0';
             }
 
@@ -908,7 +911,8 @@ TreeNode *TreeAddIP(const char *buffer, CPTTree *tree, int type) {
             if(netmask_v6 == 0) {
                 return NULL;
             }
-            else if (netmask_v6 != NETMASK_128 && pos < strlen(ip_strv6)) {
+            else if (slash != NULL && netmask_v6 != NETMASK_128 &&
+                pos < strlen(ip_strv6)) {
                 ip_strv6[pos] = '\0';
             }
 
