@@ -254,6 +254,11 @@ foreach(TEST_FILE ${TEST_FILES})
   endif()
 endforeach()
 
+# C API tests
+add_executable(api_tests ${BASE_DIR}/test/api/msc_get_tx.c)
+setTestTargetProperties(api_tests)
+add_test(NAME msc_get_tx COMMAND api_tests WORKING_DIRECTORY ${BASE_DIR}/test)
+
 # benchmark
 add_executable(benchmark ${BASE_DIR}/test/benchmark/benchmark.cc)
 setTestTargetProperties(benchmark)
