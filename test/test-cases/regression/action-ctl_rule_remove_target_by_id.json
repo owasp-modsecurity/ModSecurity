@@ -423,5 +423,70 @@
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetById=1;ARGS:foo'bar\"",
       "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById (6): lowercase exclusion, rule reads all REQUEST_HEADERS",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Referer": "This is an attack"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [ ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:1,phase:1,pass,t:none,ctl:ruleRemoveTargetById=2;REQUEST_HEADERS:referer\"",
+      "SecRule REQUEST_HEADERS \"@contains attack\" \"id:2,phase:1,deny,t:none,log\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById (7): other headers are still checked",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Referer": "This is an attack",
+        "X-Other": "another attack"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [ ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:1,phase:1,pass,t:none,ctl:ruleRemoveTargetById=2;REQUEST_HEADERS:referer\"",
+      "SecRule REQUEST_HEADERS \"@contains attack\" \"id:2,phase:1,deny,t:none,log\""
+    ]
   }
 ]

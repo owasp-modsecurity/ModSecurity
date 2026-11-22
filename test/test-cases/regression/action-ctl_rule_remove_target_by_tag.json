@@ -334,5 +334,69 @@
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetByTag=CRS;ARGS:foo'bar\"",
       "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny,tag:'CRS'\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetByTag: lowercase exclusion, rule reads all REQUEST_HEADERS",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Referer": "This is an attack"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [ ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:1,phase:1,pass,t:none,ctl:ruleRemoveTargetByTag=CRS;REQUEST_HEADERS:referer\"",
+      "SecRule REQUEST_HEADERS \"@contains attack\" \"id:2,phase:1,deny,t:none,log,tag:'CRS'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetByTag: lowercase exclusion, rule reads REQUEST_HEADERS:Referer",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Referer": "This is an attack"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [ ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:1,phase:1,pass,t:none,ctl:ruleRemoveTargetByTag=CRS;REQUEST_HEADERS:referer\"",
+      "SecRule REQUEST_HEADERS:Referer \"@contains attack\" \"id:2,phase:1,deny,t:none,log,tag:'CRS'\""
+    ]
   }
 ]

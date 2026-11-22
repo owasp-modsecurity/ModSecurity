@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <cctype>
 #include <cstring>
 #include <list>
 #include <utility>
@@ -44,6 +45,21 @@
 
 
 namespace modsecurity {
+
+namespace {
+
+// Collection keys are matched without regard to case (see MyEqual in
+// anchored_set_variable.h), so target exclusions have to be too.
+bool equalsIgnoreCase(const std::string &a, const std::string &b) {
+    return a.size() == b.size() &&
+        std::equal(a.begin(), a.end(), b.begin(),
+            [](char x, char y) {
+                return std::tolower(static_cast<unsigned char>(x)) ==
+                    std::tolower(static_cast<unsigned char>(y));
+            });
+}
+
+}  // namespace
 
 using operators::Operator;
 using actions::Action;
@@ -166,15 +182,8 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
         if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
                 trans->m_ruleRemoveTargetById.end(),
                 [&, variable, this](const auto &m) -> bool {
-                    const auto& str1 = m.second;
-                    const auto& str2 = *variable->m_fullName.get();
                     return m.first == m_ruleId &&
-                           str1.size() == str2.size() &&
-                           std::equal(str1.begin(), str1.end(), str2.begin(),
-                                      [](char a, char b) {
-                                          return std::tolower(static_cast<unsigned char>(a)) ==
-                                                 std::tolower(static_cast<unsigned char>(b));
-                                      }); // end-of std::equal
+                        equalsIgnoreCase(m.second, *variable->m_fullName.get());
                 }) != trans->m_ruleRemoveTargetById.end()) {
             continue;
         }
@@ -183,7 +192,7 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                     [&, variable, trans, this](
                         const auto &m) -> bool {
                         return containsTag(m.first, trans)
-                            && m.second == *variable->m_fullName.get();
+                            && equalsIgnoreCase(m.second, *variable->m_fullName.get());
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
             continue;
         }
@@ -266,7 +275,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 std::find_if(trans->m_ruleRemoveTargetById.begin(),
                     trans->m_ruleRemoveTargetById.end(),
                     [&, v, this](const auto &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
+                        return m.first == m_ruleId && equalsIgnoreCase(m.second, v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetById.end()
             ) {
                 delete v;
@@ -277,7 +286,7 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](const auto &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                        return containsTag(m.first, trans) && equalsIgnoreCase(m.second, v->getKeyWithCollection());
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;
