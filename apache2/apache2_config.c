@@ -1234,6 +1234,47 @@ static const char *cmd_audit_engine(cmd_parms *cmd, void *_dcfg, const char *p1)
     return NULL;
 }
 
+/**
+ * Piped logs are opened while the configuration is read, so unlike the
+ * ones httpd opens in its open_logs hook their read ends are not on the
+ * list httpd closes in every child. A child that keeps the read end of a
+ * pipe can never see EPIPE when the logger dies, and blocks in write()
+ * for ever after a graceful restart (#2822). Remember the read ends here
+ * and close them from the child_init hook.
+ */
+static apr_array_header_t *piped_log_read_fds = NULL;
+
+static apr_status_t piped_log_read_fds_cleanup(void *data) {
+    piped_log_read_fds = NULL;
+    return APR_SUCCESS;
+}
+
+static void piped_log_remember_read_fd(apr_pool_t *p, piped_log *pl) {
+    apr_file_t *fd = ap_piped_log_read_fd(pl);
+
+    if (fd == NULL) return;
+
+    if (piped_log_read_fds == NULL) {
+        piped_log_read_fds = apr_array_make(p, 4, sizeof(apr_file_t *));
+        apr_pool_cleanup_register(p, NULL, piped_log_read_fds_cleanup,
+            apr_pool_cleanup_null);
+    }
+    *(apr_file_t **)apr_array_push(piped_log_read_fds) = fd;
+}
+
+void modsec_close_piped_log_read_fds(void) {
+    int i;
+
+    if (piped_log_read_fds == NULL) return;
+
+    for (i = 0; i < piped_log_read_fds->nelts; i++) {
+        apr_file_t *fd = ((apr_file_t **)piped_log_read_fds->elts)[i];
+        if (fd != NULL) {
+            apr_file_close(fd);
+        }
+    }
+}
+
 static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
 {
     assert(cmd != NULL);
@@ -1253,6 +1294,7 @@ static const char *cmd_audit_log(cmd_parms *cmd, void *_dcfg, const char *p1)
                     pipe_name);
         }
         dcfg->auditlog_fd = ap_piped_log_write_fd(pipe_log);
+        piped_log_remember_read_fd(cmd->pool, pipe_log);
     }
     else {
         const char *file_name = ap_server_root_relative(cmd->pool, dcfg->auditlog_name);
@@ -1297,6 +1339,7 @@ static const char *cmd_audit_log2(cmd_parms *cmd, void *_dcfg, const char *p1)
                     pipe_name);
         }
         dcfg->auditlog2_fd = ap_piped_log_write_fd(pipe_log);
+        piped_log_remember_read_fd(cmd->pool, pipe_log);
     }
     else {
         const char *file_name = ap_server_root_relative(cmd->pool, dcfg->auditlog2_name);
@@ -1746,6 +1789,7 @@ static const char *cmd_guardian_log(cmd_parms *cmd, void *_dcfg,
                 pipe_name);
         }
         guardianlog_fd = ap_piped_log_write_fd(pipe_log);
+        piped_log_remember_read_fd(cmd->pool, pipe_log);
     }
     else {
         const char *file_name = ap_server_root_relative(cmd->pool, guardianlog_name);

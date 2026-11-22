@@ -844,6 +844,8 @@ static int hook_post_config(apr_pool_t *mp, apr_pool_t *mp_log, apr_pool_t *mp_t
  * Initialisation performed for every new child process.
  */
 static void hook_child_init(apr_pool_t *mp, server_rec *s) {
+    /* Drop the read ends of our piped logs, as httpd does for its own. */
+    modsec_close_piped_log_read_fds();
     modsecurity_child_init(modsecurity);
 }
 

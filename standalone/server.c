@@ -623,6 +623,11 @@ AP_DECLARE(apr_file_t *) ap_piped_log_write_fd(piped_log *pl) // cppcheck-suppre
 {
  return NULL;
 }
+
+AP_DECLARE(apr_file_t *) ap_piped_log_read_fd(piped_log *pl) // cppcheck-suppress constParameterPointer
+{
+ return NULL;
+}
 #endif
 
 AP_DECLARE(char **) ap_create_environment(apr_pool_t *p, const apr_table_t *t)
