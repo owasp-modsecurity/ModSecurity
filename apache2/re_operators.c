@@ -2333,8 +2333,8 @@ static int msre_op_detectSQLi_execute(modsec_rec *msr, msre_rule *rule, msre_var
         switch(issqli) {
             case LIBINJECTION_RESULT_TRUE:
                 set_match_to_tx(msr, capture, fingerprint, 0);
-                *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s'",
-                                        fingerprint);
+                *error_msg = apr_psprintf(msr->mp, "detected SQLi using libinjection with fingerprint '%s' at %s.",
+                                        fingerprint, var->name);
                 if (msr->txcfg->debuglog_level >= 9) {
                     msr_log(msr, 9, "ISSQL: libinjection fingerprint '%s' matched input '%s'",
                         fingerprint,
