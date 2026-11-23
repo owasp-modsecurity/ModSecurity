@@ -182,8 +182,8 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, variable, trans, this](
                         const auto &m) -> bool {
-                        return containsTag(m.first, trans)
-                            && m.second == *variable->m_fullName.get();
+                        return m.second == *variable->m_fullName.get()
+                            && containsTag(m.first, trans);
                     }) != trans->m_ruleRemoveTargetByTag.end()) {
             continue;
         }
@@ -276,8 +276,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             if (exclusion.contains(v) ||
                 std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
-                    [&, v, trans, this](const auto &m) -> bool {
-                        return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
+                    [&, trans, this](const auto &m) -> bool {
+                        return m.second == key && containsTag(m.first, trans);
                     }) != trans->m_ruleRemoveTargetByTag.end()
             ) {
                 delete v;

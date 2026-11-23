@@ -443,7 +443,7 @@ void RuleWithActions::executeTransformations(
 
 bool RuleWithActions::containsTag(const std::string& name, Transaction *t) {
     for (auto &tag : m_actionsTag) {
-        if (tag != NULL && tag->getName(t) == name) {
+        if (tag != NULL && tag->hasName(name, t)) {
             return true;
         }
     }

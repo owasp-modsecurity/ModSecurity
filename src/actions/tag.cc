@@ -52,8 +52,19 @@ namespace actions {
 
 
 std::string Tag::getName(Transaction *transaction) {
+    if (m_isStatic) {
+        return m_staticName;
+    }
     std::string tag(m_string->evaluate(transaction));
     return tag;
+}
+
+
+bool Tag::hasName(std::string_view name, Transaction *transaction) {
+    if (m_isStatic) {
+        return m_staticName == name;
+    }
+    return m_string->evaluate(transaction) == name;
 }
 
 
