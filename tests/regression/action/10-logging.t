@@ -562,3 +562,27 @@
 		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
 	),
 },
+# check log format for libinjection messages
+{
+	type => "action",
+	comment => "log format",
+	conf => qq(
+		SecRuleEngine On
+		SecDebugLog "$ENV{DEBUG_LOG}"
+		SecDebugLogLevel 9
+        SecAuditLogRelevantStatus xxx
+		SecAuditEngine RelevantOnly
+		SecAuditLog "$ENV{AUDIT_LOG}"
+		SecRule ARGS "@detectSQLi" "phase:1,block,log,id:500030"
+	),
+	match_log => {
+		error => [ qr/ModSecurity: Warning\. detected SQLi using libinjection with fingerprint 's&1c' at ARGS:id\./, 1 ],
+		audit => [ qr/Message: Warning\. detected SQLi using libinjection with fingerprint 's&1c' at ARGS:id\./, 1 ],
+	},
+	match_response => {
+		status => qr/^403$/,
+	},
+	request => new HTTP::Request(
+		GET => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/?id=%u2019%20OR%201%3D1--%20-",
+	),
+},
