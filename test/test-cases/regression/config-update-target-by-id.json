@@ -223,5 +223,99 @@
       "SecRuleUpdateTargetById 1 \"!ARGS:/xxx/\"",
       "SecRule ARGS_NAMES \"@contains yyy\" \"id:1,phase:2,deny,status:403\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateTargetById - several rules, this rule's target removed",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleUpdateTargetById 2 !ARGS:c",
+      "SecRuleUpdateTargetById 3 !ARGS:a",
+      "SecRuleUpdateTargetById 4 !ARGS:c",
+      "SecRule ARGS \"@contains attack\" \"id:3,phase:2,t:none,status:403,deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRuleUpdateTargetById - several rules, other rules' targets kept",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Length": "0"
+      },
+      "uri": "/?c=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Date": "Mon, 13 Jul 2015 20:02:41 GMT",
+        "Last-Modified": "Sun, 26 Oct 2014 22:33:37 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRuleUpdateTargetById 2 !ARGS:c",
+      "SecRuleUpdateTargetById 3 !ARGS:a",
+      "SecRuleUpdateTargetById 4 !ARGS:c",
+      "SecRule ARGS \"@contains attack\" \"id:3,phase:2,t:none,status:403,deny\""
+    ]
   }
 ]
