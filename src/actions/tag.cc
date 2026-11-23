@@ -60,7 +60,7 @@ std::string Tag::getName(Transaction *transaction) {
 }
 
 
-bool Tag::hasName(const std::string &name, Transaction *transaction) {
+bool Tag::hasName(std::string_view name, Transaction *transaction) {
     if (m_isStatic) {
         return m_staticName == name;
     }
