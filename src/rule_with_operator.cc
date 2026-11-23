@@ -23,6 +23,7 @@
 #include <cstring>
 #include <list>
 #include <utility>
+#include <vector>
 #include <memory>
 
 #include "modsecurity/rules_set.h"
@@ -120,18 +121,43 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 }
 
 
+namespace {
+
+void addVariableException(variables::Variables *exclusion,
+    variables::Variables *addition, variables::Variable *b) {
+    if (auto vme = dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
+        exclusion->push_back(vme->m_base.get());
+    } else {
+        addition->push_back(b);
+    }
+}
+
+
+/*
+ * Targets removed from rule `ruleId` by ctl:ruleRemoveTargetById, looked up
+ * once per rule evaluation instead of once per variable value: the list holds
+ * every entry of the transaction (all rules), and most rules have none.
+ */
+template<typename RuleId>
+void removedTargetsById(const Transaction *trans, RuleId ruleId,
+    std::vector<const std::string *> *out) {
+    for (const auto &[id, target] : trans->m_ruleRemoveTargetById) {
+        if (id == ruleId) {
+            out->push_back(&target);
+        }
+    }
+}
+
+}  // namespace
+
+
 template<typename MapType, typename Operation>
 void getVariablesExceptionsHelper(
     variables::Variables *exclusion, variables::Variables *addition,
     const MapType &map, Operation op) {
     for (const auto &[x, v] : map) {
         if (op(x)) {
-            auto b = v.get();
-            if (auto vme = dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-                exclusion->push_back(vme->m_base.get());
-            } else {
-                addition->push_back(b);
-            }
+            addVariableException(exclusion, addition, v.get());
         }
     }
 }
@@ -147,9 +173,12 @@ void RuleWithOperator::getVariablesExceptions(Transaction &t,
         t.m_rules->m_exceptions.m_variable_update_target_by_msg,
         [this, &t](const auto &msg) { return containsMsg(*msg.get(), &t); });
 
-    getVariablesExceptionsHelper(exclusion, addition,
-        t.m_rules->m_exceptions.m_variable_update_target_by_id,
-        [this](const auto &id) { return m_ruleId == id; });
+    // keyed by rule id: look the rule up instead of walking the whole map
+    const auto range = t.m_rules->m_exceptions.m_variable_update_target_by_id
+        .equal_range(m_ruleId);
+    for (auto it = range.first; it != range.second; ++it) {
+        addVariableException(exclusion, addition, it->second.get());
+    }
 }
 
 
@@ -158,24 +187,24 @@ inline void RuleWithOperator::getFinalVars(variables::Variables *vars,
     variables::Variables addition;
     getVariablesExceptions(*trans, exclusion, &addition); // cppcheck-suppress ctunullpointer
 
+    std::vector<const std::string *> removedById;
+    removedTargetsById(trans, m_ruleId, &removedById);
+
     for (std::size_t i = 0; i < m_variables->size(); i++) {
         Variable *variable = m_variables->at(i);
         if (exclusion->contains(variable)) {
             continue;
         }
-        if (std::find_if(trans->m_ruleRemoveTargetById.begin(),
-                trans->m_ruleRemoveTargetById.end(),
-                [&, variable, this](const auto &m) -> bool {
-                    const auto& str1 = m.second;
+        if (std::any_of(removedById.begin(), removedById.end(),
+                [variable](const std::string *str1) -> bool {
                     const auto& str2 = *variable->m_fullName.get();
-                    return m.first == m_ruleId &&
-                           str1.size() == str2.size() &&
-                           std::equal(str1.begin(), str1.end(), str2.begin(),
+                    return str1->size() == str2.size() &&
+                           std::equal(str1->begin(), str1->end(), str2.begin(),
                                       [](char a, char b) {
                                           return std::tolower(static_cast<unsigned char>(a)) ==
                                                  std::tolower(static_cast<unsigned char>(b));
                                       }); // end-of std::equal
-                }) != trans->m_ruleRemoveTargetById.end()) {
+                })) {
             continue;
         }
         if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
@@ -252,6 +281,12 @@ bool RuleWithOperator::evaluate(Transaction *trans,
 
     getFinalVars(&vars, &exclusion, trans);
 
+    std::vector<const std::string *> removedById;
+    removedTargetsById(trans, m_ruleId, &removedById);
+    // a ctl run while this rule is evaluated (its own match actions) is seen
+    // by the next values, as with the list walk this replaces
+    std::size_t removedByIdSeen = trans->m_ruleRemoveTargetById.size();
+
     for (auto &var : vars) {
         std::vector<const VariableValue *> e;
         if (!var) {
@@ -262,12 +297,16 @@ bool RuleWithOperator::evaluate(Transaction *trans,
             const std::string &value = v->getValue();
             const std::string &key = v->getKeyWithCollection();
 
+            if (trans->m_ruleRemoveTargetById.size() != removedByIdSeen) {
+                removedById.clear();
+                removedTargetsById(trans, m_ruleId, &removedById);
+                removedByIdSeen = trans->m_ruleRemoveTargetById.size();
+            }
             if (exclusion.contains(v) ||
-                std::find_if(trans->m_ruleRemoveTargetById.begin(),
-                    trans->m_ruleRemoveTargetById.end(),
-                    [&, v, this](const auto &m) -> bool {
-                        return m.first == m_ruleId && m.second == v->getKeyWithCollection();
-                    }) != trans->m_ruleRemoveTargetById.end()
+                std::any_of(removedById.begin(), removedById.end(),
+                    [&key](const std::string *target) -> bool {
+                        return *target == key;
+                    })
             ) {
                 delete v;
                 v = nullptr;

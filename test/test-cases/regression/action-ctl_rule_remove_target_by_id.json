@@ -423,5 +423,95 @@
       "SecRule REQUEST_FILENAME \"@unconditionalMatch\" \"id:9002100,phase:2,pass,ctl:ruleRemoveTargetById=1;ARGS:foo'bar\"",
       "SecRule ARGS \"@contains attack\" \"id:1,phase:3,status:403,block,deny\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById: several entries for several rules, all of this rule's targets removed",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Type": "text/xml",
+        "Referer": "This is an attack",
+        "Content-Length": "0"
+      },
+      "uri": "/index.html?a=attack&b=attack&c=ok",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,ctl:ruleRemoveTargetById=2;ARGS:c,ctl:ruleRemoveTargetById=3;ARGS:a,ctl:ruleRemoveTargetById=3;ARGS:b,ctl:ruleRemoveTargetById=4;ARGS:c\"",
+      "SecRule ARGS \"@contains attack\" \"id:3,phase:2,t:none,status:403,deny\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing CtlRuleRemoveTargetById: several entries for several rules, other rules' targets kept",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Cookie": "PHPSESSID=rAAAAAAA2t5uvjq435r4q7ib3vtdjq120",
+        "Content-Type": "text/xml",
+        "Referer": "This is an attack",
+        "Content-Length": "0"
+      },
+      "uri": "/index.html?a=attack&b=attack&c=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecAction \"id:1,phase:1,pass,nolog,ctl:ruleRemoveTargetById=2;ARGS:c,ctl:ruleRemoveTargetById=3;ARGS:a,ctl:ruleRemoveTargetById=3;ARGS:b,ctl:ruleRemoveTargetById=4;ARGS:c\"",
+      "SecRule ARGS \"@contains attack\" \"id:3,phase:2,t:none,status:403,deny\""
+    ]
   }
 ]
