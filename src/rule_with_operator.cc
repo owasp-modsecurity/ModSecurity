@@ -120,18 +120,23 @@ bool RuleWithOperator::executeOperatorAt(Transaction *trans, const std::string &
 }
 
 
+static void addVariableException(variables::Variables *exclusion,
+    variables::Variables *addition, variables::Variable *b) {
+    if (auto vme = dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
+        exclusion->push_back(vme->m_base.get());
+    } else {
+        addition->push_back(b);
+    }
+}
+
+
 template<typename MapType, typename Operation>
 void getVariablesExceptionsHelper(
     variables::Variables *exclusion, variables::Variables *addition,
     const MapType &map, Operation op) {
     for (const auto &[x, v] : map) {
         if (op(x)) {
-            auto b = v.get();
-            if (auto vme = dynamic_cast<variables::VariableModificatorExclusion*>(b)) {
-                exclusion->push_back(vme->m_base.get());
-            } else {
-                addition->push_back(b);
-            }
+            addVariableException(exclusion, addition, v.get());
         }
     }
 }
@@ -147,9 +152,12 @@ void RuleWithOperator::getVariablesExceptions(Transaction &t,
         t.m_rules->m_exceptions.m_variable_update_target_by_msg,
         [this, &t](const auto &msg) { return containsMsg(*msg.get(), &t); });
 
-    getVariablesExceptionsHelper(exclusion, addition,
-        t.m_rules->m_exceptions.m_variable_update_target_by_id,
-        [this](const auto &id) { return m_ruleId == id; });
+    // keyed by rule id: look the rule up instead of walking the whole map
+    const auto [first, last] = t.m_rules->m_exceptions
+        .m_variable_update_target_by_id.equal_range(m_ruleId);
+    for (auto it = first; it != last; ++it) {
+        addVariableException(exclusion, addition, it->second.get());
+    }
 }
 
 
