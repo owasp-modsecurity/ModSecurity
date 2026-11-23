@@ -81,6 +81,7 @@ TESTS+=test/test-cases/regression/issue-849.json
 TESTS+=test/test-cases/regression/issue-960.json
 TESTS+=test/test-cases/regression/misc.json
 TESTS+=test/test-cases/regression/misc-escaped-quote-after-macro-expansion.json
+TESTS+=test/test-cases/regression/misc-lua-getvar-transformations.json
 TESTS+=test/test-cases/regression/misc-lua-getvar-unknown-variable.json
 TESTS+=test/test-cases/regression/misc-variable-under-quotes.json
 TESTS+=test/test-cases/regression/offset-variable.json
