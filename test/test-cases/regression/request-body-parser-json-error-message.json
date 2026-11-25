@@ -1,0 +1,47 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing JSON parser error message has no trailing newline (#2278)",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "17"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"a\": 1,, \"b\": 2}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "error_log": "\\[data \"JSON parsing error: parse error: invalid object key \\(must be a string\\)\"\\] \\[severity",
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:1,phase:1,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"@eq 1\" \"id:2,phase:2,deny,status:403,log,logdata:'%{REQBODY_ERROR_MSG}'\""
+    ]
+  }
+]
