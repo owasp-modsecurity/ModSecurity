@@ -840,7 +840,7 @@ CMyHttpModule::OnBeginRequest(
 	r->hostname = ConvertUTF16ToUTF8(req->CookedUrl.pHost, req->CookedUrl.HostLength / sizeof(WCHAR), r->pool);
 	r->path_info = ConvertUTF16ToUTF8(req->CookedUrl.pAbsPath, req->CookedUrl.AbsPathLength / sizeof(WCHAR), r->pool);
 
-	if(r->hostname == NULL)
+	if(r->hostname == NULL || r->hostname[0] == '\0')
 	{
 		if(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue != NULL)
 			r->hostname = ZeroTerminate(req->Headers.KnownHeaders[HttpHeaderHost].pRawValue,
