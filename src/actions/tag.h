@@ -14,7 +14,9 @@
  */
 
 #include <string>
+#include <string_view>
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include "modsecurity/actions/action.h"
@@ -34,14 +36,23 @@ class Tag : public Action {
  public:
     explicit Tag(std::unique_ptr<RunTimeString> z)
         : Action("tag"),
-        m_string(std::move(z)) { }
+        m_string(std::move(z)),
+        m_staticName(m_string->containsMacro()
+            ? std::nullopt
+            : std::optional<std::string>(m_string->evaluate())) { }
 
     std::string getName(Transaction *transaction);
+    bool hasName(std::string_view name, Transaction *transaction);
 
     bool evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) override;
 
  protected:
     std::unique_ptr<RunTimeString> m_string;
+
+ private:
+    // Without macros, the name is the same in every transaction and is
+    // evaluated once. Empty if the tag contains macros.
+    const std::optional<std::string> m_staticName;
 };
 
 
