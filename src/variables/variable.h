@@ -672,7 +672,7 @@ class Variables : public std::vector<Variable *> {
                 if (r) {
                     return !r->m_r.searchAll(v->getKey()).empty();
                 }
-                return v->getKeyWithCollection() == *m->m_fullName.get();
+                return utils::string::toupper(v->getKeyWithCollection()) == utils::string::toupper(*m->m_fullName.get());
             }) != end();
     }
 };
