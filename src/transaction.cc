@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cstdint>
 #include <cstdio>
 #include <ctime>
 #include <fstream>
@@ -940,8 +941,14 @@ int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
 
         if (this->m_rules->m_requestBodyLimitAction ==
             RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
-            size_t spaceLeft = this->m_rules->m_requestBodyLimit.m_value
-                - current_size;
+            size_t spaceLeft = 0;
+            if (current_size >= 0
+                && static_cast<uint64_t>(current_size)
+                    < this->m_rules->m_requestBodyLimit.m_value) {
+                const uint64_t room =
+                    this->m_rules->m_requestBodyLimit.m_value - current_size;
+                spaceLeft = (room < len) ? static_cast<size_t>(room) : len;
+            }
             this->m_requestBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
             ms_dbg(5, "Request body limit is marked to process partial");
@@ -1199,8 +1206,14 @@ int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
         ms_dbg(5, "Response body is bigger than the maximum expected.");
         if (this->m_rules->m_responseBodyLimitAction ==
             RulesSet::BodyLimitAction::ProcessPartialBodyLimitAction) {
-            size_t spaceLeft = this->m_rules->m_responseBodyLimit.m_value \
-                - current_size;
+            size_t spaceLeft = 0;
+            if (current_size >= 0
+                && static_cast<uint64_t>(current_size)
+                    < this->m_rules->m_responseBodyLimit.m_value) {
+                const uint64_t room =
+                    this->m_rules->m_responseBodyLimit.m_value - current_size;
+                spaceLeft = (room < len) ? static_cast<size_t>(room) : len;
+            }
             this->m_responseBody.write(reinterpret_cast<const char*>(buf),
                 spaceLeft);
             ms_dbg(5, "Response body limit is marked to process partial");
