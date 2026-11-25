@@ -273,8 +273,8 @@ bool RuleWithOperator::evaluate(Transaction *trans,
                 v = nullptr;
                 continue;
             }
-            if (exclusion.contains(v) ||
-                std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
+            // If we get here, exclusion.contains(v) is false.
+            if (std::find_if(trans->m_ruleRemoveTargetByTag.begin(),
                     trans->m_ruleRemoveTargetByTag.end(),
                     [&, v, trans, this](const auto &m) -> bool {
                         return containsTag(m.first, trans) && m.second == v->getKeyWithCollection();
