@@ -300,7 +300,8 @@ static void sanitize_request_line(modsec_rec *msr) {
         if (strcmp(arg->origin, "QUERY_STRING") == 0) {
             char *pat = NULL;
             char *p;
-            int j, arg_min, arg_max;
+            size_t j;
+            int arg_min, arg_max;
 
             /* Go to the beginning of the parameter. */
             p = qspos;
@@ -333,7 +334,7 @@ static void sanitize_request_line(modsec_rec *msr) {
                         arg_max = 1;
                         while((*pat != '\0')&&(j--)) {
                             if(arg_max > mparm->pad_2)  {
-                                int off = (strlen(mparm->value) - arg_max);
+                                int off = (int)strlen(mparm->value) - arg_max;
                                 int pos = (mparm->pad_1-1);
                                 if(off > pos)    {
                                     *pat = '*';
@@ -668,7 +669,8 @@ void sec_audit_logger_json(modsec_rec *msr) {
     int wrote_response_body = 0;
     char *entry_filename, *entry_basename;
     apr_status_t rc;
-    int i, limit, k, sanitized_partial, j;
+    int i, limit, k, sanitized_partial;
+    size_t j;
     char *buf = NULL, *pat = NULL;
     msc_parm *mparm = NULL;
     int arg_min, arg_max, sanitize_matched;
@@ -827,7 +829,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                             arg_max = 1;
                             while((*pat != '\0')&&(j--)) {
                                 if(arg_max > mparm->pad_2)  {
-                                    int off = strlen(mparm->value) - arg_max;
+                                    int off = (int)strlen(mparm->value) - arg_max;
                                     int pos = mparm->pad_1-1;
                                     if(off > pos)    {
                                         *pat = '*';
@@ -1084,7 +1086,7 @@ void sec_audit_logger_json(modsec_rec *msr) {
                                 arg_max = 1;
                                 while((*pat != '\0')&&(j--)) {
                                     if(arg_max > mparm->pad_2)  {
-                                        int off = strlen(mparm->value) - arg_max;
+                                        int off = (int)strlen(mparm->value) - arg_max;
                                         int pos = mparm->pad_1-1;
                                         if(off > pos)    {
                                             *pat = '*';
@@ -1547,7 +1549,8 @@ void sec_audit_logger_native(modsec_rec *msr) {
     int wrote_response_body = 0;
     char *entry_filename, *entry_basename;
     apr_status_t rc;
-    int i, limit, k, sanitized_partial, j;
+    int i, limit, k, sanitized_partial;
+    size_t j;
     char *buf = NULL, *pat = NULL;
     msc_parm *mparm = NULL;
     int arg_min, arg_max, sanitize_matched;
@@ -1683,7 +1686,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                             arg_max = 1;
                             while((*pat != '\0')&&(j--)) {
                                 if(arg_max > mparm->pad_2)  {
-                                    int off = strlen(mparm->value) - arg_max;
+                                    int off = (int)strlen(mparm->value) - arg_max;
                                     int pos = mparm->pad_1-1;
                                     if(off > pos)    {
                                         *pat = '*';
@@ -1931,7 +1934,7 @@ void sec_audit_logger_native(modsec_rec *msr) {
                                 arg_max = 1;
                                 while((*pat != '\0')&&(j--)) {
                                     if(arg_max > mparm->pad_2)  {
-                                        int off = strlen(mparm->value) - arg_max;
+                                        int off = (int)strlen(mparm->value) - arg_max;
                                         int pos = mparm->pad_1-1;
                                         if(off > pos)    {
                                             *pat = '*';

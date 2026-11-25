@@ -52,11 +52,11 @@
 // Bese32 encode, based on:
 // https://code.google.com/p/google-authenticator/source/browse/libpam/base32.c
 int DSOLOCAL msc_status_engine_base32_encode(char *encoded,
-    const char *data, int len) {
+    const char *data, size_t len) {
     int buffer;
     int count = 0;
     char *result = encoded;
-    int length = strlen(data);
+    size_t length = strlen(data);
 
     buffer = data[0];
 
@@ -97,7 +97,7 @@ int DSOLOCAL msc_status_engine_base32_encode(char *encoded,
 }
 
 int DSOLOCAL msc_status_engine_fill_with_dots(char *encoded_with_dots,
-    const char *data, int len, int space)
+    const char *data, size_t len, int space)
 {
     int i;
     int count = 0;
