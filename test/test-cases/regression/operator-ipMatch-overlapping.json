@@ -1,0 +1,344 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (1) - narrow then wide on the same key, IP in the wide range",
+    "client": {
+      "ip": "10.5.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 10.0.0.0/16,10.0.0.0/8\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (2) - narrow then wide on the same key, IP in the narrow range",
+    "client": {
+      "ip": "10.0.5.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 10.0.0.0/16,10.0.0.0/8\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (3) - wide then narrow on the same key",
+    "client": {
+      "ip": "10.5.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 10.0.0.0/8,10.0.0.0/16\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (4) - host then network on the same key",
+    "client": {
+      "ip": "172.20.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 172.16.0.0,172.16.0.0/12\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (5) - three prefixes on the same key",
+    "client": {
+      "ip": "192.5.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 192.168.0.0/24,192.168.0.0/16,192.168.0.0/8\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (6) - duplicate prefixes still match",
+    "client": {
+      "ip": "10.5.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 10.0.0.0/8,127.0.0.1,10.0.0.0/8\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (7) - address outside every prefix",
+    "client": {
+      "ip": "11.0.0.1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 10.0.0.0/16,10.0.0.0/8,192.168.0.0/16\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (8) - IPv6 narrow then wide on the same key",
+    "client": {
+      "ip": "2001:db8:1::1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 2001:db8::/48,2001:db8::/32\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Testing Operator :: @ipMatch overlapping prefixes (9) - IPv6 address outside every prefix",
+    "client": {
+      "ip": "2001:db9::1",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": []
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REMOTE_ADDR \"@ipMatch 2001:db8::/48,2001:db8::/32\" \"id:1,phase:1,deny,status:403\""
+    ]
+  }
+]
