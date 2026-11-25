@@ -91,6 +91,33 @@ bool InMemoryPerProcess::updateFirst(const std::string &key,
 }
 
 
+int InMemoryPerProcess::incrementFirst(const std::string &key, int delta) {
+    const std::lock_guard lock(m_mutex); // write lock (exclusive access)
+    int value = 0;
+
+    auto search = m_map.find(key);
+    if (search != m_map.end() && search->second.isExpired()) {
+        m_map.erase(search);
+        search = m_map.end();
+    }
+    if (search != m_map.end() && search->second.hasValue()) {
+        try {
+            value = std::stoi(search->second.getValue());
+        } catch (...) {
+            value = 0;
+        }
+    }
+    value += delta;
+
+    if (search != m_map.end()) {
+        search->second.setValue(std::to_string(value));
+    } else {
+        __store(m_map, key, std::to_string(value));
+    }
+    return value;
+}
+
+
 void InMemoryPerProcess::del(const std::string& key) {
     const std::lock_guard lock(m_mutex); // write lock (exclusive access)
     m_map.erase(key);

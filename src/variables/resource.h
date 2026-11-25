@@ -111,6 +111,14 @@ class Resource_DynamicElement : public Variable {
     }
 
 
+    static int incrementFirst(Transaction *t, const std::string &var,
+        int delta) {
+        return t->m_collections.m_resource_collection->incrementFirst(
+            var, t->m_collections.m_resource_collection_key,
+            t->m_rules->m_secWebAppId.m_value,
+            delta);
+    }
+
     static void storeOrUpdateFirst(Transaction *t, const std::string &var,
         const std::string &value) {
         t->m_collections.m_resource_collection->storeOrUpdateFirst(
