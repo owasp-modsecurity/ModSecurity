@@ -1,0 +1,25 @@
+logfile: c:\inetpub\logs\modsec_audit.log
+logmarkerheadername: X-CRS-Test
+mode: "default"
+testoverride:
+  input:
+    dest_addr: "localhost"
+    port: 80
+    protocol: "http"
+  # IIS/HTTP.SYS behavior differs from the Apache CRS baseline.
+  # go-ftw's include wins over exclude, so these use the ignore map.
+  ignore:
+    "^920100-(2|8|12)$": "HTTP.SYS accepts request lines Apache rejects with 400"
+    "^920100-(10|14)$": "unknown verb becomes method INVALID; rebuilt request line matches 920100 whitelist regex"
+    "^920100-4$": "HTTP.SYS rejects CONNECT with 400"
+    "^920180-(1|3)$": "HTTP.SYS rejects CL-less POST with 411 before the module runs"
+    "^920181-1$": "ARR returns 502 on CL+TE and 920181 fires (Apache strips CL)"
+    "^920200-4$": "HTTP.SYS rejects malformed Range with 400"
+    "^920290-1$": "HTTP.SYS accepts empty Host (200) that Apache rejects with 400"
+    "^920350-(1|3)$": "HTTP.SYS rejects IP Host header with 400"
+    "^920430-8$": "HTTP.SYS returns 505 for HTTP/4.0"
+    "^920520-7$": "HTTP.SYS rejects malformed Accept-Encoding with 400"
+    "^920620-1$": "HTTP.SYS rejects duplicate Content-Type with 400"
+    "^941101-2$": "URI contains double quotes; HTTP.SYS rejects it before the module runs"
+
+include: "^(913|920|930|941)"
