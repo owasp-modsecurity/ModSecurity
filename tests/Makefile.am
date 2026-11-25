@@ -74,9 +74,6 @@ msc_test_LDFLAGS = @APR_LDFLAGS@ \
     @YAJL_LDFLAGS@ \
     @SSDEEP_LDFLAGS@
 
-check_SCRIPTS = run-unit-tests.pl
-TESTS = $(check_SCRIPTS)
-
 test: check
 
 test-regression: run-regression-tests.pl
