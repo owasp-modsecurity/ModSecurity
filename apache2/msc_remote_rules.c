@@ -290,6 +290,9 @@ int msc_remote_download_content(apr_pool_t *mp, const char *uri, const char *key
 
     apr_id = apr_psprintf(mp, "ModSec-unique-id: %s", id);
 
+    /* Without this, curl_easy_init() initialises libcurl on its own and
+     * nothing ever cleans that up (#3590). */
+    modsecurity_curl_global_init(mp);
     curl = curl_easy_init();
 
     beacon_str_len = msc_beacon_string(NULL, 0);

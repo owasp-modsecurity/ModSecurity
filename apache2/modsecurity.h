@@ -718,6 +718,10 @@ msc_engine DSOLOCAL *modsecurity_create(apr_pool_t *mp, int processing_mode);
 
 int DSOLOCAL modsecurity_init(msc_engine *msce, apr_pool_t *mp);
 
+#ifdef WITH_CURL
+void DSOLOCAL modsecurity_curl_global_init(apr_pool_t *mp);
+#endif
+
 void DSOLOCAL modsecurity_child_init(msc_engine *msce);
 
 void DSOLOCAL modsecurity_shutdown(msc_engine *msce);
