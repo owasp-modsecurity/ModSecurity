@@ -124,8 +124,8 @@ static inline apr_bucket_brigade * modsecGetResponseBrigade(const request_rec *r
 
 void modsecSetReadBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));
 void modsecSetReadResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length, unsigned int *readcnt, int *is_eos));
-void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
-void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, char *buf, unsigned int length));
+void modsecSetWriteBody(apr_status_t (*func)(request_rec *r, const char *buf, unsigned int length));
+void modsecSetWriteResponse(apr_status_t (*func)(request_rec *r, const char *buf, unsigned int length));
 void modsecSetDropAction(int (*func)(request_rec *r));
 
 int modsecIsResponseBodyAccessEnabled(request_rec *r);
