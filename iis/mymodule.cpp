@@ -941,12 +941,20 @@ CMyHttpModule::OnBeginRequest(
 	switch(req->Verb)
 	{
 	case HttpVerbUnparsed:
-	case HttpVerbUnknown:
 	case HttpVerbInvalid:
     case HttpVerbTRACK:  // used by Microsoft Cluster Server for a non-logged trace
     case HttpVerbSEARCH:
 	default:
 		r->method = "INVALID";
+		r->method_number = M_INVALID;
+		break;
+	case HttpVerbUnknown:
+		// IIS reports unrecognized methods (e.g. PATCH) as HttpVerbUnknown;
+		// keep the raw verb so REQUEST_METHOD is not collapsed to "INVALID".
+		if(req->pUnknownVerb != NULL && req->UnknownVerbLength > 0)
+			r->method = ZeroTerminate(req->pUnknownVerb, req->UnknownVerbLength, r->pool);
+		else
+			r->method = "INVALID";
 		r->method_number = M_INVALID;
 		break;
 	case HttpVerbOPTIONS:
