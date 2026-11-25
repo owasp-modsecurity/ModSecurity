@@ -155,8 +155,9 @@ std::string Operator::resolveMatchMessage(Transaction *t,
     std::string ret = m_match_message;
 
     if (ret.empty() == true) {
+        const std::string opName = (m_negation ? "!" : "") + m_op;
         if (m_couldContainsMacro == false) {
-            ret = "Matched \"Operator `" + m_op + "' with parameter `" +
+            ret = "Matched \"Operator `" + opName + "' with parameter `" +
                 utils::string::limitTo(200, m_param) +
                 "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
                 utils::string::limitTo(100,
@@ -164,7 +165,7 @@ std::string Operator::resolveMatchMessage(Transaction *t,
                 "' )";
         } else {
             std::string p(m_string->evaluate(t));
-            ret = "Matched \"Operator `" + m_op + "' with parameter `" +
+            ret = "Matched \"Operator `" + opName + "' with parameter `" +
                 utils::string::limitTo(200, p) +
                 "' against variable `" + utils::string::toHexIfNeeded(key) + "' (Value: `" +
                 utils::string::limitTo(100,
