@@ -927,7 +927,7 @@ int Transaction::requestBodyFromFile(const char *path) {
 }
 
 int Transaction::appendRequestBody(const unsigned char *buf, size_t len) {
-    int current_size = this->m_requestBody.tellp();
+    std::streamoff current_size = this->m_requestBody.tellp();
 
     ms_dbg(9, "Appending request body: " + std::to_string(len) + " bytes. " \
         "Limit set to: "
@@ -1176,7 +1176,7 @@ int Transaction::processResponseBody() {
  *
  */
 int Transaction::appendResponseBody(const unsigned char *buf, size_t len) {
-    int current_size = this->m_responseBody.tellp();
+    std::streamoff current_size = this->m_responseBody.tellp();
 
     const std::set<std::string> &bi = \
         this->m_rules->m_responseBodyTypeToBeInspected.m_value;
