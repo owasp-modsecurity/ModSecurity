@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -93,6 +94,14 @@ double cpu_seconds(void) {
             static_cast<double>(CLOCKS_PER_SEC);
 #endif
         return 0;
+}
+
+double steady_micros(void) {
+    // Monotonic wall-clock time, in whole microseconds. A double holds
+    // integers exactly up to 2^53, so no precision is lost.
+    return static_cast<double>(
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count());
 }
 
 

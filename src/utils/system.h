@@ -27,6 +27,7 @@ namespace utils {
 
 
 double cpu_seconds(void);
+double steady_micros(void);
 std::string find_resource(const std::string& file, const std::string& config,
     std::string *err);
 std::string get_path(const std::string& file);
