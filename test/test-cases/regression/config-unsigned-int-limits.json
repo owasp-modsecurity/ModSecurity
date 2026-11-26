@@ -2,7 +2,7 @@
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "SecArgumentsLimit accepts the uint32 maximum",
+    "title": "SecArgumentsLimit at the uint32 maximum still inspects arguments",
     "client": {
       "ip": "200.249.12.31",
       "port": 12300
@@ -16,7 +16,7 @@
         "Host": "localhost",
         "Content-Length": "0"
       },
-      "uri": "/",
+      "uri": "/?a=attack",
       "method": "GET",
       "body": [
         ""
@@ -31,16 +31,18 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
-      "SecArgumentsLimit 4294967295"
+      "SecRuleEngine On",
+      "SecArgumentsLimit 4294967295",
+      "SecRule ARGS:a \"@streq attack\" \"id:1,phase:1,deny,status:403\""
     ]
   },
   {
     "enabled": 1,
     "version_min": 300000,
-    "title": "SecRequestBodyJsonDepthLimit accepts the uint32 maximum",
+    "title": "SecRequestBodyJsonDepthLimit at the uint32 maximum still exposes JSON arguments",
     "client": {
       "ip": "200.249.12.31",
       "port": 12300
@@ -52,12 +54,13 @@
     "request": {
       "headers": {
         "Host": "localhost",
-        "Content-Length": "0"
+        "Content-Type": "application/json",
+        "Content-Length": "14"
       },
       "uri": "/",
-      "method": "GET",
+      "method": "POST",
       "body": [
-        ""
+        "{\"a\":\"attack\"}"
       ]
     },
     "response": {
@@ -69,10 +72,15 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
-      "SecRequestBodyJsonDepthLimit 4294967295"
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyJsonDepthLimit 4294967295",
+      "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:1,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:2,phase:2,t:none,deny,status:400\"",
+      "SecRule ARGS:json.a \"@streq attack\" \"id:3,phase:2,deny,status:403\""
     ]
   },
   {
