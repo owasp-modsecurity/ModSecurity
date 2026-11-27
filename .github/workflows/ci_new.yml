@@ -106,6 +106,14 @@ jobs:
           CC: ${{ matrix.compiler.cc }}
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
+      - name: Force parser regeneration
+        # make only regenerates the parser when the grammar is newer than the
+        # committed output, which after a checkout depends on file times
+        if: ${{ matrix.configure.opt == '--enable-parser-generation' }}
+        run: |
+          bison --version | head -n 1
+          flex --version
+          touch src/parser/seclang-parser.yy src/parser/seclang-scanner.ll
       - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
       - name: make
         run: make -j "$(nproc)"
@@ -222,6 +230,15 @@ jobs:
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
 
+      - name: Force parser regeneration
+        # make only regenerates the parser when the grammar is newer than the
+        # committed output, which after a checkout depends on file times
+        if: ${{ matrix.configure.opt == '--enable-parser-generation' }}
+        run: |
+          bison --version | head -n 1
+          flex --version
+          touch src/parser/seclang-parser.yy src/parser/seclang-scanner.ll
+
       - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 
       - name: Compile
@@ -279,11 +296,25 @@ jobs:
                        bison \
                        flex
 
+      - name: Use the Homebrew bison
+        # Homebrew installs bison keg-only; without this, configure finds
+        # the bison 2.3 that comes with macOS
+        run: echo "$(brew --prefix bison)/bin" >> "$GITHUB_PATH"
+
       - name: Run build preparation script
         run: ./build.sh
 
       - name: Configure
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
+
+      - name: Force parser regeneration
+        # make only regenerates the parser when the grammar is newer than the
+        # committed output, which after a checkout depends on file times
+        if: ${{ matrix.configure.opt == '--enable-parser-generation' }}
+        run: |
+          bison --version | head -n 1
+          flex --version
+          touch src/parser/seclang-parser.yy src/parser/seclang-scanner.ll
 
       - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 

@@ -6,7 +6,6 @@ libinjection_la_SOURCES = \
 	libinjection/src/libinjection_sqli.c \
 	libinjection/src/libinjection_xss.c
 
-libinjection_la_CFLAGS = -D LIBINJECTION_VERSION=\"${LIBINJECTION_VERSION}\"
 libinjection_la_LIBADD =
 
 noinst_HEADERS = \
