@@ -1,0 +1,242 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecArgumentsLimit at the uint32 maximum still inspects arguments",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/?a=attack",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecArgumentsLimit 4294967295",
+      "SecRule ARGS:a \"@streq attack\" \"id:1,phase:1,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyJsonDepthLimit at the uint32 maximum still exposes JSON arguments",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Type": "application/json",
+        "Content-Length": "14"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"a\":\"attack\"}"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRequestBodyJsonDepthLimit 4294967295",
+      "SecRule REQUEST_HEADERS:Content-Type \"^application/json\" \"id:1,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule REQBODY_ERROR \"!@eq 0\" \"id:2,phase:2,t:none,deny,status:400\"",
+      "SecRule ARGS:json.a \"@streq attack\" \"id:3,phase:2,deny,status:403\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecArgumentsLimit rejects uint32 overflow",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Failed to parse SecArgumentsLimit: Value is too big."
+    },
+    "rules": [
+      "SecArgumentsLimit 4294967296"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyJsonDepthLimit rejects uint32 overflow",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Failed to parse SecRequestBodyJsonDepthLimit: Value is too big."
+    },
+    "rules": [
+      "SecRequestBodyJsonDepthLimit 4294967296"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecArgumentsLimit rejects values wider than uint64",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Failed to parse SecArgumentsLimit: Number out of range"
+    },
+    "rules": [
+      "SecArgumentsLimit 999999999999999999999999999999999999999999999999999999999999"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "SecRequestBodyJsonDepthLimit rejects values wider than uint64",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 12300
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Content-Length": "0"
+      },
+      "uri": "/",
+      "method": "GET",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Failed to parse SecRequestBodyJsonDepthLimit: Number out of range"
+    },
+    "rules": [
+      "SecRequestBodyJsonDepthLimit 999999999999999999999999999999999999999999999999999999999999"
+    ]
+  }
+]

@@ -42,6 +42,7 @@ TESTS+=test/test-cases/regression/config-remove_by_tag.json
 TESTS+=test/test-cases/regression/config-response_type.json
 TESTS+=test/test-cases/regression/config-secdefaultaction.json
 TESTS+=test/test-cases/regression/config-secremoterules.json
+TESTS+=test/test-cases/regression/config-unsigned-int-limits.json
 TESTS+=test/test-cases/regression/config-update-action-by-id.json
 TESTS+=test/test-cases/regression/config-update-target-by-id.json
 TESTS+=test/test-cases/regression/config-update-target-by-msg.json
