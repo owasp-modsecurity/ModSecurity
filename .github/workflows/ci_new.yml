@@ -5,6 +5,280 @@ on:
   pull_request:
 
 jobs:
+  build-modsecurity-v3:
+    name: ModSecurity v3 (warn-only hardening build, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CC: gcc
+      CXX: g++
+      COMMON_CC_OPT: "-O2 -pipe -fstack-protector-strong -fstack-clash-protection -ffunction-sections -fdata-sections"
+      COMMON_LD_OPT: "-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,--as-needed -Wl,--gc-sections"
+      PIC_CC_OPT: "-fPIC"
+      MODSECURITY_CC_OPT: "-Wall -Wextra -Wformat -Wformat-security"
+      MODSECURITY_CXX_OPT: "-Wall -Wextra -Wformat -Wformat-security"
+      MODSECURITY_LD_OPT: ""
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y -qq
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua package"
+            exit 1
+          fi
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y \
+            autoconf automake libtool pkg-config bison flex \
+            libyajl-dev libcurl4-openssl-dev liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev libpcre2-dev libxml2-dev libfuzzy-dev \
+            binutils pcre2-utils python3 python3-venv
+
+      - name: Build preparation
+        run: ./build.sh
+
+      - name: Configure ModSecurity v3 flags
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "CFLAGS=${COMMON_CC_OPT} ${PIC_CC_OPT} ${MODSECURITY_CC_OPT}" >> "$GITHUB_ENV"
+          echo "CXXFLAGS=${COMMON_CC_OPT} ${PIC_CC_OPT} ${MODSECURITY_CXX_OPT}" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-D_FORTIFY_SOURCE=3" >> "$GITHUB_ENV"
+          echo "LDFLAGS=${COMMON_LD_OPT}${MODSECURITY_LD_OPT:+ ${MODSECURITY_LD_OPT}}" >> "$GITHUB_ENV"
+
+      - name: Print toolchain and build configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "compiler version:"
+          ${CC} --version
+          echo
+          echo "linker version:"
+          ${CC} -Wl,--version 2>&1 | sed -n '1p' || ld --version 2>&1 | sed -n '1p'
+          echo
+          echo "CFLAGS=${CFLAGS}"
+          echo "CXXFLAGS=${CXXFLAGS}"
+          echo "CPPFLAGS=${CPPFLAGS}"
+          echo "LDFLAGS=${LDFLAGS}"
+          echo "configure options: --enable-assertions=yes"
+          echo "Note: no LuaJIT rpath and no nginx/OpenResty-specific flags are used in this job."
+
+      - name: Configure
+        run: ./configure --enable-assertions=yes
+
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
+
+      - name: Build (verbose)
+        run: make -j "$(nproc)" V=1
+
+      - name: Verify binary hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          LIB="src/.libs/libmodsecurity.so"
+          if [ ! -f "$LIB" ]; then
+            echo "::error::Shared library not found: $LIB"
+            exit 1
+          fi
+
+          PROGRAM_HEADERS="$(readelf -lW "$LIB")"
+          DYNAMIC_SECTION="$(readelf -dW "$LIB")"
+          SYMBOLS="$(readelf -Ws "$LIB")"
+
+          check() {
+            local description="$1"
+            shift
+            if ! "$@"; then
+              echo "::error::Missing hardening property: $description"
+              exit 1
+            fi
+            echo "Verified: $description"
+          }
+
+          check "GNU_RELRO segment" grep -Eq "^[[:space:]]*GNU_RELRO[[:space:]]" <<< "$PROGRAM_HEADERS"
+          check "Immediate binding (BIND_NOW)" grep -Eq "\(BIND_NOW\)|\(FLAGS\).*BIND_NOW|\(FLAGS_1\).*[[:space:]]NOW([[:space:]]|$)" <<< "$DYNAMIC_SECTION"
+          check "Non-executable GNU_STACK" awk '
+            $1 == "GNU_STACK" {
+              found = 1
+              for (i = 7; i < NF; i++)
+                if ($i ~ /E/) executable = 1
+            }
+            END { exit !(found && !executable) }
+          ' <<< "$PROGRAM_HEADERS"
+          # An imported stack-check symbol indicates stack canary instrumentation.
+          check "Stack protector instrumentation" grep -Eq "[[:space:]]UND[[:space:]]+__stack_chk_fail(@|[[:space:]]|$)" <<< "$SYMBOLS"
+
+
+      - name: Run unit and regression tests
+        id: hardening_tests
+        run: make check VERBOSE=1
+
+      - name: Upload hardening test logs
+        if: failure() && steps.hardening_tests.outcome == 'failure'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: modsecurity-v3-hardening-logs-${{ matrix.os }}
+          path: |
+            test-suite.log
+            test/test-cases/**/*.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  # Keep sanitizer instrumentation separate from the hardening build (see #3779).
+  build-modsecurity-v3-asan:
+    name: ModSecurity v3 (AddressSanitizer, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CC: gcc
+      CXX: g++
+      CFLAGS: "-O1 -g -fPIC -fsanitize=address -fno-omit-frame-pointer -U_FORTIFY_SOURCE"
+      CXXFLAGS: "-O1 -g -fPIC -fsanitize=address -fno-omit-frame-pointer -U_FORTIFY_SOURCE"
+      LDFLAGS: "-fsanitize=address"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua dev package
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y -qq
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua package"
+            exit 1
+          fi
+
+          echo "lua_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "Using $BEST_PKG"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y \
+            autoconf automake libtool pkg-config bison flex \
+            libyajl-dev libcurl4-openssl-dev liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev libpcre2-dev libxml2-dev libfuzzy-dev \
+            pcre2-utils python3 python3-venv
+
+      - name: Print toolchain and sanitizer configuration
+        run: |
+          "$CC" --version
+          echo "CFLAGS=$CFLAGS"
+          echo "CXXFLAGS=$CXXFLAGS"
+          echo "LDFLAGS=$LDFLAGS"
+          echo "configure options: --enable-assertions=yes"
+
+      - name: Build preparation
+        run: ./build.sh
+
+      - name: Configure
+        run: ./configure --enable-assertions=yes
+
+      - name: Build
+        run: make -j "$(nproc)"
+
+      - name: Run unit and regression tests with ASan
+        id: asan_tests
+        # Keep diagnostics non-blocking until the known leaks in #3779 are fixed.
+        continue-on-error: true
+        env:
+          ASAN_OPTIONS: "detect_leaks=1:halt_on_error=1:log_path=${{ runner.temp }}/modsecurity-asan/asan"
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/modsecurity-asan"
+          echo "ASAN_OPTIONS=$ASAN_OPTIONS"
+          status=0
+          make check VERBOSE=1 || status=$?
+
+          # The test wrapper can mask process failures (e.g. during countall).
+          # Check per-process sanitizer reports independently of make check.
+          shopt -s nullglob
+          reports=("$RUNNER_TEMP"/modsecurity-asan/asan.*)
+          if (( ${#reports[@]} > 0 )); then
+            for report in "${reports[@]}"; do
+              echo "=== $report ==="
+              cat "$report"
+            done
+            status=1
+          fi
+          exit "$status"
+
+      - name: Report sanitizer test failures
+        if: ${{ !cancelled() && steps.asan_tests.outcome == 'failure' }}
+        run: |
+          echo "::warning::AddressSanitizer test run reported failures; see the test logs and issue #3779."
+
+      - name: Upload sanitizer test logs
+        if: ${{ !cancelled() && steps.asan_tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: modsecurity-v3-asan-logs-${{ matrix.os }}
+          path: |
+            test-suite.log
+            test/test-cases/**/*.log
+            ${{ runner.temp }}/modsecurity-asan/asan.*
+          if-no-files-found: warn
+          retention-days: 14
+
   # Keep legacy Ubuntu 22.04 coverage, including x32, in a self-contained job.
   # Remove this job when the legacy matrix is no longer needed.
   build-linux-old:
@@ -94,6 +368,7 @@ jobs:
                                   
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           submodules: recursive
           fetch-depth: 0
       - name: build.sh
@@ -154,6 +429,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
@@ -272,6 +548,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
           
@@ -340,6 +617,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
@@ -389,6 +667,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
 
@@ -420,6 +699,7 @@ jobs:
         
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           submodules: recursive
           
