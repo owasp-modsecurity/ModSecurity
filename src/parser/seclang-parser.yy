@@ -1224,7 +1224,7 @@ expression:
         int secRuleDefinedPhase = -1;
         for (auto &i : *$2.get()) {
             actions::Action *a = i.get();
-            actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
+            const actions::Phase *phase = dynamic_cast<const actions::Phase *>(a);
             if (a->isDisruptive() == true && dynamic_cast<actions::Block *>(a) == NULL) {
                 hasDisruptive = true;
             }
