@@ -17,6 +17,8 @@
 #include <fstream>
 #include <string>
 #include <functional>
+#include <memory>
+#include <shared_mutex>
 
 #if WITH_MAXMIND
 #include <maxminddb.h>
@@ -63,14 +65,22 @@ class GeoLookup {
     GeoLookup(GeoLookup const&);
     void operator=(GeoLookup const&);
 
+    /* closes the current database, the caller holds m_lock exclusively */
+    void closeDataBase();
+
     GeoLookupVersion m_version;
 #if WITH_MAXMIND
-    MMDB_s mmdb;
+    std::unique_ptr<MMDB_s> m_mmdb;
 #endif
 #if WITH_GEOIP
     GeoIP *m_gi;
 #endif
-
+    /*
+     * The database is process wide: lookup() holds it shared while it uses
+     * the database, setDataBase() and cleanUp() exclusively while they
+     * replace or close it.
+     */
+    mutable std::shared_mutex m_lock;
 };
 
 

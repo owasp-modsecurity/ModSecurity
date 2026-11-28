@@ -95,9 +95,11 @@ ModSecurity::~ModSecurity() {
 #ifdef MSC_WITH_CURL
     curl_global_cleanup();
 #endif
-#ifdef WITH_GEOIP
-    Utils::GeoLookup::getInstance().cleanUp();
-#endif
+    /*
+     * The GeoIP/MaxMind database is not closed here: it is process wide and
+     * may still be used by other instances. GeoLookup closes it when it is
+     * replaced or at exit.
+     */
 #ifdef WITH_LIBXML2
     xmlCleanupParser();
 #endif
