@@ -1358,8 +1358,6 @@ EQUALS_MINUS                            (?i:=\-)
     driver.loc.push_back(new yy::location());
     driver.m_filenames.push_back(url);
     driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
-    YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
-    yypush_buffer_state(temp);
 
     bool ret = c.download(url);
 
@@ -1374,6 +1372,14 @@ EQUALS_MINUS                            (?i:=\-)
         }
     }
 
+    /*
+     * Open a new slot on the buffer stack, yy_scan_string() replaces the
+     * current buffer. This is only done once the download has been handled,
+     * so that the same buffer is never left twice on the stack when an
+     * error is thrown above (see Driver::scan_end()).
+     */
+    YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
+    yypush_buffer_state(temp);
     yy_scan_string(c.content.c_str());
 }
 
@@ -1393,6 +1399,18 @@ bool Driver::scan_begin () {
 }
 
 void Driver::scan_end () {
+    /*
+     * If parsing stopped with an error inside an included file, the buffers
+     * of the including files are still on the stack. yylex_destroy() only
+     * releases the topmost one, so pop (and close) all of them first.
+     */
+    while (YY_CURRENT_BUFFER) {
+        FILE *in = YY_CURRENT_BUFFER->yy_input_file;
+        if (in != NULL && in != stdin) {
+            fclose(in);
+        }
+        yypop_buffer_state();
+    }
     yylex_destroy();
     BEGIN(INITIAL);
 }
