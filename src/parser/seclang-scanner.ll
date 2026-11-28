@@ -22,6 +22,17 @@ static const char* find_separator(const char *s) {
     return (*s) ? s + 1 : s;
 }
 
+/*
+ * Pops the current buffer and closes its input file. Only the buffers of
+ * included files have one, the ones from yy_scan_string() do not.
+ */
+static void close_and_pop_buffer() {
+    if (FILE *in = YY_CURRENT_BUFFER->yy_input_file; in != nullptr) {
+        fclose(in);
+    }
+    yypop_buffer_state();
+}
+
 // Work around an incompatibility in flex (at least versions
 // 2.5.31 through 2.5.33): it generates code that does
 // not conform to C89.  See Debian bug 333231
@@ -1267,11 +1278,7 @@ EQUALS_MINUS                            (?i:=\-)
 
 
 <<EOF>> {
-    if (yyin) {
-        fclose(yyin);
-    }
-
-    yypop_buffer_state();
+    close_and_pop_buffer();
     if (!YY_CURRENT_BUFFER) {
         return p::make_END(*driver.loc.back());
     }
@@ -1294,18 +1301,21 @@ EQUALS_MINUS                            (?i:=\-)
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
+    /* errors are reported at the Include directive, not at a previous file */
+    yy::location *including = driver.loc.back();
     for (auto& s: files) {
         std::string err;
-        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        std::string f = modsecurity::utils::find_resource(s, *including->end.filename, &err);
         driver.loc.push_back(new yy::location());
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            delete driver.loc.back();
             driver.loc.pop_back();
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
-            throw p::syntax_error(*driver.loc.back(), "");
+            driver.error (*including, "", s + std::string(": Not able to open file. ") + err);
+            throw p::syntax_error(*including, "");
         }
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
@@ -1324,8 +1334,10 @@ EQUALS_MINUS                            (?i:=\-)
     }
     std::list<std::string> files = modsecurity::utils::expandEnv(fi, 0);
     files.reverse();
+    /* errors are reported at the Include directive, not at a previous file */
+    yy::location *including = driver.loc.back();
     for (auto& s: files) {
-        std::string f = modsecurity::utils::find_resource(s, *driver.loc.back()->end.filename, &err);
+        std::string f = modsecurity::utils::find_resource(s, *including->end.filename, &err);
         driver.loc.push_back(new yy::location());
         driver.m_filenames.push_back(f);
         driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
@@ -1333,9 +1345,10 @@ EQUALS_MINUS                            (?i:=\-)
         yyin = fopen(f.c_str(), "r" );
         if (!yyin) {
             BEGIN(INITIAL);
+            delete driver.loc.back();
             driver.loc.pop_back();
-            driver.error (*driver.loc.back(), "", s + std::string(": Not able to open file. ") + err);
-            throw p::syntax_error(*driver.loc.back(), "");
+            driver.error (*including, "", s + std::string(": Not able to open file. ") + err);
+            throw p::syntax_error(*including, "");
         }
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
     }
@@ -1358,8 +1371,6 @@ EQUALS_MINUS                            (?i:=\-)
     driver.loc.push_back(new yy::location());
     driver.m_filenames.push_back(url);
     driver.loc.back()->begin.filename = driver.loc.back()->end.filename = &(driver.m_filenames.back());
-    YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
-    yypush_buffer_state(temp);
 
     bool ret = c.download(url);
 
@@ -1374,6 +1385,15 @@ EQUALS_MINUS                            (?i:=\-)
         }
     }
 
+    /*
+     * Open a new slot on the buffer stack, yy_scan_string() replaces the
+     * current buffer. Between the two calls the current buffer is on the
+     * stack twice, and Driver::scan_end() pops every buffer on the stack,
+     * so it would free that buffer twice if an exception was thrown there.
+     * Keep these three lines together, and add any error handling above.
+     */
+    YY_BUFFER_STATE temp = YY_CURRENT_BUFFER;
+    yypush_buffer_state(temp);
     yy_scan_string(c.content.c_str());
 }
 
@@ -1393,6 +1413,15 @@ bool Driver::scan_begin () {
 }
 
 void Driver::scan_end () {
+    /*
+     * If parsing stopped with an error inside an included file, the buffers
+     * of the including files are still on the stack. yylex_destroy() only
+     * releases the topmost one, so pop (and close) all of them first. This
+     * relies on no buffer being on the stack twice (see SecRemoteRules).
+     */
+    while (YY_CURRENT_BUFFER) {
+        close_and_pop_buffer();
+    }
     yylex_destroy();
     BEGIN(INITIAL);
 }

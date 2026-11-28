@@ -42,13 +42,20 @@ GeoLookup::~GeoLookup() {
 
 
 void GeoLookup::cleanUp() {
+    const std::lock_guard lock(m_lock); // write lock (exclusive access)
+    closeDataBase();
+}
+
+
+void GeoLookup::closeDataBase() {
 #ifdef WITH_MAXMIND
-    if (m_version == VERSION_MAXMIND) {
-        MMDB_close(&mmdb);
+    if (m_mmdb) {
+        MMDB_close(m_mmdb.get());
+        m_mmdb.reset();
     }
 #endif
 #ifdef WITH_GEOIP
-    if (m_version == VERSION_GEOIP && m_gi != NULL) {
+    if (m_gi != NULL) {
         GeoIP_delete(m_gi);
         m_gi = NULL;
     }
@@ -66,57 +73,64 @@ bool GeoLookup::setDataBase(const std::string& filePath,
     std::string intGeo;
 #endif
 
+    /*
+     * The new database is opened first. Only if that succeeds, it replaces
+     * (and closes) the current one, so a SecGeoLookupDb that fails keeps
+     * the database in use, and a repeated one does not leak it.
+     */
 #ifdef WITH_MAXMIND
-    int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &mmdb);
-    if (status != MMDB_SUCCESS) {
-        intMax.assign("libMaxMind: Can't open: " + std::string(MMDB_strerror(status)) + ".");
-    } else {
+    auto mmdb = std::make_unique<MMDB_s>();
+    int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, mmdb.get());
+    if (status == MMDB_SUCCESS) {
+        const std::lock_guard lock(m_lock); // write lock (exclusive access)
+        closeDataBase();
+        m_mmdb = std::move(mmdb);
         m_version = VERSION_MAXMIND;
+        return true;
     }
+    intMax.assign("libMaxMind: Can't open: " + std::string(MMDB_strerror(status)) + ".");
 #endif
 
 #ifdef WITH_GEOIP
-    if (m_version == NOT_LOADED) {
-        m_gi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
-        if (m_gi == NULL) {
-            intGeo.append("GeoIP: Can't open: " + filePath + ".");
-        } else {
-            m_version = VERSION_GEOIP;
-        }
+    GeoIP *gi = GeoIP_open(filePath.c_str(), GEOIP_MEMORY_CACHE);
+    if (gi != NULL) {
+        const std::lock_guard lock(m_lock); // write lock (exclusive access)
+        closeDataBase();
+        m_gi = gi;
+        m_version = VERSION_GEOIP;
+        return true;
     }
+    intGeo.append("GeoIP: Can't open: " + filePath + ".");
 #endif
 
-    if (m_version == NOT_LOADED) {
-        err->assign("Can't open:  " + filePath + ". ");
-        err->append("Support enabled for:");
+    err->assign("Can't open:  " + filePath + ". ");
+    err->append("Support enabled for:");
 #ifdef WITH_MAXMIND
-        err->append(" libMaxMind");
+    err->append(" libMaxMind");
 #endif
 #ifdef WITH_GEOIP
-        err->append(" GeoIP");
+    err->append(" GeoIP");
 #endif
-        err->append(".");
+    err->append(".");
 
 #ifdef WITH_MAXMIND
-        if (!intMax.empty()) {
-            err->append(" " + intMax);
-        }
+    if (!intMax.empty()) {
+        err->append(" " + intMax);
+    }
 #endif
 #ifdef WITH_GEOIP
-        if (!intGeo.empty()) {
-            err->append(" " + intGeo);
-        }
+    if (!intGeo.empty()) {
+        err->append(" " + intGeo);
+    }
 #endif
 
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 
 bool GeoLookup::lookup(const std::string& target, Transaction *trans,
     std::function<bool(int, const std::string &)> debug) const {
+    const std::shared_lock lock(m_lock); // read lock (shared access)
 
     if (m_version == NOT_LOADED) {
         if (debug) {
@@ -131,7 +145,7 @@ bool GeoLookup::lookup(const std::string& target, Transaction *trans,
         int gai_error, mmdb_error;
         MMDB_lookup_result_s r;
 
-        r = MMDB_lookup_string(&mmdb, target.c_str(), &gai_error, &mmdb_error);
+        r = MMDB_lookup_string(m_mmdb.get(), target.c_str(), &gai_error, &mmdb_error);
 
         if (gai_error) {
             if (debug) {
