@@ -6,8 +6,12 @@ on:
 
 jobs:
   build-modsecurity-v3:
-    name: ModSecurity v3 (warn-only hardening build)
-    runs-on: ubuntu-24.04
+    name: ModSecurity v3 (warn-only hardening build, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
     env:
       CC: gcc
       CXX: g++
