@@ -107,8 +107,12 @@ jobs:
 
   # Keep sanitizer instrumentation separate from the hardening build (see #3779).
   build-modsecurity-v3-asan:
-    name: ModSecurity v3 (AddressSanitizer)
-    runs-on: ubuntu-24.04
+    name: ModSecurity v3 (AddressSanitizer, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
     timeout-minutes: 60
     permissions:
       contents: read
@@ -214,7 +218,7 @@ jobs:
         if: steps.asan_tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: modsecurity-v3-asan-logs
+          name: modsecurity-v3-asan-logs-${{ matrix.os }}
           path: |
             test-suite.log
             test/test-cases/**/*.log
