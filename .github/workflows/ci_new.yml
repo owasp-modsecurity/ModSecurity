@@ -188,8 +188,7 @@ jobs:
 
       - name: Run unit and regression tests with ASan
         id: asan_tests
-        # Known failures are being investigated in #3779. Build failures remain fatal.
-        continue-on-error: true
+        # Report actual test failures, including the known issues in #3779.
         env:
           ASAN_OPTIONS: "detect_leaks=1:halt_on_error=1:log_path=${{ runner.temp }}/modsecurity-asan/asan"
         shell: bash
@@ -214,12 +213,12 @@ jobs:
           exit "$status"
 
       - name: Report sanitizer test failures
-        if: steps.asan_tests.outcome == 'failure'
+        if: failure() && steps.asan_tests.outcome == 'failure'
         run: |
-          echo "::warning::AddressSanitizer test run reported failures; see the test logs and issue #3779."
+          echo "::error::AddressSanitizer test run reported failures; see the test logs and issue #3779."
 
       - name: Upload sanitizer test logs
-        if: steps.asan_tests.outcome == 'failure'
+        if: failure() && steps.asan_tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: modsecurity-v3-asan-logs-${{ matrix.os }}
