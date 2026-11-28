@@ -66,6 +66,13 @@ bool GeoLookup::setDataBase(const std::string& filePath,
     std::string intGeo;
 #endif
 
+    /*
+     * Release a previously loaded database (e.g. SecGeoLookupDb used more
+     * than once), otherwise it is leaked and m_version would still claim
+     * it is loaded if opening the new one fails.
+     */
+    cleanUp();
+
 #ifdef WITH_MAXMIND
     int status = MMDB_open(filePath.c_str(), MMDB_MODE_MMAP, &mmdb);
     if (status != MMDB_SUCCESS) {
